@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Learn — ValuationDesk</title>
+  <meta name="theme-color" content="#0a0a0f">
+  <link rel="manifest" href="/valuation-toolkit/manifest.json">
+  <link rel="stylesheet" href="/valuation-toolkit/assets/vd-system.css">
+</head>
+<body>
+
+<nav class="vd-nav">
+  <a href="/valuation-toolkit/" class="vd-logo">Valuation<strong>Desk</strong></a>
+  <ul class="vd-nav-links">
+    <li><a href="/valuation-toolkit/learn/"><span class="nav-icon">📖</span> Learn</a></li>
+    <li><a href="/valuation-toolkit/calculators/"><span class="nav-icon">🧮</span> Calculators</a></li>
+    <li><a href="/valuation-toolkit/simulate/"><span class="nav-icon">📊</span> Simulate</a></li>
+    <li><a href="/valuation-toolkit/#pricing"><span class="nav-icon">💼</span> Get Toolkit</a></li>
+  </ul>
+  <div class="vd-nav-right">
+    <button id="pwa-install-btn" onclick="triggerPWAInstall()">⬇ Install App</button>
+    <a href="/valuation-toolkit/#pricing" class="vd-btn-nav">Buy Toolkit ₹3,999</a>
+    <button class="vd-hamburger" id="vd-hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+<div class="vd-mobile-menu" id="vd-mobile-menu">
+  <a href="/valuation-toolkit/learn/" class="active">📖 Learn</a>
+  <a href="/valuation-toolkit/calculators/">🧮 Calculators</a>
+  <a href="/valuation-toolkit/simulate/">📊 Simulate</a>
+  <a href="/valuation-toolkit/#pricing">💼 Get Toolkit</a>
+</div>
+
+<div class="vd-page">
+  <section class="vd-section">
+    <div class="vd-container">
+      <div class="vd-eyebrow">Valuation Fundamentals</div>
+      <h1 class="vd-h1" style="margin-bottom:1rem;">Learn Before You Calculate</h1>
+      <p class="vd-lead" style="margin-bottom:3rem;">Start here. Each module builds on the last. By the time you open the Excel model, you'll know exactly what every cell means.</p>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem;" class="stagger">
+
+        <div class="vd-card" data-animate>
+          <div class="vd-mono-label" style="margin-bottom:.5rem;">Chapter 01 — Foundation</div>
+          <h3 class="vd-h3" style="margin-bottom:.6rem;">The Language of Valuation</h3>
+          <p style="font-size:.8rem;color:var(--muted);line-height:1.65;margin-bottom:1rem;">Enterprise Value vs Equity Value. Operating vs non-operating assets. Why EV/EBITDA ≠ P/E. The bridge every analyst must know.</p>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem;">
+            <span class="vd-tag">Beginner</span>
+            <span class="vd-tag">20 min read</span>
+          </div>
+          <a href="#" class="vd-btn vd-btn-outline" style="font-size:.65rem;padding:.6rem 1.2rem;">Read Chapter →</a>
+        </div>
+
+        <div class="vd-card" data-animate>
+          <div class="vd-mono-label" style="margin-bottom:.5rem;">Chapter 02 — DCF</div>
+          <h3 class="vd-h3" style="margin-bottom:.6rem;">Discounted Cash Flow Deep Dive</h3>
+          <p style="font-size:.8rem;color:var(--muted);line-height:1.65;margin-bottom:1rem;">Forecasting FCF, building WACC from scratch, terminal value methods, and why your assumptions matter more than your formula.</p>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem;">
+            <span class="vd-tag">Intermediate</span>
+            <span class="vd-tag">35 min read</span>
+          </div>
+          <a href="#" class="vd-btn vd-btn-outline" style="font-size:.65rem;padding:.6rem 1.2rem;">Read Chapter →</a>
+        </div>
+
+        <div class="vd-card" data-animate>
+          <div class="vd-mono-label" style="margin-bottom:.5rem;">Chapter 03 — Comps</div>
+          <h3 class="vd-h3" style="margin-bottom:.6rem;">Comparable Company Analysis</h3>
+          <p style="font-size:.8rem;color:var(--muted);line-height:1.65;margin-bottom:1rem;">Selecting the right peer set. Spreading multiples correctly. Applying premiums and discounts. Constructing the implied valuation range.</p>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem;">
+            <span class="vd-tag">Intermediate</span>
+            <span class="vd-tag">25 min read</span>
+          </div>
+          <a href="#" class="vd-btn vd-btn-outline" style="font-size:.65rem;padding:.6rem 1.2rem;">Read Chapter →</a>
+        </div>
+
+        <div class="vd-card" data-animate>
+          <div class="vd-mono-label" style="margin-bottom:.5rem;">Chapter 04 — M&A / LBO</div>
+          <h3 class="vd-h3" style="margin-bottom:.6rem;">Deal Modeling & Leveraged Buyouts</h3>
+          <p style="font-size:.8rem;color:var(--muted);line-height:1.65;margin-bottom:1rem;">Accretion/dilution analysis. Debt structuring for LBOs. IRR waterfalls. How PE firms think about returns and exit multiples.</p>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem;">
+            <span class="vd-tag">Advanced</span>
+            <span class="vd-tag">45 min read</span>
+          </div>
+          <a href="#" class="vd-btn vd-btn-outline" style="font-size:.65rem;padding:.6rem 1.2rem;">Read Chapter →</a>
+        </div>
+
+        <div class="vd-card" data-animate>
+          <div class="vd-mono-label" style="margin-bottom:.5rem;">Chapter 05 — VC Valuation</div>
+          <h3 class="vd-h3" style="margin-bottom:.6rem;">Startup & Venture Valuation</h3>
+          <p style="font-size:.8rem;color:var(--muted);line-height:1.65;margin-bottom:1rem;">Pre/post-money mechanics. VC method. Cap table construction. How stage benchmarks work and what dilution really costs founders.</p>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem;">
+            <span class="vd-tag">Intermediate</span>
+            <span class="vd-tag">30 min read</span>
+          </div>
+          <a href="#" class="vd-btn vd-btn-outline" style="font-size:.65rem;padding:.6rem 1.2rem;">Read Chapter →</a>
+        </div>
+
+        <div class="vd-card" data-animate style="background:var(--gold-dim);border-color:var(--gold);">
+          <div class="vd-mono-label" style="margin-bottom:.5rem;">Chapter 06 — Synthesis</div>
+          <h3 class="vd-h3" style="margin-bottom:.6rem;">The Football Field & Final Presentation</h3>
+          <p style="font-size:.8rem;color:var(--muted);line-height:1.65;margin-bottom:1rem;">How to combine DCF + Comps + LBO into a football field chart. Communicating your valuation range. What a real IB pitch deck looks like.</p>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem;">
+            <span class="vd-tag">Advanced</span>
+            <span class="vd-tag">40 min read</span>
+          </div>
+          <a href="#" class="vd-btn vd-btn-gold" style="font-size:.65rem;padding:.6rem 1.2rem;">Read Chapter →</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer class="vd-footer">
+  <div class="vd-footer-logo">Valuation<strong>Desk</strong></div>
+  <div class="vd-footer-note">Built by practitioners. For practitioners. © 2025 ValuationDesk</div>
+</footer>
+<div id="vd-toast-container"></div>
+<script src="/valuation-toolkit/assets/vd-shared.js"></script>
+</body>
+</html>
