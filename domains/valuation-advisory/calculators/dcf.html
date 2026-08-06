@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DCF Valuation Calculator — ValuationDesk</title>
+<link rel="stylesheet" href="/valuation-toolkit/assets/vd.css">
+<style>
+/* ── EXPERIENCE STYLES ── */
+.step { display:none; }
+.step.active { display:block; }
+
+.company-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:8px; margin-top:1rem; }
+.company-card { border:1px solid var(--gray-200); border-radius:var(--r); padding:0.9rem; cursor:pointer; transition:var(--t); background:var(--white); }
+.company-card:hover { border-color:var(--gray-400); box-shadow:var(--shadow-sm); }
+.company-card.selected { border-color:var(--black); border-width:2px; background:var(--gray-50); }
+.company-card .co-name { font-size:0.82rem; font-weight:600; color:var(--black); margin-bottom:0.2rem; }
+.company-card .co-sector { font-size:0.68rem; color:var(--gray-400); }
+.company-card .co-ticker { font-family:var(--mono); font-size:0.65rem; color:var(--gray-400); }
+
+/* Context card */
+.context-card { background:var(--black); color:var(--white); border-radius:var(--r-lg); padding:1.5rem; margin-bottom:1.5rem; }
+.context-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-top:1rem; }
+.context-stat { }
+.context-stat-label { font-size:0.62rem; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:0.2rem; }
+.context-stat-val { font-size:1.3rem; font-weight:800; color:var(--white); letter-spacing:-0.02em; }
+.context-stat-sub { font-size:0.68rem; color:rgba(255,255,255,0.45); margin-top:0.1rem; }
+
+/* Assumption table */
+.assumption-table { width:100%; border-collapse:collapse; }
+.assumption-table th { font-size:0.62rem; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:var(--gray-400); padding:0.5rem 0.75rem; text-align:left; border-bottom:2px solid var(--gray-200); background:var(--gray-50); }
+.assumption-table th.input-col { text-align:center; }
+.assumption-table td { padding:0.5rem 0.75rem; border-bottom:1px solid var(--gray-100); vertical-align:middle; }
+.assumption-table tr:hover td { background:rgba(0,0,0,0.01); }
+.assumption-table tr.section-header td { background:var(--gray-50); font-size:0.65rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray-500); padding:0.6rem 0.75rem; }
+
+/* Input cells */
+.cell-label { font-size:0.82rem; color:var(--black); font-weight:500; }
+.cell-hint { font-size:0.7rem; color:var(--gray-400); margin-top:0.15rem; line-height:1.4; }
+.cell-input-wrap { display:flex; align-items:center; gap:0.4rem; justify-content:center; }
+.cell-input { font-family:var(--mono); font-size:0.88rem; font-weight:600; color:var(--black); background:var(--white); border:1.5px solid var(--gray-200); border-radius:var(--r-sm); padding:0.45rem 0.65rem; width:90px; text-align:right; outline:none; transition:var(--t); }
+.cell-input:focus { border-color:var(--black); box-shadow:0 0 0 3px rgba(17,24,39,0.06); }
+.cell-input.pre-filled { background:var(--gray-50); border-color:var(--gray-200); color:var(--gray-500); }
+.cell-input.pre-filled:focus { background:var(--white); border-color:var(--black); color:var(--black); }
+.cell-unit { font-size:0.72rem; color:var(--gray-400); flex-shrink:0; }
+.hint-badge { display:inline-flex; align-items:center; gap:0.3rem; font-size:0.65rem; color:var(--gray-400); cursor:pointer; }
+.hint-badge:hover { color:var(--black); }
+.hint-tooltip { display:none; position:absolute; z-index:50; background:var(--black); color:var(--white); font-size:0.72rem; line-height:1.55; padding:0.65rem 0.85rem; border-radius:var(--r-sm); width:240px; box-shadow:var(--shadow-lg); }
+.hint-wrap { position:relative; }
+.hint-wrap:hover .hint-tooltip { display:block; top:100%; left:0; margin-top:4px; }
+
+/* Typical range badge */
+.range-badge { font-family:var(--mono); font-size:0.62rem; color:var(--gray-400); background:var(--gray-100); padding:0.15rem 0.4rem; border-radius:3px; margin-top:0.2rem; display:inline-block; }
+
+/* The big button */
+.run-btn { width:100%; padding:1.1rem; font-size:1rem; font-weight:700; letter-spacing:-0.01em; background:var(--black); color:var(--white); border:none; border-radius:var(--r); cursor:pointer; transition:var(--t); display:flex; align-items:center; justify-content:center; gap:0.75rem; }
+.run-btn:hover { background:var(--black-2); transform:translateY(-1px); box-shadow:var(--shadow-lg); }
+.run-btn:disabled { background:var(--gray-300); cursor:not-allowed; transform:none; }
+
+/* Loading reveal */
+.reveal-loader { text-align:center; padding:3rem; }
+.reveal-loader .big-num { font-size:4rem; font-weight:800; letter-spacing:-0.04em; color:var(--black); animation:countReveal 0.8s ease both; }
+@keyframes countReveal { from { opacity:0; transform:scale(0.85); } to { opacity:1; transform:scale(1); } }
+
+/* Output */
+.output-section { animation:fadeInUp 0.5s ease both; }
+@keyframes fadeInUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
+
+.output-hero { background:var(--black); color:var(--white); border-radius:var(--r-lg); padding:2rem; margin-bottom:1.5rem; }
+.output-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.5rem; margin-top:1.5rem; }
+.output-stat { }
+.output-stat-label { font-size:0.62rem; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:0.3rem; }
+.output-stat-val { font-size:1.5rem; font-weight:800; letter-spacing:-0.02em; }
+
+.verdict { padding:1rem 1.25rem; border-radius:var(--r); margin-bottom:1.5rem; font-size:0.88rem; line-height:1.6; }
+.verdict-bull { background:#f0fdf4; border:1px solid #bbf7d0; color:#14532d; }
+.verdict-bear { background:#fef2f2; border:1px solid #fecaca; color:#7f1d1d; }
+.verdict-fair { background:var(--gray-50); border:1px solid var(--gray-200); color:var(--gray-500); }
+
+/* Sensitivity heat table */
+.sens-wrap { overflow-x:auto; }
+.w-bar-row { display:flex; align-items:center; gap:0.6rem; margin-bottom:0.4rem; }
+.wlabel { font-family:var(--mono); font-size:0.6rem; color:var(--gray-400); width:95px; text-align:right; flex-shrink:0; }
+.wtrack { flex:1; height:20px; background:var(--gray-100); border-radius:2px; overflow:hidden; }
+.wfill { height:100%; border-radius:2px; display:flex; align-items:center; padding-left:0.4rem; transition:width 0.6s ease; }
+.wfill span { font-family:var(--mono); font-size:0.6rem; color:white; white-space:nowrap; }
+
+/* Progress steps */
+.steps-bar { display:flex; gap:0; margin-bottom:2rem; }
+.step-pill { flex:1; display:flex; align-items:center; gap:0.5rem; padding:0.6rem 0.75rem; font-size:0.75rem; font-weight:500; color:var(--gray-400); border-bottom:2px solid var(--gray-200); transition:var(--t); }
+.step-pill.done { color:var(--green); border-bottom-color:var(--green); }
+.step-pill.active { color:var(--black); border-bottom-color:var(--black); font-weight:600; }
+.step-num { width:20px; height:20px; border-radius:50%; background:var(--gray-200); color:var(--gray-500); font-size:0.65rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.step-pill.active .step-num { background:var(--black); color:var(--white); }
+.step-pill.done .step-num { background:var(--green); color:var(--white); }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/valuation-toolkit/" class="nav-logo">Valuation<strong>Desk</strong></a>
+  <ul class="nav-links">
+    <li><a href="/valuation-toolkit/domains/valuation-advisory/" class="active">Valuation Advisory</a></li>
+    <li><a href="/valuation-toolkit/vault/">My Vault</a></li>
+    <li><a href="/valuation-toolkit/deal-room/">Deal Room</a></li>
+    <li><a href="/valuation-toolkit/daily-brief/">Daily Brief</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="/valuation-toolkit/vault/" class="nav-pill">🗄 Vault (<span id="vault-count">0</span>)</a>
+    <a href="/valuation-toolkit/#pricing" class="nav-cta">Get Pro — ₹799/mo</a>
+  </div>
+</nav>
+
+<div class="domain-bar">
+  <a href="/valuation-toolkit/domains/valuation-advisory/" class="domain-link">Overview</a>
+  <a href="/valuation-toolkit/domains/valuation-advisory/learn/" class="domain-link">📖 Learn</a>
+  <a href="/valuation-toolkit/domains/valuation-advisory/calculators/" class="domain-link active">🧮 DCF Calculator</a>
+  <a href="/valuation-toolkit/vault/" class="domain-link">🗄 My Vault</a>
+</div>
+
+<div class="page" style="padding-bottom:4rem;">
+<div class="container" style="padding-top:2rem;">
+
+  <!-- PROGRESS BAR -->
+  <div class="steps-bar" id="steps-bar">
+    <div class="step-pill active" id="sp-1"><div class="step-num">1</div>Pick a company</div>
+    <div class="step-pill" id="sp-2"><div class="step-num">2</div>Study the context</div>
+    <div class="step-pill" id="sp-3"><div class="step-num">3</div>Set your assumptions</div>
+    <div class="step-pill" id="sp-4"><div class="step-num">4</div>Run the valuation</div>
+  </div>
+
+  <!-- ══ STEP 1: PICK COMPANY ══ -->
+  <div class="step active" id="step-1">
+    <div style="margin-bottom:1.25rem;">
+      <h2 class="h2" style="margin-bottom:0.4rem;">Which company do you want to value?</h2>
+      <p class="lead" style="font-size:0.88rem;">Pick one. We'll load the real financials from public filings — and you'll build the DCF from there.</p>
+    </div>
+
+    <!-- Search / Filter -->
+    <div style="display:flex;gap:0.75rem;margin-bottom:0.75rem;flex-wrap:wrap;">
+      <input type="text" class="input" id="co-search" placeholder="Search company..." style="max-width:260px;" oninput="filterCompanies()">
+      <div style="display:flex;gap:0.4rem;flex-wrap:wrap;" id="filter-btns">
+        <button class="btn btn-outline btn-sm filter-btn active" onclick="filterBy('all',this)">All (30)</button>
+        <button class="btn btn-outline btn-sm filter-btn" onclick="filterBy('India',this)">🇮🇳 India</button>
+        <button class="btn btn-outline btn-sm filter-btn" onclick="filterBy('Global',this)">🌍 Global</button>
+        <button class="btn btn-outline btn-sm filter-btn" onclick="filterBy('IT Services',this)">IT</button>
+        <button class="btn btn-outline btn-sm filter-btn" onclick="filterBy('Banking',this)">Banking</button>
+        <button class="btn btn-outline btn-sm filter-btn" onclick="filterBy('FMCG',this)">FMCG</button>
+      </div>
+    </div>
+
+    <div class="company-grid" id="company-grid"></div>
+
+    <div style="margin-top:1.5rem;">
+      <button class="btn btn-black" id="btn-to-step2" onclick="goToStep(2)" disabled style="min-width:200px;">
+        Continue with selected company →
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ STEP 2: CONTEXT ══ -->
+  <div class="step" id="step-2">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:0.75rem;">
+      <div>
+        <h2 class="h2" style="margin-bottom:0.3rem;" id="ctx-heading">Study the company</h2>
+        <p class="lead" style="font-size:0.88rem;">Before you build the model, understand what you're valuing. Real analysts spend 30 minutes here before opening Excel.</p>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="goToStep(1)">← Change company</button>
+    </div>
+
+    <!-- Context card -->
+    <div class="context-card" id="ctx-card">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+        <div>
+          <div style="font-size:0.65rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:0.3rem;" id="ctx-sector-label">—</div>
+          <div style="font-size:1.5rem;font-weight:800;letter-spacing:-0.02em;color:var(--white);" id="ctx-name">—</div>
+          <div style="font-size:0.78rem;color:rgba(255,255,255,0.55);margin-top:0.25rem;" id="ctx-description">—</div>
+        </div>
+        <div style="font-family:var(--mono);font-size:0.72rem;color:rgba(255,255,255,0.35);" id="ctx-ticker-exchange">—</div>
+      </div>
+      <div class="context-grid" id="ctx-financials">
+        <!-- filled by JS -->
+      </div>
+    </div>
+
+    <!-- Analyst note -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+      <div style="border:1px solid var(--gray-200);border-radius:var(--r);padding:1.1rem;">
+        <div class="eyebrow" style="margin-bottom:0.4rem;">Analyst's View</div>
+        <div style="font-size:0.82rem;color:var(--gray-500);line-height:1.65;" id="ctx-analyst-note">—</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0.75rem;">
+        <div style="border:1px solid #bbf7d0;border-radius:var(--r);padding:1rem;background:#f0fdf4;">
+          <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--green);margin-bottom:0.35rem;">Bull Case</div>
+          <div style="font-size:0.78rem;color:#166534;line-height:1.55;" id="ctx-bull">—</div>
+        </div>
+        <div style="border:1px solid #fecaca;border-radius:var(--r);padding:1rem;background:#fef2f2;">
+          <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--red);margin-bottom:0.35rem;">Bear Case</div>
+          <div style="font-size:0.78rem;color:#7f1d1d;line-height:1.55;" id="ctx-bear">—</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-black" onclick="goToStep(3)" style="min-width:240px;">
+      I've studied it. Build the DCF →
+    </button>
+  </div>
+
+  <!-- ══ STEP 3: ASSUMPTIONS TABLE ══ -->
+  <div class="step" id="step-3">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:0.75rem;">
+      <div>
+        <div class="eyebrow" id="tbl-eyebrow">DCF Assumptions</div>
+        <h2 class="h2" style="margin-bottom:0.3rem;" id="tbl-heading">Set your assumptions</h2>
+        <p class="lead" style="font-size:0.85rem;">Green cells are pre-filled from public filings — review and override if you disagree. Grey cells need your judgment.</p>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="goToStep(2)">← Back to context</button>
+    </div>
+
+    <!-- Legend -->
+    <div style="display:flex;gap:1rem;margin-bottom:1rem;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;color:var(--gray-500);">
+        <div style="width:12px;height:12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:2px;"></div>
+        Pre-filled from filings (can override)
+      </div>
+      <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;color:var(--gray-500);">
+        <div style="width:12px;height:12px;background:var(--white);border:1.5px solid var(--black);border-radius:2px;"></div>
+        Your judgment required
+      </div>
+      <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;color:var(--gray-400);">
+        💡 Hover the hint icon for guidance
+      </div>
+    </div>
+
+    <div style="background:var(--white);border:1px solid var(--gray-200);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:1.5rem;">
+      <table class="assumption-table" id="assumption-table">
+        <!-- Built by JS -->
+      </table>
+    </div>
+
+    <!-- Run button -->
+    <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--r-lg);padding:1.5rem;">
+      <div style="font-size:0.82rem;color:var(--gray-500);margin-bottom:1rem;text-align:center;">
+        You've set <strong id="filled-count">0</strong> assumptions. Ready to see what this company is worth?
+      </div>
+      <button class="run-btn" id="run-btn" onclick="runValuation()">
+        <span style="font-size:1.4rem;">⚡</span>
+        RUN VALUATION
+        <span style="font-size:1.4rem;">⚡</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ STEP 4: LOADING → REVEAL ══ -->
+  <div class="step" id="step-4">
+
+    <!-- LOADER (shown briefly) -->
+    <div id="loader-screen" style="text-align:center;padding:4rem 2rem;">
+      <div style="font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:1rem;">Calculating your valuation...</div>
+      <div style="width:48px;height:48px;border:3px solid var(--gray-200);border-top-color:var(--black);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 1.5rem;"></div>
+      <div style="font-size:0.82rem;color:var(--gray-400);" id="loader-msg">Projecting 5-year free cash flows...</div>
+    </div>
+
+    <!-- OUTPUT (shown after loader) -->
+    <div id="output-screen" style="display:none;" class="output-section">
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:0.75rem;">
+        <div>
+          <div class="eyebrow" id="out-eyebrow">DCF Valuation Result</div>
+          <h2 class="h2" id="out-heading">Your valuation of — is complete</h2>
+        </div>
+        <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
+          <button onclick="saveToVault()" class="btn btn-outline btn-sm">🗄 Save to Vault</button>
+          <button onclick="resetCalculator()" class="btn btn-outline btn-sm">↺ Value another company</button>
+        </div>
+      </div>
+
+      <!-- HERO OUTPUT -->
+      <div class="output-hero" id="output-hero">
+        <div style="font-size:0.65rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:0.75rem;">Your DCF Intrinsic Value</div>
+        <div style="font-size:4.5rem;font-weight:800;letter-spacing:-0.04em;line-height:1;color:var(--white);margin-bottom:0.5rem;" id="out-big-price">—</div>
+        <div style="font-size:0.88rem;color:rgba(255,255,255,0.5);margin-bottom:1.5rem;" id="out-vs-market">vs market price: —</div>
+
+        <div class="output-grid">
+          <div class="output-stat">
+            <div class="output-stat-label">Upside / Downside</div>
+            <div class="output-stat-val" id="out-upside">—</div>
+          </div>
+          <div class="output-stat">
+            <div class="output-stat-label">WACC</div>
+            <div class="output-stat-val" id="out-wacc">—</div>
+          </div>
+          <div class="output-stat">
+            <div class="output-stat-label">Enterprise Value</div>
+            <div class="output-stat-val" id="out-ev">—</div>
+          </div>
+          <div class="output-stat">
+            <div class="output-stat-label">PV of FCFs (5yr)</div>
+            <div class="output-stat-val" id="out-pv-fcf">—</div>
+          </div>
+          <div class="output-stat">
+            <div class="output-stat-label">PV of Terminal Value</div>
+            <div class="output-stat-val" id="out-pv-tv">—</div>
+          </div>
+          <div class="output-stat">
+            <div class="output-stat-label">TV as % of EV</div>
+            <div class="output-stat-val" id="out-tv-pct">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VERDICT -->
+      <div class="verdict" id="verdict-box">—</div>
+
+      <!-- ANALYST COMPARISON -->
+      <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--r);padding:1.1rem;margin-bottom:1.5rem;" id="analyst-compare">
+        <div class="eyebrow" style="margin-bottom:0.5rem;">How does your view compare?</div>
+        <div style="font-size:0.82rem;color:var(--gray-500);line-height:1.6;" id="analyst-compare-text">—</div>
+      </div>
+
+      <!-- VALUE BRIDGE -->
+      <div style="background:var(--white);border:1px solid var(--gray-200);border-radius:var(--r-lg);padding:1.5rem;margin-bottom:1.5rem;">
+        <div class="eyebrow" style="margin-bottom:1rem;">Value Attribution Bridge</div>
+        <div id="output-waterfall"></div>
+      </div>
+
+      <!-- SENSITIVITY TABLE -->
+      <div style="background:var(--white);border:1px solid var(--gray-200);border-radius:var(--r-lg);padding:1.5rem;margin-bottom:1.5rem;">
+        <div class="eyebrow" style="margin-bottom:0.4rem;">Sensitivity Analysis</div>
+        <div style="font-size:0.78rem;color:var(--gray-400);margin-bottom:1rem;">Share price (₹ or $) across WACC and Terminal Growth Rate combinations. Your base case is highlighted.</div>
+        <div class="sens-wrap"><table class="table" id="output-sens"></table></div>
+      </div>
+
+      <!-- WHAT WOULD CHANGE YOUR MIND -->
+      <div style="background:var(--black);color:var(--white);border-radius:var(--r-lg);padding:1.5rem;">
+        <div style="font-size:0.65rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:0.75rem;">What would change your view?</div>
+        <div style="font-size:0.88rem;color:rgba(255,255,255,0.7);line-height:1.7;margin-bottom:1rem;" id="change-view-text">—</div>
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+          <button onclick="tweakAssumption('growth')" class="btn btn-outline btn-sm" style="color:rgba(255,255,255,0.6);border-color:rgba(255,255,255,0.2);">Change growth rate →</button>
+          <button onclick="tweakAssumption('margin')" class="btn btn-outline btn-sm" style="color:rgba(255,255,255,0.6);border-color:rgba(255,255,255,0.2);">Change margins →</button>
+          <button onclick="tweakAssumption('wacc')" class="btn btn-outline btn-sm" style="color:rgba(255,255,255,0.6);border-color:rgba(255,255,255,0.2);">Change WACC →</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</div>
+
+<footer class="footer">
+  <div class="footer-logo">Valuation<strong>Desk</strong></div>
+  <div class="footer-note">© 2025 ValuationDesk · Financial models are educational tools, not investment advice.</div>
+</footer>
+
+<div id="toast-container"></div>
+<script src="/valuation-toolkit/assets/vd.js"></script>
+<script src="/valuation-toolkit/data/companies.js"></script>
+<script>
+// ── STATE ──
+let selectedCompany = null;
+let currentStep = 1;
+let calcResult = null;
+
+// ── STEP NAVIGATION ──
+function goToStep(n) {
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.getElementById('step-' + n).classList.add('active');
+  for (let i = 1; i <= 4; i++) {
+    const pill = document.getElementById('sp-' + i);
+    pill.classList.remove('active','done');
+    if (i < n) pill.classList.add('done');
+    else if (i === n) pill.classList.add('active');
+  }
+  currentStep = n;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── COMPANY GRID ──
+function buildCompanyGrid(filter = 'all', search = '') {
+  const grid = document.getElementById('company-grid');
+  grid.innerHTML = '';
+  Object.entries(COMPANIES).forEach(([key, co]) => {
+    const matchFilter = filter === 'all' || co.market === filter || co.sector.includes(filter);
+    const matchSearch = !search || co.name.toLowerCase().includes(search.toLowerCase()) || co.ticker.toLowerCase().includes(search.toLowerCase());
+    if (!matchFilter || !matchSearch) return;
+    const card = document.createElement('div');
+    card.className = 'company-card' + (selectedCompany === key ? ' selected' : '');
+    card.innerHTML = `<div class="co-name">${co.name}</div><div class="co-sector">${co.sector}</div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.4rem;"><span class="co-ticker">${co.ticker}</span><span class="tag tag-gray" style="font-size:0.55rem;">${co.market === 'India' ? '🇮🇳' : '🌍'}</span></div>`;
+    card.onclick = () => {
+      selectedCompany = key;
+      document.querySelectorAll('.company-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      document.getElementById('btn-to-step2').disabled = false;
+    };
+    grid.appendChild(card);
+  });
+}
+
+let activeFilter = 'all';
+function filterBy(val, btn) {
+  activeFilter = val;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  buildCompanyGrid(val, document.getElementById('co-search').value);
+}
+function filterCompanies() {
+  buildCompanyGrid(activeFilter, document.getElementById('co-search').value);
+}
+
+// ── STEP 2: CONTEXT ──
+function loadContext() {
+  const co = COMPANIES[selectedCompany];
+  document.getElementById('ctx-heading').textContent = 'Study ' + co.name;
+  document.getElementById('ctx-name').textContent = co.name;
+  document.getElementById('ctx-sector-label').textContent = co.sector + ' · ' + co.exchange;
+  document.getElementById('ctx-description').textContent = co.description;
+  document.getElementById('ctx-ticker-exchange').textContent = co.ticker + ' · ' + co.exchange;
+  document.getElementById('ctx-analyst-note').textContent = co.analystNote;
+  document.getElementById('ctx-bull').textContent = co.bullCase;
+  document.getElementById('ctx-bear').textContent = co.bearCase;
+
+  const f = co.financials;
+  const cur = co.currency;
+  const isInr = cur === '₹';
+  const fmt = (n) => isInr ? '₹' + Math.round(n/100)/10 + 'K Cr' : '$' + Math.round(n/1000) + 'B';
+  const fmtSm = (n) => isInr ? '₹' + Math.round(n).toLocaleString('en-IN') + ' Cr' : '$' + Math.round(n/100)/10 + 'B';
+
+  document.getElementById('ctx-financials').innerHTML = [
+    { label: 'Revenue (FY24)', val: fmtSm(f.revenue), sub: f.revenueGrowth + '% YoY growth' },
+    { label: 'EBITDA', val: fmtSm(f.ebitda), sub: f.ebitdaMargin + '% margin' },
+    { label: 'PAT', val: fmtSm(f.pat), sub: f.patMargin + '% margin' },
+    { label: 'Market Cap', val: fmtSm(f.marketCap), sub: 'Current market value' },
+    { label: 'Net Debt', val: fmtSm(Math.abs(f.netDebt)), sub: f.netDebt < 0 ? '(Net cash position)' : '(Net debt)' },
+    { label: 'ROE', val: f.roe + '%', sub: 'Return on equity' },
+    { label: 'ROCE', val: f.roce + '%', sub: 'Return on capital' },
+    { label: 'Shares Outstanding', val: f.sharesOutstanding.toLocaleString('en-IN') + ' Cr', sub: 'Fully diluted' },
+  ].map(s => `<div class="context-stat"><div class="context-stat-label">${s.label}</div><div class="context-stat-val">${s.val}</div><div class="context-stat-sub">${s.sub}</div></div>`).join('');
+}
+
+// ── STEP 3: ASSUMPTION TABLE ──
+function buildAssumptionTable() {
+  const co = COMPANIES[selectedCompany];
+  const d = co.dcfDefaults;
+  const f = co.financials;
+  const h = co.hints;
+  const cur = co.currency;
+
+  document.getElementById('tbl-eyebrow').textContent = co.name + ' — DCF Assumptions';
+  document.getElementById('tbl-heading').textContent = 'Set your assumptions';
+
+  const rows = [
+    // Section: Revenue
+    { section: 'Revenue Projections' },
+    { key:'revenueGrowthY1', label:'Revenue Growth — Year 1', hint: h.revenueGrowth, range:'5–35%', val:d.revenueGrowthY1, unit:'%', prefilled:false },
+    { key:'revenueGrowthY2', label:'Revenue Growth — Year 2', hint: h.revenueGrowth, range:'5–35%', val:d.revenueGrowthY2, unit:'%', prefilled:false },
+    { key:'revenueGrowthY3', label:'Revenue Growth — Year 3', hint: h.revenueGrowth, range:'5–35%', val:d.revenueGrowthY3, unit:'%', prefilled:false },
+    { key:'revenueGrowthY4', label:'Revenue Growth — Year 4', hint: 'Growth typically moderates in later years.', range:'3–25%', val:d.revenueGrowthY4, unit:'%', prefilled:false },
+    { key:'revenueGrowthY5', label:'Revenue Growth — Year 5', hint: 'Growth typically moderates in later years.', range:'3–20%', val:d.revenueGrowthY5, unit:'%', prefilled:false },
+    // Section: Margins
+    { section: 'Profitability Assumptions' },
+    { key:'ebitdaMargin', label:'EBITDA Margin (steady state)', hint: h.ebitdaMargin, range:'8–65%', val:d.ebitdaMargin, unit:'%', prefilled:true, filingNote:'FY24: ' + f.ebitdaMargin + '%' },
+    { key:'daPercent', label:'D&A as % of Revenue', hint: 'Depreciation & Amortisation. Higher for capital-intensive businesses.', range:'1–12%', val:d.daPercent, unit:'%', prefilled:true },
+    { key:'capexPercent', label:'CapEx as % of Revenue', hint: 'Capital expenditure. Key driver of free cash flow. Asset-heavy industries have higher CapEx.', range:'1–20%', val:d.capexPercent, unit:'%', prefilled:true },
+    { key:'wcPercent', label:'Working Capital Change (% Rev)', hint: 'Increase in working capital = cash outflow. Negative = working capital improvement (cash inflow).', range:'-10–15%', val:d.wcPercent, unit:'%', prefilled:true },
+    { key:'taxRate', label:'Effective Tax Rate', hint: 'Indian corporate tax is 25.17% (new regime). Use effective rate from P&L if different.', range:'15–35%', val:d.taxRate, unit:'%', prefilled:true },
+    // Section: WACC
+    { section: 'Discount Rate (WACC)' },
+    { key:'riskFreeRate', label:'Risk-Free Rate', hint: cur === '₹' ? '10-year Indian G-Sec yield: ~7%. This is your baseline.' : '10-year US Treasury yield: ~4.5%. This is your baseline.', range: cur === '₹' ? '6–8.5%' : '3.5–5.5%', val:d.riskFreeRate, unit:'%', prefilled:true },
+    { key:'erp', label:'Equity Risk Premium', hint: cur === '₹' ? 'India ERP: 6–7%. Reflects the excess return investors demand for Indian equities over the risk-free rate.' : 'US ERP: 5–6%. Reflects excess return demanded for equities.', range: cur === '₹' ? '5–8%' : '4–7%', val:d.erp, unit:'%', prefilled:true },
+    { key:'beta', label:'Beta (Levered)', hint: h.beta, range:'0.5–2.5', val:d.beta, unit:'', prefilled:true, filingNote:'Based on 2yr weekly returns' },
+    { key:'leveragePercent', label:'Leverage (Debt / EV)', hint: 'Target capital structure. Use current D/EV if stable. Affects WACC through tax shield on debt.', range:'0–60%', val:d.leveragePercent, unit:'%', prefilled:true },
+    // Section: Terminal Value
+    { section: 'Terminal Value' },
+    { key:'terminalGrowth', label:'Terminal Growth Rate', hint: h.terminalGrowth, range:'2–7%', val:d.terminalGrowth, unit:'%', prefilled:false },
+    // Section: Bridge
+    { section: 'Equity Bridge' },
+    { key:'netDebt', label:'Net Debt (current)', hint: 'From latest balance sheet. Negative = net cash. Used to bridge EV to Equity Value.', range:'', val: Math.round(f.netDebt), unit:cur, prefilled:true, filingNote:'From FY24 balance sheet' },
+    { key:'sharesOutstanding', label:'Shares Outstanding', hint: 'Fully diluted share count. From latest filings.', range:'', val:f.sharesOutstanding, unit:'Cr', prefilled:true, filingNote:'From FY24 filings' },
+  ];
+
+  let html = `<thead><tr>
+    <th style="width:40%">Assumption</th>
+    <th style="width:18%;text-align:center;">Your Input</th>
+    <th style="width:22%">Typical Range</th>
+    <th style="width:20%">Guidance</th>
+  </tr></thead><tbody>`;
+
+  rows.forEach(row => {
+    if (row.section) {
+      html += `<tr class="section-header"><td colspan="4">${row.section}</td></tr>`;
+      return;
+    }
+    const isFilled = row.prefilled;
+    const inputStyle = isFilled ? 'pre-filled' : '';
+    const inputBg = isFilled ? 'style="background:#f0fdf4;border-color:#bbf7d0;"' : '';
+    html += `<tr>
+      <td>
+        <div class="cell-label">${row.label}</div>
+        ${row.filingNote ? `<div class="range-badge">${row.filingNote}</div>` : ''}
+      </td>
+      <td>
+        <div class="cell-input-wrap">
+          <input type="number" class="cell-input ${inputStyle}" id="inp-${row.key}"
+            value="${row.val}" step="0.1" ${inputBg}
+            oninput="updateFilledCount()" onchange="updateFilledCount()"
+            title="${row.label}">
+          <span class="cell-unit">${row.unit}</span>
+        </div>
+      </td>
+      <td>
+        ${row.range ? `<span class="range-badge">${row.range}</span>` : '<span style="font-size:0.72rem;color:var(--gray-300);">—</span>'}
+      </td>
+      <td>
+        <div class="hint-wrap">
+          <div class="hint-badge">💡 <span style="text-decoration:underline;text-underline-offset:2px;">Show hint</span></div>
+          <div class="hint-tooltip">${row.hint || 'Use your judgment based on the company context.'}</div>
+        </div>
+      </td>
+    </tr>`;
+  });
+
+  html += '</tbody>';
+  document.getElementById('assumption-table').innerHTML = html;
+  updateFilledCount();
+}
+
+function updateFilledCount() {
+  const inputs = document.querySelectorAll('.cell-input');
+  let filled = 0;
+  inputs.forEach(inp => { if (inp.value !== '') filled++; });
+  document.getElementById('filled-count').textContent = filled;
+}
+
+// ── RUN VALUATION ──
+function getInp(key) { return parseFloat(document.getElementById('inp-' + key).value) || 0; }
+
+function runValuation() {
+  goToStep(4);
+  document.getElementById('loader-screen').style.display = 'block';
+  document.getElementById('output-screen').style.display = 'none';
+
+  const msgs = ['Projecting 5-year free cash flows...', 'Calculating WACC components...', 'Discounting terminal value...', 'Building the equity bridge...', 'Generating sensitivity table...'];
+  let mi = 0;
+  const msgEl = document.getElementById('loader-msg');
+  const msgInterval = setInterval(() => { if (mi < msgs.length) { msgEl.textContent = msgs[mi++]; } }, 340);
+
+  setTimeout(() => {
+    clearInterval(msgInterval);
+    calcResult = computeDCF();
+    renderOutput(calcResult);
+    document.getElementById('loader-screen').style.display = 'none';
+    document.getElementById('output-screen').style.display = 'block';
+  }, 1900);
+}
+
+function computeDCF() {
+  const co = COMPANIES[selectedCompany];
+  const f = co.financials;
+  const isInr = co.currency === '₹';
+
+  const growthRates = [
+    getInp('revenueGrowthY1')/100,
+    getInp('revenueGrowthY2')/100,
+    getInp('revenueGrowthY3')/100,
+    getInp('revenueGrowthY4')/100,
+    getInp('revenueGrowthY5')/100,
+  ];
+  const ebitdaM = getInp('ebitdaMargin')/100;
+  const daP = getInp('daPercent')/100;
+  const capexP = getInp('capexPercent')/100;
+  const wcP = getInp('wcPercent')/100;
+  const taxR = getInp('taxRate')/100;
+  const rf = getInp('riskFreeRate')/100;
+  const erp = getInp('erp')/100;
+  const beta = getInp('beta');
+  const levP = getInp('leveragePercent')/100;
+  const tgr = getInp('terminalGrowth')/100;
+  const netDebt = getInp('netDebt');
+  const shares = getInp('sharesOutstanding');
+
+  const Ke = (rf + beta * erp) * 100;
+  const Kd = (rf * 100) + 1.5;
+  const E = 1 - levP; const D = levP;
+  const wacc = (Ke/100 * E) + (Kd/100 * 0.75 * D);
+
+  let pv = 0, rev = f.revenue;
+  const fcfArr = [];
+  for (let yr = 0; yr < 5; yr++) {
+    rev = rev * (1 + growthRates[yr]);
+    const ebitda = rev * ebitdaM;
+    const da = rev * daP;
+    const ebit = ebitda - da;
+    const nopat = ebit * (1 - taxR);
+    const capex = rev * capexP;
+    const wc = rev * wcP;
+    const fcf = nopat + da - capex - wc;
+    const pvFcf = fcf / Math.pow(1 + wacc, yr + 1);
+    pv += pvFcf;
+    fcfArr.push({ yr: yr+1, rev: Math.round(rev), fcf: Math.round(fcf), pvFcf: Math.round(pvFcf) });
+  }
+
+  const lastFcf = fcfArr[4].fcf;
+  const tv = lastFcf * (1 + tgr) / (wacc - tgr);
+  const pvTv = tv / Math.pow(1 + wacc, 5);
+  const ev = pv + pvTv;
+  const equityVal = ev - netDebt;
+  const pricePerShare = equityVal / shares;
+
+  // Market price estimate (from market cap / shares)
+  const marketPrice = f.marketCap / shares;
+  const upside = ((pricePerShare - marketPrice) / marketPrice * 100);
+
+  return { wacc, Ke, Kd: Kd/100*0.75, pvFcf: pv, pvTv, ev, netDebt, equityVal, pricePerShare, marketPrice, upside, tgr, fcfArr, tvPct: pvTv/ev*100, currency: co.currency, isInr, company: co };
+}
+
+function fmt(n, cur) { return cur === '₹' ? '₹' + Math.round(n).toLocaleString('en-IN') : '$' + Math.round(n).toLocaleString(); }
+function fmtCr(n, cur) { return cur === '₹' ? '₹' + Math.round(n).toLocaleString('en-IN') + ' Cr' : '$' + (Math.round(n/100)/10) + 'B'; }
+function fmtPct(n) { return n.toFixed(1) + '%'; }
+
+function renderOutput(r) {
+  const co = r.company;
+  document.getElementById('out-heading').textContent = 'Your valuation of ' + co.name + ' is complete';
+  document.getElementById('out-eyebrow').textContent = co.name + ' · DCF Valuation Result';
+
+  const mkt = r.marketPrice;
+  const price = r.pricePerShare;
+  const upside = r.upside;
+
+  document.getElementById('out-big-price').textContent = fmt(price, r.currency);
+  document.getElementById('out-big-price').style.color = upside > 0 ? 'white' : '#fca5a5';
+  document.getElementById('out-vs-market').textContent = 'vs current market price: ' + fmt(mkt, r.currency) + ' per share';
+  document.getElementById('out-upside').textContent = (upside > 0 ? '▲ +' : '▼ ') + fmtPct(Math.abs(upside));
+  document.getElementById('out-upside').style.color = upside > 0 ? '#4ade80' : '#fca5a5';
+  document.getElementById('out-wacc').textContent = fmtPct(r.wacc * 100);
+  document.getElementById('out-ev').textContent = fmtCr(r.ev, r.currency);
+  document.getElementById('out-pv-fcf').textContent = fmtCr(r.pvFcf, r.currency);
+  document.getElementById('out-pv-tv').textContent = fmtCr(r.pvTv, r.currency);
+  document.getElementById('out-tv-pct').textContent = fmtPct(r.tvPct);
+
+  // Verdict
+  const vb = document.getElementById('verdict-box');
+  if (upside > 20) {
+    vb.className = 'verdict verdict-bull';
+    vb.innerHTML = `<strong>Your model says: BUY.</strong> At ${fmt(price, r.currency)}, your DCF implies ${fmtPct(upside)} upside to the current market price. Your assumptions are more optimistic than what the market is currently pricing in. The key question: are you right about the growth rate, or is the market right?`;
+  } else if (upside < -20) {
+    vb.className = 'verdict verdict-bear';
+    vb.innerHTML = `<strong>Your model says: OVERVALUED.</strong> At ${fmt(price, r.currency)}, your DCF implies the stock is ${fmtPct(Math.abs(upside))} expensive at current prices. Either the market is wrong and expecting much higher growth — or your assumptions need revisiting. Try raising the terminal growth rate or EBITDA margin to see what the market might be assuming.`;
+  } else {
+    vb.className = 'verdict verdict-fair';
+    vb.innerHTML = `<strong>Your model says: FAIRLY VALUED.</strong> At ${fmt(price, r.currency)}, your intrinsic value is close to the current market price. This suggests your assumptions are broadly in line with what the market is pricing in. Use the sensitivity table below to understand what it takes to move the needle.`;
+  }
+
+  // Analyst comparison
+  document.getElementById('analyst-compare-text').textContent = co.analystNote;
+
+  // Waterfall
+  const maxV = Math.max(r.pvFcf, r.pvTv, r.ev) * 1.15;
+  const bars = [
+    { label:'PV FCF (5yr)', val:r.pvFcf, color:'#374151', neg:false },
+    { label:'PV Terminal', val:r.pvTv, color:'#111827', neg:false },
+    { label:'Enterprise Value', val:r.ev, color:'#111827', neg:false },
+    { label:'Less: Net Debt', val:-r.netDebt, color:'#dc2626', neg:r.netDebt>0 },
+    { label:'Equity Value', val:r.equityVal, color:'#16a34a', neg:false },
+  ];
+  document.getElementById('output-waterfall').innerHTML = bars.map(b => {
+    const pct = Math.min(Math.abs(b.val)/maxV*100, 100);
+    const disp = b.neg ? '(' + fmtCr(Math.abs(b.val), r.currency) + ')' : fmtCr(b.val, r.currency);
+    return `<div class="w-bar-row"><div class="wlabel">${b.label}</div><div class="wtrack"><div class="wfill" style="width:${pct}%;background:${b.color};"><span>${disp}</span></div></div></div>`;
+  }).join('');
+
+  // Sensitivity
+  const wB = r.wacc * 100, tB = r.tgr * 100;
+  const deltas = [-1.5, -0.75, 0, 0.75, 1.5];
+  let sHtml = '<thead><tr><th>WACC \\ TGR</th>';
+  deltas.map(t => Math.max(1, Math.min(8, tB + t))).forEach(t => { sHtml += `<th>${t.toFixed(1)}%</th>`; });
+  sHtml += '</tr></thead><tbody>';
+  deltas.forEach((wd, wi) => {
+    const wTest = wB + wd;
+    sHtml += `<tr><td>${wTest.toFixed(1)}%</td>`;
+    deltas.map(t => Math.max(1, Math.min(8, tB + t))).forEach((t, ti) => {
+      const ww = (wTest / 100);
+      const gg = t / 100;
+      let pv2 = 0, rev2 = r.company.financials.revenue;
+      const growthRates = [
+        getInp('revenueGrowthY1')/100, getInp('revenueGrowthY2')/100, getInp('revenueGrowthY3')/100,
+        getInp('revenueGrowthY4')/100, getInp('revenueGrowthY5')/100,
+      ];
+      const ebitdaM = getInp('ebitdaMargin')/100, daP = getInp('daPercent')/100;
+      const capexP = getInp('capexPercent')/100, wcP = getInp('wcPercent')/100, taxR = getInp('taxRate')/100;
+      let lastFcf2 = 0;
+      for (let yr = 0; yr < 5; yr++) {
+        rev2 *= (1 + growthRates[yr]);
+        const fcf2 = (rev2*(ebitdaM-daP)*(1-taxR)) + rev2*daP - rev2*capexP - rev2*wcP;
+        pv2 += fcf2 / Math.pow(1+ww, yr+1);
+        lastFcf2 = fcf2;
+      }
+      const tv2 = lastFcf2*(1+gg)/(ww-gg);
+      const ev2 = pv2 + tv2/Math.pow(1+ww,5);
+      const price2 = (ev2 - r.netDebt) / r.company.financials.sharesOutstanding;
+      const upside2 = (price2 - r.marketPrice) / r.marketPrice * 100;
+      let hc = upside2>30?'heat-5':upside2>10?'heat-4':upside2<-20?'heat-1':upside2<0?'heat-2':'heat-3';
+      const hl = (wi===2&&ti===2) ? ' heat-hl' : '';
+      sHtml += `<td class="${hc}${hl}">${fmt(price2, r.currency)}</td>`;
+    });
+    sHtml += '</tr>';
+  });
+  sHtml += '</tbody>';
+  document.getElementById('output-sens').innerHTML = sHtml;
+
+  // What would change your view
+  const growth = getInp('revenueGrowthY1');
+  const margin = getInp('ebitdaMargin');
+  document.getElementById('change-view-text').textContent = `Your base case uses ${growth}% Year 1 revenue growth and ${margin}% EBITDA margin. Try changing the terminal growth rate — it has an outsized impact on the final number (currently ${fmtPct(r.tvPct)} of Enterprise Value comes from terminal value). A 1% change in terminal growth can move the share price by 15-25%.`;
+}
+
+// ── VAULT SAVE ──
+function saveToVault() {
+  if (!calcResult) return;
+  VD.vault.save({
+    type: 'DCF',
+    company: calcResult.company.name,
+    value: fmt(calcResult.pricePerShare, calcResult.currency),
+    domain: 'Valuation Advisory',
+    upside: fmtPct(Math.abs(calcResult.upside)) + (calcResult.upside > 0 ? ' upside' : ' overvalued'),
+  });
+  document.getElementById('vault-count').textContent = VD.vault.count();
+}
+
+function tweakAssumption(type) {
+  goToStep(3);
+  setTimeout(() => {
+    const targets = { growth:'inp-revenueGrowthY1', margin:'inp-ebitdaMargin', wacc:'inp-riskFreeRate' };
+    const el = document.getElementById(targets[type]);
+    if (el) { el.focus(); el.select(); el.style.borderColor='var(--black)'; el.style.boxShadow='0 0 0 3px rgba(17,24,39,0.15)'; setTimeout(()=>{el.style.borderColor=''; el.style.boxShadow='';},2000); }
+  }, 300);
+}
+
+function resetCalculator() {
+  selectedCompany = null;
+  calcResult = null;
+  document.querySelectorAll('.company-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('btn-to-step2').disabled = true;
+  goToStep(1);
+}
+
+// ── STEP 2 INTERCEPT ──
+const origGoToStep2 = goToStep;
+document.getElementById('btn-to-step2').addEventListener('click', () => {
+  if (!selectedCompany) return;
+  loadContext();
+  goToStep(2);
+});
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+  buildCompanyGrid();
+  VD.countUp(document.getElementById('vault-count'), VD.vault.count(), 500);
+});
+</script>
+</body>
+</html>
