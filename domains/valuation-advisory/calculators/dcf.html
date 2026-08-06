@@ -200,6 +200,9 @@
       </div>
     </div>
 
+    <!-- TEACHING ANALYSIS (populated by JS) -->
+    <div id="ctx-teaching"></div>
+
     <button class="btn btn-black" onclick="goToStep(3)" style="min-width:240px;">
       I've studied it. Build the DCF →
     </button>
@@ -372,6 +375,9 @@ function goToStep(n) {
     else if (i === n) pill.classList.add('active');
   }
   currentStep = n;
+  // Trigger step-specific loaders
+  if (n === 2 && selectedCompany) loadContext();
+  if (n === 3 && selectedCompany) buildAssumptionTable();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -425,6 +431,7 @@ function loadContext() {
   const fmt = (n) => isInr ? '₹' + Math.round(n/100)/10 + 'K Cr' : '$' + Math.round(n/1000) + 'B';
   const fmtSm = (n) => isInr ? '₹' + Math.round(n).toLocaleString('en-IN') + ' Cr' : '$' + Math.round(n/100)/10 + 'B';
 
+  // Key financial metrics with explanations
   document.getElementById('ctx-financials').innerHTML = [
     { label: 'Revenue (FY24)', val: fmtSm(f.revenue), sub: f.revenueGrowth + '% YoY growth' },
     { label: 'EBITDA', val: fmtSm(f.ebitda), sub: f.ebitdaMargin + '% margin' },
@@ -435,6 +442,86 @@ function loadContext() {
     { label: 'ROCE', val: f.roce + '%', sub: 'Return on capital' },
     { label: 'Shares Outstanding', val: f.sharesOutstanding.toLocaleString('en-IN') + ' Cr', sub: 'Fully diluted' },
   ].map(s => `<div class="context-stat"><div class="context-stat-label">${s.label}</div><div class="context-stat-val">${s.val}</div><div class="context-stat-sub">${s.sub}</div></div>`).join('');
+
+  // ── TEACHING ANALYSIS SECTION ──
+  const mktPrice = Math.round(f.marketCap / f.sharesOutstanding);
+  const impliedPE = f.pat > 0 ? (f.marketCap / f.pat).toFixed(1) : 'N/A (loss-making)';
+  const impliedEV = f.marketCap + f.netDebt;
+  const impliedEVEBITDA = f.ebitda > 0 ? (impliedEV / f.ebitda).toFixed(1) : 'N/A';
+  const fcfProxy = f.pat + (f.revenue * 0.04) - (f.revenue * 0.05); // rough proxy
+  const fcfYield = f.marketCap > 0 ? ((fcfProxy / f.marketCap) * 100).toFixed(1) : '0';
+  const debtToEV = f.netDebt > 0 ? ((f.netDebt / impliedEV) * 100).toFixed(1) : '0 (net cash)';
+
+  const teachEl = document.getElementById('ctx-teaching');
+  if (teachEl) teachEl.innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem;">
+
+      <div style="border:1px solid var(--gray-200);border-radius:var(--r);padding:1.1rem;">
+        <div class="eyebrow" style="margin-bottom:0.6rem;">What the market is currently pricing in</div>
+        <div style="font-size:0.82rem;color:var(--gray-500);line-height:1.7;">
+          At ${cur}${mktPrice.toLocaleString('en-IN')} per share, the market implies a <strong style="color:var(--black);">P/E of ${impliedPE}x</strong> and <strong style="color:var(--black);">EV/EBITDA of ${impliedEVEBITDA}x</strong>. The question for your DCF: do the cash flows you project justify this price, or is the market over/under-valuing ${co.name}?
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem;margin-top:0.9rem;">
+          <div style="background:var(--gray-50);padding:0.5rem 0.7rem;border-radius:var(--r-sm);">
+            <div style="font-size:0.58rem;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.15rem;">Market Price</div>
+            <div style="font-size:0.95rem;font-weight:700;">${cur}${mktPrice.toLocaleString('en-IN')}</div>
+          </div>
+          <div style="background:var(--gray-50);padding:0.5rem 0.7rem;border-radius:var(--r-sm);">
+            <div style="font-size:0.58rem;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.15rem;">Implied P/E</div>
+            <div style="font-size:0.95rem;font-weight:700;">${impliedPE}x</div>
+          </div>
+          <div style="background:var(--gray-50);padding:0.5rem 0.7rem;border-radius:var(--r-sm);">
+            <div style="font-size:0.58rem;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.15rem;">EV/EBITDA</div>
+            <div style="font-size:0.95rem;font-weight:700;">${impliedEVEBITDA}x</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="border:1px solid var(--gray-200);border-radius:var(--r);padding:1.1rem;">
+        <div class="eyebrow" style="margin-bottom:0.6rem;">Key numbers for your model</div>
+        <div style="font-size:0.82rem;color:var(--gray-500);line-height:1.7;">
+          ${f.ebitdaMargin > 30
+            ? 'This is a <strong style="color:var(--black);">high-margin business</strong> (' + f.ebitdaMargin + '% EBITDA margin). In your DCF, you need to decide if these margins are sustainable or if they compress over time.'
+            : f.ebitdaMargin > 15
+            ? 'At ' + f.ebitdaMargin + '% EBITDA margin, this is a <strong style="color:var(--black);">moderately profitable</strong> business. Your key decision: do margins expand as the company scales, or are they structurally capped?'
+            : 'At ' + f.ebitdaMargin + '% EBITDA margin, profitability is <strong style="color:var(--black);">still developing</strong>. Your DCF hinges on what steady-state margins look like 5 years from now. That single assumption will drive your entire valuation.'
+          }
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem;margin-top:0.9rem;">
+          <div style="background:var(--gray-50);padding:0.5rem 0.7rem;border-radius:var(--r-sm);">
+            <div style="font-size:0.58rem;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.15rem;">FCF Yield (est.)</div>
+            <div style="font-size:0.95rem;font-weight:700;">${fcfYield}%</div>
+          </div>
+          <div style="background:var(--gray-50);padding:0.5rem 0.7rem;border-radius:var(--r-sm);">
+            <div style="font-size:0.58rem;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.15rem;">Net Debt / EV</div>
+            <div style="font-size:0.95rem;font-weight:700;">${debtToEV}${typeof debtToEV === 'string' ? '' : '%'}</div>
+          </div>
+          <div style="background:var(--gray-50);padding:0.5rem 0.7rem;border-radius:var(--r-sm);">
+            <div style="font-size:0.58rem;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.15rem;">Rev Growth</div>
+            <div style="font-size:0.95rem;font-weight:700;">${f.revenueGrowth}%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="border:1px solid var(--gray-200);border-radius:var(--r);padding:1.1rem;margin-bottom:1rem;background:var(--gray-50);">
+      <div class="eyebrow" style="margin-bottom:0.5rem;">What to think about before building the model</div>
+      <div style="font-size:0.82rem;color:var(--gray-500);line-height:1.8;">
+        ${f.revenueGrowth > 20
+          ? '<strong style="color:var(--black);">Growth trajectory:</strong> At ' + f.revenueGrowth + '% growth, ' + co.name + ' is growing fast but remember — high growth always decelerates. The market is pricing in sustained high growth. If you use lower growth in your DCF, you will get a lower value than the current market price. That doesn\'t mean you\'re wrong — it might mean the market is overpaying.<br><br>'
+          : '<strong style="color:var(--black);">Growth trajectory:</strong> At ' + f.revenueGrowth + '% growth, ' + co.name + ' is growing moderately. For your DCF, the key question is whether growth accelerates (new products, markets) or stays at this level. Check what management guided in the latest earnings call.<br><br>'
+        }
+        ${f.roe > 20
+          ? '<strong style="color:var(--black);">Return on equity:</strong> At ' + f.roe + '% ROE, this is a high-quality business — it generates strong returns on the capital invested in it. High ROE companies typically deserve higher valuation multiples because every rupee of reinvested profit generates above-average returns.<br><br>'
+          : '<strong style="color:var(--black);">Return on equity:</strong> ROE at ' + f.roe + '% is ' + (f.roe > 12 ? 'reasonable but not exceptional' : 'below average — suggesting the business isn\'t generating strong returns on equity') + '. This affects how much value is created from reinvested earnings.<br><br>'
+        }
+        ${f.netDebt < 0
+          ? '<strong style="color:var(--black);">Balance sheet:</strong> ' + co.name + ' has a net cash position of ' + fmtSm(Math.abs(f.netDebt)) + '. This is positive — it means the company has more cash than debt. In your EV-to-Equity bridge, this net cash ADDS to equity value (i.e., your per-share value goes UP). It also means the company has financial flexibility to invest, acquire, or return capital.'
+          : '<strong style="color:var(--black);">Balance sheet:</strong> ' + co.name + ' has net debt of ' + fmtSm(f.netDebt) + '. In your EV-to-Equity bridge, this net debt SUBTRACTS from equity value. Higher leverage means higher risk and a higher WACC. Think about whether the company will deleverage (pay down debt) or take on more.'
+        }
+      </div>
+    </div>
+  `;
 }
 
 // ── STEP 3: ASSUMPTION TABLE ──
