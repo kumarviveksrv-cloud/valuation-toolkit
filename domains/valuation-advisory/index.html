@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Valuation Advisory — ValuationDesk</title>
+<link rel="stylesheet" href="/valuation-toolkit/assets/vd.css">
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/valuation-toolkit/" class="nav-logo">Valuation<strong>Desk</strong></a>
+  <ul class="nav-links">
+    <li><a href="/valuation-toolkit/domains/valuation-advisory/" class="active">Valuation Advisory</a></li>
+    <li><a href="/valuation-toolkit/domains/investment-banking/">Investment Banking</a></li>
+    <li><a href="/valuation-toolkit/vault/">My Vault</a></li>
+    <li><a href="/valuation-toolkit/deal-room/">Deal Room</a></li>
+    <li><a href="/valuation-toolkit/daily-brief/">Daily Brief</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="/valuation-toolkit/vault/" class="nav-pill">🗄 Vault (<span id="vault-count">0</span>)</a>
+    <a href="/valuation-toolkit/#pricing" class="nav-cta">Get Pro — ₹799/mo</a>
+  </div>
+</nav>
+
+<!-- DOMAIN BAR -->
+<div class="domain-bar">
+  <a href="/valuation-toolkit/domains/valuation-advisory/" class="domain-link active">Overview</a>
+  <a href="/valuation-toolkit/domains/valuation-advisory/learn/" class="domain-link">📖 Learn</a>
+  <a href="/valuation-toolkit/domains/valuation-advisory/calculators/" class="domain-link">🧮 Calculators</a>
+  <a href="/valuation-toolkit/vault/" class="domain-link">🗄 My Vault</a>
+</div>
+
+<div class="page">
+
+  <!-- HERO -->
+  <section class="section">
+    <div class="container">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;">
+        <div>
+          <div class="eyebrow">Domain 01 — Phase 1</div>
+          <h1 class="h1 fade-up" style="margin-bottom:1rem;">Valuation Advisory</h1>
+          <p class="lead fade-up" style="margin-bottom:1.5rem;">The complete valuation practitioner toolkit — from first principles to boardroom-ready output. 7 live calculators, 5 learning chapters, and an IB-grade Excel model.</p>
+          <div style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-bottom:2rem;">
+            <span class="tag tag-black">7 Calculators</span>
+            <span class="tag tag-gray">5 Chapters</span>
+            <span class="tag tag-gray">1 Excel Model</span>
+            <span class="tag tag-green">Free tier available</span>
+          </div>
+          <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+            <a href="/valuation-toolkit/domains/valuation-advisory/calculators/" class="btn btn-black">Open Calculators →</a>
+            <a href="/valuation-toolkit/domains/valuation-advisory/learn/" class="btn btn-outline">Start Learning</a>
+          </div>
+        </div>
+
+        <!-- PROGRESS / STATS -->
+        <div style="display:flex;flex-direction:column;gap:1rem;">
+          <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--r-lg);padding:1.25rem;">
+            <div class="eyebrow" style="margin-bottom:0.75rem;">Your Progress</div>
+            <div style="display:flex;flex-direction:column;gap:0.6rem;">
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:0.3rem;"><span>Learning chapters</span><span style="font-weight:600;" id="prog-learn">0 / 5</span></div>
+                <div style="height:4px;background:var(--gray-200);border-radius:2px;"><div style="height:100%;background:var(--black);border-radius:2px;width:0%;transition:width 0.5s ease;" id="prog-learn-bar"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:0.3rem;"><span>Models saved to Vault</span><span style="font-weight:600;" id="prog-vault">0</span></div>
+                <div style="height:4px;background:var(--gray-200);border-radius:2px;"><div style="height:100%;background:var(--green);border-radius:2px;width:0%;transition:width 0.5s ease;" id="prog-vault-bar"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:0.78rem;margin-bottom:0.3rem;"><span>Calculators explored</span><span style="font-weight:600;" id="prog-calc">0 / 7</span></div>
+                <div style="height:4px;background:var(--gray-200);border-radius:2px;"><div style="height:100%;background:var(--blue);border-radius:2px;width:0%;transition:width 0.5s ease;" id="prog-calc-bar"></div></div>
+              </div>
+            </div>
+          </div>
+          <div class="brief-card">
+            <div style="font-size:0.65rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:0.5rem;">Today's Brief</div>
+            <div style="font-weight:700;color:var(--white);margin-bottom:0.25rem;font-size:0.88rem;" id="brief-co">—</div>
+            <div style="font-size:1.4rem;font-weight:800;color:var(--white);" id="brief-val">—</div>
+            <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);margin-top:0.25rem;" id="brief-ctx">—</div>
+            <a href="/valuation-toolkit/daily-brief/" style="font-size:0.7rem;color:rgba(255,255,255,0.55);text-decoration:none;display:block;margin-top:0.6rem;">Read full brief →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="vd">
+
+  <!-- 7 CALCULATORS -->
+  <section class="section section-gray">
+    <div class="container">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;">
+        <div>
+          <div class="eyebrow">Interactive Tools</div>
+          <h2 class="h2">7 Calculators</h2>
+        </div>
+        <a href="/valuation-toolkit/domains/valuation-advisory/calculators/" class="btn btn-black btn-sm">Open all calculators →</a>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1rem;">
+
+        <a href="/valuation-toolkit/domains/valuation-advisory/calculators/#dcf" style="text-decoration:none;">
+          <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;">
+              <span style="font-size:1.2rem;">📊</span>
+              <span class="tag tag-green">Free</span>
+            </div>
+            <h3 class="h3" style="margin-bottom:0.3rem;">DCF Valuation</h3>
+            <p style="font-size:0.78rem;color:var(--gray-500);line-height:1.6;">Multi-stage DCF with WACC builder, terminal value, scenario toggles, and 25-cell sensitivity table.</p>
+          </div>
+        </a>
+
+        <a href="/valuation-toolkit/domains/valuation-advisory/calculators/#comps" style="text-decoration:none;">
+          <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;">
+              <span style="font-size:1.2rem;">⚖️</span>
+              <span class="tag tag-black">Pro</span>
+            </div>
+            <h3 class="h3" style="margin-bottom:0.3rem;">Comps Engine</h3>
+            <p style="font-size:0.78rem;color:var(--gray-500);line-height:1.6;">EV/EBITDA, P/E, EV/Revenue spread analysis. Implied valuation range with bridge output.</p>
+          </div>
+        </a>
+
+        <a href="/valuation-toolkit/domains/valuation-advisory/calculators/#wacc" style="text-decoration:none;">
+          <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;">
+              <span style="font-size:1.2rem;">🔢</span>
+              <span class="tag tag-black">Pro</span>
+            </div>
+            <h3 class="h3" style="margin-bottom:0.3rem;">WACC Builder</h3>
+            <p style="font-size:0.78rem;color:var(--gray-500);line-height:1.6;">Build WACC from first principles — risk-free rate, ERP, beta, leverage, cost of debt, tax shield.</p>
+          </div>
+        </a>
+
+        <a href="/valuation-toolkit/domains/valuation-advisory/calculators/#ev-bridge" style="text-decoration:none;">
+          <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;">
+              <span style="font-size:1.2rem;">🌉</span>
+              <span class="tag tag-black">Pro</span>
+            </div>
+            <h3 class="h3" style="margin-bottom:0.3rem;">EV Bridge</h3>
+            <p style="font-size:0.78rem;color:var(--gray-500);line-height:1.6;">Walk from Enterprise Value to Equity Value. Net debt, minorities, associates — fully visualised.</p>
+          </div>
+        </a>
+
+        <a href="/valuation-toolkit/domains/valuation-advisory/calculators/#sotp" style="text-decoration:none;">
+          <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;">
+              <span style="font-size:1.2rem;">🧩</span>
+              <span class="tag tag-black">Pro</span>
+            </div>
+            <h3 class="h3" style="margin-bottom:0.3rem;">SOTP Valuation</h3>
+            <p style="font-size:0.78rem;color:var(--gray-500);line-height:1.6;">Sum-of-the-parts for conglomerates. Value each segment separately, add up, subtract holdco discount.</p>
+          </div>
+        </a>
+
+        <a href="/valuation-toolkit/domains/valuation-advisory/calculators/#football-field" style="text-decoration:none;">
+          <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;">
+              <span style="font-size:1.2rem;">🏈</span>
+              <span class="tag tag-black">Pro</span>
+            </div>
+            <h3 class="h3" style="margin-bottom:0.3rem;">Football Field Chart</h3>
+            <p style="font-size:0.78rem;color:var(--gray-500);line-height:1.6;">Combine DCF, Comps, and transaction multiples into a single valuation range chart — board-ready.</p>
+          </div>
+        </a>
+
+        <a href="/valuation-toolkit/domains/valuation-advisory/calculators/#nav" style="text-decoration:none;">
+          <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem;">
+              <span style="font-size:1.2rem;">🏢</span>
+              <span class="tag tag-black">Pro</span>
+            </div>
+            <h3 class="h3" style="margin-bottom:0.3rem;">NAV Calculator</h3>
+            <p style="font-size:0.78rem;color:var(--gray-500);line-height:1.6;">Net Asset Value for real estate and asset-heavy businesses. Asset-by-asset valuation with discount to NAV.</p>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 CHAPTERS -->
+  <section class="section">
+    <div class="container">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;">
+        <div>
+          <div class="eyebrow">Learning Path</div>
+          <h2 class="h2">5 Chapters</h2>
+        </div>
+        <a href="/valuation-toolkit/domains/valuation-advisory/learn/" class="btn btn-outline btn-sm">View all chapters →</a>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0.75rem;">
+
+        <a href="/valuation-toolkit/domains/valuation-advisory/learn/#ch1" style="text-decoration:none;">
+          <div class="card" style="display:flex;align-items:center;gap:1.5rem;">
+            <div style="font-size:1.4rem;font-weight:800;color:var(--gray-200);font-family:var(--mono);flex-shrink:0;">01</div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.2rem;">
+                <h3 class="h3">The Language of Valuation</h3>
+                <span class="tag tag-green">Free</span>
+                <span class="tag tag-gray">20 min</span>
+              </div>
+              <p style="font-size:0.8rem;color:var(--gray-500);">EV vs Equity Value. Operating vs non-operating. Why EV/EBITDA ≠ P/E. The bridge every analyst must know cold.</p>
+            </div>
+            <div style="font-size:1.2rem;color:var(--gray-300);">→</div>
+          </div>
+        </a>
+
+        <a href="/valuation-toolkit/domains/valuation-advisory/learn/#ch2" style="text-decoration:none;">
+          <div class="card" style="display:flex;align-items:center;gap:1.5rem;">
+            <div style="font-size:1.4rem;font-weight:800;color:var(--gray-200);font-family:var(--mono);flex-shrink:0;">02</div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.2rem;">
+                <h3 class="h3">DCF Deep Dive</h3>
+                <span class="tag tag-black">Pro</span>
+                <span class="tag tag-gray">35 min</span>
+              </div>
+              <p style="font-size:0.8rem;color:var(--gray-500);">Forecasting FCF, building WACC, terminal value methods, why your assumptions matter more than your formula.</p>
+            </div>
+            <div style="font-size:1.2rem;color:var(--gray-300);">→</div>
+          </div>
+        </a>
+
+        <a href="/valuation-toolkit/domains/valuation-advisory/learn/#ch3" style="text-decoration:none;">
+          <div class="card" style="display:flex;align-items:center;gap:1.5rem;">
+            <div style="font-size:1.4rem;font-weight:800;color:var(--gray-200);font-family:var(--mono);flex-shrink:0;">03</div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.2rem;">
+                <h3 class="h3">Comparable Company Analysis</h3>
+                <span class="tag tag-black">Pro</span>
+                <span class="tag tag-gray">25 min</span>
+              </div>
+              <p style="font-size:0.8rem;color:var(--gray-500);">Selecting peers. Spreading multiples correctly. Applying premiums and discounts. The implied valuation range.</p>
+            </div>
+            <div style="font-size:1.2rem;color:var(--gray-300);">→</div>
+          </div>
+        </a>
+
+        <a href="/valuation-toolkit/domains/valuation-advisory/learn/#ch4" style="text-decoration:none;">
+          <div class="card" style="display:flex;align-items:center;gap:1.5rem;">
+            <div style="font-size:1.4rem;font-weight:800;color:var(--gray-200);font-family:var(--mono);flex-shrink:0;">04</div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.2rem;">
+                <h3 class="h3">SOTP & Complex Valuations</h3>
+                <span class="tag tag-black">Pro</span>
+                <span class="tag tag-gray">30 min</span>
+              </div>
+              <p style="font-size:0.8rem;color:var(--gray-500);">When one multiple isn't enough. Conglomerates, holdco discounts, NAV — valuing the parts to find the whole.</p>
+            </div>
+            <div style="font-size:1.2rem;color:var(--gray-300);">→</div>
+          </div>
+        </a>
+
+        <a href="/valuation-toolkit/domains/valuation-advisory/learn/#ch5" style="text-decoration:none;">
+          <div class="card" style="display:flex;align-items:center;gap:1.5rem;background:var(--gray-50);border-style:dashed;">
+            <div style="font-size:1.4rem;font-weight:800;color:var(--gray-200);font-family:var(--mono);flex-shrink:0;">05</div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.2rem;">
+                <h3 class="h3">Live Case Study — Valuing Reliance Industries</h3>
+                <span class="tag tag-black">Pro</span>
+                <span class="tag tag-gray">45 min</span>
+              </div>
+              <p style="font-size:0.8rem;color:var(--gray-500);">Apply every tool in this domain to a real company. Build the full valuation. Present the football field. This is the exam.</p>
+            </div>
+            <div style="font-size:1.2rem;color:var(--gray-300);">→</div>
+          </div>
+        </a>
+
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer class="footer">
+  <div class="footer-logo">Valuation<strong>Desk</strong></div>
+  <div class="footer-note">© 2025 ValuationDesk</div>
+</footer>
+
+<div id="toast-container"></div>
+<script src="/valuation-toolkit/assets/vd.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const b = VD.brief.get();
+  document.getElementById('brief-co').textContent = b.company;
+  document.getElementById('brief-val').textContent = b.value + ' ' + b.metric;
+  document.getElementById('brief-ctx').textContent = b.context;
+  VD.countUp(document.getElementById('vault-count'), VD.vault.count(), 600);
+
+  // Progress from localStorage
+  const calcsSeen = JSON.parse(localStorage.getItem('vd_calcs_seen') || '[]');
+  const chaptersDone = JSON.parse(localStorage.getItem('vd_chapters_done') || '[]');
+  const vaultCount = VD.vault.count();
+
+  document.getElementById('prog-learn').textContent = chaptersDone.length + ' / 5';
+  document.getElementById('prog-learn-bar').style.width = (chaptersDone.length / 5 * 100) + '%';
+  document.getElementById('prog-calc').textContent = calcsSeen.length + ' / 7';
+  document.getElementById('prog-calc-bar').style.width = (calcsSeen.length / 7 * 100) + '%';
+  document.getElementById('prog-vault').textContent = vaultCount;
+  document.getElementById('prog-vault-bar').style.width = Math.min(vaultCount / 10 * 100, 100) + '%';
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Learn Valuation Advisory — ValuationDesk</title>
+<link rel="stylesheet" href="/valuation-toolkit/assets/vd.css">
+<style>
+.chapter-content { max-width: 680px; }
+.chapter-content h3 { font-size:1.1rem; font-weight:700; margin:2rem 0 0.5rem; }
+.chapter-content p { font-size:0.9rem; line-height:1.8; color:var(--gray-500); margin-bottom:1rem; }
+.chapter-content ul { padding-left:1.25rem; margin-bottom:1rem; }
+.chapter-content li { font-size:0.88rem; line-height:1.7; color:var(--gray-500); margin-bottom:0.3rem; }
+.chapter-content strong { color:var(--black); font-weight:600; }
+.formula-box { background:var(--gray-50); border:1px solid var(--gray-200); border-left:3px solid var(--black); border-radius:var(--r-sm); padding:1rem 1.25rem; margin:1.25rem 0; font-family:var(--mono); font-size:0.82rem; color:var(--black); line-height:1.8; }
+.insight-box { background:var(--gray-50); border:1px solid var(--gray-200); border-radius:var(--r); padding:1rem 1.25rem; margin:1.25rem 0; }
+.insight-box .eyebrow { margin-bottom:0.4rem; }
+.insight-box p { margin:0; font-size:0.82rem; }
+.try-it { background:var(--black); color:var(--white); border-radius:var(--r-lg); padding:1.5rem; margin:2rem 0; }
+.chapter-nav { display:flex; justify-content:space-between; padding-top:1.5rem; border-top:1px solid var(--gray-200); margin-top:2rem; }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="/valuation-toolkit/" class="nav-logo">Valuation<strong>Desk</strong></a>
+  <ul class="nav-links">
+    <li><a href="/valuation-toolkit/domains/valuation-advisory/" class="active">Valuation Advisory</a></li>
+    <li><a href="/valuation-toolkit/vault/">My Vault</a></li>
+    <li><a href="/valuation-toolkit/deal-room/">Deal Room</a></li>
+    <li><a href="/valuation-toolkit/daily-brief/">Daily Brief</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="/valuation-toolkit/#pricing" class="nav-cta">Get Pro — ₹799/mo</a>
+  </div>
+</nav>
+<div class="domain-bar">
+  <a href="/valuation-toolkit/domains/valuation-advisory/" class="domain-link">Overview</a>
+  <a href="/valuation-toolkit/domains/valuation-advisory/learn/" class="domain-link active">📖 Learn</a>
+  <a href="/valuation-toolkit/domains/valuation-advisory/calculators/" class="domain-link">🧮 Calculators</a>
+  <a href="/valuation-toolkit/vault/" class="domain-link">🗄 My Vault</a>
+</div>
+<div class="page">
+  <section class="section">
+    <div class="container">
+      <div style="display:grid;grid-template-columns:220px 1fr;gap:3rem;align-items:flex-start;">
+
+        <!-- SIDEBAR -->
+        <div style="position:sticky;top:120px;">
+          <div class="eyebrow" style="margin-bottom:0.75rem;">Chapters</div>
+          <div style="display:flex;flex-direction:column;gap:0.25rem;">
+            <a href="#ch1" style="font-size:0.82rem;font-weight:600;color:var(--black);text-decoration:none;padding:0.5rem 0.75rem;border-radius:var(--r-sm);background:var(--gray-100);">01 — Language of Valuation</a>
+            <a href="#ch2" style="font-size:0.82rem;color:var(--gray-400);text-decoration:none;padding:0.5rem 0.75rem;border-radius:var(--r-sm);display:flex;justify-content:space-between;"><span>02 — DCF Deep Dive</span><span class="tag tag-black" style="font-size:0.55rem;">Pro</span></a>
+            <a href="#ch3" style="font-size:0.82rem;color:var(--gray-400);text-decoration:none;padding:0.5rem 0.75rem;border-radius:var(--r-sm);display:flex;justify-content:space-between;"><span>03 — Comps Analysis</span><span class="tag tag-black" style="font-size:0.55rem;">Pro</span></a>
+            <a href="#ch4" style="font-size:0.82rem;color:var(--gray-400);text-decoration:none;padding:0.5rem 0.75rem;border-radius:var(--r-sm);display:flex;justify-content:space-between;"><span>04 — SOTP & Complex</span><span class="tag tag-black" style="font-size:0.55rem;">Pro</span></a>
+            <a href="#ch5" style="font-size:0.82rem;color:var(--gray-400);text-decoration:none;padding:0.5rem 0.75rem;border-radius:var(--r-sm);display:flex;justify-content:space-between;"><span>05 — Live Case Study</span><span class="tag tag-black" style="font-size:0.55rem;">Pro</span></a>
+          </div>
+          <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--gray-200);">
+            <div class="eyebrow" style="margin-bottom:0.5rem;">Reading time</div>
+            <div style="font-size:0.82rem;color:var(--gray-500);">Chapter 1 — 20 min</div>
+          </div>
+        </div>
+
+        <!-- CHAPTER 1 FULL CONTENT -->
+        <div class="chapter-content" id="ch1">
+          <div style="margin-bottom:1.5rem;">
+            <span class="tag tag-green" style="margin-bottom:0.75rem;display:inline-block;">Chapter 01 — Free</span>
+            <h1 class="h1" style="font-size:2rem;margin-bottom:0.5rem;">The Language of Valuation</h1>
+            <p style="font-size:0.88rem;color:var(--gray-400);">20 min read · Beginner · Valuation Advisory</p>
+          </div>
+
+          <p>Before you build a single model, you need to speak the language. Two analysts can run the same DCF on the same company and get wildly different answers — not because one is smarter, but because they're answering different questions. This chapter eliminates that confusion.</p>
+
+          <h3>Enterprise Value vs Equity Value — The Most Important Distinction in Finance</h3>
+          <p>This is where most people get confused, and where most valuation errors are born.</p>
+          <p><strong>Enterprise Value (EV)</strong> is the total value of the business — what it would cost to buy the entire company outright, including paying off all its debt and taking its cash. Think of it as the "price tag" of the operating business.</p>
+          <p><strong>Equity Value</strong> is what's left for shareholders after all the creditors have been paid. It's the market capitalisation of the company — share price × shares outstanding.</p>
+
+          <div class="formula-box">
+            Enterprise Value = Equity Value + Net Debt + Minority Interests + Preferred Stock<br>
+            Net Debt = Total Debt − Cash & Equivalents<br>
+            Equity Value = Enterprise Value − Net Debt − Minorities − Preferred
+          </div>
+
+          <div class="insight-box">
+            <div class="eyebrow">Why this matters</div>
+            <p>If Company A has a market cap of ₹1,000 Cr but ₹500 Cr of debt and zero cash, its EV is ₹1,500 Cr. Company B has the same market cap but is debt-free with ₹200 Cr of cash — its EV is ₹800 Cr. They "cost" very different amounts to acquire, even though their market caps are identical.</p>
+          </div>
+
+          <h3>Why EV/EBITDA ≠ P/E — And When to Use Each</h3>
+          <p>The single most common question in an IB interview. The answer is about <strong>capital structure neutrality</strong>.</p>
+          <p>EBITDA is before interest — so it doesn't matter how the company is financed. EV/EBITDA is capital structure neutral, which means you can compare a heavily leveraged company with a debt-free one on the same basis. This makes it ideal for:</p>
+          <ul>
+            <li>M&A analysis (you're buying the whole business, not just equity)</li>
+            <li>Comparing companies across different geographies with different tax rates</li>
+            <li>Capital-intensive sectors where D&A is a big number</li>
+          </ul>
+          <p>P/E is an equity multiple — it's after interest and tax, so it's sensitive to capital structure. Use it when:</p>
+          <ul>
+            <li>Comparing companies with similar leverage profiles</li>
+            <li>Financial services (where EV/EBITDA breaks down)</li>
+            <li>Mature, stable businesses where earnings quality is consistent</li>
+          </ul>
+
+          <div class="formula-box">
+            EV / EBITDA = Enterprise Value ÷ EBITDA (capital structure neutral)<br>
+            P / E = Market Cap ÷ Net Income = Share Price ÷ EPS (equity metric)<br>
+            EV / Revenue = Enterprise Value ÷ Revenue (used for early-stage or high-growth)
+          </div>
+
+          <h3>The Bridge — Walking from EV to Equity Value</h3>
+          <p>In practice, every valuation ends with a "bridge" — taking the Enterprise Value you've calculated and walking it down to an Equity Value and then a per-share price. Here's what that looks like:</p>
+
+          <div class="formula-box">
+            Enterprise Value (from DCF or Comps)   ₹1,500 Cr<br>
+            Less: Total Debt                        (₹300 Cr)<br>
+            Less: Finance Lease Liabilities         (₹50 Cr)<br>
+            Less: Minority Interests                (₹0 Cr)<br>
+            Add:  Cash & Equivalents                ₹180 Cr<br>
+            Add:  Associates / Investments           ₹0 Cr<br>
+            ─────────────────────────────────────────────────<br>
+            Equity Value                            ₹1,330 Cr<br>
+            ÷ Shares Outstanding                    15 Cr<br>
+            ─────────────────────────────────────────────────<br>
+            Value Per Share                         ₹88.67
+          </div>
+
+          <h3>Operating vs Non-Operating Assets</h3>
+          <p>Not everything on a company's balance sheet is part of the operating business. Non-operating assets — excess cash, investments in subsidiaries, real estate held for sale — are typically valued separately and added back to the core business value.</p>
+          <p>This is especially important for Indian conglomerates like Reliance, Tata, or Bajaj — where the holding company owns stakes in dozens of listed and unlisted businesses. You can't value these with a single multiple. You need SOTP — which is Chapter 4.</p>
+
+          <h3>The Three Questions Every Valuation Answers</h3>
+          <p>Before you open a model, ask yourself which of these you're answering:</p>
+          <ul>
+            <li><strong>What is the intrinsic value?</strong> → DCF (discounted cash flow)</li>
+            <li><strong>What are similar companies worth?</strong> → Comps (trading or transaction multiples)</li>
+            <li><strong>What would a buyer pay?</strong> → Transaction comps + control premium</li>
+          </ul>
+          <p>A well-constructed valuation uses all three — and the "Football Field" chart (Chapter 4) shows you how to present the range.</p>
+
+          <!-- TRY IT -->
+          <div class="try-it">
+            <div style="font-size:0.65rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:0.75rem;">Now try it yourself</div>
+            <div style="font-size:1rem;font-weight:700;color:var(--white);margin-bottom:0.4rem;">Build the EV Bridge — live</div>
+            <div style="font-size:0.82rem;color:rgba(255,255,255,0.55);margin-bottom:1rem;">Open the EV Bridge calculator. Input a company's debt and cash figures. Watch the bridge walk from EV to Equity Value in real time.</div>
+            <a href="/valuation-toolkit/domains/valuation-advisory/calculators/#ev-bridge" class="btn btn-outline" style="color:var(--white);border-color:rgba(255,255,255,0.2);">Open EV Bridge Calculator →</a>
+          </div>
+
+          <!-- CHAPTER NAV -->
+          <div class="chapter-nav">
+            <div></div>
+            <a href="/valuation-toolkit/#pricing" class="btn btn-black">Continue to Chapter 2 — DCF Deep Dive (Pro) →</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</div>
+<footer class="footer">
+  <div class="footer-logo">Valuation<strong>Desk</strong></div>
+  <div class="footer-note">© 2025 ValuationDesk</div>
+</footer>
+<div id="toast-container"></div>
+<script src="/valuation-toolkit/assets/vd.js"></script>
+<script>
+// Mark chapter 1 as done
+const done = JSON.parse(localStorage.getItem('vd_chapters_done') || '[]');
+if (!done.includes('ch1-va')) { done.push('ch1-va'); localStorage.setItem('vd_chapters_done', JSON.stringify(done)); }
+</script>
+</body>
+</html>

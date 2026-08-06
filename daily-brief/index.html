@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daily Brief — ValuationDesk</title>
+<link rel="stylesheet" href="/valuation-toolkit/assets/vd.css">
+</head>
+<body>
+<nav class="nav">
+  <a href="/valuation-toolkit/" class="nav-logo">Valuation<strong>Desk</strong></a>
+  <ul class="nav-links">
+    <li><a href="/valuation-toolkit/domains/valuation-advisory/">Valuation Advisory</a></li>
+    <li><a href="/valuation-toolkit/vault/">My Vault</a></li>
+    <li><a href="/valuation-toolkit/deal-room/">Deal Room</a></li>
+    <li><a href="/valuation-toolkit/daily-brief/" class="active">Daily Brief</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="/valuation-toolkit/#pricing" class="nav-cta">Get Pro — ₹799/mo</a>
+  </div>
+</nav>
+<div class="page-no-domain">
+  <section class="section">
+    <div class="container-sm">
+      <div class="eyebrow">Every morning. One company. One metric. One insight.</div>
+      <h1 class="h1" style="margin-bottom:0.75rem;">Daily Brief</h1>
+      <p class="lead" style="margin-bottom:2.5rem;">The fastest way to stay market-sharp. Open this every morning. 60 seconds. Done.</p>
+
+      <!-- TODAY'S BRIEF -->
+      <div class="brief-card" style="margin-bottom:2rem;" id="brief-main">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+          <div style="font-size:0.65rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);">Today's Brief — <span id="brief-date"></span></div>
+          <span class="tag tag-green" id="brief-sector-tag">—</span>
+        </div>
+        <div style="font-size:1.1rem;font-weight:700;color:var(--white);margin-bottom:0.5rem;" id="brief-company">—</div>
+        <div style="display:flex;align-items:baseline;gap:0.75rem;margin-bottom:0.75rem;">
+          <div style="font-size:3rem;font-weight:800;letter-spacing:-0.03em;color:var(--white);" id="brief-value">—</div>
+          <div style="font-size:1rem;color:rgba(255,255,255,0.5);" id="brief-metric">—</div>
+        </div>
+        <div style="font-size:0.88rem;color:rgba(255,255,255,0.7);margin-bottom:1rem;font-weight:500;" id="brief-context">—</div>
+        <div style="height:1px;background:rgba(255,255,255,0.1);margin-bottom:1rem;"></div>
+        <div style="font-size:0.82rem;color:rgba(255,255,255,0.55);line-height:1.7;" id="brief-insight">—</div>
+      </div>
+
+      <!-- QUICK ACTIONS -->
+      <div style="display:flex;gap:0.75rem;margin-bottom:3rem;flex-wrap:wrap;">
+        <a href="/valuation-toolkit/domains/valuation-advisory/calculators/" class="btn btn-black">Run a DCF on this company →</a>
+        <button onclick="saveBriefToVault()" class="btn btn-outline">🗄 Save this brief</button>
+      </div>
+
+      <!-- ARCHIVE -->
+      <div>
+        <div class="eyebrow" style="margin-bottom:1rem;">This week's briefs</div>
+        <div id="brief-archive" style="display:flex;flex-direction:column;gap:0.6rem;"></div>
+      </div>
+    </div>
+  </section>
+</div>
+<footer class="footer">
+  <div class="footer-logo">Valuation<strong>Desk</strong></div>
+  <div class="footer-note">© 2025 ValuationDesk</div>
+</footer>
+<div id="toast-container"></div>
+<script src="/valuation-toolkit/assets/vd.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const b = VD.brief.get();
+  document.getElementById('brief-date').textContent = new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('brief-company').textContent = b.company;
+  document.getElementById('brief-value').textContent = b.value;
+  document.getElementById('brief-metric').textContent = b.metric;
+  document.getElementById('brief-context').textContent = b.context;
+  document.getElementById('brief-insight').textContent = b.insight;
+  document.getElementById('brief-sector-tag').textContent = b.sector;
+
+  // Archive — show other briefs this week
+  const archive = document.getElementById('brief-archive');
+  VD.brief.data.forEach((item, i) => {
+    if (item.company === b.company) return;
+    const d = document.createElement('div');
+    d.className = 'card';
+    d.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:1rem;';
+    d.innerHTML = `<div><div style="font-size:0.62rem;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.2rem;">${item.sector}</div><div style="font-size:0.88rem;font-weight:600;">${item.company}</div><div style="font-size:0.78rem;color:var(--gray-500);">${item.context}</div></div><div style="text-align:right;flex-shrink:0;"><div style="font-size:1.2rem;font-weight:800;">${item.value}</div><div style="font-size:0.7rem;color:var(--gray-400);">${item.metric}</div></div>`;
+    archive.appendChild(d);
+  });
+});
+
+function saveBriefToVault() {
+  const b = VD.brief.get();
+  VD.vault.save({ type:'Daily Brief', company:b.company, value:b.value+' '+b.metric, domain:'Daily Brief' });
+}
+</script>
+</body>
+</html>

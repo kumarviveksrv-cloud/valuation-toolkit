@@ -1,258 +1,315 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ValuationDesk — Professional Financial Modeling Platform</title>
-  <meta name="description" content="DCF, Comparable Company Analysis, M&A/LBO, and VC Valuation — built to investment banking standards.">
-  <meta name="theme-color" content="#111827">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="ValuationDesk">
-  <link rel="manifest" href="/valuation-toolkit/manifest.json">
-  <link rel="apple-touch-icon" href="/valuation-toolkit/assets/icons/icon-192.png">
-  <link rel="stylesheet" href="/valuation-toolkit/assets/vd-system.css">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ValuationDesk — World's First End-to-End Finance Practice Platform</title>
+<meta name="description" content="Learn, practice, and master finance through hands-on tools. DCF, LBO, M&A, VC and more — built to IB standards.">
+<meta name="theme-color" content="#111827">
+<link rel="manifest" href="/valuation-toolkit/manifest.json">
+<link rel="stylesheet" href="/valuation-toolkit/assets/vd.css">
 </head>
 <body>
 
-<nav class="vd-nav">
-  <a href="/valuation-toolkit/" class="vd-logo">Valuation<strong>Desk</strong></a>
-  <ul class="vd-nav-links">
-    <li><a href="/valuation-toolkit/learn/">Learn</a></li>
-    <li><a href="/valuation-toolkit/calculators/">Calculators</a></li>
-    <li><a href="/valuation-toolkit/simulate/">Simulate</a></li>
+<nav class="nav">
+  <a href="/valuation-toolkit/" class="nav-logo">Valuation<strong>Desk</strong></a>
+  <ul class="nav-links">
+    <li><a href="/valuation-toolkit/domains/valuation-advisory/">Valuation Advisory</a></li>
+    <li><a href="/valuation-toolkit/domains/investment-banking/">Investment Banking</a></li>
+    <li><a href="/valuation-toolkit/vault/">My Vault</a></li>
+    <li><a href="/valuation-toolkit/deal-room/">Deal Room</a></li>
+    <li><a href="/valuation-toolkit/daily-brief/">Daily Brief</a></li>
   </ul>
-  <div class="vd-nav-right">
-    <button id="pwa-install-btn" onclick="triggerPWAInstall()">Install App</button>
-    <a href="#pricing" class="vd-btn-nav">Get Toolkit — ₹3,999</a>
-    <button class="vd-hamburger" id="vd-hamburger" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
+  <div class="nav-right">
+    <a href="/valuation-toolkit/vault/" class="nav-pill">🗄 Vault (<span id="vault-count">0</span>)</a>
+    <a href="#pricing" class="nav-cta">Get Pro — ₹799/mo</a>
   </div>
 </nav>
 
-<div class="vd-mobile-menu" id="vd-mobile-menu">
-  <a href="/valuation-toolkit/learn/">Learn</a>
-  <a href="/valuation-toolkit/calculators/">Calculators</a>
-  <a href="/valuation-toolkit/simulate/">Simulate</a>
-  <a href="#pricing">Get Toolkit</a>
-</div>
-
-<div class="vd-page">
+<div class="page-no-domain">
 
   <!-- HERO -->
-  <section style="min-height:100vh; display:grid; grid-template-columns:1fr 1fr; align-items:center; padding:6rem 2rem 4rem; gap:5rem; max-width:1080px; margin:0 auto;">
+  <section class="section" style="min-height:92vh;display:flex;align-items:center;padding-top:3rem;">
+    <div class="container">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;">
 
-    <div class="stagger">
-      <div class="vd-eyebrow">4 models · practitioner built · download forever</div>
-
-      <h1 class="vd-h1" style="margin-bottom:1.25rem;">
-        The valuation toolkit professionals actually use
-      </h1>
-
-      <p class="vd-lead" style="margin-bottom:1.25rem;">
-        DCF, Comparable Company Analysis, M&A/LBO, and VC Valuation — built to investment banking standards. Interactive platform. Downloadable Excel models.
-      </p>
-
-      <div style="font-size:0.75rem;color:var(--muted-light);border-left:2px solid var(--border-dark);padding-left:0.75rem;margin-bottom:2rem;line-height:1.7;">
-        Built with a senior IB practitioner with 12+ years of deal experience across Indian and global markets — who prefers to remain anonymous for professional reasons.
-      </div>
-
-      <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:3rem;">
-        <a href="/valuation-toolkit/calculators/" class="vd-btn vd-btn-black">Try live demo →</a>
-        <a href="#pricing" class="vd-btn vd-btn-outline">View pricing</a>
-      </div>
-
-      <div style="display:flex;gap:2.5rem;padding-top:1.75rem;border-top:1px solid var(--border);">
         <div>
-          <div style="font-size:1.8rem;font-weight:800;letter-spacing:-0.03em;" id="stat-models">0</div>
-          <div class="vd-eyebrow" style="margin:0.15rem 0 0;">Pro models</div>
-        </div>
-        <div>
-          <div style="font-size:1.8rem;font-weight:800;letter-spacing:-0.03em;" id="stat-sectors">0</div>
-          <div class="vd-eyebrow" style="margin:0.15rem 0 0;">Sectors</div>
-        </div>
-        <div>
-          <div style="font-size:1.8rem;font-weight:800;letter-spacing:-0.03em;">∞</div>
-          <div class="vd-eyebrow" style="margin:0.15rem 0 0;">Your license</div>
-        </div>
-      </div>
-    </div>
+          <div class="eyebrow fade-up s1">The world's first hands-on finance practice platform</div>
+          <h1 class="h1 fade-up s2" style="margin-bottom:1.1rem;">Learn finance by actually <em style="font-style:italic;">doing</em> finance</h1>
+          <p class="lead fade-up s3" style="margin-bottom:1rem;max-width:480px;">Not PDFs. Not lectures. Real calculators, real models, real data — across 6 finance domains. Built to investment banking standards.</p>
+          <div style="font-size:0.75rem;color:var(--gray-400);border-left:2px solid var(--gray-300);padding-left:0.75rem;margin-bottom:2rem;line-height:1.7;" class="fade-up s3">
+            Built with a senior IB practitioner with 12+ years of deal experience — who prefers to remain anonymous for professional reasons.
+          </div>
+          <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-bottom:2.5rem;" class="fade-up s4">
+            <a href="/valuation-toolkit/domains/valuation-advisory/" class="btn btn-black">Start with Valuation Advisory →</a>
+            <a href="#domains" class="btn btn-outline">Explore all domains</a>
+          </div>
 
-    <!-- HERO RIGHT -->
-    <div style="display:flex;flex-direction:column;gap:8px;" class="anim-fade-up">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
-        <div class="vd-metric-card">
-          <div class="vd-eyebrow" style="margin-bottom:0.35rem;">DCF fair value</div>
-          <div style="font-size:1.7rem;font-weight:800;letter-spacing:-0.03em;">₹847</div>
-          <div style="font-size:0.72rem;color:var(--green);margin-top:0.2rem;font-weight:500;">▲ 18.5% upside to market</div>
-          <a href="/valuation-toolkit/calculators/" style="font-size:0.7rem;color:var(--muted);text-decoration:none;display:block;margin-top:0.75rem;">Try DCF Calculator →</a>
+          <!-- DAILY BRIEF TEASER -->
+          <div class="brief-card fade-up s5" id="brief-teaser">
+            <div style="font-size:0.65rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:0.6rem;">Today's Daily Brief</div>
+            <div style="font-size:0.9rem;font-weight:600;color:var(--white);margin-bottom:0.3rem;" id="brief-company">Loading...</div>
+            <div style="display:flex;align-items:baseline;gap:0.5rem;margin-bottom:0.4rem;">
+              <div style="font-size:1.6rem;font-weight:800;color:var(--white);" id="brief-value">—</div>
+              <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);" id="brief-metric"></div>
+            </div>
+            <div style="font-size:0.75rem;color:rgba(255,255,255,0.55);line-height:1.6;" id="brief-context"></div>
+            <a href="/valuation-toolkit/daily-brief/" style="display:inline-block;margin-top:0.75rem;font-size:0.72rem;font-weight:600;color:rgba(255,255,255,0.6);text-decoration:none;">Read full brief →</a>
+          </div>
         </div>
-        <div class="vd-metric-card">
-          <div class="vd-eyebrow" style="margin-bottom:0.35rem;">Comps — EV/EBITDA</div>
-          <div style="font-size:1.7rem;font-weight:800;letter-spacing:-0.03em;">12.4x</div>
-          <div style="font-size:0.72rem;color:var(--muted-light);margin-top:0.2rem;">Sector median: 14.2x</div>
-          <a href="/valuation-toolkit/calculators/" style="font-size:0.7rem;color:var(--muted);text-decoration:none;display:block;margin-top:0.75rem;">Try Comps Engine →</a>
+
+        <!-- LIVE METRICS -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;" class="fade-up s3">
+          <div class="card-metric">
+            <div class="eyebrow" style="margin-bottom:0.3rem;">DCF Fair Value</div>
+            <div style="font-size:1.6rem;font-weight:800;letter-spacing:-0.03em;">₹847</div>
+            <div style="font-size:0.72rem;color:var(--green);font-weight:500;margin-top:0.2rem;">▲ 18.5% upside</div>
+            <a href="/valuation-toolkit/domains/valuation-advisory/calculators/" style="font-size:0.7rem;color:var(--gray-400);text-decoration:none;display:block;margin-top:0.65rem;">Open DCF Calculator →</a>
+          </div>
+          <div class="card-metric">
+            <div class="eyebrow" style="margin-bottom:0.3rem;">EV / EBITDA</div>
+            <div style="font-size:1.6rem;font-weight:800;letter-spacing:-0.03em;">12.4x</div>
+            <div style="font-size:0.72rem;color:var(--gray-400);margin-top:0.2rem;">Sector median 14.2x</div>
+            <a href="/valuation-toolkit/domains/valuation-advisory/calculators/" style="font-size:0.7rem;color:var(--gray-400);text-decoration:none;display:block;margin-top:0.65rem;">Open Comps Engine →</a>
+          </div>
+          <div class="card-metric">
+            <div class="eyebrow" style="margin-bottom:0.3rem;">LBO IRR (5yr)</div>
+            <div style="font-size:1.6rem;font-weight:800;letter-spacing:-0.03em;color:var(--green);">23.1%</div>
+            <div style="font-size:0.72rem;color:var(--gray-400);margin-top:0.2rem;">Entry 8.5x → Exit 10.2x</div>
+            <a href="/valuation-toolkit/domains/private-equity/" style="font-size:0.7rem;color:var(--gray-400);text-decoration:none;display:block;margin-top:0.65rem;">Open LBO Model →</a>
+          </div>
+          <div class="card-metric">
+            <div class="eyebrow" style="margin-bottom:0.3rem;">VC Post-Money</div>
+            <div style="font-size:1.6rem;font-weight:800;letter-spacing:-0.03em;">$18.4M</div>
+            <div style="font-size:0.72rem;color:var(--gray-400);margin-top:0.2rem;">Pre $15.4M · 16.3% dil</div>
+            <a href="/valuation-toolkit/domains/venture-capital/" style="font-size:0.7rem;color:var(--gray-400);text-decoration:none;display:block;margin-top:0.65rem;">Open VC Calculator →</a>
+          </div>
+          <div class="card-metric" style="grid-column:1/-1;background:var(--gray-50);border-style:dashed;">
+            <div class="eyebrow" style="margin-bottom:0.3rem;">Valuation Vault</div>
+            <div style="font-size:1.1rem;font-weight:700;letter-spacing:-0.02em;" id="hero-vault-count">0 models saved</div>
+            <div style="font-size:0.72rem;color:var(--gray-400);margin-top:0.2rem;">Your personal model library</div>
+            <a href="/valuation-toolkit/vault/" style="font-size:0.7rem;color:var(--gray-400);text-decoration:none;display:block;margin-top:0.65rem;">Open Vault →</a>
+          </div>
         </div>
-        <div class="vd-metric-card">
-          <div class="vd-eyebrow" style="margin-bottom:0.35rem;">LBO IRR (5yr)</div>
-          <div style="font-size:1.7rem;font-weight:800;letter-spacing:-0.03em;color:var(--green);">23.1%</div>
-          <div style="font-size:0.72rem;color:var(--muted-light);margin-top:0.2rem;">Entry 8.5x → Exit 10.2x</div>
-          <a href="/valuation-toolkit/calculators/" style="font-size:0.7rem;color:var(--muted);text-decoration:none;display:block;margin-top:0.75rem;">Try M&A/LBO Model →</a>
-        </div>
-        <div class="vd-metric-card">
-          <div class="vd-eyebrow" style="margin-bottom:0.35rem;">VC post-money</div>
-          <div style="font-size:1.7rem;font-weight:800;letter-spacing:-0.03em;">$18.4M</div>
-          <div style="font-size:0.72rem;color:var(--muted-light);margin-top:0.2rem;">Pre: $15.4M · 16.3% dilution</div>
-          <a href="/valuation-toolkit/calculators/" style="font-size:0.7rem;color:var(--muted);text-decoration:none;display:block;margin-top:0.75rem;">Try VC Calculator →</a>
-        </div>
+
       </div>
     </div>
   </section>
 
-  <!-- PLATFORM MODULES -->
-  <section class="vd-section vd-section-gray">
-    <div class="vd-container">
-      <div style="text-align:center;margin-bottom:3rem;">
-        <div class="vd-eyebrow">The platform</div>
-        <h2 class="vd-h2">Three ways to learn. One platform.</h2>
+  <!-- DOMAINS -->
+  <section class="section section-gray" id="domains">
+    <div class="container">
+      <div style="text-align:center;margin-bottom:2.5rem;">
+        <div class="eyebrow">Phase 1 — Live now</div>
+        <h2 class="h2">6 domains. 39 calculators. One platform.</h2>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;">
-        <a href="/valuation-toolkit/learn/" style="text-decoration:none;">
-          <div class="vd-card" style="height:100%;">
-            <div style="font-size:1.5rem;margin-bottom:0.75rem;">📖</div>
-            <div class="vd-eyebrow">Module 01</div>
-            <h3 class="vd-h3" style="margin-bottom:0.6rem;">Learn</h3>
-            <p style="font-size:0.82rem;color:var(--muted);line-height:1.65;margin-bottom:1rem;">6 chapters. Concepts, methodology, worked examples across all 4 valuation frameworks.</p>
-            <span class="vd-tag">Free access</span>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;">
+
+        <a href="/valuation-toolkit/domains/valuation-advisory/" style="text-decoration:none;">
+          <div class="card" style="border-color:var(--black);border-width:2px;height:100%;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+              <span style="font-size:1.4rem;">📊</span>
+              <span class="tag tag-black">Live now</span>
+            </div>
+            <h3 class="h3" style="margin-bottom:0.4rem;">Valuation Advisory</h3>
+            <p style="font-size:0.8rem;color:var(--gray-500);line-height:1.6;margin-bottom:0.75rem;">DCF, Comps, SOTP, Football Field, WACC, EV Bridge, NAV — the complete valuation practitioner toolkit.</p>
+            <div style="font-size:0.72rem;color:var(--gray-400);">7 calculators · 5 chapters · Excel model</div>
           </div>
         </a>
-        <a href="/valuation-toolkit/calculators/" style="text-decoration:none;">
-          <div class="vd-card" style="height:100%;border-color:var(--black);box-shadow:var(--shadow);">
-            <div style="font-size:1.5rem;margin-bottom:0.75rem;">🧮</div>
-            <div class="vd-eyebrow">Module 02</div>
-            <h3 class="vd-h3" style="margin-bottom:0.6rem;">Calculators</h3>
-            <p style="font-size:0.82rem;color:var(--muted);line-height:1.65;margin-bottom:1rem;">Live DCF, Comps, LBO, VC. Toggle assumptions, watch outputs update in real time.</p>
-            <span class="vd-tag">Free access</span>
+
+        <a href="/valuation-toolkit/domains/investment-banking/" style="text-decoration:none;">
+          <div class="card" style="height:100%;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+              <span style="font-size:1.4rem;">🏦</span>
+              <span class="tag tag-gray">Coming soon</span>
+            </div>
+            <h3 class="h3" style="margin-bottom:0.4rem;">Investment Banking</h3>
+            <p style="font-size:0.8rem;color:var(--gray-500);line-height:1.6;margin-bottom:0.75rem;">Deal structuring, pitch logic, fee calculators, M&A model, accretion/dilution, transaction comps.</p>
+            <div style="font-size:0.72rem;color:var(--gray-400);">6 calculators · 4 chapters · Excel model</div>
           </div>
         </a>
-        <a href="/valuation-toolkit/simulate/" style="text-decoration:none;">
-          <div class="vd-card" style="height:100%;">
-            <div style="font-size:1.5rem;margin-bottom:0.75rem;">📊</div>
-            <div class="vd-eyebrow">Module 03</div>
-            <h3 class="vd-h3" style="margin-bottom:0.6rem;">Simulate</h3>
-            <p style="font-size:0.82rem;color:var(--muted);line-height:1.65;margin-bottom:1rem;">Upload your P&L as CSV. Auto-map columns. Benchmark against 12 Indian sectors.</p>
-            <span class="vd-tag">Free access</span>
+
+        <a href="/valuation-toolkit/domains/private-equity/" style="text-decoration:none;">
+          <div class="card" style="height:100%;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+              <span style="font-size:1.4rem;">💰</span>
+              <span class="tag tag-gray">Coming soon</span>
+            </div>
+            <h3 class="h3" style="margin-bottom:0.4rem;">Private Equity</h3>
+            <p style="font-size:0.8rem;color:var(--gray-500);line-height:1.6;margin-bottom:0.75rem;">LBO model, returns waterfall, debt scheduling, fund economics, carry calculator, IRR sensitivity.</p>
+            <div style="font-size:0.72rem;color:var(--gray-400);">6 calculators · 5 chapters · Excel model</div>
           </div>
         </a>
+
+        <a href="/valuation-toolkit/domains/venture-capital/" style="text-decoration:none;">
+          <div class="card" style="height:100%;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+              <span style="font-size:1.4rem;">🚀</span>
+              <span class="tag tag-gray">Coming soon</span>
+            </div>
+            <h3 class="h3" style="margin-bottom:0.4rem;">Venture Capital</h3>
+            <p style="font-size:0.8rem;color:var(--gray-500);line-height:1.6;margin-bottom:0.75rem;">Cap table, pre/post-money, VC method, dilution tracker, runway calculator, SAFE notes.</p>
+            <div style="font-size:0.72rem;color:var(--gray-400);">7 calculators · 4 chapters · Excel model</div>
+          </div>
+        </a>
+
+        <a href="/valuation-toolkit/domains/corporate-finance/" style="text-decoration:none;">
+          <div class="card" style="height:100%;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+              <span style="font-size:1.4rem;">📈</span>
+              <span class="tag tag-gray">Coming soon</span>
+            </div>
+            <h3 class="h3" style="margin-bottom:0.4rem;">Corporate Finance</h3>
+            <p style="font-size:0.8rem;color:var(--gray-500);line-height:1.6;margin-bottom:0.75rem;">WACC, capital structure, NPV/IRR, working capital, dividend policy, budgeting models.</p>
+            <div style="font-size:0.72rem;color:var(--gray-400);">8 calculators · 4 chapters · Excel model</div>
+          </div>
+        </a>
+
+        <a href="/valuation-toolkit/domains/ma/" style="text-decoration:none;">
+          <div class="card" style="height:100%;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+              <span style="font-size:1.4rem;">🤝</span>
+              <span class="tag tag-gray">Coming soon</span>
+            </div>
+            <h3 class="h3" style="margin-bottom:0.4rem;">M&A</h3>
+            <p style="font-size:0.8rem;color:var(--gray-500);line-height:1.6;margin-bottom:0.75rem;">Accretion/dilution, synergy calculator, deal premium analyser, merger model, target screening.</p>
+            <div style="font-size:0.72rem;color:var(--gray-400);">5 calculators · 4 chapters · Excel model</div>
+          </div>
+        </a>
+
       </div>
     </div>
   </section>
 
-  <!-- 4 MODELS -->
-  <section class="vd-section">
-    <div class="vd-container">
-      <div style="display:grid;grid-template-columns:1fr 1fr;align-items:end;margin-bottom:3rem;gap:2rem;">
+  <!-- WHY DIFFERENT -->
+  <section class="section">
+    <div class="container">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;">
         <div>
-          <div class="vd-eyebrow">What you download</div>
-          <h2 class="vd-h2">Four models. Every deal covered.</h2>
+          <div class="eyebrow">Why ValuationDesk</div>
+          <h2 class="h2" style="margin-bottom:1rem;">This isn't a course. It's a practice ground.</h2>
+          <p class="lead" style="margin-bottom:2rem;">Every other finance platform gives you PDFs and videos. ValuationDesk gives you live calculators where you input real numbers and get real outputs — the way it works at an actual IB firm.</p>
+          <div style="display:flex;flex-direction:column;gap:1rem;">
+            <div style="display:flex;gap:0.75rem;align-items:flex-start;">
+              <div style="width:20px;height:20px;background:var(--black);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;"><span style="color:white;font-size:10px;">✓</span></div>
+              <div><div style="font-size:0.88rem;font-weight:600;margin-bottom:0.2rem;">Hands-on, not hands-off</div><div style="font-size:0.8rem;color:var(--gray-500);">Every concept has a live calculator. You don't just read about DCF — you build one in the browser right now.</div></div>
+            </div>
+            <div style="display:flex;gap:0.75rem;align-items:flex-start;">
+              <div style="width:20px;height:20px;background:var(--black);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;"><span style="color:white;font-size:10px;">✓</span></div>
+              <div><div style="font-size:0.88rem;font-weight:600;margin-bottom:0.2rem;">IB-grade Excel models you keep forever</div><div style="font-size:0.8rem;color:var(--gray-500);">Download professional models with all formulas intact. Use them on real deals. Forever.</div></div>
+            </div>
+            <div style="display:flex;gap:0.75rem;align-items:flex-start;">
+              <div style="width:20px;height:20px;background:var(--black);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;"><span style="color:white;font-size:10px;">✓</span></div>
+              <div><div style="font-size:0.88rem;font-weight:600;margin-bottom:0.2rem;">Daily Brief keeps you market-sharp</div><div style="font-size:0.8rem;color:var(--gray-500);">One real company metric every morning. Context, insight, and the analyst debate — in 60 seconds.</div></div>
+            </div>
+            <div style="display:flex;gap:0.75rem;align-items:flex-start;">
+              <div style="width:20px;height:20px;background:var(--black);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;"><span style="color:white;font-size:10px;">✓</span></div>
+              <div><div style="font-size:0.88rem;font-weight:600;margin-bottom:0.2rem;">Valuation Vault saves your work</div><div style="font-size:0.8rem;color:var(--gray-500);">Every model you build is saved. Your personal library grows. Export any model to Excel anytime.</div></div>
+            </div>
+          </div>
         </div>
-        <p class="vd-lead">Each model is built to the standard you'd see at a bulge-bracket firm — dynamic assumptions, scenario toggles, and print-ready output sheets.</p>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;">
-        <div style="background:var(--white);padding:1.5rem;">
-          <div class="vd-eyebrow">Model 01</div>
-          <div style="font-size:1.4rem;margin:0.6rem 0;">📊</div>
-          <h3 class="vd-h3" style="margin-bottom:0.5rem;">DCF & Intrinsic Valuation</h3>
-          <p style="font-size:0.78rem;color:var(--muted);line-height:1.65;">Multi-stage DCF, WACC builder, Gordon Growth TV, scenario toggles, 25-cell sensitivity table.</p>
-        </div>
-        <div style="background:var(--white);padding:1.5rem;">
-          <div class="vd-eyebrow">Model 02</div>
-          <div style="font-size:1.4rem;margin:0.6rem 0;">⚖️</div>
-          <h3 class="vd-h3" style="margin-bottom:0.5rem;">Comparable Company Analysis</h3>
-          <p style="font-size:0.78rem;color:var(--muted);line-height:1.65;">EV/EBITDA, P/E, EV/Revenue spread analysis. Implied valuation bridge.</p>
-        </div>
-        <div style="background:var(--white);padding:1.5rem;">
-          <div class="vd-eyebrow">Model 03</div>
-          <div style="font-size:1.4rem;margin:0.6rem 0;">🏦</div>
-          <h3 class="vd-h3" style="margin-bottom:0.5rem;">M&A / LBO Model</h3>
-          <p style="font-size:0.78rem;color:var(--muted);line-height:1.65;">Deal structuring, debt scheduling, returns waterfall, accretion/dilution, IRR sensitivity.</p>
-        </div>
-        <div style="background:var(--white);padding:1.5rem;">
-          <div class="vd-eyebrow">Model 04</div>
-          <div style="font-size:1.4rem;margin:0.6rem 0;">🚀</div>
-          <h3 class="vd-h3" style="margin-bottom:0.5rem;">VC & Startup Valuation</h3>
-          <p style="font-size:0.78rem;color:var(--muted);line-height:1.65;">Pre/post-money, cap table, runway calc, VC method with ownership back-solving.</p>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;">
+          <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--r-lg);padding:1.25rem;display:flex;align-items:center;gap:1rem;">
+            <div style="font-size:1.8rem;">☀️</div>
+            <div><div style="font-weight:600;font-size:0.88rem;margin-bottom:0.2rem;">Daily Brief</div><div style="font-size:0.78rem;color:var(--gray-500);">One market metric every morning. Build a daily habit.</div></div>
+          </div>
+          <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--r-lg);padding:1.25rem;display:flex;align-items:center;gap:1rem;">
+            <div style="font-size:1.8rem;">🗄</div>
+            <div><div style="font-weight:600;font-size:0.88rem;margin-bottom:0.2rem;">Valuation Vault</div><div style="font-size:0.78rem;color:var(--gray-500);">Save every model. Build your personal finance library.</div></div>
+          </div>
+          <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--r-lg);padding:1.25rem;display:flex;align-items:center;gap:1rem;">
+            <div style="font-size:1.8rem;">🏛</div>
+            <div><div style="font-weight:600;font-size:0.88rem;margin-bottom:0.2rem;">Deal Room</div><div style="font-size:0.78rem;color:var(--gray-500);">Weekly live case study. Real companies. Real numbers.</div></div>
+          </div>
+          <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--r-lg);padding:1.25rem;display:flex;align-items:center;gap:1rem;">
+            <div style="font-size:1.8rem;">🏅</div>
+            <div><div style="font-weight:600;font-size:0.88rem;margin-bottom:0.2rem;">Certification</div><div style="font-size:0.78rem;color:var(--gray-500);">Complete a domain. Earn a badge. Put it on LinkedIn.</div></div>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- PRICING -->
-  <section class="vd-section vd-section-gray" id="pricing">
-    <div class="vd-container" style="text-align:center;">
-      <div class="vd-eyebrow">One-time purchase · yours forever</div>
-      <h2 class="vd-h2" style="margin-bottom:0.75rem;">No subscription. No hosting. Just download.</h2>
-      <p class="vd-lead" style="margin:0 auto 3rem;">Own it forever. Use it on every deal for the rest of your career.</p>
+  <section class="section section-gray" id="pricing">
+    <div class="container" style="text-align:center;">
+      <div class="eyebrow">Pricing</div>
+      <h2 class="h2" style="margin-bottom:0.75rem;">Simple. No tricks.</h2>
+      <p class="lead" style="margin:0 auto 2.5rem;max-width:480px;">Start free. Go Pro when you're ready. Cancel anytime — but you won't want to.</p>
 
-      <div style="display:flex;gap:1.25rem;justify-content:center;flex-wrap:wrap;max-width:860px;margin:0 auto;">
+      <div style="display:flex;gap:1.25rem;justify-content:center;flex-wrap:wrap;max-width:820px;margin:0 auto;">
 
-        <div class="vd-card" style="flex:1;min-width:220px;max-width:260px;text-align:left;">
-          <div class="vd-eyebrow">Starter</div>
-          <div style="font-size:2rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.15rem;">₹1,999</div>
-          <div style="font-size:0.72rem;color:var(--muted-light);margin-bottom:1.25rem;">One-time · ~$24</div>
+        <div class="card" style="flex:1;min-width:220px;max-width:250px;text-align:left;">
+          <div class="eyebrow">Free</div>
+          <div style="font-size:2rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.15rem;">₹0</div>
+          <div style="font-size:0.72rem;color:var(--gray-400);margin-bottom:1.25rem;">Forever free</div>
           <ul style="list-style:none;margin-bottom:1.5rem;display:flex;flex-direction:column;gap:0.5rem;">
-            <li style="font-size:0.8rem;color:var(--muted);display:flex;gap:0.5rem;align-items:flex-start;"><span style="color:var(--black);font-weight:600;">→</span> DCF Model (full)</li>
-            <li style="font-size:0.8rem;color:var(--muted);display:flex;gap:0.5rem;align-items:flex-start;"><span style="color:var(--black);font-weight:600;">→</span> Comps Engine (full)</li>
-            <li style="font-size:0.8rem;color:var(--muted);display:flex;gap:0.5rem;align-items:flex-start;"><span style="color:var(--black);font-weight:600;">→</span> Methodology notes</li>
+            <li style="font-size:0.8rem;color:var(--gray-500);">→ 1 calculator per domain</li>
+            <li style="font-size:0.8rem;color:var(--gray-500);">→ Chapter 1 of each domain</li>
+            <li style="font-size:0.8rem;color:var(--gray-500);">→ Daily Brief access</li>
+            <li style="font-size:0.8rem;color:var(--gray-500);">→ 5 Vault saves</li>
           </ul>
-          <button class="vd-btn vd-btn-outline" style="width:100%;justify-content:center;">Get Starter</button>
+          <a href="/valuation-toolkit/domains/valuation-advisory/" class="btn btn-outline" style="width:100%;justify-content:center;">Start free</a>
         </div>
 
-        <div class="vd-card" style="flex:1;min-width:220px;max-width:260px;text-align:left;border-color:var(--black);border-width:2px;position:relative;">
+        <div class="card" style="flex:1;min-width:220px;max-width:250px;text-align:left;border-color:var(--black);border-width:2px;position:relative;">
           <div style="position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:var(--black);color:var(--white);font-size:0.6rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.75rem;border-radius:0 0 6px 6px;">Most popular</div>
-          <div class="vd-eyebrow" style="margin-top:0.5rem;">Full Toolkit</div>
-          <div style="font-size:2rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.15rem;">₹3,999</div>
-          <div style="font-size:0.72rem;color:var(--muted-light);margin-bottom:1.25rem;">One-time · ~$48</div>
+          <div class="eyebrow" style="margin-top:0.5rem;">Pro</div>
+          <div style="font-size:2rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.15rem;">₹799<span style="font-size:1rem;font-weight:500;color:var(--gray-400)">/mo</span></div>
+          <div style="font-size:0.72rem;color:var(--gray-400);margin-bottom:1.25rem;">or ₹5,999/year — save 37%</div>
           <ul style="list-style:none;margin-bottom:1.5rem;display:flex;flex-direction:column;gap:0.5rem;">
-            <li style="font-size:0.8rem;color:var(--muted);display:flex;gap:0.5rem;align-items:flex-start;"><span style="color:var(--black);font-weight:600;">→</span> All 4 models</li>
-            <li style="font-size:0.8rem;color:var(--muted);display:flex;gap:0.5rem;align-items:flex-start;"><span style="color:var(--black);font-weight:600;">→</span> Scenario & sensitivity tabs</li>
-            <li style="font-size:0.8rem;color:var(--muted);display:flex;gap:0.5rem;align-items:flex-start;"><span style="color:var(--black);font-weight:600;">→</span> Worked examples baked in</li>
-            <li style="font-size:0.8rem;color:var(--muted);display:flex;gap:0.5rem;align-items:flex-start;"><span style="color:var(--black);font-weight:600;">→</span> Print-ready output sheets</li>
+            <li style="font-size:0.8rem;color:var(--gray-500);">→ All calculators, all domains</li>
+            <li style="font-size:0.8rem;color:var(--gray-500);">→ All learning chapters</li>
+            <li style="font-size:0.8rem;color:var(--gray-500);">→ Excel model downloads</li>
+            <li style="font-size:0.8rem;color:var(--gray-500);">→ Unlimited Vault saves</li>
+            <li style="font-size:0.8rem;color:var(--gray-500);">→ Weekly Deal Room access</li>
+            <li style="font-size:0.8rem;color:var(--gray-500);">→ Domain certifications</li>
           </ul>
-          <button class="vd-btn vd-btn-black" style="width:100%;justify-content:center;">Get Full Toolkit</button>
+          <button class="btn btn-black" style="width:100%;justify-content:center;">Get Pro</button>
         </div>
 
-        <div class="vd-card" style="flex:1;min-width:220px;max-width:260px;text-align:left;">
-          <div class="vd-eyebrow">Pro Bundle</div>
-          <div style="font-size:2rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.15rem;">₹6,999</div>
-          <div style="font-size:0.72rem;color:var(--muted-light);margin-bottom:1.25rem;">One-time · ~$84</div>
+        <div class="card" style="flex:1;min-width:220px;max-width:250px;text-align:left;">
+          <div class="eyebrow">Teams</div>
+          <div style="font-size:2rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.15rem;">₹2,999<span style="font-size:1rem;font-weight:500;color:var(--gray-400)">/mo</span></div>
+          <div style="font-size:0.72rem;color:var(--gray-400);margin-bottom:1.25rem;">Up to 5 users · Coming Phase 2</div>
           <ul style="list-style:none;margin-bottom:1.5rem;display:flex;flex-direction:column;gap:0.5rem;">
-            <li style="font-size:0.8rem;color:var(--muted);display:flex;gap:0.5rem;align-items:flex-start;"><span style="color:var(--black);font-weight:600;">→</span> Everything in Full Toolkit</li>
-            <li style="font-size:0.8rem;color:var(--muted);display:flex;gap:0.5rem;align-items:flex-start;"><span style="color:var(--black);font-weight:600;">→</span> 2 additional sector models</li>
-            <li style="font-size:0.8rem;color:var(--muted);display:flex;gap:0.5rem;align-items:flex-start;"><span style="color:var(--black);font-weight:600;">→</span> Benchmark guide (12 sectors)</li>
-            <li style="font-size:0.8rem;color:var(--muted);display:flex;gap:0.5rem;align-items:flex-start;"><span style="color:var(--black);font-weight:600;">→</span> Video walkthrough</li>
+            <li style="font-size:0.8rem;color:var(--gray-500);">→ Everything in Pro</li>
+            <li style="font-size:0.8rem;color:var(--gray-500);">→ Shared Vault</li>
+            <li style="font-size:0.8rem;color:var(--gray-500);">→ Team leaderboard</li>
+            <li style="font-size:0.8rem;color:var(--gray-500);">→ Admin dashboard</li>
           </ul>
-          <button class="vd-btn vd-btn-outline" style="width:100%;justify-content:center;">Get Pro Bundle</button>
+          <button class="btn btn-outline" style="width:100%;justify-content:center;" disabled>Notify me</button>
         </div>
+
       </div>
-      <p style="margin-top:1.75rem;font-size:0.72rem;color:var(--muted-light);">Secure checkout · Instant download · Works on Excel 2016+</p>
     </div>
   </section>
 
 </div>
 
-<footer class="vd-footer">
-  <div class="vd-footer-logo">Valuation<strong>Desk</strong></div>
-  <div class="vd-footer-note">Built by practitioners. For practitioners. © 2025 ValuationDesk</div>
+<footer class="footer">
+  <div class="footer-logo">Valuation<strong>Desk</strong></div>
+  <div class="footer-note">The world's first hands-on finance practice platform. © 2025 ValuationDesk</div>
 </footer>
 
-<div id="vd-toast-container"></div>
-<script src="/valuation-toolkit/assets/vd-shared.js"></script>
+<div id="toast-container"></div>
+<script src="/valuation-toolkit/assets/vd.js"></script>
 <script>
-  window.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => VD.countUp(document.getElementById('stat-models'), 4, 800), 400);
-    setTimeout(() => VD.countUp(document.getElementById('stat-sectors'), 12, 1000), 500);
-  });
+document.addEventListener('DOMContentLoaded', () => {
+  // Daily Brief teaser
+  const b = VD.brief.get();
+  document.getElementById('brief-company').textContent = b.company + ' — ' + b.sector;
+  document.getElementById('brief-value').textContent = b.value;
+  document.getElementById('brief-metric').textContent = b.metric;
+  document.getElementById('brief-context').textContent = b.context;
+
+  // Vault count
+  const vc = VD.vault.count();
+  const hvc = document.getElementById('hero-vault-count');
+  if (hvc) hvc.textContent = vc === 0 ? '0 models saved — start building' : vc + ' model' + (vc > 1 ? 's' : '') + ' saved';
+
+  // Count-up stats
+  VD.countUp(document.getElementById('vault-count'), vc, 600);
+});
 </script>
 </body>
 </html>

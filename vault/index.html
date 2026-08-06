@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Valuation Vault — ValuationDesk</title>
+<link rel="stylesheet" href="/valuation-toolkit/assets/vd.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body>
+<nav class="nav">
+  <a href="/valuation-toolkit/" class="nav-logo">Valuation<strong>Desk</strong></a>
+  <ul class="nav-links">
+    <li><a href="/valuation-toolkit/domains/valuation-advisory/">Valuation Advisory</a></li>
+    <li><a href="/valuation-toolkit/vault/" class="active">My Vault</a></li>
+    <li><a href="/valuation-toolkit/deal-room/">Deal Room</a></li>
+    <li><a href="/valuation-toolkit/daily-brief/">Daily Brief</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="/valuation-toolkit/#pricing" class="nav-cta">Get Pro — ₹799/mo</a>
+  </div>
+</nav>
+<div class="page-no-domain">
+  <section class="section">
+    <div class="container">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;">
+        <div>
+          <div class="eyebrow">Your personal model library</div>
+          <h1 class="h1">Valuation Vault</h1>
+          <p class="lead" style="margin-top:0.5rem;">Every model you save lives here. Export any of them to Excel anytime.</p>
+        </div>
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-start;">
+          <button onclick="exportAllToExcel()" class="btn btn-outline btn-sm">⬇ Export all to Excel</button>
+          <button onclick="clearVault()" class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red);">Clear vault</button>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;" id="vault-stats">
+        <div class="card-metric"><div class="eyebrow" style="margin-bottom:0.3rem;">Total Saved</div><div style="font-size:2rem;font-weight:800;" id="vs-total">0</div></div>
+        <div class="card-metric"><div class="eyebrow" style="margin-bottom:0.3rem;">DCF Models</div><div style="font-size:2rem;font-weight:800;" id="vs-dcf">0</div></div>
+        <div class="card-metric"><div class="eyebrow" style="margin-bottom:0.3rem;">Comps</div><div style="font-size:2rem;font-weight:800;" id="vs-comps">0</div></div>
+        <div class="card-metric"><div class="eyebrow" style="margin-bottom:0.3rem;">Other Models</div><div style="font-size:2rem;font-weight:800;" id="vs-other">0</div></div>
+      </div>
+
+      <!-- VAULT ITEMS -->
+      <div id="vault-list"></div>
+
+      <!-- EMPTY STATE -->
+      <div id="vault-empty" style="display:none;text-align:center;padding:4rem 2rem;background:var(--gray-50);border:1px dashed var(--gray-200);border-radius:var(--r-lg);">
+        <div style="font-size:2.5rem;margin-bottom:1rem;">🗄</div>
+        <h3 class="h3" style="margin-bottom:0.5rem;">Your Vault is empty</h3>
+        <p class="lead" style="margin-bottom:1.5rem;">Run any calculator and click "Save to Vault" — your models will appear here.</p>
+        <a href="/valuation-toolkit/domains/valuation-advisory/calculators/" class="btn btn-black">Open Calculators →</a>
+      </div>
+    </div>
+  </section>
+</div>
+<footer class="footer">
+  <div class="footer-logo">Valuation<strong>Desk</strong></div>
+  <div class="footer-note">© 2025 ValuationDesk</div>
+</footer>
+<div id="toast-container"></div>
+<script src="/valuation-toolkit/assets/vd.js"></script>
+<script>
+function renderVault() {
+  const all = VD.vault.getAll();
+  const list = document.getElementById('vault-list');
+  const empty = document.getElementById('vault-empty');
+  if (all.length === 0) { list.innerHTML=''; empty.style.display='block'; }
+  else {
+    empty.style.display='none';
+    list.innerHTML = all.map(item => `
+      <div class="vault-item">
+        <div style="display:flex;align-items:center;gap:0.75rem;flex:1;">
+          <div style="width:32px;height:32px;background:var(--gray-100);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;color:var(--gray-500);flex-shrink:0;">${item.type.slice(0,3).toUpperCase()}</div>
+          <div>
+            <div style="font-size:0.88rem;font-weight:600;">${item.type}${item.company ? ' — ' + item.company : ''}</div>
+            <div style="font-size:0.75rem;color:var(--gray-400);">${item.domain} · Saved ${item.savedAt}</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:1rem;">
+          <div style="font-size:1rem;font-weight:700;">${item.value || '—'}</div>
+          <button onclick="VD.vault.delete(${item.id}); renderVault();" style="font-size:0.72rem;color:var(--gray-400);background:none;border:none;cursor:pointer;padding:0.25rem;">✕</button>
+        </div>
+      </div>`).join('');
+  }
+  document.getElementById('vs-total').textContent = all.length;
+  document.getElementById('vs-dcf').textContent = all.filter(i=>i.type==='DCF').length;
+  document.getElementById('vs-comps').textContent = all.filter(i=>i.type==='Comps').length;
+  document.getElementById('vs-other').textContent = all.filter(i=>!['DCF','Comps'].includes(i.type)).length;
+}
+
+function exportAllToExcel() {
+  const all = VD.vault.getAll();
+  if (!all.length) { toast('Vault is empty', 'error'); return; }
+  const wb = XLSX.utils.book_new();
+  const rows = [['Type','Company','Value','Domain','Saved On'], ...all.map(i=>[i.type,i.company||'—',i.value||'—',i.domain,i.savedAt])];
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), 'Valuation Vault');
+  XLSX.writeFile(wb, 'ValuationDesk_Vault.xlsx');
+  toast('Exported to Excel!', 'success');
+}
+
+function clearVault() {
+  if (confirm('Clear all saved models? This cannot be undone.')) {
+    localStorage.removeItem('vd_vault_v2');
+    renderVault();
+    toast('Vault cleared', 'info');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', renderVault);
+</script>
+</body>
+</html>

@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Valuation Calculators — ValuationDesk</title>
+<link rel="stylesheet" href="/valuation-toolkit/assets/vd.css">
+<style>
+.calc-tabs { display:flex; gap:4px; padding:0 1.75rem; background:var(--white); border-bottom:1px solid var(--gray-200); overflow-x:auto; }
+.calc-tabs::-webkit-scrollbar { display:none; }
+.calc-tab { font-size:0.78rem; font-weight:500; color:var(--gray-400); padding:0.65rem 1rem; border-bottom:2px solid transparent; cursor:pointer; transition:var(--t); white-space:nowrap; flex-shrink:0; background:none; border-top:none; border-left:none; border-right:none; border-bottom:2px solid transparent; }
+.calc-tab:hover { color:var(--black); }
+.calc-tab.active { color:var(--black); border-bottom-color:var(--black); }
+.calc-panel { display:none; }
+.calc-panel.active { display:block; }
+.w-bar { display:flex; align-items:center; gap:0.6rem; margin-bottom:0.4rem; }
+.w-bar-label { font-family:var(--mono); font-size:0.6rem; color:var(--gray-400); width:90px; text-align:right; flex-shrink:0; }
+.w-bar-track { flex:1; height:18px; background:var(--gray-100); border-radius:2px; overflow:hidden; }
+.w-bar-fill { height:100%; border-radius:2px; display:flex; align-items:center; padding-left:0.4rem; transition:width 0.5s ease; }
+.w-bar-fill span { font-family:var(--mono); font-size:0.58rem; color:white; white-space:nowrap; }
+.locked-overlay { position:absolute; inset:0; background:rgba(255,255,255,0.85); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0.75rem; border-radius:var(--r-lg); backdrop-filter:blur(2px); z-index:10; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/valuation-toolkit/" class="nav-logo">Valuation<strong>Desk</strong></a>
+  <ul class="nav-links">
+    <li><a href="/valuation-toolkit/domains/valuation-advisory/" class="active">Valuation Advisory</a></li>
+    <li><a href="/valuation-toolkit/domains/investment-banking/">Investment Banking</a></li>
+    <li><a href="/valuation-toolkit/vault/">My Vault</a></li>
+    <li><a href="/valuation-toolkit/deal-room/">Deal Room</a></li>
+    <li><a href="/valuation-toolkit/daily-brief/">Daily Brief</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="/valuation-toolkit/vault/" class="nav-pill">🗄 Vault (<span id="vault-count">0</span>)</a>
+    <a href="/valuation-toolkit/#pricing" class="nav-cta">Get Pro — ₹799/mo</a>
+  </div>
+</nav>
+
+<div class="domain-bar">
+  <a href="/valuation-toolkit/domains/valuation-advisory/" class="domain-link">Overview</a>
+  <a href="/valuation-toolkit/domains/valuation-advisory/learn/" class="domain-link">📖 Learn</a>
+  <a href="/valuation-toolkit/domains/valuation-advisory/calculators/" class="domain-link active">🧮 Calculators</a>
+  <a href="/valuation-toolkit/vault/" class="domain-link">🗄 My Vault</a>
+</div>
+
+<!-- CALCULATOR TABS -->
+<div style="position:sticky;top:calc(var(--nav-h) + 42px);z-index:100;background:var(--white);">
+  <div class="calc-tabs">
+    <button class="calc-tab active" onclick="switchCalc('dcf',this)">📊 DCF <span class="tag tag-green" style="font-size:0.6rem;">Free</span></button>
+    <button class="calc-tab" onclick="switchCalc('comps',this)">⚖️ Comps <span class="tag tag-black" style="font-size:0.6rem;">Pro</span></button>
+    <button class="calc-tab" onclick="switchCalc('wacc',this)">🔢 WACC Builder <span class="tag tag-black" style="font-size:0.6rem;">Pro</span></button>
+    <button class="calc-tab" onclick="switchCalc('evbridge',this)">🌉 EV Bridge <span class="tag tag-black" style="font-size:0.6rem;">Pro</span></button>
+    <button class="calc-tab" onclick="switchCalc('sotp',this)">🧩 SOTP <span class="tag tag-black" style="font-size:0.6rem;">Pro</span></button>
+    <button class="calc-tab" onclick="switchCalc('football',this)">🏈 Football Field <span class="tag tag-black" style="font-size:0.6rem;">Pro</span></button>
+    <button class="calc-tab" onclick="switchCalc('nav',this)">🏢 NAV <span class="tag tag-black" style="font-size:0.6rem;">Pro</span></button>
+  </div>
+</div>
+
+<div style="padding:1.5rem 1.75rem;max-width:1060px;margin:0 auto;">
+
+  <!-- ══ DCF CALCULATOR ══ -->
+  <div class="calc-panel active" id="panel-dcf">
+    <div class="calc-shell">
+      <div class="calc-topbar">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <div class="calc-dots"><div class="calc-dot" style="background:#e74c3c"></div><div class="calc-dot" style="background:#f39c12"></div><div class="calc-dot" style="background:#2ecc71"></div></div>
+          <div class="calc-title">DCF_Valuation.calc — Acme Industries Ltd. (Demo)</div>
+        </div>
+        <div style="display:flex;gap:0.5rem;align-items:center;">
+          <button onclick="saveDCFToVault()" class="btn btn-green btn-sm">🗄 Save to Vault</button>
+          <span class="tag tag-green">Free Calculator</span>
+        </div>
+      </div>
+      <div class="calc-body">
+        <div class="calc-inputs">
+          <div class="input-group">
+            <div class="input-group-label">Revenue Assumptions</div>
+            <div class="input-row"><span class="input-label">Revenue Growth (Y1-3)</span><div class="input-ctrl"><input type="range" id="d-growth" min="5" max="35" value="18" oninput="calcDCF()"><span class="input-val" id="v-growth">18%</span></div></div>
+            <div class="input-row"><span class="input-label">EBITDA Margin</span><div class="input-ctrl"><input type="range" id="d-margin" min="8" max="40" value="22" oninput="calcDCF()"><span class="input-val" id="v-margin">22%</span></div></div>
+            <div class="input-row"><span class="input-label">Base Revenue (₹Cr)</span><div class="input-ctrl"><input type="range" id="d-rev" min="100" max="2000" value="450" step="50" oninput="calcDCF()"><span class="input-val" id="v-rev">450</span></div></div>
+          </div>
+          <div class="input-group">
+            <div class="input-group-label">WACC Components</div>
+            <div class="input-row"><span class="input-label">Risk-Free Rate</span><div class="input-ctrl"><input type="range" id="d-rf" min="5" max="9" step="0.5" value="7" oninput="calcDCF()"><span class="input-val" id="v-rf">7.0%</span></div></div>
+            <div class="input-row"><span class="input-label">Equity Risk Premium</span><div class="input-ctrl"><input type="range" id="d-erp" min="4" max="9" step="0.5" value="6" oninput="calcDCF()"><span class="input-val" id="v-erp">6.0%</span></div></div>
+            <div class="input-row"><span class="input-label">Beta</span><div class="input-ctrl"><input type="range" id="d-beta" min="0.5" max="2.0" step="0.1" value="1.1" oninput="calcDCF()"><span class="input-val" id="v-beta">1.10</span></div></div>
+            <div class="input-row"><span class="input-label">Leverage (D/EV)</span><div class="input-ctrl"><input type="range" id="d-lev" min="0" max="60" value="25" oninput="calcDCF()"><span class="input-val" id="v-lev">25%</span></div></div>
+          </div>
+          <div class="input-group">
+            <div class="input-group-label">Terminal Value & Bridge</div>
+            <div class="input-row"><span class="input-label">Terminal Growth Rate</span><div class="input-ctrl"><input type="range" id="d-tgr" min="2" max="6" step="0.5" value="4" oninput="calcDCF()"><span class="input-val" id="v-tgr">4.0%</span></div></div>
+            <div class="input-row"><span class="input-label">Net Debt (₹Cr)</span><div class="input-ctrl"><input type="range" id="d-debt" min="0" max="1000" value="120" step="10" oninput="calcDCF()"><span class="input-val" id="v-debt">120</span></div></div>
+            <div class="input-row"><span class="input-label">Shares Outstanding (Cr)</span><div class="input-ctrl"><input type="range" id="d-shares" min="5" max="100" value="15" oninput="calcDCF()"><span class="input-val" id="v-shares">15</span></div></div>
+          </div>
+        </div>
+        <div class="calc-outputs">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;">
+            <div>
+              <div class="eyebrow" style="margin-bottom:0.3rem;">Intrinsic Value / Share</div>
+              <div class="output-big" id="o-price">₹847</div>
+              <div style="font-size:0.72rem;color:var(--gray-400);margin-top:0.25rem;">Market price: ₹715 (assumed)</div>
+            </div>
+            <div style="text-align:right;">
+              <div class="eyebrow" style="margin-bottom:0.3rem;">Upside / Downside</div>
+              <div id="o-upside"><span class="tag tag-green" style="font-size:0.8rem;">▲ 18.5% Upside</span></div>
+              <div style="margin-top:0.75rem;"><div class="eyebrow" style="margin-bottom:0.2rem;">WACC</div><div style="font-family:var(--mono);font-size:1.1rem;font-weight:600;" id="o-wacc">13.6%</div></div>
+            </div>
+          </div>
+          <hr class="vd" style="margin:1rem 0;">
+          <div style="margin-bottom:1rem;">
+            <div class="eyebrow" style="margin-bottom:0.6rem;">Value Attribution Bridge (₹Cr)</div>
+            <div id="waterfall"></div>
+          </div>
+          <hr class="vd" style="margin:1rem 0;">
+          <div>
+            <div class="eyebrow" style="margin-bottom:0.6rem;">Sensitivity: Share Price — WACC vs Terminal Growth</div>
+            <div style="overflow-x:auto;"><table class="table" id="sens-table"></table></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ COMPS CALCULATOR ══ -->
+  <div class="calc-panel" id="panel-comps">
+    <div class="calc-shell" style="position:relative;">
+      <div class="calc-topbar">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <div class="calc-dots"><div class="calc-dot" style="background:#e74c3c"></div><div class="calc-dot" style="background:#f39c12"></div><div class="calc-dot" style="background:#2ecc71"></div></div>
+          <div class="calc-title">Comps_Engine.calc — Comparable Company Analysis</div>
+        </div>
+        <span class="tag tag-black">Pro Calculator</span>
+      </div>
+      <div class="calc-body">
+        <div class="calc-inputs">
+          <div class="input-group">
+            <div class="input-group-label">Your Company</div>
+            <div class="input-row"><span class="input-label">EBITDA (₹Cr)</span><div class="input-ctrl"><input type="range" id="c-ebitda" min="10" max="500" value="99" step="5" oninput="calcComps()"><span class="input-val" id="cv-ebitda">99</span></div></div>
+            <div class="input-row"><span class="input-label">Revenue (₹Cr)</span><div class="input-ctrl"><input type="range" id="c-rev" min="100" max="2000" value="450" step="50" oninput="calcComps()"><span class="input-val" id="cv-rev">450</span></div></div>
+            <div class="input-row"><span class="input-label">Net Income (₹Cr)</span><div class="input-ctrl"><input type="range" id="c-ni" min="5" max="200" value="45" step="5" oninput="calcComps()"><span class="input-val" id="cv-ni">45</span></div></div>
+            <div class="input-row"><span class="input-label">Shares (Cr)</span><div class="input-ctrl"><input type="range" id="c-sh" min="5" max="100" value="15" oninput="calcComps()"><span class="input-val" id="cv-sh">15</span></div></div>
+            <div class="input-row"><span class="input-label">Net Debt (₹Cr)</span><div class="input-ctrl"><input type="range" id="c-nd" min="0" max="500" value="120" step="10" oninput="calcComps()"><span class="input-val" id="cv-nd">120</span></div></div>
+          </div>
+          <div class="input-group">
+            <div class="input-group-label">Sector Multiples</div>
+            <div class="input-row"><span class="input-label">EV/EBITDA Median</span><div class="input-ctrl"><input type="range" id="c-em" min="5" max="40" value="14" step="0.5" oninput="calcComps()"><span class="input-val" id="cv-em">14.0x</span></div></div>
+            <div class="input-row"><span class="input-label">P/E Median</span><div class="input-ctrl"><input type="range" id="c-pe" min="10" max="60" value="28" step="0.5" oninput="calcComps()"><span class="input-val" id="cv-pe">28.0x</span></div></div>
+            <div class="input-row"><span class="input-label">EV/Revenue Median</span><div class="input-ctrl"><input type="range" id="c-rm" min="1" max="15" value="4.8" step="0.1" oninput="calcComps()"><span class="input-val" id="cv-rm">4.8x</span></div></div>
+            <div class="input-row"><span class="input-label">Control Premium (%)</span><div class="input-ctrl"><input type="range" id="c-prem" min="0" max="40" value="15" oninput="calcComps()"><span class="input-val" id="cv-prem">15%</span></div></div>
+          </div>
+        </div>
+        <div class="calc-outputs">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem;">
+            <div class="card-metric">
+              <div class="eyebrow" style="margin-bottom:0.3rem;">EV/EBITDA Implied</div>
+              <div style="font-size:1.6rem;font-weight:800;letter-spacing:-0.02em;" id="o-evebitda-price">—</div>
+              <div style="font-size:0.7rem;color:var(--gray-400);margin-top:0.2rem;" id="o-evebitda-ev">EV: —</div>
+            </div>
+            <div class="card-metric">
+              <div class="eyebrow" style="margin-bottom:0.3rem;">P/E Implied</div>
+              <div style="font-size:1.6rem;font-weight:800;letter-spacing:-0.02em;" id="o-pe-price">—</div>
+              <div style="font-size:0.7rem;color:var(--gray-400);margin-top:0.2rem;" id="o-pe-ev">EV: —</div>
+            </div>
+            <div class="card-metric">
+              <div class="eyebrow" style="margin-bottom:0.3rem;">EV/Revenue Implied</div>
+              <div style="font-size:1.6rem;font-weight:800;letter-spacing:-0.02em;" id="o-evrev-price">—</div>
+              <div style="font-size:0.7rem;color:var(--gray-400);margin-top:0.2rem;" id="o-evrev-ev">EV: —</div>
+            </div>
+          </div>
+          <div class="card-metric" style="margin-bottom:1.5rem;background:var(--gray-50);">
+            <div class="eyebrow" style="margin-bottom:0.5rem;">Valuation Range Summary</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;">
+              <div><div style="font-size:0.72rem;color:var(--gray-400);">Low (EV/Rev)</div><div style="font-size:1.2rem;font-weight:700;" id="range-low">—</div></div>
+              <div style="font-size:0.8rem;color:var(--gray-300);">———</div>
+              <div style="text-align:center;"><div style="font-size:0.72rem;color:var(--gray-400);">Mid (EV/EBITDA)</div><div style="font-size:1.4rem;font-weight:800;" id="range-mid">—</div></div>
+              <div style="font-size:0.8rem;color:var(--gray-300);">———</div>
+              <div style="text-align:right;"><div style="font-size:0.72rem;color:var(--gray-400);">High (P/E + prem)</div><div style="font-size:1.2rem;font-weight:700;" id="range-high">—</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="eyebrow" style="margin-bottom:0.75rem;">Multiples Comparison</div>
+            <table class="table" id="comps-table"></table>
+          </div>
+          <div style="margin-top:1rem;display:flex;gap:0.5rem;">
+            <button onclick="saveCompsToVault()" class="btn btn-green btn-sm">🗄 Save to Vault</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ WACC BUILDER ══ -->
+  <div class="calc-panel" id="panel-wacc">
+    <div class="calc-shell">
+      <div class="calc-topbar">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <div class="calc-dots"><div class="calc-dot" style="background:#e74c3c"></div><div class="calc-dot" style="background:#f39c12"></div><div class="calc-dot" style="background:#2ecc71"></div></div>
+          <div class="calc-title">WACC_Builder.calc — Weighted Average Cost of Capital</div>
+        </div>
+        <span class="tag tag-black">Pro Calculator</span>
+      </div>
+      <div class="calc-body">
+        <div class="calc-inputs">
+          <div class="input-group">
+            <div class="input-group-label">Cost of Equity (CAPM)</div>
+            <div class="input-row"><span class="input-label">Risk-Free Rate (10yr G-sec)</span><div class="input-ctrl"><input type="range" id="w-rf" min="5" max="9" step="0.25" value="7" oninput="calcWACCBuilder()"><span class="input-val" id="wv-rf">7.00%</span></div></div>
+            <div class="input-row"><span class="input-label">Equity Risk Premium</span><div class="input-ctrl"><input type="range" id="w-erp" min="3" max="10" step="0.25" value="6.5" oninput="calcWACCBuilder()"><span class="input-val" id="wv-erp">6.50%</span></div></div>
+            <div class="input-row"><span class="input-label">Beta (levered)</span><div class="input-ctrl"><input type="range" id="w-beta" min="0.3" max="2.5" step="0.05" value="1.1" oninput="calcWACCBuilder()"><span class="input-val" id="wv-beta">1.10</span></div></div>
+            <div class="input-row"><span class="input-label">Small Cap Premium</span><div class="input-ctrl"><input type="range" id="w-scp" min="0" max="4" step="0.25" value="0" oninput="calcWACCBuilder()"><span class="input-val" id="wv-scp">0.00%</span></div></div>
+          </div>
+          <div class="input-group">
+            <div class="input-group-label">Cost of Debt</div>
+            <div class="input-row"><span class="input-label">Pre-tax Cost of Debt</span><div class="input-ctrl"><input type="range" id="w-kd" min="5" max="15" step="0.25" value="9" oninput="calcWACCBuilder()"><span class="input-val" id="wv-kd">9.00%</span></div></div>
+            <div class="input-row"><span class="input-label">Tax Rate</span><div class="input-ctrl"><input type="range" id="w-tax" min="15" max="35" step="1" value="25" oninput="calcWACCBuilder()"><span class="input-val" id="wv-tax">25%</span></div></div>
+          </div>
+          <div class="input-group">
+            <div class="input-group-label">Capital Structure</div>
+            <div class="input-row"><span class="input-label">Equity Weight</span><div class="input-ctrl"><input type="range" id="w-we" min="20" max="100" value="75" oninput="calcWACCBuilder()"><span class="input-val" id="wv-we">75%</span></div></div>
+            <div class="input-row"><span class="input-label">Debt Weight</span><div class="input-ctrl"><input type="range" disabled id="w-wd" min="0" max="80" value="25"><span class="input-val" id="wv-wd">25%</span></div></div>
+          </div>
+        </div>
+        <div class="calc-outputs">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem;">
+            <div class="card-metric" style="border-top:3px solid var(--black);">
+              <div class="eyebrow" style="margin-bottom:0.3rem;">WACC</div>
+              <div style="font-size:2rem;font-weight:800;letter-spacing:-0.02em;" id="wo-wacc">—</div>
+            </div>
+            <div class="card-metric">
+              <div class="eyebrow" style="margin-bottom:0.3rem;">Cost of Equity (Ke)</div>
+              <div style="font-size:1.6rem;font-weight:800;letter-spacing:-0.02em;" id="wo-ke">—</div>
+            </div>
+            <div class="card-metric">
+              <div class="eyebrow" style="margin-bottom:0.3rem;">After-tax Kd</div>
+              <div style="font-size:1.6rem;font-weight:800;letter-spacing:-0.02em;" id="wo-kd">—</div>
+            </div>
+          </div>
+          <div style="margin-bottom:1.5rem;">
+            <div class="eyebrow" style="margin-bottom:0.75rem;">WACC Build-up</div>
+            <table class="table" id="wacc-table"></table>
+          </div>
+          <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--r);padding:1rem;">
+            <div class="eyebrow" style="margin-bottom:0.4rem;">Interpretation</div>
+            <div style="font-size:0.82rem;color:var(--gray-500);line-height:1.6;" id="wacc-interpretation">—</div>
+          </div>
+          <div style="margin-top:1rem;"><button onclick="saveWACCToVault()" class="btn btn-green btn-sm">🗄 Save to Vault</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ EV BRIDGE ══ -->
+  <div class="calc-panel" id="panel-evbridge">
+    <div class="calc-shell">
+      <div class="calc-topbar">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <div class="calc-dots"><div class="calc-dot" style="background:#e74c3c"></div><div class="calc-dot" style="background:#f39c12"></div><div class="calc-dot" style="background:#2ecc71"></div></div>
+          <div class="calc-title">EV_Bridge.calc — Enterprise to Equity Value</div>
+        </div>
+        <span class="tag tag-black">Pro Calculator</span>
+      </div>
+      <div class="calc-body">
+        <div class="calc-inputs">
+          <div class="input-group">
+            <div class="input-group-label">Enterprise Value</div>
+            <div class="input-row"><span class="input-label">Enterprise Value (₹Cr)</span><div class="input-ctrl"><input type="range" id="eb-ev" min="100" max="5000" value="1500" step="50" oninput="calcEVBridge()"><span class="input-val" id="ebv-ev">1,500</span></div></div>
+          </div>
+          <div class="input-group">
+            <div class="input-group-label">Debt Items (subtract)</div>
+            <div class="input-row"><span class="input-label">Total Debt (₹Cr)</span><div class="input-ctrl"><input type="range" id="eb-debt" min="0" max="2000" value="300" step="25" oninput="calcEVBridge()"><span class="input-val" id="ebv-debt">300</span></div></div>
+            <div class="input-row"><span class="input-label">Lease Liabilities (₹Cr)</span><div class="input-ctrl"><input type="range" id="eb-lease" min="0" max="500" value="50" step="10" oninput="calcEVBridge()"><span class="input-val" id="ebv-lease">50</span></div></div>
+            <div class="input-row"><span class="input-label">Pension Obligations (₹Cr)</span><div class="input-ctrl"><input type="range" id="eb-pension" min="0" max="200" value="0" step="10" oninput="calcEVBridge()"><span class="input-val" id="ebv-pension">0</span></div></div>
+            <div class="input-row"><span class="input-label">Minority Interests (₹Cr)</span><div class="input-ctrl"><input type="range" id="eb-minority" min="0" max="500" value="0" step="10" oninput="calcEVBridge()"><span class="input-val" id="ebv-minority">0</span></div></div>
+          </div>
+          <div class="input-group">
+            <div class="input-group-label">Cash Items (add back)</div>
+            <div class="input-row"><span class="input-label">Cash & Equivalents (₹Cr)</span><div class="input-ctrl"><input type="range" id="eb-cash" min="0" max="1000" value="180" step="10" oninput="calcEVBridge()"><span class="input-val" id="ebv-cash">180</span></div></div>
+            <div class="input-row"><span class="input-label">Associates / Investments (₹Cr)</span><div class="input-ctrl"><input type="range" id="eb-assoc" min="0" max="500" value="0" step="10" oninput="calcEVBridge()"><span class="input-val" id="ebv-assoc">0</span></div></div>
+            <div class="input-row"><span class="input-label">Shares Outstanding (Cr)</span><div class="input-ctrl"><input type="range" id="eb-sh" min="5" max="200" value="15" oninput="calcEVBridge()"><span class="input-val" id="ebv-sh">15</span></div></div>
+          </div>
+        </div>
+        <div class="calc-outputs">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+            <div class="card-metric" style="border-top:3px solid var(--black);">
+              <div class="eyebrow" style="margin-bottom:0.3rem;">Equity Value</div>
+              <div style="font-size:1.8rem;font-weight:800;letter-spacing:-0.02em;" id="ebo-equity">—</div>
+            </div>
+            <div class="card-metric">
+              <div class="eyebrow" style="margin-bottom:0.3rem;">Value Per Share</div>
+              <div style="font-size:1.8rem;font-weight:800;letter-spacing:-0.02em;" id="ebo-pershare">—</div>
+            </div>
+          </div>
+          <div class="eyebrow" style="margin-bottom:0.75rem;">EV → Equity Bridge</div>
+          <div id="ev-bridge-bars"></div>
+          <div style="margin-top:1rem;"><button onclick="saveEVToVault()" class="btn btn-green btn-sm">🗄 Save to Vault</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SOTP ══ -->
+  <div class="calc-panel" id="panel-sotp">
+    <div class="calc-shell">
+      <div class="calc-topbar">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <div class="calc-dots"><div class="calc-dot" style="background:#e74c3c"></div><div class="calc-dot" style="background:#f39c12"></div><div class="calc-dot" style="background:#2ecc71"></div></div>
+          <div class="calc-title">SOTP_Valuation.calc — Sum of the Parts</div>
+        </div>
+        <span class="tag tag-black">Pro Calculator</span>
+      </div>
+      <div class="calc-body">
+        <div class="calc-inputs">
+          <div class="input-group">
+            <div class="input-group-label">Segment 1 — Core Business</div>
+            <div class="input-row"><span class="input-label">EBITDA (₹Cr)</span><div class="input-ctrl"><input type="range" id="s1-ebitda" min="10" max="500" value="200" step="5" oninput="calcSOTP()"><span class="input-val" id="s1v-ebitda">200</span></div></div>
+            <div class="input-row"><span class="input-label">EV/EBITDA Multiple</span><div class="input-ctrl"><input type="range" id="s1-mult" min="4" max="30" value="14" step="0.5" oninput="calcSOTP()"><span class="input-val" id="s1v-mult">14.0x</span></div></div>
+          </div>
+          <div class="input-group">
+            <div class="input-group-label">Segment 2 — Growth Division</div>
+            <div class="input-row"><span class="input-label">EBITDA (₹Cr)</span><div class="input-ctrl"><input type="range" id="s2-ebitda" min="0" max="300" value="80" step="5" oninput="calcSOTP()"><span class="input-val" id="s2v-ebitda">80</span></div></div>
+            <div class="input-row"><span class="input-label">EV/EBITDA Multiple</span><div class="input-ctrl"><input type="range" id="s2-mult" min="4" max="50" value="22" step="0.5" oninput="calcSOTP()"><span class="input-val" id="s2v-mult">22.0x</span></div></div>
+          </div>
+          <div class="input-group">
+            <div class="input-group-label">Segment 3 — Non-core / Investments</div>
+            <div class="input-row"><span class="input-label">Asset Value (₹Cr)</span><div class="input-ctrl"><input type="range" id="s3-val" min="0" max="1000" value="150" step="25" oninput="calcSOTP()"><span class="input-val" id="s3v-val">150</span></div></div>
+          </div>
+          <div class="input-group">
+            <div class="input-group-label">Holdco & Bridge</div>
+            <div class="input-row"><span class="input-label">Net Debt (₹Cr)</span><div class="input-ctrl"><input type="range" id="so-debt" min="0" max="1000" value="200" step="25" oninput="calcSOTP()"><span class="input-val" id="sov-debt">200</span></div></div>
+            <div class="input-row"><span class="input-label">Holdco Discount (%)</span><div class="input-ctrl"><input type="range" id="so-disc" min="0" max="40" value="20" oninput="calcSOTP()"><span class="input-val" id="sov-disc">20%</span></div></div>
+            <div class="input-row"><span class="input-label">Shares (Cr)</span><div class="input-ctrl"><input type="range" id="so-sh" min="5" max="100" value="15" oninput="calcSOTP()"><span class="input-val" id="sov-sh">15</span></div></div>
+          </div>
+        </div>
+        <div class="calc-outputs">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem;">
+            <div class="card-metric" style="border-top:3px solid var(--black);">
+              <div class="eyebrow" style="margin-bottom:0.3rem;">SOTP Value / Share</div>
+              <div style="font-size:1.8rem;font-weight:800;letter-spacing:-0.02em;" id="so-pershare">—</div>
+            </div>
+            <div class="card-metric">
+              <div class="eyebrow" style="margin-bottom:0.3rem;">Total EV (pre-discount)</div>
+              <div style="font-size:1.4rem;font-weight:800;letter-spacing:-0.02em;" id="so-ev">—</div>
+            </div>
+            <div class="card-metric">
+              <div class="eyebrow" style="margin-bottom:0.3rem;">Equity Value</div>
+              <div style="font-size:1.4rem;font-weight:800;letter-spacing:-0.02em;" id="so-equity">—</div>
+            </div>
+          </div>
+          <div class="eyebrow" style="margin-bottom:0.75rem;">Segment Contribution</div>
+          <div id="sotp-bars"></div>
+          <div style="margin-top:1rem;"><button onclick="saveSOTPToVault()" class="btn btn-green btn-sm">🗄 Save to Vault</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ FOOTBALL FIELD ══ -->
+  <div class="calc-panel" id="panel-football">
+    <div class="calc-shell">
+      <div class="calc-topbar">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <div class="calc-dots"><div class="calc-dot" style="background:#e74c3c"></div><div class="calc-dot" style="background:#f39c12"></div><div class="calc-dot" style="background:#2ecc71"></div></div>
+          <div class="calc-title">Football_Field.calc — Valuation Range Summary</div>
+        </div>
+        <span class="tag tag-black">Pro Calculator</span>
+      </div>
+      <div class="calc-body">
+        <div class="calc-inputs">
+          <div class="input-group">
+            <div class="input-group-label">DCF Range (₹/share)</div>
+            <div class="input-row"><span class="input-label">DCF Low</span><div class="input-ctrl"><input type="range" id="ff-dcf-lo" min="100" max="1000" value="620" step="10" oninput="calcFootball()"><span class="input-val" id="ffv-dcf-lo">620</span></div></div>
+            <div class="input-row"><span class="input-label">DCF High</span><div class="input-ctrl"><input type="range" id="ff-dcf-hi" min="100" max="2000" value="980" step="10" oninput="calcFootball()"><span class="input-val" id="ffv-dcf-hi">980</span></div></div>
+          </div>
+          <div class="input-group">
+            <div class="input-group-label">Trading Comps Range</div>
+            <div class="input-row"><span class="input-label">Comps Low</span><div class="input-ctrl"><input type="range" id="ff-cm-lo" min="100" max="1000" value="580" step="10" oninput="calcFootball()"><span class="input-val" id="ffv-cm-lo">580</span></div></div>
+            <div class="input-row"><span class="input-label">Comps High</span><div class="input-ctrl"><input type="range" id="ff-cm-hi" min="100" max="2000" value="850" step="10" oninput="calcFootball()"><span class="input-val" id="ffv-cm-hi">850</span></div></div>
+          </div>
+          <div class="input-group">
+            <div class="input-group-label">Transaction Comps Range</div>
+            <div class="input-row"><span class="input-label">Transaction Low</span><div class="input-ctrl"><input type="range" id="ff-tx-lo" min="100" max="1500" value="720" step="10" oninput="calcFootball()"><span class="input-val" id="ffv-tx-lo">720</span></div></div>
+            <div class="input-row"><span class="input-label">Transaction High</span><div class="input-ctrl"><input type="range" id="ff-tx-hi" min="100" max="3000" value="1100" step="10" oninput="calcFootball()"><span class="input-val" id="ffv-tx-hi">1,100</span></div></div>
+          </div>
+          <div class="input-group">
+            <div class="input-group-label">Reference Points</div>
+            <div class="input-row"><span class="input-label">Current Market Price</span><div class="input-ctrl"><input type="range" id="ff-mkt" min="100" max="1500" value="715" step="5" oninput="calcFootball()"><span class="input-val" id="ffv-mkt">715</span></div></div>
+            <div class="input-row"><span class="input-label">52-Week High</span><div class="input-ctrl"><input type="range" id="ff-52hi" min="100" max="2000" value="890" step="5" oninput="calcFootball()"><span class="input-val" id="ffv-52hi">890</span></div></div>
+          </div>
+        </div>
+        <div class="calc-outputs">
+          <div class="eyebrow" style="margin-bottom:1rem;">Football Field — Valuation Range Chart</div>
+          <div id="football-chart" style="padding:0.5rem 0;"></div>
+          <div style="margin-top:1rem;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--r);padding:1rem;">
+            <div class="eyebrow" style="margin-bottom:0.4rem;">Analyst View</div>
+            <div style="font-size:0.82rem;color:var(--gray-500);line-height:1.6;" id="ff-view">—</div>
+          </div>
+          <div style="margin-top:1rem;"><button onclick="saveFFToVault()" class="btn btn-green btn-sm">🗄 Save to Vault</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ NAV ══ -->
+  <div class="calc-panel" id="panel-nav">
+    <div class="calc-shell">
+      <div class="calc-topbar">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <div class="calc-dots"><div class="calc-dot" style="background:#e74c3c"></div><div class="calc-dot" style="background:#f39c12"></div><div class="calc-dot" style="background:#2ecc71"></div></div>
+          <div class="calc-title">NAV_Calculator.calc — Net Asset Value</div>
+        </div>
+        <span class="tag tag-black">Pro Calculator</span>
+      </div>
+      <div class="calc-body">
+        <div class="calc-inputs">
+          <div class="input-group">
+            <div class="input-group-label">Assets</div>
+            <div class="input-row"><span class="input-label">Real Estate / Property (₹Cr)</span><div class="input-ctrl"><input type="range" id="n-re" min="0" max="2000" value="800" step="50" oninput="calcNAV()"><span class="input-val" id="nv-re">800</span></div></div>
+            <div class="input-row"><span class="input-label">Plant & Machinery (₹Cr)</span><div class="input-ctrl"><input type="range" id="n-pm" min="0" max="1000" value="300" step="25" oninput="calcNAV()"><span class="input-val" id="nv-pm">300</span></div></div>
+            <div class="input-row"><span class="input-label">Investments (₹Cr)</span><div class="input-ctrl"><input type="range" id="n-inv" min="0" max="500" value="150" step="25" oninput="calcNAV()"><span class="input-val" id="nv-inv">150</span></div></div>
+            <div class="input-row"><span class="input-label">Intangibles / Brand (₹Cr)</span><div class="input-ctrl"><input type="range" id="n-int" min="0" max="500" value="100" step="25" oninput="calcNAV()"><span class="input-val" id="nv-int">100</span></div></div>
+            <div class="input-row"><span class="input-label">Working Capital (₹Cr)</span><div class="input-ctrl"><input type="range" id="n-wc" min="-100" max="500" value="80" step="10" oninput="calcNAV()"><span class="input-val" id="nv-wc">80</span></div></div>
+          </div>
+          <div class="input-group">
+            <div class="input-group-label">Liabilities & Adjustments</div>
+            <div class="input-row"><span class="input-label">Total Debt (₹Cr)</span><div class="input-ctrl"><input type="range" id="n-debt" min="0" max="1000" value="250" step="25" oninput="calcNAV()"><span class="input-val" id="nv-debt">250</span></div></div>
+            <div class="input-row"><span class="input-label">Discount to NAV (%)</span><div class="input-ctrl"><input type="range" id="n-disc" min="0" max="50" value="15" oninput="calcNAV()"><span class="input-val" id="nv-disc">15%</span></div></div>
+            <div class="input-row"><span class="input-label">Shares (Cr)</span><div class="input-ctrl"><input type="range" id="n-sh" min="5" max="100" value="15" oninput="calcNAV()"><span class="input-val" id="nv-sh">15</span></div></div>
+          </div>
+        </div>
+        <div class="calc-outputs">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem;">
+            <div class="card-metric" style="border-top:3px solid var(--black);">
+              <div class="eyebrow" style="margin-bottom:0.3rem;">NAV / Share</div>
+              <div style="font-size:1.8rem;font-weight:800;letter-spacing:-0.02em;" id="no-pershare">—</div>
+            </div>
+            <div class="card-metric">
+              <div class="eyebrow" style="margin-bottom:0.3rem;">Gross NAV</div>
+              <div style="font-size:1.4rem;font-weight:800;letter-spacing:-0.02em;" id="no-gross">—</div>
+            </div>
+            <div class="card-metric">
+              <div class="eyebrow" style="margin-bottom:0.3rem;">Net NAV (after disc)</div>
+              <div style="font-size:1.4rem;font-weight:800;letter-spacing:-0.02em;" id="no-net">—</div>
+            </div>
+          </div>
+          <div class="eyebrow" style="margin-bottom:0.75rem;">Asset Breakdown</div>
+          <div id="nav-bars"></div>
+          <div style="margin-top:1rem;"><button onclick="saveNAVToVault()" class="btn btn-green btn-sm">🗄 Save to Vault</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<footer class="footer">
+  <div class="footer-logo">Valuation<strong>Desk</strong></div>
+  <div class="footer-note">© 2025 ValuationDesk</div>
+</footer>
+
+<div id="toast-container"></div>
+<script src="/valuation-toolkit/assets/vd.js"></script>
+<script>
+// ── TAB SWITCHER ──
+function switchCalc(id, btn) {
+  document.querySelectorAll('.calc-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.calc-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  btn.classList.add('active');
+  // Track calc seen
+  const seen = JSON.parse(localStorage.getItem('vd_calcs_seen') || '[]');
+  if (!seen.includes(id)) { seen.push(id); localStorage.setItem('vd_calcs_seen', JSON.stringify(seen)); }
+}
+
+// ── HELPER ──
+const g = id => parseFloat(document.getElementById(id).value);
+const s = (id, val) => { if(document.getElementById(id)) document.getElementById(id).textContent = val; };
+const inr = (n, d=0) => '₹' + Math.round(n).toLocaleString('en-IN');
+const pct = (n, d=1) => n.toFixed(d) + '%';
+const xm = (n, d=1) => n.toFixed(d) + 'x';
+
+function bar(label, val, maxVal, color, isNeg=false) {
+  const pct = Math.min(Math.abs(val) / maxVal * 100, 100);
+  const disp = isNeg ? '(' + inr(Math.abs(val)) + ')' : inr(val) + ' Cr';
+  return `<div class="w-bar"><div class="w-bar-label">${label}</div><div class="w-bar-track"><div class="w-bar-fill" style="width:${pct}%;background:${color};"><span>${disp}</span></div></div></div>`;
+}
+
+// ── DCF ──
+function calcDCF() {
+  const growth=g('d-growth'), margin=g('d-margin'), rev=g('d-rev');
+  const rf=g('d-rf'), erp=g('d-erp'), beta=g('d-beta'), lev=g('d-lev');
+  const tgr=g('d-tgr'), debt=g('d-debt'), shares=g('d-shares');
+  s('v-growth', growth+'%'); s('v-margin', margin+'%'); s('v-rev', rev);
+  s('v-rf', rf.toFixed(1)+'%'); s('v-erp', erp.toFixed(1)+'%');
+  s('v-beta', beta.toFixed(2)); s('v-lev', lev+'%');
+  s('v-tgr', tgr.toFixed(1)+'%'); s('v-debt', debt); s('v-shares', shares);
+  const Ke = rf + beta * erp; const Kd = rf + 1.5;
+  const E = 1-lev/100; const D = lev/100;
+  const wacc = (Ke*E + Kd*0.75*D) / 100;
+  const gg = tgr/100;
+  let pv=0, r=rev;
+  for(let yr=1;yr<=5;yr++){
+    r *= (1+(yr<=3?growth/100:(growth/100)*0.6));
+    const fcf = r*(margin/100-0.05-0.08-0.03)+r*0.05;
+    pv += fcf/Math.pow(1+wacc,yr);
+  }
+  const lastFCF = r*(margin/100-0.05-0.08-0.03)+r*0.05;
+  const tv = lastFCF*(1+gg)/(wacc-gg);
+  const pvTV = tv/Math.pow(1+wacc,5);
+  const ev = pv+pvTV, equity = ev-debt, price = equity/shares;
+  const mkt=715, upside=((price-mkt)/mkt*100).toFixed(1);
+  const priceEl = document.getElementById('o-price');
+  priceEl.textContent = inr(price); priceEl.className = 'output-big';
+  void priceEl.offsetWidth; priceEl.className = 'output-big output-updating';
+  setTimeout(()=>priceEl.className='output-big',350);
+  s('o-wacc', pct(wacc*100));
+  const up = document.getElementById('o-upside');
+  if(price>mkt){up.innerHTML=`<span class="tag tag-green" style="font-size:.8rem;">▲ ${upside}% Upside</span>`;}
+  else{up.innerHTML=`<span class="tag tag-red" style="font-size:.8rem;">▼ ${Math.abs(upside)}% Overvalued</span>`;}
+  // Waterfall
+  const maxW = Math.max(pv,pvTV,ev)*1.1;
+  document.getElementById('waterfall').innerHTML = [
+    bar('PV FCF (5yr)', pv, maxW, '#374151'),
+    bar('PV Terminal', pvTV, maxW, '#111827'),
+    bar('Enterprise Value', ev, maxW, '#111827'),
+    bar('Less: Net Debt', -debt, maxW, '#dc2626', true),
+    bar('Equity Value', equity, maxW, '#16a34a'),
+  ].join('');
+  // Sensitivity
+  const wB=wacc*100, tB=tgr;
+  let html='<thead><tr><th>WACC \\ TGR</th>';
+  [-1.5,-.75,0,.75,1.5].map(t=>Math.max(1,Math.min(7,tB+t))).forEach(t=>{html+=`<th>${t.toFixed(1)}%</th>`;});
+  html+='</tr></thead><tbody>';
+  [-1.5,-.75,0,.75,1.5].forEach((wd,wi)=>{
+    const wT=wB+wd; html+=`<tr><td>${wT.toFixed(1)}%</td>`;
+    [-1.5,-.75,0,.75,1.5].map(t=>Math.max(1,Math.min(7,tB+t))).forEach((t,ti)=>{
+      const ww=(rf+wd+beta*erp)*E/100+(rf+wd+1.5)*0.75*D/100;
+      const gg2=t/100; let p2=0,r2=rev;
+      for(let yr=1;yr<=5;yr++){r2*=(1+(yr<=3?growth/100:(growth/100)*0.6)); p2+=( r2*(margin/100-0.05-0.08-0.03)+r2*0.05)/Math.pow(1+ww,yr);}
+      const lf2=r2*(margin/100-0.05-0.08-0.03)+r2*0.05;
+      const tv2=lf2*(1+gg2)/(ww-gg2); const pv2=p2+tv2/Math.pow(1+ww,5);
+      const pr2=Math.round((pv2-debt)/shares);
+      const pc=(pr2-mkt)/mkt*100;
+      let hc=pc>30?'heat-5':pc>10?'heat-4':pc<-10?'heat-1':pc<0?'heat-2':'heat-3';
+      const hl=(wi===2&&ti===2)?' heat-hl':'';
+      html+=`<td class="${hc}${hl}">${inr(pr2)}</td>`;
+    });
+    html+='</tr>';
+  });
+  html+='</tbody>';
+  document.getElementById('sens-table').innerHTML=html;
+}
+
+function saveDCFToVault() {
+  VD.vault.save({ type:'DCF', company:'Acme Industries (Demo)', value: document.getElementById('o-price').textContent, wacc: document.getElementById('o-wacc').textContent, domain:'Valuation Advisory' });
+}
+
+// ── COMPS ──
+function calcComps() {
+  const ebitda=g('c-ebitda'), rev=g('c-rev'), ni=g('c-ni'), sh=g('c-sh'), nd=g('c-nd');
+  const em=g('c-em'), pe=g('c-pe'), rm=g('c-rm'), prem=g('c-prem');
+  s('cv-ebitda',ebitda); s('cv-rev',rev); s('cv-ni',ni); s('cv-sh',sh); s('cv-nd',nd);
+  s('cv-em',xm(em)); s('cv-pe',xm(pe)); s('cv-rm',xm(rm)); s('cv-prem',prem+'%');
+  const evByE=ebitda*em, evByR=rev*rm;
+  const eqByE=(evByE-nd)/sh, eqByR=(evByR-nd)/sh, eqByPE=ni/sh*pe;
+  const eqHighPrem=eqByPE*(1+prem/100);
+  s('o-evebitda-price', inr(eqByE)); s('o-evebitda-ev', 'EV: '+inr(evByE)+' Cr');
+  s('o-pe-price', inr(eqByPE)); s('o-pe-ev', 'EV: '+inr(ni*pe+nd)+' Cr');
+  s('o-evrev-price', inr(eqByR)); s('o-evrev-ev', 'EV: '+inr(evByR)+' Cr');
+  const low=Math.min(eqByR,eqByE,eqByPE), high=Math.max(eqHighPrem,eqByE);
+  s('range-low', inr(low)); s('range-mid', inr(eqByE)); s('range-high', inr(high));
+  const rows=[['Metric','Your Multiple','Sector Median','vs Median'],
+    ['EV/EBITDA', xm(evByE/ebitda), xm(em), evByE/ebitda>em?'Premium':'Discount'],
+    ['P/E', xm(ni>0?(ni/sh*pe)/(ni/sh):0), xm(pe), '—'],
+    ['EV/Revenue', xm(evByR/rev), xm(rm), evByR/rev>rm?'Premium':'Discount'],
+  ];
+  document.getElementById('comps-table').innerHTML='<thead><tr>'+rows[0].map(h=>`<th>${h}</th>`).join('')+'</tr></thead><tbody>'+rows.slice(1).map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')+'</tbody>';
+}
+
+function saveCompsToVault() {
+  VD.vault.save({ type:'Comps', company:'Custom Analysis', value:document.getElementById('o-evebitda-price').textContent, domain:'Valuation Advisory' });
+}
+
+// ── WACC BUILDER ──
+function calcWACCBuilder() {
+  const rf=g('w-rf'), erp=g('w-erp'), beta=g('w-beta'), scp=g('w-scp');
+  const kd=g('w-kd'), tax=g('w-tax'), we=g('w-we');
+  const wd=100-we;
+  s('wv-rf',rf.toFixed(2)+'%'); s('wv-erp',erp.toFixed(2)+'%'); s('wv-beta',beta.toFixed(2));
+  s('wv-scp',scp.toFixed(2)+'%'); s('wv-kd',kd.toFixed(2)+'%'); s('wv-tax',tax+'%');
+  s('wv-we',we+'%'); s('wv-wd',wd+'%');
+  document.getElementById('w-wd').value=wd;
+  const Ke=rf+beta*erp+scp;
+  const KdAT=kd*(1-tax/100);
+  const wacc=(Ke*we/100)+(KdAT*wd/100);
+  s('wo-wacc', pct(wacc)); s('wo-ke', pct(Ke)); s('wo-kd', pct(KdAT));
+  const rows=[
+    ['Risk-Free Rate', pct(rf),'10-year G-sec yield'],
+    ['Beta', beta.toFixed(2), 'Systematic risk vs market'],
+    ['× Equity Risk Premium', pct(erp), 'Excess return demanded'],
+    ['+ Small Cap Premium', pct(scp), 'Size adjustment'],
+    ['= Cost of Equity (Ke)', pct(Ke), 'Return required by equity holders'],
+    ['Pre-tax Cost of Debt', pct(kd), 'Weighted avg borrowing rate'],
+    ['× (1 - Tax Rate)', pct(100-tax), 'Tax shield on debt interest'],
+    ['= After-tax Kd', pct(KdAT), 'Net cost of debt financing'],
+    ['Equity Weight', pct(we), 'E / (E+D)'],
+    ['Debt Weight', pct(wd), 'D / (E+D)'],
+    ['━━ WACC', pct(wacc), 'Weighted average cost of capital'],
+  ];
+  document.getElementById('wacc-table').innerHTML='<thead><tr><th>Component</th><th>Value</th><th>Note</th></tr></thead><tbody>'+rows.map((r,i)=>`<tr style="${i===rows.length-1?'font-weight:600;background:var(--gray-50)':''}"><td>${r[0]}</td><td style="font-family:var(--mono)">${r[1]}</td><td style="color:var(--gray-400)">${r[2]}</td></tr>`).join('')+'</tbody>';
+  const interp = wacc<10?'Low WACC — typical of stable, low-risk businesses like utilities or FMCG.':wacc<14?'Moderate WACC — typical of mid-risk Indian corporates in sectors like IT, auto, or pharma.':wacc<18?'High WACC — reflects elevated risk. Typical of leveraged companies, early-stage, or cyclical sectors.':'Very high WACC — suggests significant financial or operational risk. Use caution in DCF assumptions.';
+  s('wacc-interpretation', interp);
+}
+
+function saveWACCToVault() {
+  VD.vault.save({ type:'WACC', value:document.getElementById('wo-wacc').textContent, domain:'Valuation Advisory' });
+}
+
+// ── EV BRIDGE ──
+function calcEVBridge() {
+  const ev=g('eb-ev'), debt=g('eb-debt'), lease=g('eb-lease'), pension=g('eb-pension');
+  const minority=g('eb-minority'), cash=g('eb-cash'), assoc=g('eb-assoc'), sh=g('eb-sh');
+  s('ebv-ev',ev.toLocaleString('en-IN')); s('ebv-debt',debt); s('ebv-lease',lease);
+  s('ebv-pension',pension); s('ebv-minority',minority); s('ebv-cash',cash); s('ebv-assoc',assoc); s('ebv-sh',sh);
+  const equity=ev-debt-lease-pension-minority+cash+assoc;
+  const perShare=equity/sh;
+  s('ebo-equity', inr(equity)+' Cr'); s('ebo-pershare', inr(perShare));
+  const items=[
+    {label:'Enterprise Value', val:ev, color:'#111827', add:true},
+    {label:'Less: Debt', val:-debt, color:'#dc2626', add:false},
+    {label:'Less: Leases', val:-lease, color:'#ef4444', add:false},
+    {label:'Less: Minorities', val:-minority, color:'#f87171', add:false},
+    {label:'+ Cash', val:cash, color:'#16a34a', add:true},
+    {label:'+ Associates', val:assoc, color:'#15803d', add:true},
+    {label:'= Equity Value', val:equity, color:'#111827', add:true},
+  ];
+  const maxV=ev*1.1;
+  document.getElementById('ev-bridge-bars').innerHTML=items.map(item=>bar(item.label,item.val,maxV,item.color,!item.add)).join('');
+}
+
+function saveEVToVault() {
+  VD.vault.save({ type:'EV Bridge', value:document.getElementById('ebo-equity').textContent, domain:'Valuation Advisory' });
+}
+
+// ── SOTP ──
+function calcSOTP() {
+  const s1e=g('s1-ebitda'), s1m=g('s1-mult'), s2e=g('s2-ebitda'), s2m=g('s2-mult');
+  const s3v=g('s3-val'), debt=g('so-debt'), disc=g('so-disc'), sh=g('so-sh');
+  s('s1v-ebitda',s1e); s('s1v-mult',xm(s1m)); s('s2v-ebitda',s2e); s('s2v-mult',xm(s2m));
+  s('s3v-val',s3v); s('sov-debt',debt); s('sov-disc',pct(disc)); s('sov-sh',sh);
+  const seg1=s1e*s1m, seg2=s2e*s2m, seg3=s3v;
+  const totalEV=seg1+seg2+seg3;
+  const discountedEV=totalEV*(1-disc/100);
+  const equity=discountedEV-debt;
+  const perShare=equity/sh;
+  s('so-pershare', inr(perShare)); s('so-ev', inr(totalEV)+' Cr'); s('so-equity', inr(equity)+' Cr');
+  const maxS=Math.max(seg1,seg2,seg3)*1.2||1;
+  document.getElementById('sotp-bars').innerHTML=[
+    bar('Core Business', seg1, maxS, '#111827'),
+    bar('Growth Division', seg2, maxS, '#374151'),
+    bar('Non-core Assets', seg3, maxS, '#6b7280'),
+    bar('Holdco Discount', -(totalEV*disc/100), maxS, '#ef4444', true),
+    bar('Total Equity Value', equity, maxS, '#16a34a'),
+  ].join('');
+}
+
+function saveSOTPToVault() {
+  VD.vault.save({ type:'SOTP', value:document.getElementById('so-pershare').textContent, domain:'Valuation Advisory' });
+}
+
+// ── FOOTBALL FIELD ──
+function calcFootball() {
+  const dcfLo=g('ff-dcf-lo'), dcfHi=g('ff-dcf-hi');
+  const cmLo=g('ff-cm-lo'), cmHi=g('ff-cm-hi');
+  const txLo=g('ff-tx-lo'), txHi=g('ff-tx-hi');
+  const mkt=g('ff-mkt'), hi52=g('ff-52hi');
+  s('ffv-dcf-lo',dcfLo); s('ffv-dcf-hi',dcfHi); s('ffv-cm-lo',cmLo); s('ffv-cm-hi',cmHi);
+  s('ffv-tx-lo',txLo); s('ffv-tx-hi',txHi); s('ffv-mkt',mkt); s('ffv-52hi',hi52);
+  const allVals=[dcfLo,dcfHi,cmLo,cmHi,txLo,txHi,mkt,hi52];
+  const minV=Math.min(...allVals)*0.9, maxV=Math.max(...allVals)*1.1;
+  const range=maxV-minV;
+  const toP=v=>((v-minV)/range*100).toFixed(1);
+  const rowStyle='display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;';
+  const labelStyle='font-size:0.72rem;color:var(--gray-400);width:120px;text-align:right;flex-shrink:0;';
+  const trackStyle='flex:1;height:22px;background:var(--gray-100);border-radius:3px;position:relative;';
+  const rows=[
+    {label:'DCF Valuation', lo:dcfLo, hi:dcfHi, color:'#111827'},
+    {label:'Trading Comps', lo:cmLo, hi:cmHi, color:'#374151'},
+    {label:'Transaction Comps', lo:txLo, hi:txHi, color:'#6b7280'},
+  ];
+  const mktP=toP(mkt), hi52P=toP(hi52);
+  let html=rows.map(r=>{
+    const loP=toP(r.lo), hiP=toP(r.hi), w=(hiP-loP).toFixed(1);
+    return `<div style="${rowStyle}"><div style="${labelStyle}">${r.label}</div><div style="${trackStyle}"><div style="position:absolute;left:${loP}%;width:${w}%;height:100%;background:${r.color};border-radius:3px;display:flex;align-items:center;padding:0 6px;"><span style="font-family:var(--mono);font-size:0.58rem;color:white;white-space:nowrap;">${inr(r.lo)} — ${inr(r.hi)}</span></div></div></div>`;
+  }).join('');
+  html+=`<div style="${rowStyle}"><div style="${labelStyle}">Reference</div><div style="${trackStyle}"><div style="position:absolute;left:${mktP}%;width:2px;height:100%;background:#2563eb;"></div><span style="position:absolute;left:calc(${mktP}% + 4px);top:50%;transform:translateY(-50%);font-family:var(--mono);font-size:0.6rem;color:#2563eb;">Mkt ${inr(mkt)}</span><div style="position:absolute;left:${hi52P}%;width:2px;height:100%;background:#9ca3af;"></div></div></div>`;
+  document.getElementById('football-chart').innerHTML=html;
+  const allMids=[(dcfLo+dcfHi)/2,(cmLo+cmHi)/2,(txLo+txHi)/2];
+  const avgMid=allMids.reduce((a,b)=>a+b,0)/3;
+  const view=mkt<avgMid*0.9?'Market appears to be undervaluing the company across all methods. The bull case is well-supported — upside is material.':mkt>avgMid*1.1?'Market is trading above the central tendency across all valuation methods. Premium requires a compelling growth story.':'Market is broadly in line with intrinsic value. The range of outcomes is wide — assumptions drive the debate.';
+  s('ff-view', view);
+}
+
+function saveFFToVault() {
+  VD.vault.save({ type:'Football Field', value:'Range analysis saved', domain:'Valuation Advisory' });
+}
+
+// ── NAV ──
+function calcNAV() {
+  const re=g('n-re'), pm=g('n-pm'), inv=g('n-inv'), int=g('n-int'), wc=g('n-wc');
+  const debt=g('n-debt'), disc=g('n-disc'), sh=g('n-sh');
+  s('nv-re',re); s('nv-pm',pm); s('nv-inv',inv); s('nv-int',int); s('nv-wc',wc);
+  s('nv-debt',debt); s('nv-disc',pct(disc)); s('nv-sh',sh);
+  const grossAssets=re+pm+inv+int+wc;
+  const grossNAV=grossAssets-debt;
+  const netNAV=grossNAV*(1-disc/100);
+  const perShare=netNAV/sh;
+  s('no-pershare', inr(perShare)); s('no-gross', inr(grossNAV)+' Cr'); s('no-net', inr(netNAV)+' Cr');
+  const maxA=Math.max(re,pm,inv,int,wc)*1.2||1;
+  document.getElementById('nav-bars').innerHTML=[
+    bar('Real Estate', re, maxA, '#111827'),
+    bar('Plant & Mach.', pm, maxA, '#374151'),
+    bar('Investments', inv, maxA, '#4b5563'),
+    bar('Intangibles', int, maxA, '#6b7280'),
+    bar('Working Capital', wc, maxA, '#9ca3af'),
+    bar('Less: Debt', -debt, maxA, '#dc2626', true),
+    bar('Net NAV', netNAV, maxA, '#16a34a'),
+  ].join('');
+}
+
+function saveNAVToVault() {
+  VD.vault.save({ type:'NAV', value:document.getElementById('no-pershare').textContent, domain:'Valuation Advisory' });
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+  calcDCF(); calcComps(); calcWACCBuilder(); calcEVBridge(); calcSOTP(); calcFootball(); calcNAV();
+  VD.countUp(document.getElementById('vault-count'), VD.vault.count(), 500);
+  // Track dcf seen
+  const seen=JSON.parse(localStorage.getItem('vd_calcs_seen')||'[]');
+  if(!seen.includes('dcf')){seen.push('dcf'); localStorage.setItem('vd_calcs_seen',JSON.stringify(seen));}
+});
+</script>
+</body>
+</html>
