@@ -204,6 +204,25 @@ a{text-decoration:none;color:inherit}
 .act-secondary{padding:11px 22px;border:1.5px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);background:var(--bg);text-decoration:none;display:inline-flex;align-items:center;gap:7px}
 .act-secondary:hover{border-color:var(--text)}
 
+/* LOADING SCREEN */
+.loading-wrap{text-align:center;padding:80px 24px 60px;max-width:480px;margin:0 auto}
+.loading-headline{font-size:22px;font-weight:800;margin-bottom:8px}
+.loading-sub{font-size:14px;color:var(--muted);margin-bottom:52px}
+.loading-steps-list{list-style:none;text-align:left;margin-bottom:40px}
+.ls-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--muted);opacity:0;transform:translateY(6px);transition:opacity .35s ease,transform .35s ease}
+.ls-item.show{opacity:1;transform:translateY(0)}
+.ls-item.active{color:var(--text);font-weight:600}
+.ls-item.done{color:var(--text)}
+.ls-dot{width:9px;height:9px;border-radius:50%;background:var(--border);flex-shrink:0;transition:background .3s}
+.ls-item.active .ls-dot{background:var(--text);animation:dotpulse .7s ease-in-out infinite}
+.ls-item.done .ls-dot{background:var(--green)}
+.ls-check{font-size:13px;color:var(--green);margin-left:auto;opacity:0;transition:opacity .3s}
+.ls-item.done .ls-check{opacity:1}
+@keyframes dotpulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.5}}
+.loading-bar-track{height:3px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:16px}
+.loading-bar-fill{height:100%;width:0%;background:var(--text);border-radius:3px;transition:width .4s ease}
+.loading-pct{font-size:12px;font-family:var(--mono);color:var(--muted);font-weight:600}
+
 /* RESPONSIVE */
 @media(max-width:640px){
   .stat-grid,.bull-bear{grid-template-columns:1fr 1fr}
@@ -498,7 +517,25 @@ a{text-decoration:none;color:inherit}
   </div>
 
   <p class="assume-inputs-count" id="inputsCount"></p>
-  <button class="run-wacc-btn" onclick="goToStep(4)">⚡ CALCULATE WACC ⚡</button>
+  <button class="run-wacc-btn" onclick="startCalculation()">⚡ CALCULATE WACC ⚡</button>
+</section>
+
+<!-- LOADING SCREEN -->
+<section class="step-section" id="stepLoading">
+  <div class="loading-wrap">
+    <div class="loading-headline">Computing your WACC...</div>
+    <div class="loading-sub">Analysing capital structure, running CAPM, building sensitivity model</div>
+    <ul class="loading-steps-list">
+      <li class="ls-item" id="ls1"><span class="ls-dot"></span>Pulling capital structure data<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls2"><span class="ls-dot"></span>Computing Cost of Equity via CAPM<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls3"><span class="ls-dot"></span>Applying tax shield to cost of debt<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls4"><span class="ls-dot"></span>Calculating capital structure weights<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls5"><span class="ls-dot"></span>Running sensitivity analysis across 42 scenarios<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls6"><span class="ls-dot"></span>Finalising your WACC<span class="ls-check">✓</span></li>
+    </ul>
+    <div class="loading-bar-track"><div class="loading-bar-fill" id="loadingBarFill"></div></div>
+    <div class="loading-pct" id="loadingPct">0%</div>
+  </div>
 </section>
 
 <!-- STEP 4: RESULTS -->
@@ -772,6 +809,63 @@ function goToStep(n) {
   if (n === 3) populateAssumptions();
   if (n === 4) renderResults();
   window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── PREMIUM LOADING SEQUENCE ────────────────────────────────────────────────
+function startCalculation() {
+  recalc();
+  // Hide all steps, show loading screen
+  document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('stepLoading').classList.add('active');
+  updateProgress(4);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Reset all loading items
+  [1,2,3,4,5,6].forEach(i => {
+    const el = document.getElementById('ls' + i);
+    el.classList.remove('show','active','done');
+  });
+  document.getElementById('loadingBarFill').style.width = '0%';
+  document.getElementById('loadingPct').textContent = '0%';
+
+  // Step timings: [delay to show, delay to complete]
+  const steps = [
+    { id:'ls1', showAt:200,  doneAt:700  },
+    { id:'ls2', showAt:800,  doneAt:1400 },
+    { id:'ls3', showAt:1500, doneAt:2100 },
+    { id:'ls4', showAt:2200, doneAt:2800 },
+    { id:'ls5', showAt:2900, doneAt:3800 },
+    { id:'ls6', showAt:3900, doneAt:4600 },
+  ];
+
+  // Progress bar percentages matching step completion
+  const barPcts = [10, 25, 42, 60, 80, 100];
+
+  steps.forEach((step, idx) => {
+    // Show step (make it appear + mark active)
+    setTimeout(() => {
+      const el = document.getElementById(step.id);
+      el.classList.add('show','active');
+    }, step.showAt);
+
+    // Complete step (mark done + update bar)
+    setTimeout(() => {
+      const el = document.getElementById(step.id);
+      el.classList.remove('active');
+      el.classList.add('done');
+      const pct = barPcts[idx];
+      document.getElementById('loadingBarFill').style.width = pct + '%';
+      document.getElementById('loadingPct').textContent = pct + '%';
+    }, step.doneAt);
+  });
+
+  // After all steps complete, transition to results
+  setTimeout(() => {
+    document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+    document.getElementById('step4').classList.add('active');
+    renderResults();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 5200);
 }
 
 function updateProgress(n) {
