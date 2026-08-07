@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trading Comps — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;
+  --card:#f9fafb;--green:#16a34a;--red:#dc2626;--orange:#f59e0b;
+  --font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+.top-nav{border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;height:56px;gap:28px}
+.logo{font-size:17px;font-weight:700}.logo strong{font-weight:900}
+.nav-links{display:flex;gap:20px;flex:1}
+.nav-links a{font-size:13px;color:var(--muted);font-weight:500}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{display:flex;gap:8px;align-items:center;margin-left:auto}
+.vault-btn{font-size:12px;font-weight:600;padding:6px 12px;border:1px solid var(--border);border-radius:6px;color:var(--text)}
+.pro-btn{font-size:12px;font-weight:700;padding:6px 14px;background:var(--text);color:#fff;border-radius:6px}
+.domain-nav{border-bottom:1px solid var(--border);background:var(--bg)}
+.domain-nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex}
+.domain-nav a{font-size:13px;font-weight:500;color:var(--muted);padding:10px 16px;border-bottom:2px solid transparent;transition:all .15s}
+.domain-nav a:hover,.domain-nav a.active{color:var(--text);border-bottom-color:var(--text)}
+.progress-wrap{max-width:820px;margin:36px auto 0;padding:0 24px}
+.prog-bar{display:flex;align-items:center}
+.prog-step{display:flex;align-items:center;gap:8px;flex:1}
+.prog-step:last-child{flex:none}
+.step-num{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--muted);font-family:var(--mono);flex-shrink:0;transition:all .2s}
+.prog-step.active .step-num{background:var(--text);border-color:var(--text);color:#fff}
+.prog-step.done .step-num{background:var(--green);border-color:var(--green);color:#fff}
+.step-label{font-size:12px;font-weight:500;color:var(--muted);white-space:nowrap}
+.prog-step.active .step-label{color:var(--text);font-weight:600}
+.prog-step.done .step-label{color:var(--green)}
+.prog-line{flex:1;height:1px;background:var(--border);margin:0 8px}
+.prog-line.done{background:var(--green)}
+.step-section{display:none;max-width:960px;margin:0 auto;padding:36px 24px 80px}
+.step-section.active{display:block}
+.step-headline{font-size:26px;font-weight:800;margin-bottom:6px}
+.step-sub{font-size:14px;color:var(--muted);margin-bottom:24px}
+.filter-bar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.filter-btn{padding:6px 14px;border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;background:var(--bg);color:var(--muted);transition:all .15s;font-family:var(--font)}
+.filter-btn:hover{border-color:var(--text);color:var(--text)}
+.filter-btn.active{background:var(--text);color:#fff;border-color:var(--text)}
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:9px;margin-bottom:20px}
+.company-card{border:1.5px solid var(--border);border-radius:10px;padding:13px;cursor:pointer;transition:all .15s;background:var(--bg)}
+.company-card:hover{border-color:#999}
+.company-card.selected{border-color:var(--text);border-width:2px;background:#f3f3f3}
+.company-card.hidden{display:none}
+.co-flag{font-size:18px;margin-bottom:5px}
+.co-name{font-size:12px;font-weight:700;margin-bottom:2px}
+.co-ticker{font-size:10px;font-family:var(--mono);color:var(--muted)}
+.co-sector{font-size:10px;color:var(--muted);margin-top:3px}
+.continue-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);opacity:.35;pointer-events:none;transition:opacity .2s}
+.continue-btn.enabled{opacity:1;pointer-events:all}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer;margin-bottom:20px;border:none;background:none;font-family:var(--font);padding:0}
+.back-link:hover{color:var(--text)}
+.ctx-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:22px}
+.ctx-flag{font-size:30px;line-height:1}
+.ctx-co-name{font-size:22px;font-weight:800;margin-bottom:3px}
+.ctx-meta{font-size:13px;color:var(--muted)}
+.ctx-tag{display:inline-block;padding:2px 8px;border:1px solid var(--border);border-radius:12px;font-size:10px;font-weight:600;color:var(--muted);margin-right:5px;text-transform:uppercase;letter-spacing:.5px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:22px}
+.stat-card{border:1px solid var(--border);border-radius:8px;padding:13px}
+.stat-lbl{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.stat-val{font-size:17px;font-weight:700;font-family:var(--mono)}
+.stat-note{font-size:10px;color:var(--muted);margin-top:3px}
+.key-badge{display:inline-block;padding:3px 10px;background:var(--text);color:#fff;border-radius:20px;font-size:11px;font-weight:700;font-family:var(--mono);margin-bottom:14px}
+.edu-block{border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:10px}
+.edu-icon{font-size:16px;margin-bottom:6px}
+.edu-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:7px}
+.edu-text{font-size:14px;line-height:1.7;color:var(--text)}
+.bull-bear{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:22px}
+.bull-box{border:1px solid #bbf7d0;border-radius:10px;padding:15px;background:#f0fdf4}
+.bear-box{border:1px solid #fecaca;border-radius:10px;padding:15px;background:#fef2f2}
+.bb-ttl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px}
+.bull-box .bb-ttl{color:var(--green)}
+.bear-box .bb-ttl{color:var(--red)}
+.bb-row{display:flex;gap:7px;margin-bottom:5px;font-size:13px}
+.bb-row:last-child{margin-bottom:0}
+.bb-arrow{font-weight:700;flex-shrink:0}
+.bull-box .bb-arrow{color:var(--green)}
+.bear-box .bb-arrow{color:var(--red)}
+.bank-note{border:1px solid #fde68a;border-radius:10px;padding:15px;background:#fffbeb;margin-bottom:18px}
+.bank-note-ttl{font-size:12px;font-weight:700;color:#92400e;margin-bottom:5px}
+.bank-note-txt{font-size:13px;color:#78350f;line-height:1.6}
+/* ASSUMPTIONS */
+.live-bar{position:sticky;top:113px;background:var(--bg);border-bottom:1px solid var(--border);padding:10px 0;margin-bottom:26px;z-index:50}
+.live-inner{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.live-prices{display:flex;gap:20px}
+.lp-item{text-align:center}
+.lp-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.lp-val{font-size:15px;font-weight:700;font-family:var(--mono)}
+.lp-chg{font-size:10px;font-family:var(--mono);margin-top:1px}
+.lp-chg.up{color:var(--green)}
+.lp-chg.dn{color:var(--red)}
+.live-current{text-align:right}
+.live-current-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.live-current-val{font-size:22px;font-weight:900;font-family:var(--mono)}
+.assume-section{margin-bottom:26px}
+.assume-sec-head{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-top:2px solid var(--text);padding-top:9px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.assume-formula{font-family:var(--mono);font-size:11px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0}
+.assume-table{width:100%;border-collapse:collapse}
+.assume-tr{border-bottom:1px solid var(--border)}
+.assume-tr:last-child{border-bottom:none}
+.assume-td{padding:11px 0;vertical-align:middle}
+.assume-td.label-col{width:55%}
+.assume-td.type-col{width:20%;text-align:center}
+.assume-td.input-col{width:25%;text-align:right}
+.assume-label{font-size:14px;font-weight:500;display:flex;align-items:center;gap:7px}
+.hint-wrap{position:relative;display:inline-block}
+.hint-icon{width:16px;height:16px;border-radius:50%;border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:var(--muted);cursor:default;vertical-align:middle}
+.hint-tip{display:none;position:absolute;left:22px;top:-6px;background:var(--text);color:#fff;font-size:11px;line-height:1.5;padding:8px 12px;border-radius:6px;width:230px;z-index:200;font-weight:400;white-space:normal;font-family:var(--font)}
+.hint-wrap:hover .hint-tip{display:block}
+.type-badge{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:600}
+.type-pre{background:#dbeafe;color:#1e40af}
+.type-yours{background:#fef3c7;color:#92400e}
+.type-calc{background:#f3f4f6;color:#6b7280}
+.assume-input{width:110px;border:1.5px solid var(--border);border-radius:6px;padding:7px 9px;font-size:14px;font-family:var(--mono);font-weight:600;text-align:right;background:var(--bg);color:var(--text)}
+.assume-input:focus{outline:none;border-color:var(--text)}
+.assume-input.calc{background:var(--card);cursor:default;font-weight:700;border-color:var(--border);color:var(--text)}
+.assume-input.calc-green{border-color:var(--green);background:#f0fdf4;color:#14532d}
+.assume-input.calc-red{border-color:var(--red);background:#fef2f2;color:#7f1d1d}
+.run-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:800;cursor:pointer;font-family:var(--font);margin-top:8px;letter-spacing:.3px}
+.run-btn:hover{background:#222}
+/* LOADING */
+.loading-wrap{text-align:center;padding:80px 24px 60px;max-width:480px;margin:0 auto}
+.loading-headline{font-size:22px;font-weight:800;margin-bottom:8px}
+.loading-sub{font-size:14px;color:var(--muted);margin-bottom:52px}
+.loading-steps-list{list-style:none;text-align:left;margin-bottom:40px}
+.ls-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--muted);opacity:0;transform:translateY(6px);transition:opacity .35s ease,transform .35s ease}
+.ls-item.show{opacity:1;transform:translateY(0)}
+.ls-item.active{color:var(--text);font-weight:600}
+.ls-item.done{color:var(--text)}
+.ls-dot{width:9px;height:9px;border-radius:50%;background:var(--border);flex-shrink:0;transition:background .3s}
+.ls-item.active .ls-dot{background:var(--text);animation:dotpulse .7s ease-in-out infinite}
+.ls-item.done .ls-dot{background:var(--green)}
+.ls-check{font-size:13px;color:var(--green);margin-left:auto;opacity:0;transition:opacity .3s}
+.ls-item.done .ls-check{opacity:1}
+@keyframes dotpulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.5}}
+.loading-bar-track{height:3px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:16px}
+.loading-bar-fill{height:100%;width:0%;background:var(--text);border-radius:3px;transition:width .4s ease}
+.loading-pct{font-size:12px;font-family:var(--mono);color:var(--muted);font-weight:600}
+/* RESULTS */
+.result-hero{text-align:center;padding:40px 0 28px;border-bottom:1px solid var(--border);margin-bottom:28px}
+.result-co-lbl{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.result-headline{font-size:15px;color:var(--muted);margin-bottom:6px}
+.result-range{font-size:13px;color:var(--muted);margin-top:8px}
+/* COMPS TABLE */
+.comps-table-wrap{margin-bottom:28px}
+.comps-table-title{font-size:14px;font-weight:700;margin-bottom:14px}
+.comps-table{width:100%;border-collapse:collapse}
+.comps-table th{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;padding:9px 12px;text-align:right;background:var(--card);border:1px solid var(--border)}
+.comps-table th:first-child{text-align:left}
+.comps-table td{padding:11px 12px;border:1px solid var(--border);text-align:right;font-size:14px}
+.comps-table td:first-child{text-align:left;font-weight:600;font-size:13px}
+.comps-table tr.highlight{background:#f8f8f8}
+.tag-key{display:inline-block;padding:1px 6px;background:var(--text);color:#fff;border-radius:3px;font-size:9px;font-weight:700;margin-left:6px;vertical-align:middle}
+.verdict-up{color:var(--green);font-weight:700;font-family:var(--mono)}
+.verdict-dn{color:var(--red);font-weight:700;font-family:var(--mono)}
+.verdict-flat{color:var(--orange);font-weight:700;font-family:var(--mono)}
+/* FOOTBALL FIELD CHART */
+.ff-section{margin-bottom:28px}
+.ff-title{font-size:14px;font-weight:700;margin-bottom:6px}
+.ff-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.ff-chart{position:relative;padding:16px 0 32px}
+.ff-row{display:flex;align-items:center;gap:12px;margin-bottom:18px;position:relative}
+.ff-lbl{font-size:12px;font-weight:600;width:140px;flex-shrink:0;text-align:right}
+.ff-lbl.key-lbl{font-weight:800}
+.ff-track{flex:1;height:6px;background:var(--border);border-radius:3px;position:relative}
+.ff-dot{position:absolute;width:14px;height:14px;border-radius:50%;background:var(--text);top:-4px;transform:translateX(-50%);cursor:default;z-index:2}
+.ff-dot.key-dot{width:18px;height:18px;top:-6px;background:var(--text);box-shadow:0 0 0 3px rgba(10,10,10,.15)}
+.ff-price-lbl{position:absolute;bottom:calc(100% + 10px);font-size:11px;font-family:var(--mono);font-weight:700;transform:translateX(-50%);white-space:nowrap;background:var(--bg);padding:0 2px}
+.ff-current-line{position:absolute;top:-12px;bottom:-12px;width:2px;background:var(--red);opacity:.8;z-index:3;transform:translateX(-50%)}
+.ff-current-lbl{position:absolute;top:-28px;font-size:10px;font-weight:700;color:var(--red);transform:translateX(-50%);white-space:nowrap;font-family:var(--mono)}
+.ff-axis{display:flex;justify-content:space-between;margin-top:8px;padding:0}
+.ff-axis span{font-size:10px;font-family:var(--mono);color:var(--muted)}
+.ff-legend{display:flex;gap:16px;margin-top:12px;font-size:12px;color:var(--muted)}
+.ff-leg-item{display:flex;align-items:center;gap:6px}
+.ff-leg-dot{width:10px;height:10px;border-radius:50%;background:var(--text)}
+.ff-leg-line{width:14px;height:2px;background:var(--red)}
+/* SENSITIVITY TABLE */
+.sens-section{margin-bottom:28px}
+.sens-title{font-size:14px;font-weight:700;margin-bottom:3px}
+.sens-sub{font-size:13px;color:var(--muted);margin-bottom:14px}
+.sens-table{border-collapse:collapse;width:100%;font-size:12px}
+.sens-table th{font-size:10px;font-weight:600;color:var(--muted);padding:7px 10px;text-align:center;background:var(--card);border:1px solid var(--border)}
+.sens-table th:first-child{text-align:left}
+.sens-table td{font-family:var(--mono);font-weight:600;padding:7px 10px;text-align:center;border:1px solid var(--border)}
+.sens-table td:first-child{font-family:var(--font);color:var(--muted);background:var(--card);font-weight:600;text-align:left}
+.cell-low{background:#dcfce7;color:#14532d}
+.cell-mid{background:#fef9c3;color:#713f12}
+.cell-high{background:#fee2e2;color:#7f1d1d}
+.cell-base{background:var(--text);color:#fff}
+/* IMPLICATION */
+.impl-card{border:2px solid var(--text);border-radius:10px;padding:20px;margin-bottom:22px}
+.impl-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px}
+.impl-text{font-size:14px;line-height:1.7}
+.action-row{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap}
+.act-primary{padding:11px 22px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);text-decoration:none;display:inline-flex;align-items:center;gap:7px}
+.act-secondary{padding:11px 22px;border:1.5px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);background:var(--bg);text-decoration:none;display:inline-flex;align-items:center;gap:7px}
+.act-secondary:hover{border-color:var(--text)}
+@media(max-width:640px){
+  .stat-grid,.bull-bear{grid-template-columns:1fr 1fr}
+  .company-grid{grid-template-columns:repeat(2,1fr)}
+  .nav-links,.domain-nav{display:none}
+  .live-prices{display:none}
+  .ff-lbl{width:80px;font-size:11px}
+}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <div class="nav-inner">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/" class="logo">Valuation<strong>Desk</strong></a>
+    <div class="nav-links">
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/">Valuation Advisory</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/">My Vault</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/deal-room/">Deal Room</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/daily-brief/">Daily Brief</a>
+    </div>
+    <div class="nav-cta">
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/" class="vault-btn">🗄 Vault (0)</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/#pricing" class="pro-btn">Get Pro — ₹799/mo</a>
+    </div>
+  </div>
+</nav>
+<div class="domain-nav">
+  <div class="domain-nav-inner">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/">Overview</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/learn/">📖 Learn</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/" class="active">📊 Trading Comps</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/">🗄 My Vault</a>
+  </div>
+</div>
+<div class="progress-wrap">
+  <div class="prog-bar" id="progressBar">
+    <div class="prog-step active" id="ps1"><div class="step-num">1</div><span class="step-label">Pick a company</span></div>
+    <div class="prog-line" id="pl1"></div>
+    <div class="prog-step" id="ps2"><div class="step-num">2</div><span class="step-label">Study the context</span></div>
+    <div class="prog-line" id="pl2"></div>
+    <div class="prog-step" id="ps3"><div class="step-num">3</div><span class="step-label">Set assumptions</span></div>
+    <div class="prog-line" id="pl3"></div>
+    <div class="prog-step" id="ps4"><div class="step-num">4</div><span class="step-label">Run Comps</span></div>
+  </div>
+</div>
+
+<!-- STEP 1 -->
+<section class="step-section active" id="step1">
+  <h1 class="step-headline">Which company do you want to value?</h1>
+  <p class="step-sub">Pick one. We'll load peer trading multiples from the market and help you build an implied valuation range — the way bankers actually do it.</p>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterGrid('all',this)">All (30)</button>
+    <button class="filter-btn" onclick="filterGrid('india',this)">🇮🇳 India</button>
+    <button class="filter-btn" onclick="filterGrid('global',this)">🌍 Global</button>
+    <button class="filter-btn" onclick="filterGrid('it',this)">IT</button>
+    <button class="filter-btn" onclick="filterGrid('banking',this)">Banking</button>
+    <button class="filter-btn" onclick="filterGrid('fmcg',this)">FMCG</button>
+  </div>
+  <div class="company-grid" id="companyGrid"></div>
+  <button class="continue-btn" id="continueBtn" onclick="goToStep(2)">Continue with selected company →</button>
+</section>
+
+<!-- STEP 2 -->
+<section class="step-section" id="step2">
+  <button class="back-link" onclick="goToStep(1)">← Change company</button>
+  <div class="ctx-header">
+    <div class="ctx-flag" id="ctxFlag"></div>
+    <div><div class="ctx-co-name" id="ctxName"></div><div class="ctx-meta" id="ctxMeta"></div></div>
+  </div>
+  <div id="keyMultipleBadge"></div>
+  <div class="stat-grid" id="statGrid"></div>
+  <div id="bankNote" style="display:none" class="bank-note">
+    <div class="bank-note-ttl">⚠️ EV multiples don't apply to banks and NBFCs</div>
+    <div class="bank-note-txt" id="bankNoteTxt"></div>
+  </div>
+  <div class="edu-block">
+    <div class="edu-icon">🏢</div>
+    <div class="edu-title">Who are the real comparable peers — and why peer selection is harder than it looks</div>
+    <div class="edu-text" id="ctxPeers"></div>
+  </div>
+  <div class="edu-block">
+    <div class="edu-icon">📐</div>
+    <div class="edu-title">Which multiple matters most for this sector — and the financial reason why</div>
+    <div class="edu-text" id="ctxMultiple"></div>
+  </div>
+  <div class="edu-block">
+    <div class="edu-icon">🎯</div>
+    <div class="edu-title">What the current premium or discount to peers actually means</div>
+    <div class="edu-text" id="ctxPremium"></div>
+  </div>
+  <div class="bull-bear">
+    <div class="bull-box"><div class="bb-ttl">Bull Case — Re-rates to Premium</div><div id="ctxBull"></div></div>
+    <div class="bear-box"><div class="bb-ttl">Bear Case — Derates to Discount</div><div id="ctxBear"></div></div>
+  </div>
+  <button class="continue-btn enabled" onclick="goToStep(3)">I've studied it. Build the Comps →</button>
+</section>
+
+<!-- STEP 3 -->
+<section class="step-section" id="step3">
+  <button class="back-link" onclick="goToStep(2)">← Back to context</button>
+  <h2 class="step-headline">Set your assumptions</h2>
+  <p class="step-sub">Pre-filled from public filings and market data. Override peer multiples if you believe this company deserves a premium or discount. Watch the implied prices update live.</p>
+
+  <div class="live-bar">
+    <div class="live-inner">
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:4px">Implied Prices — 3 methods</div>
+        <div class="live-prices" id="livePrices"></div>
+      </div>
+      <div class="live-current">
+        <div class="live-current-lbl">Current Market Price</div>
+        <div class="live-current-val" id="liveCurrentPrice">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="assume-section" id="finSection">
+    <div class="assume-sec-head"><span id="finSectionTitle">A · Company Financials</span><span class="assume-formula" id="finSectionNote"></span></div>
+    <table class="assume-table" id="finTable"></table>
+  </div>
+
+  <div class="assume-section">
+    <div class="assume-sec-head"><span id="peerSectionTitle">B · Peer Trading Multiples</span><span class="assume-formula">Override if you think a premium/discount is warranted</span></div>
+    <table class="assume-table" id="peerTable"></table>
+  </div>
+
+  <button class="run-btn" onclick="startCalculation()">📊 RUN COMPS 📊</button>
+</section>
+
+<!-- LOADING -->
+<section class="step-section" id="stepLoading">
+  <div class="loading-wrap">
+    <div class="loading-headline">Running comparable analysis...</div>
+    <div class="loading-sub">Benchmarking against peer universe and calculating implied valuation range</div>
+    <ul class="loading-steps-list">
+      <li class="ls-item" id="ls1"><span class="ls-dot"></span>Identifying comparable peer companies<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls2"><span class="ls-dot"></span>Calculating peer median EV/Revenue, EV/EBITDA and P/E<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls3"><span class="ls-dot"></span>Applying multiples to target company financials<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls4"><span class="ls-dot"></span>Computing implied enterprise and equity values<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls5"><span class="ls-dot"></span>Building implied share price range<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls6"><span class="ls-dot"></span>Running sensitivity across multiple scenarios<span class="ls-check">✓</span></li>
+    </ul>
+    <div class="loading-bar-track"><div class="loading-bar-fill" id="loadingBarFill"></div></div>
+    <div class="loading-pct" id="loadingPct">0%</div>
+  </div>
+</section>
+
+<!-- STEP 4 -->
+<section class="step-section" id="step4">
+  <button class="back-link" onclick="goToStep(3)">← Adjust assumptions</button>
+  <div class="result-hero">
+    <div class="result-co-lbl" id="rCoLbl"></div>
+    <div class="result-headline">Implied valuation range from comparable company analysis</div>
+    <div id="rPriceRange" style="font-size:32px;font-weight:900;font-family:var(--mono);margin:10px 0"></div>
+    <div class="result-range" id="rRangeSub"></div>
+  </div>
+
+  <div class="comps-table-wrap">
+    <div class="comps-table-title">Implied Price by Method</div>
+    <div style="overflow-x:auto"><table class="comps-table" id="compsTable"></table></div>
+  </div>
+
+  <div class="ff-section">
+    <div class="ff-title">Football Field — Visual Price Range</div>
+    <div class="ff-sub">Each dot shows the implied share price from that method. The red line is the current market price.</div>
+    <div class="ff-chart" id="ffChart"></div>
+    <div class="ff-legend">
+      <div class="ff-leg-item"><div class="ff-leg-dot"></div><span>Implied price from method</span></div>
+      <div class="ff-leg-item"><div class="ff-leg-line"></div><span>Current market price</span></div>
+    </div>
+  </div>
+
+  <div class="impl-card">
+    <div class="impl-title">🎓 Analyst's read on this Comps output</div>
+    <div class="impl-text" id="rAnalystRead"></div>
+  </div>
+
+  <div class="sens-section">
+    <div class="sens-title">Sensitivity Analysis</div>
+    <div class="sens-sub" id="sensSub"></div>
+    <div style="overflow-x:auto"><table class="sens-table" id="sensTable"></table></div>
+  </div>
+
+  <div class="action-row">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/dcf.html" class="act-primary">📈 Cross-check with DCF →</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/wacc.html" class="act-primary" style="background:#374151">⚙️ Build WACC first →</a>
+    <button class="act-secondary" onclick="resetAll()">↺ Value another company</button>
+  </div>
+</section>
+
+<script>
+// ─── COMPANY DATA ─────────────────────────────────────────────────────────────
+// isBank: use P/B + P/E instead of EV multiples
+// nd: net debt (positive=owes, negative=net cash)
+// Fields: rev,ebitda,ni,nd,shares,price (non-bank) | bv,ni,shares,price (bank)
+// pEVR,pEVE,pPE = peer median multiples | pPB,pPE = bank peer medians
+// keyM = key multiple label | keyMField = which field drives key sensitivity
+const CO = [
+  {id:'reliance',name:'Reliance Industries',ticker:'RELIANCE',flag:'🇮🇳',sector:'Conglomerate',tags:['india'],cur:'₹',unit:'Cr',isBank:false,
+   rev:902000,ebitda:178000,ni:79000,nd:116000,shares:1350,price:1400,
+   pEVR:1.8,pEVE:8.5,pPE:16.0,keyM:'EV/EBITDA',peers:'Shell, BP, Exxon (refining), Deutsche Telekom (telecom), Walmart (retail)',
+   ctx:{pr:'No single peer universe fits Reliance cleanly. Real analysts use a sum-of-parts approach — Shell/BP for refining, Deutsche Telekom for Jio, Walmart for retail. Using a blended global peer set understates India\'s growth premium embedded in each division.',mm:'EV/EBITDA is the anchor because revenue multiples mislead when 60% of revenue comes from low-margin refining while 40% of EBITDA comes from high-margin telecom. You need an earnings-level metric to cut through the margin mix.',pd:'Reliance trades at ~11x EV/EBITDA vs the 8.5x peer median — a 33% premium that embeds India\'s structural growth advantage and the optionality of three potential segment IPOs: Jio, Retail, and New Energy.',bull:['Sum-of-parts IPOs unlock premium standalone valuations above blended comps','India GDP re-rates the growth premium embedded in each EV multiple','New Energy assets reclassified to clean energy peer group at higher multiples'],bear:['Conglomerate discount deepens as cross-subsidies become more visible','Global oil peers derate as energy transition accelerates','Retail expansion dilutes EBITDA margins before reaching scale efficiency']}},
+
+  {id:'tcs',name:'TCS',ticker:'TCS',flag:'🇮🇳',sector:'IT Services',tags:['india','it'],cur:'₹',unit:'Cr',isBank:false,
+   rev:240893,ebitda:65000,ni:46099,nd:-71000,shares:363,price:4000,
+   pEVR:3.2,pEVE:17.0,pPE:26.0,keyM:'P/E',peers:'Infosys, HCL Tech, Accenture, Cognizant, Wipro',
+   ctx:{pr:'Primary peers: Infosys, HCL Tech, Wipro (India IT), Accenture and Cognizant (global). Accenture matters most — it sets the ceiling for what IT services quality commands globally. IBM and DXC are lower-quality comps and should be excluded.',mm:'P/E is the gold standard for IT services. Margins vary significantly across peers (TCS 25% vs sector 18%), making EV/EBITDA noisy across the peer set. P/E normalises for quality and is how analyst consensus actually values the sector.',pd:'TCS trades at 31x P/E vs the peer median of 26x — a 20% premium justified by best-in-class EBITDA margins (25% vs 18%), near-zero debt, and unmatched client retention in Fortune 500 BFSI accounts.',bull:['AI services premiumisation drives sector P/E re-rating above historical range','Accenture P/E premium expands, pulling TCS along as quality benchmark','Large deal wins reduce revenue uncertainty, compressing equity risk premium'],bear:['AI commoditisation narrows margin gap to peers, compressing the quality premium','US BFSI spending cuts reduce discretionary tech budgets sector-wide','Attrition spike compresses EBITDA margins, removing the key premium justification']}},
+
+  {id:'hdfc',name:'HDFC Bank',ticker:'HDFCBANK',flag:'🇮🇳',sector:'Banking',tags:['india','banking'],cur:'₹',unit:'Cr',isBank:true,
+   bv:350000,ni:65000,shares:750,price:1600,pPB:2.8,pPE:16.0,
+   bankNote:'EV multiples don\'t apply to banks. Customer deposits are an operational input, not financing. Use P/B and P/E — the metrics that actually drive bank valuation in every analyst model.',
+   peers:'ICICI Bank, Kotak Mahindra, Axis Bank, IndusInd Bank',
+   ctx:{pr:'Primary peers: ICICI Bank (closest in scale), Kotak Mahindra (premium franchise), Axis Bank (transformation story). Public sector banks (SBI, PNB) are not comparable — structurally different risk profiles, governance standards, and growth trajectories.',mm:'P/B (Price-to-Book) is the primary metric. Bank value is created through the balance sheet — lending at higher rates than funding costs, compounded over decades. P/E misses this because EPS swings dramatically with loan-loss provision cycles.',pd:'HDFC Bank trades at ~3.5x P/B vs private bank peers at 2.8x — a 25% premium earned through 30 years of superior asset quality, consistently high RoE above cost of equity, and a CASA franchise that lowers funding costs structurally.',bull:['RoE sustains above 16% post HDFC merger, fully justifying the P/B premium','Net NPA ratio continues falling, warranting upward multiple re-rating','CASA franchise strengthens as UPI payment flows increasingly concentrate at HDFC'],bear:['P/B compression if NIM falls below 4% post merger integration','Credit cycle deterioration spikes provisioning, denting P/E and P/B simultaneously','Sector P/B derates if RBI tightens capital adequacy norms beyond current requirements']}},
+
+  {id:'infosys',name:'Infosys',ticker:'INFY',flag:'🇮🇳',sector:'IT Services',tags:['india','it'],cur:'₹',unit:'Cr',isBank:false,
+   rev:153670,ebitda:38000,ni:26248,nd:-38000,shares:415,price:1540,
+   pEVR:2.8,pEVE:15.0,pPE:23.0,keyM:'P/E',peers:'TCS, HCL Tech, Wipro, Capgemini, Cognizant',
+   ctx:{pr:'Peers: TCS (premium benchmark), HCL Tech, Wipro, Accenture, Capgemini. The structural truth: Infosys is almost always valued at a discount to TCS. The delta between them — currently 24x vs 31x P/E — is the fundamental input any Infosys comps model starts with.',mm:'P/E drives the conversation, same as TCS. But Infosys\'s margins are 18-19% vs TCS\'s 25%, so the discount is structurally consistent. Any change in positioning comes from margin movement, not revenue growth alone.',pd:'Infosys trades at 24x P/E — essentially at peer median (23x). It neither commands a premium like TCS nor a sustained discount like Wipro. Moving above peer median requires a credible margin expansion story above 19%.',bull:['AI-native consulting wins improve margin mix, warranting a premium re-rating vs peers','Large deal TCV acceleration validates the strategy under new management','Attrition normalisation reduces subcontracting costs, driving margin upside'],bear:['Management guidance cuts trigger sector-wide P/E derating','Cloud migration spending falls as enterprise budgets tighten globally','US visa policy tightens, increasing delivery costs structurally for India-headquartered firms']}},
+
+  {id:'asianpaint',name:'Asian Paints',ticker:'ASIANPAINT',flag:'🇮🇳',sector:'FMCG/Paints',tags:['india','fmcg'],cur:'₹',unit:'Cr',isBank:false,
+   rev:35000,ebitda:6300,ni:4300,nd:-2000,shares:96,price:2900,
+   pEVR:3.5,pEVE:35.0,pPE:55.0,keyM:'P/E',peers:'Berger Paints, Kansai Nerolac, Sherwin-Williams (US), Akzo Nobel',
+   ctx:{pr:'Global: Sherwin-Williams (US), Akzo Nobel (Netherlands). India: Berger Paints, Kansai Nerolac, Indigo. The honest truth: no peer globally operates at Asian Paints\' market share and margin combination in a single large market. Comps inherently undersells the moat.',mm:'P/E is the primary multiple. Paints is a premium consumer brand business, not an industrial chemicals company. The market values brand moat, distribution depth, and pricing power — all captured in earnings quality, not revenue volume.',pd:'Asian Paints traded at 80x+ P/E two years ago. Today it\'s at 55x — right at peer median. The Birla Opus entry has already deducted the market share risk discount. The question is whether that discount is fully priced or has further to go.',bull:['Birla Opus fails to gain meaningful share in premium decorative — multiple recovers','Real estate cycle re-accelerates volume growth, warranting expansion above peer median','Waterproofing and wood finishes diversify revenue, sustaining premium positioning'],bear:['Grasim wins 8-10% market share, structurally compressing revenue growth and P/E','Crude oil spike hits gross margins, reducing earnings growth rate','Rural slowdown disproportionately hits mass category volumes in core markets']}},
+
+  {id:'zomato',name:'Zomato',ticker:'ZOMATO',flag:'🇮🇳',sector:'Consumer Tech',tags:['india'],cur:'₹',unit:'Cr',isBank:false,
+   rev:14170,ebitda:1200,ni:351,nd:-12000,shares:875,price:240,
+   pEVR:2.8,pEVE:80.0,pPE:200.0,keyM:'EV/Revenue',peers:'DoorDash (US), Delivery Hero (EU), Grab (SEA), Meituan (China)',
+   ctx:{pr:'Global: DoorDash (most comparable on market structure), Delivery Hero (Europe), Grab (SEA food delivery), Meituan (China). The problem: each operates in completely different margin environments. DoorDash P&L metrics are the closest structural proxy.',mm:'EV/Revenue is the only coherent multiple. EBITDA is too thin and volatile. P/E is meaningless for a near-zero earnings company. Revenue multiple is imperfect but it\'s the least-bad option — think of it as a bet on future monetisation at scale.',pd:'Zomato trades at 15x EV/Revenue vs global food delivery peers at 2.8x — a 5x premium. This reflects India\'s structural underpenetration of food delivery, Blinkit\'s quick commerce growth, and a credible path to significantly higher EBITDA margins than global peers.',bull:['Blinkit reaches profitability — multiple framework shifts from EV/Revenue to EV/EBITDA at higher level','India\'s 300M monthly internet user growth expands the serviceable market sustainably','Platform advertising revenue diversifies away from pure delivery commission dependency'],bear:['Global peers continue derating as food delivery growth plateaus everywhere','Blinkit unit economics worsen as expansion hits lower-density tier-2 cities','Swiggy IPO funds aggressive discounting, extending Zomato\'s path to profitability']}},
+
+  {id:'wipro',name:'Wipro',ticker:'WIPRO',flag:'🇮🇳',sector:'IT Services',tags:['india','it'],cur:'₹',unit:'Cr',isBank:false,
+   rev:89800,ebitda:19500,ni:11000,nd:-25000,shares:519,price:520,
+   pEVR:2.5,pEVE:14.0,pPE:22.0,keyM:'P/E',peers:'Infosys, HCL Tech, Capgemini, Cognizant, DXC Technology',
+   ctx:{pr:'Peers: TCS, Infosys, HCL Tech, Capgemini, DXC Technology. Wipro has historically traded at the largest discount to the India IT peer group due to lower margins and slower organic growth. Capco acquisition aimed to change that narrative — watch the cross-sell data.',mm:'P/E is standard for IT services. Wipro\'s discount to peers on P/E (22x vs 24x Infosys) reflects lower EBITDA margins (~21%). Any margin improvement from automation and AI integration moves all multiples simultaneously.',pd:'Wipro trades at 22x P/E vs peer median 22x — right at peer median. The discount vs TCS (31x) and Infosys (24x) is consistent. New management under Srinivas Pallia is being benchmarked on whether organic growth can narrow this gap.',bull:['Margin expansion toward 22-23% removes the discount vs Infosys and Capgemini','ERM (Europe) growth acceleration closes the revenue CAGR gap','Capco integration creates momentum in BFSI financial consulting cross-sell'],bear:['Acquisition complexity depresses organic growth, sustaining peer discount','Margin recovery takes longer than guided, maintaining the structural multiple gap','Client mining efficiency below TCS/Infosys sustains the P/E discount permanently']}},
+
+  {id:'maruti',name:'Maruti Suzuki',ticker:'MARUTI',flag:'🇮🇳',sector:'Auto OEM',tags:['india'],cur:'₹',unit:'Cr',isBank:false,
+   rev:141800,ebitda:19100,ni:13489,nd:-34000,shares:30,price:12500,
+   pEVR:1.5,pEVE:12.0,pPE:22.0,keyM:'EV/EBITDA',peers:'Toyota, Hyundai, Honda, Kia, Mahindra',
+   ctx:{pr:'Global: Toyota, Hyundai, Honda, Kia. India domestic: Tata Motors (passenger), Mahindra. The honest reality: Maruti\'s 41% market share has no global parallel for a single OEM in any large market. Toyota is the closest in philosophy but operates at global scale.',mm:'EV/EBITDA is standard for auto OEMs — it normalises for depreciation differences across capital-heavy manufacturers and removes leverage noise. P/E fluctuates dramatically with commodity cycles; EV/EBITDA is more stable across the cycle.',pd:'Maruti trades at 22x EV/EBITDA vs global auto peer median of 12x — an 83% premium. This is entirely an India structural growth bet: auto penetration at 3% of population vs 80% in the US, with rising middle-class incomes driving a long-runway demand story.',bull:['India car penetration doubles over 10 years, sustaining premium multiple vs global peers','Hybrid vehicles protect Maruti\'s ICE advantage while EVs mature in the market','Suzuki Japan EV technology transfer reduces India-level R&D cost burden'],bear:['EV adoption faster than forecast makes Maruti\'s ICE platform prematurely obsolete','Tata Nexon, MG, and BYD win the fast-growing SUV segment at Maruti\'s expense','Income growth disappoints, compressing auto demand and collapsing the India growth premium']}},
+
+  {id:'bajfinance',name:'Bajaj Finance',ticker:'BAJFINANCE',flag:'🇮🇳',sector:'NBFC',tags:['india','banking'],cur:'₹',unit:'Cr',isBank:true,
+   bv:66000,ni:16778,shares:61,price:7400,pPB:4.0,pPE:28.0,
+   bankNote:'NBFCs use wholesale borrowings to fund loan books — this is operational, not traditional financing. P/B and P/E are the correct metrics. EV multiples would double-count the operational leverage.',
+   peers:'Cholamandalam, SBI Cards, HDFC Ltd (merged), Shriram Finance',
+   ctx:{pr:'Peers: HDFC Bank (aspirational benchmark on RoE), Cholamandalam, SBI Cards, Shriram Finance. No NBFC globally matches Bajaj Finance\'s combination of consumer credit scale, technology depth, and margin profile. It\'s a category of one in Indian fintech.',mm:'P/B is the anchor for NBFCs. Bajaj Finance has historically commanded 6-8x P/B — extraordinarily high for any financial company globally — justified by 22-24% RoE delivered consistently over a decade of consumer credit scaling.',pd:'Bajaj Finance trades at ~6.8x P/B vs peer NBFCs at 4.0x — a 70% premium. This reflects its technology-first consumer credit model, cross-sell effectiveness, and the depth of brand trust across India\'s middle class.',bull:['AUM growth above 25% sustains high RoE, compressing the P/B premium gap further up','New product categories (insurance, MF distribution) expand RoE without proportional capital','Digital lending competition fails to match Bajaj\'s physical + digital hybrid model'],bear:['RBI regulations cap growth — NPA cycle hits RoE, compressing P/B sharply','Consumer credit cycle turns with unsecured lending NPAs spiking','Banks build competing digital consumer credit at lower cost of capital']}},
+
+  {id:'itc',name:'ITC',ticker:'ITC',flag:'🇮🇳',sector:'FMCG/Tobacco',tags:['india','fmcg'],cur:'₹',unit:'Cr',isBank:false,
+   rev:74000,ebitda:21000,ni:20422,nd:-30000,shares:1250,price:450,
+   pEVR:2.5,pEVE:16.0,pPE:22.0,keyM:'P/E',peers:'British American Tobacco, Philip Morris, Altria, HUL (FMCG segment)',
+   ctx:{pr:'Tobacco peers: BAT, Philip Morris, Altria. FMCG peers: HUL, Nestlé India, Dabur. The structural tension: ITC earns 50%+ of EBITDA from tobacco but seeks to trade as an FMCG company. This gap between its two possible peer sets drives all valuation complexity.',mm:'P/E drives the conversation — but global tobacco trades at 14x while India FMCG trades at 50-60x. ITC\'s blended 22x reflects this unresolved tension: tobacco cash flows at 14x combined with FMCG growth at 50x, proportional to each business\'s contribution.',pd:'ITC at 22x P/E is a discount to India FMCG peers (50-55x) but premium to global tobacco peers (12-14x). It\'s essentially a demerger optionality trade: if ITC separates tobacco from FMCG, each business trades at its natural multiple — unlocking value.',bull:['FMCG demerger unlocks portfolio at 50x P/E, re-rating the remaining tobacco stub','Hotels profitability validates a third distinct valuation pillar for sum-of-parts','ESG exclusions reverse globally, allowing tobacco multiples to recover from trough'],bear:['Demerger keeps getting deferred, sustaining the blended discount permanently','Tobacco taxation destroys EBITDA at a pace that cuts the P/E floor below 18x','FMCG growth disappoints below 15%, reducing the premium vs global tobacco peers']}},
+
+  {id:'hul',name:'Hindustan Unilever',ticker:'HINDUNILVR',flag:'🇮🇳',sector:'FMCG',tags:['india','fmcg'],cur:'₹',unit:'Cr',isBank:false,
+   rev:62700,ebitda:13900,ni:10277,nd:-5000,shares:235,price:2400,
+   pEVR:3.0,pEVE:32.0,pPE:52.0,keyM:'P/E',peers:'Nestle India, Dabur, Godrej Consumer, Britannia, Marico',
+   ctx:{pr:'Primary: Nestle India, Dabur, Godrej Consumer Products, Britannia, Marico. Global: P&G, Unilever parent, Reckitt. HUL\'s closest comp is its own parent — Unilever global trades at 20x EV/EBITDA vs HUL\'s 40x, a structural India premium that has held for two decades.',mm:'P/E is standard. HUL\'s operating leverage is extreme — small volume growth translates to outsized earnings growth. P/E captures this earnings power quality in a way EV/Revenue cannot. Analyst consensus models almost exclusively use P/E for India FMCG.',pd:'HUL trades at 52x P/E vs India FMCG peer median of 52x — precisely at peer median. The premium to Unilever parent (18x) is the India FMCG premium: consumption underpenetration, brand trust, and distribution moat commanding a structural growth multiple.',bull:['Rural volume recovery re-accelerates P/E toward the 65x+ range seen pre-slowdown','Premiumisation mix shift improves net realisation, expanding EPS growth above volume growth','Parent Unilever\'s India strategic focus drives incremental category innovation investment'],bear:['Private label growth in modern trade compresses market share and long-term earnings power','P/E multiple compression if India FMCG sector growth falls below 8% revenue CAGR','Raw material inflation hits gross margins faster than pricing power catches up']}},
+
+  {id:'tatamotors',name:'Tata Motors',ticker:'TATAMOTORS',flag:'🇮🇳',sector:'Auto OEM',tags:['india'],cur:'₹',unit:'Cr',isBank:false,
+   rev:440000,ebitda:54000,ni:23800,nd:76000,shares:366,price:1000,
+   pEVR:0.5,pEVE:8.0,pPE:18.0,keyM:'EV/EBITDA',peers:'BMW, Mercedes-Benz, Volkswagen, Mahindra (India commercial)',
+   ctx:{pr:'JLR peers: BMW, Mercedes-Benz, Audi/Volkswagen (premium OEM). India CV peers: Ashok Leyland, Mahindra. The complexity: 70% of Tata Motors\' EBITDA comes from JLR. Indian analysts using India auto peers significantly mismatch the business.',mm:'EV/EBITDA is non-negotiable for Tata Motors. JLR\'s capex intensity makes P/E extremely volatile — it swings from massive losses to large profits within one commodity cycle. EV/EBITDA removes this noise and enables consistent peer comparison.',pd:'Tata Motors trades at 8x EV/EBITDA vs global auto peer median of 8x — precisely at peer median. The market is saying: JLR\'s EV transition capex and debt repayment exactly offset the India CV cycle growth premium. Balanced, not cheap.',bull:['JLR cash generation above £3B sustains debt paydown, warranting premium over global auto peers','India domestic commercial vehicle cycle provides a structural growth layer on top','Range Rover EV launches at ICE-equivalent margins, validating the product positioning'],bear:['China JLR sales disappoint, removing the premium growth narrative from the thesis','Supply chain disruptions hit JLR production ahead of key EV model launches','India commercial vehicle cycle enters downturn, removing the domestic growth premium']}},
+
+  {id:'sunpharma',name:'Sun Pharma',ticker:'SUNPHARMA',flag:'🇮🇳',sector:'Pharma',tags:['india'],cur:'₹',unit:'Cr',isBank:false,
+   rev:48000,ebitda:13500,ni:11000,nd:-15000,shares:240,price:1600,
+   pEVR:3.0,pEVE:22.0,pPE:30.0,keyM:'EV/EBITDA',peers:'Dr. Reddy\'s, Cipla, Lupin, Aurobindo, Abbott India',
+   ctx:{pr:'India generics: Dr. Reddy\'s, Cipla, Lupin, Aurobindo. Global specialty comparables: Abbott (India), Jazz Pharmaceuticals. Sun\'s specialty pivot — Ilumya, Cosentyx biosimilars — changes which peer group is most relevant.',mm:'EV/EBITDA is standard for pharma — it normalises for heavy R&D spending cycles that can make P/E very lumpy. For Sun specifically, specialty drugs drive most margin improvement, and EV/EBITDA captures this business mix shift better than P/E.',pd:'Sun Pharma trades at 24x EV/EBITDA vs India pharma peers at 22x — a small premium reflecting its US specialty drug transition success and domestic branded generics leadership across chronic therapy categories.',bull:['US specialty pipeline launches drive EBITDA margin expansion toward 28-30%','India chronic therapy market share gains sustain domestic earnings growth','FDA resolution removes quality overhang, restoring the full specialty drug premium'],bear:['US specialty pricing pressure accelerates as PBM negotiations tighten across categories','New facility warning letter creates supply disruption risk for key revenue products','Specialty drug patent expiry faster than pipeline replacement rate compresses margins']}},
+
+  {id:'adaniports',name:'Adani Ports',ticker:'ADANIPORTS',flag:'🇮🇳',sector:'Infrastructure',tags:['india'],cur:'₹',unit:'Cr',isBank:false,
+   rev:26500,ebitda:15200,ni:9000,nd:39000,shares:215,price:1050,
+   pEVR:5.0,pEVE:15.0,pPE:20.0,keyM:'EV/EBITDA',peers:'DP World (UAE), ICTSI (Philippines), JSW Infrastructure, PSA International',
+   ctx:{pr:'Global: DP World (UAE, most direct comparable by business model), International Container Terminal Services (Philippines), PSA International. India: JSW Infrastructure. DP World is the best peer — similar scale, similar concession-based model.',mm:'EV/EBITDA is standard for port infrastructure. Revenue multiples don\'t work because concession economics can inflate revenue without proportionate margin. EV/EBITDA captures the true recurring cash generation of port operations across cycles.',pd:'Adani Ports trades at 15x EV/EBITDA vs global port peers at 15x — exactly at peer median. The Hindenburg episode erased the previous premium (18x). Recovery to pre-Hindenburg premium requires sustained governance improvement and cargo volume delivery.',bull:['Container volume CAGR of 8-10% sustains above-peer EBITDA growth consistently','International acquisitions (Colombo, Haifa) diversify into higher-multiple geographies','Governance improvement restores the India infrastructure premium above global peers'],bear:['Global trade slowdown compresses container volumes below long-term forecast','Further Adani Group concerns trigger conglomerate-level derating beyond ports fundamentals','JSW Infrastructure competition wins cargo share at key western India ports']}},
+
+  {id:'kotak',name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',flag:'🇮🇳',sector:'Banking',tags:['india','banking'],cur:'₹',unit:'Cr',isBank:true,
+   bv:90000,ni:13782,shares:200,price:1900,pPB:2.8,pPE:18.0,
+   bankNote:'Private banks are valued on P/B and P/E. Kotak\'s P/B premium to peers reflects its founder\'s conservative credit culture and RoE above cost of equity through entire credit cycles — including downturns when peers write down NPAs.',
+   peers:'HDFC Bank, ICICI Bank, Axis Bank, IndusInd Bank',
+   ctx:{pr:'Primary peers: HDFC Bank (aspirational benchmark), ICICI Bank (similar transformation narrative), Axis Bank. Kotak is unique: founder-managed with the most conservative risk culture in Indian banking — which historically justified its premium P/B.',mm:'P/B is the primary metric, same as HDFC Bank. Kotak\'s thesis has always been: pay up on P/B because the founder\'s capital discipline ensures RoE stays above cost of equity through the entire credit cycle — including downturns.',pd:'Kotak trades at 4.2x P/B vs private bank peers at 2.8x — a 50% premium. This is the Uday Kotak premium. The post-succession era is now the single biggest question mark on whether this premium is structural or founder-dependent.',bull:['New management sustains the conservative lending culture, validating the structural P/B premium','HDFC Bank\'s post-merger integration risk narrows its P/B premium, making Kotak relatively attractive','Corporate banking expansion improves NIM, sustaining RoE above cost of equity'],bear:['Succession narrative weakens the founder premium, compressing P/B toward ICICI Bank levels','Asset quality deterioration in credit cards and unsecured loans spikes provisioning','Regulatory action on technology infrastructure creates reputational and operational risk']}},
+
+  // ─── GLOBAL ──────────────────────────────────────────────────────────────────
+  {id:'apple',name:'Apple',ticker:'AAPL',flag:'🇺🇸',sector:'Consumer Tech',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   rev:385,ebitda:130,ni:97,nd:-50,shares:15.4,price:190,
+   pEVR:5.5,pEVE:20.0,pPE:28.0,keyM:'P/E',peers:'Microsoft, Alphabet, Samsung, Sony, Qualcomm',
+   ctx:{pr:'Meaningful peers are limited. Microsoft (enterprise moat), Alphabet (platform), Samsung (devices). Apple\'s Services business has no perfect comp — Netflix for streaming, Visa for payments, and Salesforce for recurring software are all partial proxies for different divisions.',mm:'P/E is primary, but analysts increasingly use Sum of Parts — hardware at 20x P/E (Samsung comparable) and Services at 35-40x P/E (Salesforce comparable). The blended 29x reflects the ongoing mix shift as Services reaches 25%+ of gross profit.',pd:'Apple at 30x P/E vs consumer electronics peers at 22x reveals a real premium. The premium is vs hardware-only comps: Apple\'s services revenue justifies a much higher multiple than Samsung or Xiaomi, which trade at 8-12x P/E.',bull:['Services reaches 30% of revenue, warranting a structurally higher blended P/E for the company','India manufacturing removes China geopolitical discount from the equity risk premium','AI features drive a new iPhone upgrade cycle, expanding earnings per share'],bear:['Antitrust ruling forces App Store payment changes, cutting Services segment margins','China iPhone ban expands beyond government sector to broader consumer segment','Revenue growth falls below 5% as developed markets reach iPhone saturation']}},
+
+  {id:'microsoft',name:'Microsoft',ticker:'MSFT',flag:'🇺🇸',sector:'Cloud / Enterprise',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   rev:228,ebitda:112,ni:88,nd:-26,shares:7.4,price:420,
+   pEVR:7.0,pEVE:22.0,pPE:30.0,keyM:'P/E',peers:'Alphabet, Salesforce, Oracle, Amazon AWS, Adobe',
+   ctx:{pr:'Primary: Alphabet (cloud+advertising), Amazon AWS (cloud), Salesforce (SaaS), Oracle (enterprise). For Azure specifically, AWS and Google Cloud are the only meaningful peers. Microsoft is unique in spanning enterprise software, gaming, and cloud — no single peer group covers all three.',mm:'P/E is the key metric. Microsoft\'s quality warrants a persistent premium to Alphabet — higher margins, more predictable revenue, lower regulatory risk. EV/Revenue is also watched for Azure\'s growth trajectory relative to AWS.',pd:'Microsoft trades at 35x P/E vs enterprise software peer median of 30x — a 17% premium. This is the Azure cloud premium: recurring, high-margin revenue with switching costs at every enterprise client. Copilot AI premium is not yet in consensus.',bull:['Copilot enterprise adoption drives $10B+ incremental revenue, expanding the earnings multiple','Azure gains cloud market share as Microsoft enterprise relationships compound over time','Gaming (Activision) reaches synergy targets, adding a new high-margin earnings stream'],bear:['AI capex of $80B/year exceeds near-term return generation, diluting returns on equity','Antitrust scrutiny on bundling Office + Azure + Teams creates regulatory execution risk','GitHub Copilot gets commoditised by open-source alternatives, removing AI moat perception']}},
+
+  {id:'tesla',name:'Tesla',ticker:'TSLA',flag:'🇺🇸',sector:'EV / Energy',tags:['global'],cur:'$',unit:'B',isBank:false,
+   rev:97,ebitda:12,ni:7,nd:-17,shares:3.18,price:250,
+   pEVR:1.8,pEVE:12.0,pPE:40.0,keyM:'EV/Revenue',peers:'BYD, GM, Ford (auto), Rivian, NIO (EV-native)',
+   ctx:{pr:'Auto peers: BYD (most direct EV competitor), GM, Ford, Rivian, Lucid. Tech peers: NVIDIA (AI), Apple (brand). The core debate: using auto peers (8-10x P/E) implies Tesla is 80% overvalued; using tech peers (25-35x P/E) implies it\'s fairly valued.',mm:'EV/Revenue is the most defensible multiple. Tesla\'s P/E at 50x+ is too high vs auto peers; auto OEM EV/EBITDA understates the tech optionality of FSD and Optimus. EV/Revenue allows comparison across both tech and auto peer universes simultaneously.',pd:'Tesla trades at 8x EV/Revenue vs auto peers at 1.8x — a 4.4x premium. This is literally a bet on whether Tesla is a tech company or an auto company. The market\'s answer fluctuates with every earnings report.',bull:['FSD regulatory approval makes Tesla a robotaxi company, justifying 15x+ EV/Revenue','Optimus humanoid production begins, creating a capital-efficient entirely new revenue stream','China volume recovery demonstrates global brand demand resilience'],bear:['BYD price cuts force Tesla to compete on unit economics, compressing automotive margins','Market consensus shifts to viewing Tesla as an auto company, collapsing to 1.8x EV/Revenue','Brand boycott risk from Elon Musk political controversy in key European and US markets']}},
+
+  {id:'alphabet',name:'Alphabet',ticker:'GOOGL',flag:'🇺🇸',sector:'Search / Cloud',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   rev:307,ebitda:96,ni:74,nd:-96,shares:12.6,price:175,
+   pEVR:5.0,pEVE:18.0,pPE:25.0,keyM:'P/E',peers:'Meta, Microsoft, Amazon (advertising + cloud), Baidu, Pinterest',
+   ctx:{pr:'Advertising: Meta, Pinterest, Snap, The Trade Desk. Cloud: Amazon AWS, Microsoft Azure. Search monopoly: no comparable. Alphabet\'s different division moats mean no single peer universe works. Analysts model Search and Cloud separately.',mm:'P/E is the headline metric, but EV/EBITDA is increasingly important as Alphabet reaches mature profitability. Key debate: is search 15x EV/EBITDA (mature media) or 25x (high-quality platform)? AI risk from ChatGPT has made this debate live.',pd:'Alphabet trades at 22x P/E vs advertising peer median of 25x — a discount, not a premium. The market is assigning an AI disruption risk discount for the first time. Five years ago, Alphabet commanded a 20-30% premium to the same peer set.',bull:['Gemini AI proves search share is defensible, removing the AI disruption discount','YouTube and Cloud profitability accelerates, warranting a sum-of-parts re-rating','Waymo monetisation creates a new capital-efficient, high-margin revenue stream'],bear:['OpenAI and Perplexity gain 5%+ of global search queries from Google Search','DOJ antitrust ruling forces search default unbundling from Chrome and Android','AI infrastructure capex of $50B+ depresses free cash flow margins for 3+ years']}},
+
+  {id:'amazon',name:'Amazon',ticker:'AMZN',flag:'🇺🇸',sector:'Cloud / E-commerce',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   rev:575,ebitda:96,ni:30,nd:-26,shares:10.5,price:171,
+   pEVR:2.8,pEVE:17.0,pPE:40.0,keyM:'EV/EBITDA',peers:'Alibaba, JD.com (e-commerce), Microsoft Azure, Google Cloud (cloud), Walmart',
+   ctx:{pr:'AWS peers: Azure, Google Cloud, Oracle. E-commerce: JD.com, eBay, Alibaba. Advertising: Meta, Alphabet. Amazon is the only company where three global leaderboard businesses coexist in one P&L — making any single peer universe inadequate.',mm:'EV/EBITDA is most useful because it strips out the massive capex-driven depreciation that suppresses Amazon\'s P/E. AWS generates 60%+ of EBITDA — so the multiple you assign to AWS dominates the overall consolidated calculation.',pd:'Amazon trades at 17x EV/EBITDA vs blended peer median of 17x — precisely at peer median. The market says: AWS\'s premium (22x) and e-commerce/logistics discount (8x) perfectly offset at the consolidated level.',bull:['AWS margin expansion to 40%+ EBITDA as fixed costs scale warrants premium over the blended peer','Advertising business reaching $60B creates a third 30%+ EBITDA margin business','Project Kuiper satellite internet creates an AWS-scale new growth opportunity'],bear:['AWS growth deceleration below 12% triggers multiple compression across consolidated business','E-commerce margin remains structurally below 5% EBITDA even at full scale','Azure and GCP erode AWS\'s 31% cloud market share through AI infrastructure wins']}},
+
+  {id:'meta',name:'Meta',ticker:'META',flag:'🇺🇸',sector:'Social / AI',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   rev:134,ebitda:70,ni:39,nd:-43,shares:2.56,price:550,
+   pEVR:6.0,pEVE:18.0,pPE:28.0,keyM:'P/E',peers:'Alphabet, Snap, Pinterest, TikTok (unlisted), Twitter/X (unlisted)',
+   ctx:{pr:'Advertising: Alphabet (primary benchmark), Snap, Pinterest. Social: TikTok (unlisted — most direct threat), LinkedIn/Microsoft. Reality Labs: Apple Vision Pro, Microsoft HoloLens. TikTok is Meta\'s most important comp and it\'s not publicly traded.',mm:'P/E is the headline metric. Advertising businesses have 80%+ gross margins, so EBITDA and P/E move together. Key debate: should Reality Labs losses be excluded when calculating the multiple? Analysts split on this.',pd:'Meta at 30x P/E (including Reality Labs losses) vs Alphabet\'s 22x — a premium despite worse earnings visibility. The market is paying for Meta\'s AI ad-targeting advantage and Reality Labs optionality at scale.',bull:['Reality Labs becomes cash-flow positive by 2026-27, removing the earnings drag','AI-driven ad targeting delivers 20%+ ARPU improvement per daily active user','Threads reaches 500M daily active users, creating a new monetisation surface'],bear:['Reality Labs losses exceed $25B with no commercial path — write-down triggers','TikTok ban reversal collapses the Gen Z user acquisition Meta had been benefiting from','FTC forces Instagram divestiture, destroying the core cross-platform monetisation engine']}},
+
+  {id:'berkshire',name:'Berkshire Hathaway',ticker:'BRK.B',flag:'🇺🇸',sector:'Conglomerate',tags:['global','banking'],cur:'$',unit:'B',isBank:true,
+   bv:500,ni:36,shares:1.45,price:620,pPB:1.4,pPE:18.0,
+   bankNote:'Use P/B and operating P/E for Berkshire. EV multiples are meaningless for a holding company with insurance float. Reported net income includes investment gains/losses that wildly distort P/E — use operating earnings of ~$36B instead.',
+   peers:'Markel, Fairfax Financial, Alleghany, Loews Corporation',
+   ctx:{pr:'No perfect peer exists. Closest: Markel (mini-Berkshire model), Fairfax Financial, Alleghany. Some use private equity firms (Blackstone, KKR) but Berkshire\'s permanent capital model is completely different. It is essentially its own asset class.',mm:'P/B is the most credible metric. Buffett himself has said intrinsic value tracks book value growth. Operating P/E is also used but investment gain/loss volatility makes reported P/E meaningless. Never use EV multiples for a holding company.',pd:'Berkshire at 1.8x P/B is the highest level at which Buffett has consistently bought back shares. Below 1.5x P/B, Berkshire itself buys its own stock aggressively. The 1.5x floor to 2.0x current range is the market\'s Buffett premium.',bull:['Japan trading house thesis generates 15%+ annual returns on $20B+ invested','Large acquisition creates a new earnings engine before succession concerns materialise','Insurance underwriting stays profitable, sustaining float at near-zero effective cost'],bear:['$180B+ cash pile drags on per-share book value growth indefinitely','Succession uncertainty post-Buffett triggers a conglomerate discount below 1.5x P/B','BNSF railroad earnings disappoint as intermodal freight loses share to trucking']}},
+
+  {id:'nvidia',name:'NVIDIA',ticker:'NVDA',flag:'🇺🇸',sector:'Semiconductors / AI',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   rev:60,ebitda:33,ni:30,nd:-26,shares:24.4,price:135,
+   pEVR:10.0,pEVE:25.0,pPE:35.0,keyM:'P/E',peers:'AMD, Broadcom, Marvell, Intel, Qualcomm',
+   ctx:{pr:'Peers: AMD (GPU competitor), Broadcom (custom AI chips), Marvell, Intel (CPU), TSMC (supply partner). Brutal truth: NVIDIA has no peer earning $60B+ at 60%+ gross margins in semiconductors. AMD is the closest at 47% gross margins.',mm:'P/E is primary, but at 40x it looks expensive vs semiconductor history. Forward P/E (next-12-month earnings) is more widely used given rapid earnings growth. EV/Revenue at 10x is also tracked vs historical semi multiples of 3-5x.',pd:'NVIDIA at 40x P/E vs semi peer median of 25x — a 60% premium. This reflects a simple fact: NVIDIA\'s earnings grew 10x in 24 months and the market does not believe this growth is finished. The question is how many more years of runway.',bull:['Blackwell GPU maintains NVIDIA\'s 2-year technology lead over AMD MI300X series','Sovereign AI government spending adds $20B+ of new demand outside hyperscalers','CUDA moat means software ecosystem margins sustain even as hardware prices eventually fall'],bear:['Hyperscalers (Google TPU, Amazon Trainium) reduce GPU dependency by 30-40% over 3 years','AI investment pauses as enterprise ROI from LLM deployments disappoints broadly','Export restrictions permanently remove China — historically 20%+ of revenue — from the addressable market']}},
+
+  {id:'netflix',name:'Netflix',ticker:'NFLX',flag:'🇺🇸',sector:'Streaming',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   rev:36,ebitda:7.5,ni:5,nd:7,shares:0.43,price:900,
+   pEVR:3.5,pEVE:30.0,pPE:40.0,keyM:'EV/Revenue',peers:'Disney+ (Disney), Warner Bros Discovery, Paramount+, Apple TV+, Amazon Prime Video',
+   ctx:{pr:'Direct: Disney+, Warner Bros Discovery, Paramount+, Apple TV+, Amazon Prime Video. Global: iQIYI (China), Hotstar (Disney India). Problem: most Netflix peers are embedded in large media conglomerates, making pure-play comparison structurally impossible.',mm:'EV/Revenue is the key metric because EBITDA margins vary wildly across streaming services — Netflix at 20%+ while Disney+ only recently broke even. EV/Revenue allows top-line growth comparison regardless of each company\'s profitability stage.',pd:'Netflix at 11x EV/Revenue vs streaming peer median of 3.5x — a 3x premium. This reflects global scale (270M+ subscribers), structural profitability no competitor has matched, and a brand that translates across 190 countries.',bull:['Ad-supported tier reaches 30% of subscribers, adding very high-margin revenue per user','Live sports (NFL, FIFA) drives subscriber acquisition with no linear TV replacement','Password sharing crackdown continues to onboard new paid subscribers globally'],bear:['Content spending must increase 20%+ to defend position against Apple\'s content budgets','Ad market softness compresses CPM rates in the ad-supported tier','Disney bundle with ESPN successfully retains subscribers who would migrate to Netflix']}},
+
+  {id:'samsung',name:'Samsung Electronics',ticker:'005930',flag:'🇰🇷',sector:'Semiconductors',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   rev:224,ebitda:32,ni:15,nd:-70,shares:6.0,price:58,
+   pEVR:3.0,pEVE:18.0,pPE:22.0,keyM:'EV/EBITDA',peers:'SK Hynix, Micron (memory), TSMC (foundry), Sony, LG (consumer)',
+   ctx:{pr:'Memory: SK Hynix (Korea, most direct), Micron (US DRAM). Foundry: TSMC, Intel. Consumer: Sony, LG. Samsung spans all three — which creates a persistent conglomerate discount vs pure-play comparisons. Sum-of-parts typically gives higher value.',mm:'EV/EBITDA is standard, but memory cycles make it extremely volatile. At peak cycle, Samsung earns 30%+ EBITDA margins; at trough, near zero. Analysts use mid-cycle EV/EBITDA (approximately 18x) to remove commodity cycle distortion.',pd:'Samsung at 9.5x EV/EBITDA (cyclically depressed trough) vs 18x peer median reveals a deep discount. This reflects the current DRAM/NAND cycle trough, foundry market share loss to TSMC, and conglomerate complexity. At mid-cycle earnings, the discount largely disappears.',bull:['HBM3E memory for AI training creates supercycle demand unlike prior DRAM cycles','SF3 foundry node wins a major US fabless customer from TSMC on specific products','Chaebol restructuring unlocks the holding company discount through sum-of-parts'],bear:['TSMC\'s N2 node advantage maintains 3-4 years of foundry leadership','DRAM oversupply in 2025-26 drives memory prices below cash costs for multiple quarters','Korean won appreciation reduces dollar-denominated earnings for US investors']}},
+
+  {id:'alibaba',name:'Alibaba',ticker:'BABA',flag:'🇨🇳',sector:'E-commerce / Cloud',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   rev:130,ebitda:25,ni:11,nd:-63,shares:22,price:80,
+   pEVR:2.5,pEVE:15.0,pPE:18.0,keyM:'P/E',peers:'JD.com, Pinduoduo/PDD, Meituan, Amazon (partial), eBay',
+   ctx:{pr:'China domestic: JD.com, PDD, Meituan. Global: Amazon, eBay. Critical peer context: PDD has taken Alibaba\'s #1 GMV position in China — making PDD the most important and most uncomfortable comparable. PDD trades at 15x P/E vs Alibaba at 11x.',mm:'P/E is increasingly relevant as Alibaba\'s earnings normalise post-regulatory period. EV/Revenue at 1.5x understates the shift toward higher-margin cloud and international operations. Historically Alibaba traded at 25-30x P/E; at 11x it prices permanent impairment.',pd:'Alibaba at 11x P/E vs China internet peer median of 18x — a 39% discount. This is the regulatory and governance discount: VIE structure, Jack Ma\'s exit, Ant Financial cancellation, and ongoing uncertainty structurally compressed the multiple.',bull:['Xi Jinping pro-growth pivot ends regulatory uncertainty, allowing re-rating toward 18-20x','Alibaba Cloud reaches 30% EBITDA margin, warranting sum-of-parts re-rating','AliExpress and Lazada capture SEA e-commerce growth outside of China'],bear:['PDD continues winning Chinese consumer wallet share, structurally reducing Taobao GMV','US-China tension escalates toward ADR forced delisting risk for institutional investors','Domestic cloud competition from Huawei and Tencent caps Alibaba Cloud growth ceiling']}},
+
+  {id:'tsmc',name:'TSMC',ticker:'TSM',flag:'🇹🇼',sector:'Semiconductor Foundry',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   rev:69,ebitda:45,ni:29,nd:-35,shares:4.7,price:175,
+   pEVR:10.0,pEVE:20.0,pPE:25.0,keyM:'P/E',peers:'Samsung Foundry, Intel Foundry Services, GlobalFoundries, UMC',
+   ctx:{pr:'Foundry peers: Samsung Foundry (leading-edge), Intel Foundry Services, GlobalFoundries, UMC. The uncomfortable truth: at N3/N2 process nodes, TSMC has zero real competition at scale. Samsung is 1-2 years behind. Intel is 3-4 years behind.',mm:'P/E is standard. EV/Revenue is also tracked because TSMC\'s revenue growth directly correlates with leading-edge adoption — it\'s a proxy for global semiconductor intensity. At 20x EV/Revenue vs Samsung at 3x, the margin difference (53% vs 12%) fully justifies the gap.',pd:'TSMC at 25x P/E vs foundry peer median of 20x — a 25% premium for irreplaceability. No competitor can make N3 chips at TSMC\'s yield and cost. This premium is not for growth; it\'s for the monopoly nature of the asset.',bull:['N2/A14 process leadership extends to 5+ years — moat widens as competitors fall further behind','CoWoS advanced packaging for AI creates high-margin incremental revenue line','Taiwan geopolitical de-escalation compresses the geopolitical risk premium in the stock'],bear:['China military action destroys the Taiwan infrastructure — existential scenario','Arizona fab cost structure 3-4x higher than Taiwan compresses long-term margins','Intel Foundry wins Samsung or Qualcomm business, normalising the comps peer multiple']}},
+
+  {id:'toyota',name:'Toyota',ticker:'TM',flag:'🇯🇵',sector:'Auto OEM',tags:['global'],cur:'$',unit:'B',isBank:false,
+   rev:308,ebitda:35,ni:32,nd:40,shares:14.5,price:19,
+   pEVR:0.4,pEVE:9.0,pPE:10.0,keyM:'P/E',peers:'Honda, Hyundai, Volkswagen, Stellantis, BMW, BYD (EV comparison)',
+   ctx:{pr:'Direct: Honda, Nissan, Hyundai, Volkswagen, Stellantis. Premium: BMW, Mercedes-Benz (for Lexus). EV-native: Tesla, BYD. Toyota\'s hybrid-first strategy makes BYD a surprisingly important comp — their diverging electrification approaches define the investment debate.',mm:'P/E is standard for Toyota, but Japanese P/E (10x vs global 18x) reflects structural factors: cross-shareholding unwinding, governance improvements, and yen dynamics. European premium OEMs at 8-10x P/E are most useful direct comparables.',pd:'Toyota at 10x P/E vs global auto peer median of 10x — precisely at peer median. Record FY24 profits from yen weakness and hybrid dominance have not translated to a P/E premium — correctly identified as partially cyclical by the market.',bull:['Yen depreciation sustains record profitability for multiple years beyond FY24','Solid-state battery commercialisation delivers fundamental EV technology moat by 2027-28','Governance reforms trigger P/E re-rating as Japan corporate shareholder return policy improves'],bear:['BYD hybrid and EV wins Toyota\'s core compact car segments in China and SEA markets','Japanese interest rate normalisation creates headwind to profitability reported in yen','Solid-state battery development delays leave Toyota exposed in the pure-EV transition']}},
+
+  {id:'nestle',name:'Nestle',ticker:'NESN',flag:'🇨🇭',sector:'FMCG',tags:['global','fmcg'],cur:'$',unit:'B',isBank:false,
+   rev:93,ebitda:18,ni:11,nd:40,shares:2.8,price:100,
+   pEVR:3.0,pEVE:18.0,pPE:22.0,keyM:'EV/EBITDA',peers:'Unilever, P&G, Danone, Mondelez, Coca-Cola, PepsiCo',
+   ctx:{pr:'Direct: Unilever, P&G, Danone, Mondelez, Coca-Cola, PepsiCo. No single company matches Nestle\'s breadth across coffee, confectionery, water, nutrition, and pet care. Analysts often break Nestle by division — Nespresso vs Purina vs Nestle Nutrition.',mm:'EV/EBITDA is standard for global FMCG. P/E is also used but varies significantly with input cost cycles — EBITDA is more stable and enables cleaner cross-country comparison in a business spanning 190 countries.',pd:'Nestle at 17x EV/EBITDA vs global FMCG peer median of 18x — a modest discount for the first time in a decade. This reflects organic revenue growth slowdown (from 7-8% COVID-era highs to 2-3%), GLP-1 drug risk on processed food portfolios, and a CEO transition.',bull:['GLP-1 trend accelerates demand for Nestle\'s nutrition and health brands specifically','Nespresso and premium coffee sustain 15%+ EBITDA margins even in broader slowdown','Emerging market premiumisation drives ARPU growth well above volume growth rates'],bear:['Processed food demand structurally declines as GLP-1 drugs reshape global consumer behaviour','ECB rate normalisation increases cost of Nestle\'s efficiently leveraged balance sheet','Water brand regulatory battles across Europe create meaningful liability and brand risk']}},
+
+  {id:'bhp',name:'BHP Group',ticker:'BHP',flag:'🇦🇺',sector:'Mining',tags:['global'],cur:'$',unit:'B',isBank:false,
+   rev:55,ebitda:26,ni:13,nd:9,shares:5.08,price:43,
+   pEVR:3.5,pEVE:6.0,pPE:11.0,keyM:'EV/EBITDA',peers:'Rio Tinto, Vale, Anglo American, Glencore, Freeport-McMoRan',
+   ctx:{pr:'Iron ore: Vale (Brazil), Rio Tinto, Fortescue. Copper: Freeport-McMoRan (most important copper comparable), Anglo American, Glencore. BHP\'s peer group shifts with commodity cycles — iron ore dominated in 2020; copper increasingly dominates in 2024.',mm:'EV/EBITDA is universal for mining — revenue varies too much with commodity prices. Mid-cycle EV/EBITDA (using normalised commodity prices) is the most defensible approach. At $100/ton iron ore, BHP looks cheap; at $60, it looks fairly valued.',pd:'BHP at 7x EV/EBITDA vs global mining peer median of 6x — a 17% premium. This is the copper optionality premium: Olympic Dam positions BHP as primary beneficiary of the EV and grid electrification copper demand supercycle.',bull:['Copper supercycle from EV and grid electrification sustains $4+/lb prices for 5-10 years','Olympic Dam expansion delivers below budget, creating significant copper production growth','Iron ore sustains above $80 as China stimulus exceeds expectations'],bear:['China steel demand structural decline brings iron ore below $60/ton, depressing EBITDA','Olympic Dam capex overruns delay copper production by 2-3 years','ESG-driven divestiture reduces sector valuation multiples across the mining peer group']}}
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let selId = null, calcState = {};
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+window.onload = () => renderGrid('all');
+
+// ─── GRID ─────────────────────────────────────────────────────────────────────
+function renderGrid(f) {
+  const g = document.getElementById('companyGrid');
+  g.innerHTML = '';
+  CO.forEach(co => {
+    const show = f === 'all' || co.tags.includes(f);
+    const el = document.createElement('div');
+    el.className = 'company-card' + (co.id === selId ? ' selected' : '') + (!show ? ' hidden' : '');
+    el.innerHTML = `<div class="co-flag">${co.flag}</div><div class="co-name">${co.name}</div><div class="co-ticker">${co.ticker}</div><div class="co-sector">${co.sector}</div>`;
+    el.onclick = () => { selId = co.id; document.querySelectorAll('.company-card').forEach(c => c.classList.remove('selected')); el.classList.add('selected'); document.getElementById('continueBtn').classList.add('enabled'); };
+    g.appendChild(el);
+  });
+}
+function filterGrid(f, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active'); renderGrid(f);
+}
+
+// ─── STEP NAV ─────────────────────────────────────────────────────────────────
+function goToStep(n) {
+  document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('step' + n).classList.add('active');
+  updateProg(n);
+  if (n === 2) renderContext();
+  if (n === 3) populateAssumptions();
+  if (n === 4) renderResults();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function updateProg(n) {
+  [1,2,3,4].forEach(i => {
+    const ps = document.getElementById('ps' + i);
+    ps.classList.remove('active','done');
+    if (i < n) ps.classList.add('done');
+    if (i === n) ps.classList.add('active');
+    if (i < 4) { const pl = document.getElementById('pl' + i); pl.classList[i < n ? 'add' : 'remove']('done'); }
+  });
+}
+
+// ─── CONTEXT ──────────────────────────────────────────────────────────────────
+function renderContext() {
+  const co = CO.find(c => c.id === selId); if (!co) return;
+  document.getElementById('ctxFlag').textContent = co.flag;
+  document.getElementById('ctxName').textContent = co.name;
+  document.getElementById('ctxMeta').innerHTML = `<span class="ctx-tag">${co.ticker}</span><span class="ctx-tag">${co.sector}</span>`;
+  document.getElementById('keyMultipleBadge').innerHTML = `<div class="key-badge">Key Multiple: ${co.keyM}</div>`;
+
+  const ev = co.isBank ? (co.bv || 0) : (co.rev * co.pEVR);
+  if (co.isBank) {
+    const bvps = (co.bv / co.shares).toFixed(0);
+    const eps = (co.ni / co.shares).toFixed(1);
+    const curPB = (co.price / bvps).toFixed(1);
+    const curPE = (co.price / eps).toFixed(1);
+    document.getElementById('statGrid').innerHTML = `
+      <div class="stat-card"><div class="stat-lbl">Net Income</div><div class="stat-val">${co.cur}${fmt(co.ni)}</div><div class="stat-note">${co.unit}</div></div>
+      <div class="stat-card"><div class="stat-lbl">Book Value/Share</div><div class="stat-val">${co.cur}${fmt(bvps)}</div><div class="stat-note">Per share</div></div>
+      <div class="stat-card"><div class="stat-lbl">Current P/B</div><div class="stat-val">${curPB}x</div><div class="stat-note">Peer: ${co.pPB}x</div></div>
+      <div class="stat-card"><div class="stat-lbl">Current P/E</div><div class="stat-val">${curPE}x</div><div class="stat-note">Peer: ${co.pPE}x</div></div>`;
+    document.getElementById('bankNote').style.display = 'block';
+    document.getElementById('bankNoteTxt').textContent = co.bankNote;
+  } else {
+    const mc = co.price * co.shares;
+    const netEV = mc + co.nd;
+    const curEVR = (netEV / co.rev).toFixed(1);
+    const curEVE = (netEV / co.ebitda).toFixed(1);
+    const eps = co.ni / co.shares;
+    const curPE = (co.price / eps).toFixed(1);
+    document.getElementById('statGrid').innerHTML = `
+      <div class="stat-card"><div class="stat-lbl">Revenue</div><div class="stat-val">${co.cur}${fmt(co.rev)}</div><div class="stat-note">${co.unit}</div></div>
+      <div class="stat-card"><div class="stat-lbl">EBITDA</div><div class="stat-val">${co.cur}${fmt(co.ebitda)}</div><div class="stat-note">${co.unit} · ${(co.ebitda/co.rev*100).toFixed(0)}% margin</div></div>
+      <div class="stat-card"><div class="stat-lbl">Current EV/EBITDA</div><div class="stat-val">${curEVE}x</div><div class="stat-note">Peer: ${co.pEVE}x</div></div>
+      <div class="stat-card"><div class="stat-lbl">Current P/E</div><div class="stat-val">${curPE}x</div><div class="stat-note">Peer: ${co.pPE}x</div></div>`;
+    document.getElementById('bankNote').style.display = 'none';
+  }
+
+  document.getElementById('ctxPeers').textContent = co.ctx.pr;
+  document.getElementById('ctxMultiple').textContent = co.ctx.mm;
+  document.getElementById('ctxPremium').textContent = co.ctx.pd;
+  document.getElementById('ctxBull').innerHTML = co.ctx.bull.map(t => `<div class="bb-row"><span class="bb-arrow">↑</span>${t}</div>`).join('');
+  document.getElementById('ctxBear').innerHTML = co.ctx.bear.map(t => `<div class="bb-row"><span class="bb-arrow">↓</span>${t}</div>`).join('');
+}
+
+// ─── ASSUMPTIONS ──────────────────────────────────────────────────────────────
+function row(label, id, type, hint, val, cls='') {
+  const badge = type === 'pre' ? '<span class="type-badge type-pre">Pre-filled</span>' : type === 'calc' ? '<span class="type-badge type-calc">Calculated</span>' : '<span class="type-badge type-yours">Your view</span>';
+  const ro = (type === 'calc') ? 'readonly' : '';
+  const inputCls = type === 'calc' ? `assume-input calc ${cls}` : `assume-input`;
+  return `<tr class="assume-tr"><td class="assume-td label-col"><span class="assume-label">${label}<span class="hint-wrap"><span class="hint-icon">?</span><span class="hint-tip">${hint}</span></span></span></td><td class="assume-td type-col">${badge}</td><td class="assume-td input-col"><input class="${inputCls}" id="${id}" type="${ro ? 'text' : 'number'}" step="any" ${ro} value="${val}" oninput="recalc()"></td></tr>`;
+}
+
+function populateAssumptions() {
+  const co = CO.find(c => c.id === selId); if (!co) return;
+  document.getElementById('liveCurrentPrice').textContent = `${co.cur}${co.price.toLocaleString()}`;
+
+  if (co.isBank) {
+    const bvps = (co.bv / co.shares).toFixed(1);
+    const eps = (co.ni / co.shares).toFixed(2);
+    document.getElementById('finSectionTitle').textContent = 'A · Bank / NBFC Financials';
+    document.getElementById('finSectionNote').textContent = '';
+    document.getElementById('finTable').innerHTML =
+      row('Total Book Value','inp_bv','pre','Total shareholders\' equity from the latest balance sheet.',co.bv) +
+      row('Net Income','inp_ni','pre','Latest annual net income / profit after tax.',co.ni) +
+      row('Shares Outstanding','inp_shares','pre',co.cur === '₹' ? 'Shares in Crores' : 'Shares in Billions',co.shares) +
+      row('→ Book Value per Share','out_bvps','calc','Calculated: Book Value ÷ Shares',bvps,'') +
+      row('→ EPS','out_eps','calc','Calculated: Net Income ÷ Shares',eps,'');
+    document.getElementById('peerSectionTitle').textContent = 'B · Peer Multiples';
+    document.getElementById('peerTable').innerHTML =
+      row('Peer Median P/B','inp_pPB','pre','Price-to-book ratio of comparable financial companies.',co.pPB) +
+      row('Peer Median P/E','inp_pPE','pre','Price-to-earnings ratio of comparable peers.',co.pPE) +
+      row('→ Implied Price from P/B','out_pricePB','calc','Calculated: Peer P/B × BVPS','-','') +
+      row('→ Implied Price from P/E','out_pricePE','calc','Calculated: Peer P/E × EPS','-','');
+  } else {
+    document.getElementById('finSectionTitle').textContent = 'A · Company Financials';
+    document.getElementById('finSectionNote').textContent = 'LTM / FY24 actuals';
+    document.getElementById('finTable').innerHTML =
+      row('Revenue','inp_rev','pre','Latest annual or last-twelve-months revenue.',co.rev) +
+      row('EBITDA','inp_ebitda','pre','Earnings before interest, tax, depreciation and amortisation.',co.ebitda) +
+      row('Net Income','inp_ni','pre','Profit after tax, after interest and D&A.',co.ni) +
+      row('Net Debt','inp_nd','pre','Total debt minus cash. Negative = net cash position.',co.nd) +
+      row('Shares Outstanding','inp_shares','pre',co.cur === '₹' ? 'Shares in Crores' : 'Shares in Billions',co.shares);
+    document.getElementById('peerSectionTitle').textContent = 'B · Peer Trading Multiples';
+    document.getElementById('peerTable').innerHTML =
+      row('Peer Median EV/Revenue','inp_pEVR','pre','Median enterprise value divided by revenue across peer set.',co.pEVR) +
+      row('Peer Median EV/EBITDA','inp_pEVE','pre','Median enterprise value divided by EBITDA across peer set.',co.pEVE) +
+      row('Peer Median P/E','inp_pPE','pre','Median price-to-earnings ratio across peer companies.',co.pPE) +
+      row('→ Implied Price from EV/Revenue','out_priceEVR','calc','Peer EV/Revenue × Revenue − Net Debt, divided by shares.','-','') +
+      row('→ Implied Price from EV/EBITDA','out_priceEVE','calc','Peer EV/EBITDA × EBITDA − Net Debt, divided by shares.','-','') +
+      row('→ Implied Price from P/E','out_pricePE','calc','Peer P/E × (Net Income ÷ Shares).','-','');
+  }
+  recalc();
+}
+
+function recalc() {
+  const co = CO.find(c => c.id === selId); if (!co) return;
+  let p1, p2, p3, l1, l2, l3;
+
+  if (co.isBank) {
+    const bv = parseFloat(document.getElementById('inp_bv')?.value) || co.bv;
+    const ni = parseFloat(document.getElementById('inp_ni')?.value) || co.ni;
+    const sh = parseFloat(document.getElementById('inp_shares')?.value) || co.shares;
+    const pPB = parseFloat(document.getElementById('inp_pPB')?.value) || co.pPB;
+    const pPE = parseFloat(document.getElementById('inp_pPE')?.value) || co.pPE;
+    const bvps = bv / sh;
+    const eps = ni / sh;
+    setV('out_bvps', fmtPrice(bvps));
+    setV('out_eps', fmtPrice(eps));
+    p1 = pPB * bvps; p2 = pPE * eps; p3 = null;
+    l1 = 'P/B'; l2 = 'P/E'; l3 = null;
+    setCalcV('out_pricePB', p1, co.price, co);
+    setCalcV('out_pricePE', p2, co.price, co);
+    calcState = { co, p1, p2, p3, l1, l2, l3, isBank: true };
+  } else {
+    const rev = parseFloat(document.getElementById('inp_rev')?.value) || co.rev;
+    const ebitda = parseFloat(document.getElementById('inp_ebitda')?.value) || co.ebitda;
+    const ni = parseFloat(document.getElementById('inp_ni')?.value) || co.ni;
+    const nd = parseFloat(document.getElementById('inp_nd')?.value) || co.nd;
+    const sh = parseFloat(document.getElementById('inp_shares')?.value) || co.shares;
+    const pEVR = parseFloat(document.getElementById('inp_pEVR')?.value) || co.pEVR;
+    const pEVE = parseFloat(document.getElementById('inp_pEVE')?.value) || co.pEVE;
+    const pPE = parseFloat(document.getElementById('inp_pPE')?.value) || co.pPE;
+    p1 = (pEVR * rev - nd) / sh;
+    p2 = (pEVE * ebitda - nd) / sh;
+    p3 = pPE * (ni / sh);
+    l1 = 'EV/Revenue'; l2 = 'EV/EBITDA'; l3 = 'P/E';
+    setCalcV('out_priceEVR', p1, co.price, co);
+    setCalcV('out_priceEVE', p2, co.price, co);
+    setCalcV('out_pricePE', p3, co.price, co);
+    calcState = { co, p1, p2, p3, l1, l2, l3, nd, sh, rev, ebitda, ni, pEVR, pEVE, pPE, isBank: false };
+  }
+
+  // Update live bar
+  const lp = document.getElementById('livePrices');
+  const prices = p3 !== null ? [{ v: p1, l: l1 }, { v: p2, l: l2 }, { v: p3, l: l3 }] : [{ v: p1, l: l1 }, { v: p2, l: l2 }];
+  lp.innerHTML = prices.map(({ v, l }) => {
+    const chg = ((v - co.price) / co.price * 100).toFixed(1);
+    const cls = chg > 0 ? 'up' : 'dn';
+    return `<div class="lp-item"><div class="lp-lbl">${l}</div><div class="lp-val">${co.cur}${fmtP(v)}</div><div class="lp-chg ${cls}">${chg > 0 ? '+' : ''}${chg}%</div></div>`;
+  }).join('');
+}
+
+function setV(id, val) { const el = document.getElementById(id); if (el) el.value = val; }
+function setCalcV(id, price, current, co) {
+  const el = document.getElementById(id); if (!el) return;
+  el.value = `${co.cur}${fmtP(price)}`;
+  const pct = ((price - current) / current * 100);
+  el.className = 'assume-input calc ' + (pct > 3 ? 'calc-green' : pct < -3 ? 'calc-red' : '');
+}
+function fmtP(n) { return Math.abs(n) >= 1000 ? n.toLocaleString(undefined, {maximumFractionDigits: 0}) : n.toFixed(2); }
+function fmtPrice(n) { return n >= 1000 ? n.toLocaleString(undefined, {maximumFractionDigits: 0}) : n.toFixed(2); }
+function fmt(n) { if (n >= 100000) return (n/100000).toFixed(1)+'L'; if (n >= 1000) return (n/1000).toFixed(1)+'K'; return n.toLocaleString(); }
+
+// ─── LOADING ──────────────────────────────────────────────────────────────────
+function startCalculation() {
+  recalc();
+  document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('stepLoading').classList.add('active');
+  updateProg(4);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  [1,2,3,4,5,6].forEach(i => { const el = document.getElementById('ls'+i); el.classList.remove('show','active','done'); });
+  document.getElementById('loadingBarFill').style.width = '0%';
+  document.getElementById('loadingPct').textContent = '0%';
+  const steps = [{id:'ls1',s:200,d:700},{id:'ls2',s:800,d:1400},{id:'ls3',s:1500,d:2100},{id:'ls4',s:2200,d:2800},{id:'ls5',s:2900,d:3800},{id:'ls6',s:3900,d:4600}];
+  const pcts = [10,25,42,60,80,100];
+  steps.forEach((st, i) => {
+    setTimeout(() => { const el = document.getElementById(st.id); el.classList.add('show','active'); }, st.s);
+    setTimeout(() => { const el = document.getElementById(st.id); el.classList.remove('active'); el.classList.add('done'); document.getElementById('loadingBarFill').style.width = pcts[i]+'%'; document.getElementById('loadingPct').textContent = pcts[i]+'%'; }, st.d);
+  });
+  setTimeout(() => { document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active')); document.getElementById('step4').classList.add('active'); renderResults(); window.scrollTo({ top:0, behavior:'smooth' }); }, 5200);
+}
+
+// ─── RESULTS ──────────────────────────────────────────────────────────────────
+function renderResults() {
+  const s = calcState; if (!s || !s.co) return;
+  const co = s.co;
+
+  document.getElementById('rCoLbl').textContent = `${co.flag} ${co.name} · ${co.ticker}`;
+
+  const prices = s.p3 !== null ? [s.p1, s.p2, s.p3] : [s.p1, s.p2];
+  const labels = s.p3 !== null ? [s.l1, s.l2, s.l3] : [s.l1, s.l2];
+  const validPrices = prices.filter(p => p > 0);
+  const minP = Math.min(...validPrices);
+  const maxP = Math.max(...validPrices);
+  document.getElementById('rPriceRange').textContent = `${co.cur}${fmtP(minP)} – ${co.cur}${fmtP(maxP)}`;
+  const avgP = validPrices.reduce((a, b) => a + b, 0) / validPrices.length;
+  const avgChg = ((avgP - co.price) / co.price * 100).toFixed(1);
+  document.getElementById('rRangeSub').textContent = `Current price: ${co.cur}${co.price.toLocaleString()} · Avg implied: ${co.cur}${fmtP(avgP)} (${avgChg > 0 ? '+' : ''}${avgChg}% vs current)`;
+
+  // Comps table
+  const keyM = co.keyM;
+  let tableHTML = `<tr><th style="text-align:left">Method</th><th>Peer Multiple</th><th>Implied Price</th><th>vs Current</th><th>Signal</th></tr>`;
+  prices.forEach((p, i) => {
+    const chgPct = ((p - co.price) / co.price * 100);
+    const chgStr = (chgPct > 0 ? '+' : '') + chgPct.toFixed(1) + '%';
+    const verdict = chgPct > 10 ? '<span class="verdict-up">UPSIDE</span>' : chgPct < -10 ? '<span class="verdict-dn">DISCOUNT</span>' : '<span class="verdict-flat">FAIR</span>';
+    const isKey = labels[i] === keyM;
+    const peerMult = s.isBank ? (i === 0 ? `${co.pPB}x P/B` : `${co.pPE}x P/E`) : (i === 0 ? `${s.pEVR}x` : i === 1 ? `${s.pEVE}x` : `${s.pPE}x`);
+    tableHTML += `<tr class="${isKey ? 'highlight' : ''}"><td>${labels[i]}${isKey ? '<span class="tag-key">KEY</span>' : ''}</td><td style="font-family:var(--mono);font-weight:700">${peerMult}</td><td style="font-family:var(--mono);font-weight:700">${co.cur}${fmtP(p)}</td><td style="font-family:var(--mono);font-weight:700;color:${chgPct > 0 ? 'var(--green)' : 'var(--red)'};">${chgStr}</td><td>${verdict}</td></tr>`;
+  });
+  tableHTML += `<tr style="border-top:2px solid var(--text)"><td style="font-weight:700">Average Implied</td><td></td><td style="font-family:var(--mono);font-weight:800">${co.cur}${fmtP(avgP)}</td><td style="font-family:var(--mono);font-weight:800;color:${avgChg > 0 ? 'var(--green)' : 'var(--red)'};">${avgChg > 0 ? '+' : ''}${avgChg}%</td><td></td></tr>`;
+  document.getElementById('compsTable').innerHTML = tableHTML;
+
+  // Football field chart
+  const allPrices = [...validPrices, co.price];
+  const chartMin = Math.min(...allPrices) * 0.75;
+  const chartMax = Math.max(...allPrices) * 1.25;
+  const pctOnChart = p => Math.max(2, Math.min(96, ((p - chartMin) / (chartMax - chartMin)) * 100));
+  const currentPct = pctOnChart(co.price);
+
+  let ffHTML = '';
+  prices.forEach((p, i) => {
+    const xPct = pctOnChart(p);
+    const isKey = labels[i] === keyM;
+    ffHTML += `<div class="ff-row">
+      <div class="ff-lbl ${isKey ? 'key-lbl' : ''}">${labels[i]}${isKey ? ' ★' : ''}</div>
+      <div class="ff-track">
+        <div class="ff-dot ${isKey ? 'key-dot' : ''}" style="left:${xPct}%">
+          <div class="ff-price-lbl">${co.cur}${fmtP(p)}</div>
+        </div>
+        <div class="ff-current-line" style="left:${currentPct}%">
+          ${i === 0 ? `<div class="ff-current-lbl">Current ${co.cur}${co.price.toLocaleString()}</div>` : ''}
+        </div>
+      </div>
+    </div>`;
+  });
+  const axisMin = `${co.cur}${fmtP(chartMin)}`;
+  const axisMid = `${co.cur}${fmtP((chartMin + chartMax) / 2)}`;
+  const axisMax = `${co.cur}${fmtP(chartMax)}`;
+  ffHTML += `<div class="ff-axis"><span>${axisMin}</span><span>${axisMid}</span><span>${axisMax}</span></div>`;
+  document.getElementById('ffChart').innerHTML = ffHTML;
+
+  // Analyst read
+  const spread = ((maxP - minP) / avgP * 100).toFixed(0);
+  const keyIdx = labels.indexOf(keyM);
+  const keyPrice = prices[keyIdx];
+  const keyChg = ((keyPrice - co.price) / co.price * 100).toFixed(1);
+  document.getElementById('rAnalystRead').innerHTML = `The implied price range of <strong>${co.cur}${fmtP(minP)} to ${co.cur}${fmtP(maxP)}</strong> represents a ${spread}% spread — ${parseInt(spread) > 40 ? 'wide, meaning high uncertainty in peer benchmarking' : parseInt(spread) > 20 ? 'moderate, typical for a diversified business' : 'narrow, suggesting strong peer comparability'}. The key multiple for this sector is <strong>${keyM}</strong>, which implies <strong>${co.cur}${fmtP(keyPrice)}</strong> (${keyChg > 0 ? '+' : ''}${keyChg}% vs current). ${keyChg > 10 ? 'This suggests upside potential relative to peer benchmarks — but verify whether the premium is truly unwarranted, or whether this company deserves to trade above peers.' : keyChg < -10 ? 'This suggests the stock may be expensive relative to peers — but check whether a quality premium is justified before concluding overvaluation.' : 'The current price is broadly in line with peer benchmarks on the key multiple, suggesting fair value at current levels.'} Always cross-check with DCF intrinsic value — Comps tells you what the market pays for peers, not what the business is fundamentally worth.`;
+
+  // Sensitivity on key multiple
+  if (!s.isBank && keyM === 'EV/EBITDA') buildSens('EV/EBITDA', s.pEVE, s.ebitda, s.nd, s.sh, co);
+  else if (!s.isBank && keyM === 'P/E') buildSens('P/E', s.pPE, s.ni / s.sh, 0, 1, co);
+  else if (!s.isBank && keyM === 'EV/Revenue') buildSens('EV/Revenue', s.pEVR, s.rev, s.nd, s.sh, co);
+  else if (s.isBank && keyM === 'P/B') buildBankSens(co);
+  else buildBankSens(co);
+}
+
+function buildSens(mLabel, baseMultiple, metricBase, nd, sh, co) {
+  const metricLabel = mLabel === 'EV/EBITDA' ? 'EBITDA' : mLabel === 'P/E' ? 'EPS' : 'Revenue';
+  const multiples = [baseMultiple*0.7, baseMultiple*0.8, baseMultiple*0.9, baseMultiple, baseMultiple*1.1, baseMultiple*1.2, baseMultiple*1.3].map(m => parseFloat(m.toFixed(1)));
+  const metrics = [metricBase*0.85, metricBase*0.92, metricBase, metricBase*1.08, metricBase*1.15].map(m => parseFloat(m.toFixed(1)));
+  document.getElementById('sensSub').textContent = `Implied share price across different ${mLabel} peer multiples (columns) and ${metricLabel} scenarios (rows). Base case highlighted.`;
+  let tbl = `<tr><th>${metricLabel} / Multiple</th>` + multiples.map(m => `<th>${m.toFixed(1)}x</th>`).join('') + '</tr>';
+  metrics.forEach(me => {
+    const isBaseMet = Math.abs(me - metricBase) / metricBase < 0.03;
+    tbl += `<tr><td>${co.cur}${fmt(me)}</td>`;
+    multiples.forEach(mu => {
+      const imp = mLabel === 'P/E' ? mu * me : (mu * me - nd) / sh;
+      const isBase = Math.abs(mu - multiples[3]) < 0.01 && isBaseMet;
+      const chg = (imp - co.price) / co.price;
+      const cls = isBase ? 'cell-base' : chg > 0.1 ? 'cell-low' : chg < -0.1 ? 'cell-high' : 'cell-mid';
+      tbl += `<td class="${cls}">${co.cur}${fmtP(imp)}</td>`;
+    });
+    tbl += '</tr>';
+  });
+  document.getElementById('sensTable').innerHTML = tbl;
+}
+
+function buildBankSens(co) {
+  const pbs = [co.pPB*0.7, co.pPB*0.85, co.pPB, co.pPB*1.15, co.pPB*1.3].map(m => parseFloat(m.toFixed(1)));
+  const pes = [co.pPE*0.8, co.pPE*0.9, co.pPE, co.pPE*1.1, co.pPE*1.2].map(m => parseFloat(m.toFixed(1)));
+  document.getElementById('sensSub').textContent = 'Implied share price across different P/B (columns) and P/E (rows) peer multiple assumptions. Base case highlighted.';
+  let tbl = `<tr><th>P/E / P/B</th>` + pbs.map(m => `<th>${m.toFixed(1)}x P/B</th>`).join('') + '</tr>';
+  pes.forEach(pe => {
+    tbl += `<tr><td>${pe.toFixed(1)}x P/E</td>`;
+    pbs.forEach(pb => {
+      const bvps = co.bv / co.shares;
+      const eps = co.ni / co.shares;
+      const avgImp = (pb * bvps + pe * eps) / 2;
+      const isBase = Math.abs(pb - co.pPB) < 0.01 && Math.abs(pe - co.pPE) < 0.01;
+      const chg = (avgImp - co.price) / co.price;
+      const cls = isBase ? 'cell-base' : chg > 0.1 ? 'cell-low' : chg < -0.1 ? 'cell-high' : 'cell-mid';
+      tbl += `<td class="${cls}">${co.cur}${fmtP(avgImp)}</td>`;
+    });
+    tbl += '</tr>';
+  });
+  document.getElementById('sensTable').innerHTML = tbl;
+}
+
+function resetAll() { selId = null; calcState = {}; goToStep(1); renderGrid('all'); document.getElementById('continueBtn').classList.remove('enabled'); }
+</script>
+</body>
+</html>
