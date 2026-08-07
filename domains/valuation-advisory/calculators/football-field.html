@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Football Field — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+.top-nav{border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;height:56px;gap:28px}
+.logo{font-size:17px;font-weight:700}.logo strong{font-weight:900}
+.nav-links{display:flex;gap:20px;flex:1}.nav-links a{font-size:13px;color:var(--muted);font-weight:500}.nav-links a:hover{color:var(--text)}
+.nav-cta{display:flex;gap:8px;align-items:center;margin-left:auto}
+.vault-btn{font-size:12px;font-weight:600;padding:6px 12px;border:1px solid var(--border);border-radius:6px;color:var(--text)}
+.pro-btn{font-size:12px;font-weight:700;padding:6px 14px;background:var(--text);color:#fff;border-radius:6px}
+.domain-nav{border-bottom:1px solid var(--border);background:var(--bg)}
+.domain-nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex}
+.domain-nav a{font-size:13px;font-weight:500;color:var(--muted);padding:10px 16px;border-bottom:2px solid transparent}
+.domain-nav a:hover,.domain-nav a.active{color:var(--text);border-bottom-color:var(--text)}
+.progress-wrap{max-width:820px;margin:36px auto 0;padding:0 24px}
+.prog-bar{display:flex;align-items:center}
+.prog-step{display:flex;align-items:center;gap:8px;flex:1}.prog-step:last-child{flex:none}
+.step-num{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--muted);font-family:var(--mono);flex-shrink:0;transition:all .2s}
+.prog-step.active .step-num{background:var(--text);border-color:var(--text);color:#fff}
+.prog-step.done .step-num{background:var(--green);border-color:var(--green);color:#fff}
+.step-label{font-size:12px;font-weight:500;color:var(--muted);white-space:nowrap}
+.prog-step.active .step-label{color:var(--text);font-weight:600}.prog-step.done .step-label{color:var(--green)}
+.prog-line{flex:1;height:1px;background:var(--border);margin:0 8px}.prog-line.done{background:var(--green)}
+.step-section{display:none;max-width:960px;margin:0 auto;padding:36px 24px 80px}.step-section.active{display:block}
+.step-headline{font-size:26px;font-weight:800;margin-bottom:6px}
+.step-sub{font-size:14px;color:var(--muted);margin-bottom:24px}
+.filter-bar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.filter-btn{padding:6px 14px;border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;background:var(--bg);color:var(--muted);font-family:var(--font)}
+.filter-btn:hover{border-color:var(--text);color:var(--text)}.filter-btn.active{background:var(--text);color:#fff;border-color:var(--text)}
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:9px;margin-bottom:20px}
+.company-card{border:1.5px solid var(--border);border-radius:10px;padding:13px;cursor:pointer;transition:all .15s;background:var(--bg)}
+.company-card:hover{border-color:#999}.company-card.selected{border-color:var(--text);border-width:2px;background:#f3f3f3}.company-card.hidden{display:none}
+.co-flag{font-size:18px;margin-bottom:5px}.co-name{font-size:12px;font-weight:700;margin-bottom:2px}.co-ticker{font-size:10px;font-family:var(--mono);color:var(--muted)}.co-sector{font-size:10px;color:var(--muted);margin-top:3px}
+.continue-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);opacity:.35;pointer-events:none;transition:opacity .2s}.continue-btn.enabled{opacity:1;pointer-events:all}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer;margin-bottom:20px;border:none;background:none;font-family:var(--font);padding:0}.back-link:hover{color:var(--text)}
+.ctx-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:22px}
+.ctx-flag{font-size:30px;line-height:1}.ctx-co-name{font-size:22px;font-weight:800;margin-bottom:3px}.ctx-meta{font-size:13px;color:var(--muted)}
+.ctx-tag{display:inline-block;padding:2px 8px;border:1px solid var(--border);border-radius:12px;font-size:10px;font-weight:600;color:var(--muted);margin-right:5px;text-transform:uppercase;letter-spacing:.5px}
+.edu-block{border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:10px}
+.edu-icon{font-size:16px;margin-bottom:6px}.edu-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:7px}.edu-text{font-size:14px;line-height:1.7}
+/* ASSUMPTIONS */
+.method-table{width:100%;border-collapse:collapse;margin-bottom:24px}
+.method-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding:9px 12px;text-align:left;background:var(--card);border:1px solid var(--border)}
+.method-table td{padding:12px 12px;border:1px solid var(--border);vertical-align:middle}
+.method-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:8px;flex-shrink:0}
+.method-name-cell{display:flex;align-items:center}
+.method-input{width:100px;border:1.5px solid var(--border);border-radius:6px;padding:7px 9px;font-size:14px;font-family:var(--mono);font-weight:700;text-align:right;background:var(--bg);color:var(--text)}
+.method-input:focus{outline:none;border-color:var(--text)}
+.method-desc{font-size:12px;color:var(--muted);margin-top:3px}
+.current-ref{display:flex;align-items:center;gap:10px;padding:14px 16px;border:1.5px solid var(--text);border-radius:10px;margin-bottom:20px}
+.current-ref-lbl{font-size:13px;font-weight:600;flex:1}
+.current-ref-val{font-size:22px;font-weight:900;font-family:var(--mono)}
+.run-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:800;cursor:pointer;font-family:var(--font);margin-top:8px}.run-btn:hover{background:#222}
+/* LOADING */
+.loading-wrap{text-align:center;padding:80px 24px 60px;max-width:480px;margin:0 auto}
+.loading-headline{font-size:22px;font-weight:800;margin-bottom:8px}.loading-sub{font-size:14px;color:var(--muted);margin-bottom:52px}
+.loading-steps-list{list-style:none;text-align:left;margin-bottom:40px}
+.ls-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--muted);opacity:0;transform:translateY(6px);transition:opacity .35s ease,transform .35s ease}
+.ls-item.show{opacity:1;transform:translateY(0)}.ls-item.active{color:var(--text);font-weight:600}.ls-item.done{color:var(--text)}
+.ls-dot{width:9px;height:9px;border-radius:50%;background:var(--border);flex-shrink:0;transition:background .3s}
+.ls-item.active .ls-dot{background:var(--text);animation:dotpulse .7s ease-in-out infinite}
+.ls-item.done .ls-dot{background:var(--green)}
+.ls-check{font-size:13px;color:var(--green);margin-left:auto;opacity:0;transition:opacity .3s}.ls-item.done .ls-check{opacity:1}
+@keyframes dotpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.4);opacity:.5}}
+.loading-bar-track{height:3px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:16px}
+.loading-bar-fill{height:100%;width:0%;background:var(--text);border-radius:3px;transition:width .4s ease}
+.loading-pct{font-size:12px;font-family:var(--mono);color:var(--muted);font-weight:600}
+/* FOOTBALL FIELD CHART */
+.ff-wrap{margin-bottom:32px}
+.ff-chart-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.ff-chart-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.ff-current-banner{display:flex;align-items:center;gap:12px;padding:10px 16px;background:var(--card);border-radius:8px;margin-bottom:16px;border:1px solid var(--border)}
+.ff-cur-dot{width:12px;height:12px;background:var(--red);border-radius:50%;flex-shrink:0}
+.ff-cur-txt{font-size:13px;font-weight:600}
+.ff-conv-txt{font-size:13px;color:var(--muted);margin-left:auto}
+.ff-chart-inner{position:relative}
+.ff-row{display:flex;align-items:center;margin-bottom:10px;gap:10px}
+.ff-row-lbl{font-size:12px;font-weight:700;width:180px;flex-shrink:0;text-align:right;padding-right:12px;line-height:1.3}
+.ff-row-lbl span{display:block;font-size:10px;font-weight:400;color:var(--muted)}
+.ff-row-track{flex:1;height:34px;background:var(--card);border-radius:6px;position:relative;border:1px solid var(--border)}
+.ff-bar{position:absolute;height:100%;top:0;border-radius:5px}
+.ff-cur-line{position:absolute;width:3px;top:-5px;bottom:-5px;background:var(--red);border-radius:2px;z-index:5}
+.ff-cur-top{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:700;color:var(--red);white-space:nowrap;font-family:var(--mono)}
+.ff-conv-zone{position:absolute;top:-2px;bottom:-2px;background:rgba(22,163,74,.08);border-left:1.5px dashed rgba(22,163,74,.5);border-right:1.5px dashed rgba(22,163,74,.5);z-index:2;pointer-events:none}
+.ff-price-lo,.ff-price-hi{position:absolute;font-size:9px;font-family:var(--mono);font-weight:700;color:#fff;top:50%;transform:translateY(-50%);white-space:nowrap}
+.ff-price-lo{left:4px}.ff-price-hi{right:4px}
+.ff-xaxis{display:flex;justify-content:space-between;margin-top:4px;padding-left:190px}
+.ff-xaxis span{font-size:10px;font-family:var(--mono);color:var(--muted)}
+.ff-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;padding-left:190px}
+.ff-leg{display:flex;align-items:center;gap:6px;font-size:12px}
+.ff-leg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.ff-leg-line{width:14px;height:3px;background:var(--red);flex-shrink:0;border-radius:2px}
+/* SUMMARY CARDS */
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px}
+.summary-card{border:1px solid var(--border);border-radius:10px;padding:14px}
+.summary-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px}
+.summary-val{font-size:18px;font-weight:800;font-family:var(--mono)}
+.summary-sub{font-size:11px;color:var(--muted);margin-top:3px}
+/* METHOD DETAIL TABLE */
+.method-detail-table{width:100%;border-collapse:collapse;margin-bottom:28px}
+.method-detail-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding:8px 12px;text-align:center;background:var(--card);border:1px solid var(--border)}
+.method-detail-table th:first-child{text-align:left}
+.method-detail-table td{padding:10px 12px;border:1px solid var(--border);text-align:center;font-size:14px}
+.method-detail-table td:first-child{text-align:left;font-weight:600;font-size:13px}
+.signal-up{color:var(--green);font-weight:700;font-family:var(--mono)}
+.signal-dn{color:var(--red);font-weight:700;font-family:var(--mono)}
+.signal-neutral{color:var(--muted);font-weight:600;font-family:var(--mono)}
+/* CONVICTION TABLE */
+.sens-section{margin-bottom:28px}
+.sens-title{font-size:14px;font-weight:700;margin-bottom:3px}.sens-sub{font-size:13px;color:var(--muted);margin-bottom:14px}
+.sens-table{border-collapse:collapse;width:100%;font-size:12px}
+.sens-table th{font-size:10px;font-weight:600;color:var(--muted);padding:7px 10px;text-align:center;background:var(--card);border:1px solid var(--border)}
+.sens-table th:first-child{text-align:left}
+.sens-table td{font-family:var(--mono);font-weight:600;padding:7px 10px;text-align:center;border:1px solid var(--border)}
+.sens-table td:first-child{font-family:var(--font);color:var(--muted);background:var(--card);font-weight:600;text-align:left}
+.conv-5{background:#14532d;color:#fff}.conv-4{background:#16a34a;color:#fff}.conv-3{background:#bbf7d0;color:#14532d}.conv-2{background:#fef9c3;color:#713f12}.conv-1{background:#fecaca;color:#7f1d1d}.conv-0{background:#dc2626;color:#fff}
+.impl-card{border:2px solid var(--text);border-radius:10px;padding:20px;margin-bottom:22px}
+.impl-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px}
+.impl-text{font-size:14px;line-height:1.7}
+.action-row{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap}
+.act-primary{padding:11px 22px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);text-decoration:none;display:inline-flex;align-items:center;gap:7px}
+.act-secondary{padding:11px 22px;border:1.5px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);background:var(--bg);text-decoration:none;display:inline-flex;align-items:center;gap:7px}.act-secondary:hover{border-color:var(--text)}
+@media(max-width:640px){.company-grid{grid-template-columns:repeat(2,1fr)}.nav-links,.domain-nav{display:none}.summary-grid{grid-template-columns:1fr 1fr}.ff-row-lbl{width:100px;font-size:11px}.ff-xaxis,.ff-legend{padding-left:110px}}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <div class="nav-inner">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/" class="logo">Valuation<strong>Desk</strong></a>
+    <div class="nav-links">
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/">Valuation Advisory</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/">My Vault</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/deal-room/">Deal Room</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/daily-brief/">Daily Brief</a>
+    </div>
+    <div class="nav-cta">
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/" class="vault-btn">🗄 Vault (0)</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/#pricing" class="pro-btn">Get Pro — ₹799/mo</a>
+    </div>
+  </div>
+</nav>
+<div class="domain-nav">
+  <div class="domain-nav-inner">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/">Overview</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/learn/">📖 Learn</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/" class="active">🏈 Football Field</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/">🗄 My Vault</a>
+  </div>
+</div>
+<div class="progress-wrap">
+  <div class="prog-bar" id="progressBar">
+    <div class="prog-step active" id="ps1"><div class="step-num">1</div><span class="step-label">Pick a company</span></div>
+    <div class="prog-line" id="pl1"></div>
+    <div class="prog-step" id="ps2"><div class="step-num">2</div><span class="step-label">How to read it</span></div>
+    <div class="prog-line" id="pl2"></div>
+    <div class="prog-step" id="ps3"><div class="step-num">3</div><span class="step-label">Enter your ranges</span></div>
+    <div class="prog-line" id="pl3"></div>
+    <div class="prog-step" id="ps4"><div class="step-num">4</div><span class="step-label">See the field</span></div>
+  </div>
+</div>
+
+<!-- STEP 1 -->
+<section class="step-section active" id="step1">
+  <h1 class="step-headline">Which company do you want to see the full picture for?</h1>
+  <p class="step-sub">The Football Field is the final slide of every IB pitch book. It puts all five valuation methods on one chart — and the overlap tells you where analysts anchor their conviction.</p>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterGrid('all',this)">All (30)</button>
+    <button class="filter-btn" onclick="filterGrid('india',this)">🇮🇳 India</button>
+    <button class="filter-btn" onclick="filterGrid('global',this)">🌍 Global</button>
+    <button class="filter-btn" onclick="filterGrid('it',this)">IT</button>
+    <button class="filter-btn" onclick="filterGrid('banking',this)">Banking</button>
+    <button class="filter-btn" onclick="filterGrid('fmcg',this)">FMCG</button>
+  </div>
+  <div class="company-grid" id="companyGrid"></div>
+  <button class="continue-btn" id="continueBtn" onclick="goToStep(2)">Continue with selected company →</button>
+</section>
+
+<!-- STEP 2 -->
+<section class="step-section" id="step2">
+  <button class="back-link" onclick="goToStep(1)">← Change company</button>
+  <div class="ctx-header">
+    <div class="ctx-flag" id="ctxFlag"></div>
+    <div><div class="ctx-co-name" id="ctxName"></div><div class="ctx-meta" id="ctxMeta"></div></div>
+  </div>
+  <div class="edu-block">
+    <div class="edu-icon">📊</div>
+    <div class="edu-title">What the Football Field actually is — and why every pitch book uses it</div>
+    <div class="edu-text">The Football Field puts every valuation method on the same axis. DCF gives an intrinsic value range. Trading Comps gives a market-anchored range. SOTP gives the segment-level range. EV Bridge gives the implied equity sensitivity. The 52-Week Range gives the factual market trading range. The chart doesn't tell you which is right — it tells you where they agree. The overlap zone is where the analyst has maximum conviction. If five different methods all say ₹1,200–₹1,600 is fair value and the stock is at ₹900, that is a strong buy signal. If they all disagree wildly, the valuation is uncertain by definition — not unclear analysis.</div>
+  </div>
+  <div class="edu-block">
+    <div class="edu-icon">🎯</div>
+    <div class="edu-title">The zone of convergence — where conviction lives</div>
+    <div class="edu-text" id="ctxConv"></div>
+  </div>
+  <div class="edu-block">
+    <div class="edu-icon">📏</div>
+    <div class="edu-title">Why the bars are wide or narrow for this company specifically</div>
+    <div class="edu-text" id="ctxSpread"></div>
+  </div>
+  <div class="edu-block">
+    <div class="edu-icon">🏦</div>
+    <div class="edu-title">How a banker uses this chart in a real deal</div>
+    <div class="edu-text" id="ctxDeal"></div>
+  </div>
+  <button class="continue-btn enabled" onclick="goToStep(3)">I've understood it. Build the field →</button>
+</section>
+
+<!-- STEP 3 -->
+<section class="step-section" id="step3">
+  <button class="back-link" onclick="goToStep(2)">← Back to context</button>
+  <h2 class="step-headline">Enter your valuation ranges</h2>
+  <p class="step-sub">Pre-filled with ranges derived from each method's bear and bull scenarios. These are the outputs you would bring from DCF, Comps, SOTP, and EV Bridge. Override with your own analysis.</p>
+
+  <div class="current-ref">
+    <div class="ff-cur-dot" style="width:14px;height:14px;background:var(--red);border-radius:50%"></div>
+    <div class="current-ref-lbl">Current Market Price <span style="font-size:11px;color:var(--muted);font-weight:400">(reference line on the chart)</span></div>
+    <div class="current-ref-val" id="curRefVal">—</div>
+  </div>
+
+  <table class="method-table" id="methodTable">
+    <thead><tr><th>Method</th><th>Bear / Low Case</th><th>Base / Midpoint</th><th>Bull / High Case</th><th>What drives the range</th></tr></thead>
+    <tbody id="methodTableBody"></tbody>
+  </table>
+
+  <button class="run-btn" onclick="startCalc()">🏈 BUILD THE FOOTBALL FIELD 🏈</button>
+</section>
+
+<!-- LOADING -->
+<section class="step-section" id="stepLoading">
+  <div class="loading-wrap">
+    <div class="loading-headline">Assembling the football field...</div>
+    <div class="loading-sub">Pulling ranges from all five valuation methods and finding the zone of convergence</div>
+    <ul class="loading-steps-list">
+      <li class="ls-item" id="ls1"><span class="ls-dot"></span>Loading DCF intrinsic value range<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls2"><span class="ls-dot"></span>Pulling trading comparables range<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls3"><span class="ls-dot"></span>Computing SOTP implied price range<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls4"><span class="ls-dot"></span>Calculating EV bridge price sensitivity<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls5"><span class="ls-dot"></span>Fetching 52-week trading range<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls6"><span class="ls-dot"></span>Finding zone of convergence<span class="ls-check">✓</span></li>
+    </ul>
+    <div class="loading-bar-track"><div class="loading-bar-fill" id="loadingBarFill"></div></div>
+    <div class="loading-pct" id="loadingPct">0%</div>
+  </div>
+</section>
+
+<!-- STEP 4 -->
+<section class="step-section" id="step4">
+  <button class="back-link" onclick="goToStep(3)">← Adjust ranges</button>
+  <div style="text-align:center;padding:32px 0 24px;border-bottom:1px solid var(--border);margin-bottom:28px">
+    <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px" id="rCoLbl"></div>
+    <div style="font-size:15px;color:var(--muted);margin-bottom:8px">Multi-method valuation summary</div>
+    <div style="font-size:13px;font-weight:600;color:var(--green)" id="rConvZone"></div>
+  </div>
+
+  <div class="summary-grid" id="summaryGrid"></div>
+
+  <div class="ff-wrap">
+    <div class="ff-chart-title">The Football Field</div>
+    <div class="ff-chart-sub">Horizontal bars show each method's implied price range. The red line is current market price. The green shaded zone is where 3+ methods converge.</div>
+    <div class="ff-current-banner">
+      <div class="ff-cur-dot"></div>
+      <div class="ff-cur-txt" id="ffCurTxt"></div>
+      <div class="ff-conv-txt" id="ffConvTxt"></div>
+    </div>
+    <div class="ff-chart-inner" id="ffChartInner"></div>
+    <div class="ff-xaxis" id="ffXaxis"></div>
+    <div class="ff-legend">
+      <div class="ff-leg"><div class="ff-leg-line"></div><span>Current market price</span></div>
+      <div class="ff-leg" style="gap:6px"><div style="width:14px;height:14px;background:rgba(22,163,74,.15);border:1.5px dashed rgba(22,163,74,.5);border-radius:2px"></div><span>Zone of convergence (3+ methods)</span></div>
+    </div>
+  </div>
+
+  <div class="impl-card">
+    <div class="impl-title">🎓 Analyst's synthesis</div>
+    <div class="impl-text" id="rSynthesis"></div>
+  </div>
+
+  <div style="font-size:14px;font-weight:700;margin-bottom:14px">Method Detail — Ranges and Signals</div>
+  <div style="overflow-x:auto;margin-bottom:28px">
+    <table class="method-detail-table" id="methodDetailTable"></table>
+  </div>
+
+  <div class="sens-section">
+    <div class="sens-title">Conviction Table</div>
+    <div class="sens-sub">How many methods (out of 5) suggest upside at different entry prices. Green = strong buy conviction. Red = multiple methods say overvalued.</div>
+    <div style="overflow-x:auto"><table class="sens-table" id="sensTable"></table></div>
+  </div>
+
+  <div class="action-row">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/dcf.html" class="act-primary">📈 Refine your DCF →</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/comps.html" class="act-primary" style="background:#374151">📊 Refine Comps →</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/sotp.html" class="act-primary" style="background:#2563eb">🧩 Refine SOTP →</a>
+    <button class="act-secondary" onclick="resetAll()">↺ New football field</button>
+  </div>
+</section>
+
+<script>
+const M_COLORS = ['#0a0a0a','#2563eb','#16a34a','#f59e0b','#6b7280'];
+
+const CO = [
+  // Fields: id,name,ticker,flag,sector,tags,cur,price
+  // methods: array of {label, desc, hint, lo, hi}
+  // ctx: {conv, spread, deal}
+  {id:'reliance',name:'Reliance Industries',ticker:'RELIANCE',flag:'🇮🇳',sector:'Conglomerate',tags:['india'],cur:'₹',price:1400,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Sensitive to Jio\'s long-term EBITDA growth and WACC assumption',lo:850,hi:1950},
+            {label:'Trading Comps',desc:'EV/EBITDA Peer Range',hint:'Range of 7x–12x EV/EBITDA across oil, telecom, and retail peers',lo:1000,hi:1500},
+            {label:'SOTP',desc:'Sum of Parts',hint:'20% conglomerate discount to 0% — 4 distinct segment valuations',lo:1100,hi:1700},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% of current market enterprise value',lo:1000,hi:1800},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'Actual NSE price range over the past 12 months',lo:1200,hi:1620}],
+   ctx:{conv:'All five methods place Reliance\'s fair value between ₹1,000–₹1,700. The current price of ₹1,400 sits in the upper half of this convergence zone — suggesting the market has priced in Jio\'s premium and New Energy optionality, but hasn\'t yet gone to a full SOTP bull scenario.',spread:'DCF has the widest range (₹850–₹1,950) because Jio\'s terminal growth rate drives enormous variation in intrinsic value. Comps has the narrowest range because it anchors to what peers currently trade at — a market-level constraint.',deal:'In a hypothetical acquisition of Reliance, the buyer would anchor the offer price at the bottom of the convergence zone (₹1,200) and use SOTP\'s bull case (₹1,700) to justify paying a premium. The football field sets the negotiation corridor.'}},
+
+  {id:'tcs',name:'TCS',ticker:'TCS',flag:'🇮🇳',sector:'IT Services',tags:['india','it'],cur:'₹',price:4000,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Sensitive to long-term IT services demand and WACC',lo:2800,hi:5500},
+            {label:'Trading Comps',desc:'P/E Peer Range',hint:'20x–32x P/E across India and global IT services peers',lo:3100,hi:4600},
+            {label:'SOTP',desc:'Sum of Parts',hint:'BFSI, AI Services, and Traditional IT valued separately',lo:3500,hi:4200},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% of current EV, adjusted for net cash',lo:3200,hi:4800},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'NSE price range over the past 12 months',lo:3400,hi:4600}],
+   ctx:{conv:'Methods converge tightly between ₹3,400–₹4,600 — a narrow range for a large-cap, suggesting TCS is well-researched and efficiently priced. The current price of ₹4,000 sits in the middle of this zone, meaning the market is at consensus fair value.',spread:'Relatively narrow spread across methods. TCS\'s predictable, contracted revenue and near-zero debt make all models converge. DCF is the outlier with a wider range — purely driven by long-term terminal growth rate assumptions for IT services.',deal:'In an M&A scenario, a global IT acquirer (Accenture, IBM) would anchor a bid at ₹4,200–₹4,600 (upper convergence) and use DCF\'s bull case (₹5,500) to justify a premium. TCS\'s premium to peers would make any bid expensive.'}},
+
+  {id:'hdfc',name:'HDFC Bank',ticker:'HDFCBANK',flag:'🇮🇳',sector:'Banking',tags:['india','banking'],cur:'₹',price:1600,
+   methods:[{label:'DDM',desc:'Dividend Discount Model',hint:'3-stage DDM with varying dividend growth assumptions',lo:1300,hi:2000},
+            {label:'P/B Multiple',desc:'Price-to-Book Range',hint:'2.5x–4.0x P/B based on RoE and peer positioning',lo:1250,hi:1900},
+            {label:'P/E Multiple',desc:'Price-to-Earnings Range',hint:'16x–22x P/E based on earnings growth and peer premium',lo:1400,hi:1900},
+            {label:'SOTP',desc:'Business Line SOTP',hint:'Retail, corporate, and treasury banking valued separately',lo:1400,hi:1800},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'NSE price range over the past 12 months',lo:1400,hi:1800}],
+   ctx:{conv:'Four of five methods converge between ₹1,400–₹1,900. The current price of ₹1,600 sits near the lower-middle of this range — suggesting mild upside to fair value on most methods, with the post-HDFC-merger integration risk creating the discount.',spread:'Relatively narrow spread for a bank — a positive sign of predictable earnings. DDM has the widest range because it\'s sensitive to long-term dividend growth assumptions, which depend heavily on RoE sustaining post-merger.',deal:'In a private equity stake acquisition (unlikely given regulation), the football field would anchor at P/B of 2.5x (₹1,250) floor and DDM bull (₹2,000) ceiling. A strategic acquirer would pay at the upper convergence zone.'}},
+
+  {id:'infosys',name:'Infosys',ticker:'INFY',flag:'🇮🇳',sector:'IT Services',tags:['india','it'],cur:'₹',price:1540,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Sensitive to AI services transition and margin expansion assumptions',lo:1100,hi:2100},
+            {label:'Trading Comps',desc:'P/E Peer Range',hint:'18x–28x P/E across India and global IT services peers',lo:1300,hi:1900},
+            {label:'SOTP',desc:'AI vs Core IT Split',hint:'Digital AI segment at premium, core IT at discount',lo:1400,hi:1700},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% EV, adjusted for ₹38,000 Cr net cash',lo:1200,hi:1900},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'NSE trading range over the past 12 months',lo:1350,hi:1850}],
+   ctx:{conv:'Methods converge between ₹1,350–₹1,850 with the current price of ₹1,540 sitting comfortably in the middle. This is the football field for a fairly valued stock — no extreme outlier from any single method.',spread:'Moderate spread. SOTP is the narrowest (₹1,400–₹1,700) because Infosys\'s segments are highly correlated. DCF is widest because the AI services growth rate drives large sensitivity.',deal:'Infosys has historically been an acquisition target for global IT companies. The football field would set a bid anchor at ₹1,700–₹1,900 (upper convergence) — at current multiples, any acquirer would pay above ₹2,000 to move the board.'}},
+
+  {id:'asianpaint',name:'Asian Paints',ticker:'ASIANPAINT',flag:'🇮🇳',sector:'FMCG/Paints',tags:['india','fmcg'],cur:'₹',price:2900,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Sensitive to volume growth assumptions and Grasim market share loss',lo:2000,hi:3800},
+            {label:'Trading Comps',desc:'P/E Peer Range',hint:'35x–70x P/E across India and global decorative paint peers',lo:2000,hi:3200},
+            {label:'SOTP',desc:'India + Industrial + International',hint:'Decorative at premium, industrial at discount',lo:2400,hi:3200},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% EV, with ₹2,000 Cr net cash',lo:2300,hi:3600},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'NSE 52-week high and low',lo:2400,hi:3600}],
+   ctx:{conv:'Methods converge between ₹2,400–₹3,200. The current price of ₹2,900 sits near the top of this range — suggesting the market has already priced in most of the Grasim risk, with limited further downside but also limited upside on base case assumptions.',spread:'Wide spread across methods reflects genuine uncertainty from the Grasim competition. Two years ago, all five methods would have converged at ₹3,200–₹3,800. The widened range is the football field\'s visual representation of increased investment risk.',deal:'Any acquirer of Asian Paints would anchor at ₹2,400 (lower convergence) and justify up to ₹3,800 (DCF bull) using distribution moat and brand value. The Grasim threat reduces the maximum premium any strategic acquirer would pay.'}},
+
+  {id:'zomato',name:'Zomato',ticker:'ZOMATO',flag:'🇮🇳',sector:'Consumer Tech',tags:['india'],cur:'₹',price:240,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Highly sensitive to Blinkit\'s long-term unit economics and food delivery margins',lo:120,hi:380},
+            {label:'Trading Comps',desc:'EV/Revenue Peer Range',hint:'7x–20x EV/Revenue range — DoorDash at low, India premium at high',lo:140,hi:360},
+            {label:'SOTP',desc:'Food + Blinkit + Hyperpure',hint:'Separate multiples per segment at 0% conglomerate discount',lo:150,hi:300},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% EV, adjusted for ₹12,000 Cr net cash',lo:150,hi:320},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'NSE 52-week high and low',lo:160,hi:300}],
+   ctx:{conv:'Methods converge loosely between ₹150–₹300 with the current price of ₹240 in the upper half. DCF is the outlier with the widest range (₹120–₹380), driven almost entirely by whether Blinkit\'s unit economics reach DoorDash-like levels at scale.',spread:'Very wide spread — this is the football field of a pre-profit, high-growth consumer tech company. The spread is not poor analysis; it reflects genuine uncertainty about whether Zomato\'s margins will converge toward global peers or find their own India-specific equilibrium.',deal:'In a private equity investment or strategic buyout scenario, the football field anchors the bid at ₹200–₹260 (convergence zone). A SoftBank-type growth investor would pay up to ₹360 if Blinkit\'s bull case is in their model.'}},
+
+  {id:'wipro',name:'Wipro',ticker:'WIPRO',flag:'🇮\N',sector:'IT Services',tags:['india','it'],cur:'₹',price:520,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Sensitive to Capco integration and margin recovery assumptions',lo:380,hi:700},
+            {label:'Trading Comps',desc:'P/E Peer Range',hint:'18x–28x P/E range across India IT and global consulting peers',lo:430,hi:600},
+            {label:'SOTP',desc:'Core IT + Capco Consulting',hint:'Two segments with different peer multiples',lo:470,hi:570},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% EV, adjusted for ₹25,000 Cr net cash',lo:420,hi:650},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'NSE 52-week trading range',lo:420,hi:600}],
+   ctx:{conv:'Methods converge between ₹430–₹600. The current price of ₹520 sits in the middle — Wipro is fairly valued on most methods, consistent with its current positioning as a peer-median IT services company.',spread:'Moderate spread. SOTP has the narrowest range because Wipro\'s two segments (Core IT, Capco) are highly correlated. DCF is widest because it\'s sensitive to whether the Capco integration creates the cross-sell synergies management has promised.',deal:'Wipro has been frequently cited as an acquisition target for global IT majors. A bid at ₹560–₹620 (upper convergence) with a DCF bull case justifying ₹700 would be the banker\'s playbook for presenting this football field to a board.'}},
+
+  {id:'maruti',name:'Maruti Suzuki',ticker:'MARUTI',flag:'🇮🇳',sector:'Auto OEM',tags:['india'],cur:'₹',price:12500,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Sensitive to EV transition timeline and India car penetration assumptions',lo:9000,hi:17000},
+            {label:'Trading Comps',desc:'EV/EBITDA Range',hint:'10x–18x EV/EBITDA range — global auto at low, India growth premium at high',lo:9500,hi:14500},
+            {label:'SOTP',desc:'Small Cars + SUVs + Commercial',hint:'Three segments with different peer multiples — SUV at premium',lo:11000,hi:14000},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% EV, adjusted for ₹34,000 Cr net cash',lo:9500,hi:16000},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'NSE 52-week trading range',lo:9500,hi:13500}],
+   ctx:{conv:'Methods converge between ₹11,000–₹14,000. The current price of ₹12,500 sits in the upper-middle of this zone — fairly valued to slight premium on most methods. DCF outlier at ₹17,000 bull requires 15-year India car penetration thesis playing out.',spread:'Wide spread reflects the genuine uncertainty of India\'s EV transition. A scenario where Maruti leads EVs (Suzuki hybrid platform) → ₹17,000. A scenario where EVs disrupt faster than expected → ₹9,000. This is not analytical uncertainty — it is real business uncertainty.',deal:'In an M&A scenario, Suzuki Japan (the parent at 58%) would be the most likely buyer of remaining Maruti shares. The football field sets ₹11,000–₹13,500 as the convergence zone — a fair price. A formal delisting would require a substantial premium above the 52-week high.'}},
+
+  {id:'bajfinance',name:'Bajaj Finance',ticker:'BAJFINANCE',flag:'🇮\N',sector:'NBFC',tags:['india','banking'],cur:'₹',price:7400,
+   methods:[{label:'DDM',desc:'Dividend Discount Model',hint:'3-stage DDM with long-term RoE normalisation assumption',lo:5500,hi:9500},
+            {label:'P/B Multiple',desc:'Price-to-Book Range',hint:'4x–9x P/B range — NBFC peers at low, Bajaj premium at high',lo:5800,hi:9200},
+            {label:'P/E Multiple',desc:'Price-to-Earnings Range',hint:'22x–34x P/E range based on earnings growth and NPA cycle',lo:6200,hi:8800},
+            {label:'SOTP',desc:'Consumer + SME + Rural Split',hint:'Three lending verticals valued at different P/E multiples',lo:6500,hi:8500},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'NSE 52-week high and low',lo:6200,hi:9000}],
+   ctx:{conv:'Methods converge between ₹6,500–₹8,800. The current price of ₹7,400 sits in the lower-middle of the convergence zone — suggesting mild upside on most methods but no clear deep value.',spread:'Wide spread for a financial company — unusual. This reflects two genuine uncertainties: (1) whether Bajaj Finance\'s premium P/B is structurally justified or will compress as competition increases; (2) RoE trajectory post-AUM scaling.',deal:'Bajaj Finance is not an acquisition target (Bajaj group structure). But in a rights issue or block deal context, institutional investors would anchor at ₹7,000–₹8,000 (convergence zone) and use the bull P/B case (₹9,200) to justify allocation.'}},
+
+  {id:'itc',name:'ITC',ticker:'ITC',flag:'🇮🇳',sector:'FMCG/Tobacco',tags:['india','fmcg'],cur:'₹',price:450,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Sensitive to FMCG growth and tobacco volume decline rate',lo:300,hi:600},
+            {label:'Trading Comps',desc:'P/E Blended Range',hint:'12x tobacco P/E to 50x FMCG P/E — blended based on EBITDA mix',lo:360,hi:520},
+            {label:'SOTP',desc:'5-Segment Sum of Parts',hint:'Cigarettes (12x), FMCG (40x), Hotels (25x), Paper (9x), Agri (8x)',lo:280,hi:480},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% EV, adjusted for ₹30,000 Cr net cash',lo:320,hi:560},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'NSE 52-week high and low',lo:380,hi:500}],
+   ctx:{conv:'Methods converge narrowly between ₹380–₹500 — the smallest convergence zone in our India coverage. ITC\'s stable tobacco cash flows and predictable FMCG trajectory create genuine analytical consensus at current prices.',spread:'Interesting divergence: SOTP gives the widest range (₹280–₹480) because the conglomerate discount itself is uncertain (0%–20%). 52-Week has the narrowest range (₹380–₹500) — the market has been remarkably stable on ITC, reflecting the yield-seeking, defensive investor base.',deal:'An activist investor pushing for an ITC demerger would use SOTP\'s bull case (₹480) vs the 52-Week low (₹380) to argue that the holding company structure destroys ₹100/share of value. This is the core activist playbook — and the football field makes it visible.'}},
+
+  {id:'hul',name:'Hindustan Unilever',ticker:'HINDUNILVR',flag:'🇮🇳',sector:'FMCG',tags:['india','fmcg'],cur:'₹',price:2400,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Sensitive to rural volume recovery and premiumisation rate assumptions',lo:1800,hi:3200},
+            {label:'Trading Comps',desc:'P/E Peer Range',hint:'40x–65x P/E across India FMCG peers and Unilever global parent',lo:1900,hi:2800},
+            {label:'SOTP',desc:'Home + Beauty + Foods Split',hint:'Three categories valued at different FMCG multiples',lo:2100,hi:2800},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% EV, adjusted for ₹5,000 Cr net cash',lo:2000,hi:3000},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'NSE 52-week high and low',lo:2100,hi:2900}],
+   ctx:{conv:'Methods converge between ₹2,100–₹2,800. The current price of ₹2,400 sits in the lower half of this zone — suggesting mild upside potential if rural volume recovery materialises. The Unilever parent trades at a significant discount to HUL, anchoring global valuation comparisons.',spread:'Moderate spread. SOTP gives the narrowest range (₹2,100–₹2,800) because all three HUL segments are consumer staples with similar peer benchmarks. DCF gives the widest because rural consumption recovery rate is highly variable.',deal:'Unilever global already owns 62% and cannot increase beyond 75% under SEBI rules. A creeping acquisition by Unilever within SEBI limits would anchor at ₹2,400–₹2,700 (middle convergence). A full delisting would require ₹2,800–₹3,200.'}},
+
+  {id:'tatamotors',name:'Tata Motors',ticker:'TATAMOTORS',flag:'🇮🇳',sector:'Auto OEM',tags:['india'],cur:'₹',price:1000,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Sensitive to JLR EV transition margin and India CV cycle assumptions',lo:650,hi:1400},
+            {label:'Trading Comps',desc:'EV/EBITDA Range',hint:'5x–10x EV/EBITDA across JLR peers (BMW, Mercedes) and India auto',lo:800,hi:1200},
+            {label:'SOTP',desc:'JLR + India PV + India CV',hint:'Three segments with geographically distinct peer sets',lo:750,hi:1150},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% EV, accounting for ₹76,000 Cr net debt',lo:700,hi:1300},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'NSE 52-week high and low',lo:700,hi:1100}],
+   ctx:{conv:'Methods converge between ₹750–₹1,150. The current price of ₹1,000 sits in the upper portion of this convergence zone — suggesting the market has priced in JLR\'s turnaround story but left limited upside on base case assumptions.',spread:'Wide spread — particularly DCF (₹650–₹1,400) — driven by JLR\'s binary character: either the EV transition succeeds (₹1,400+) or the capex cycle delays free cash flow for years (₹650). This binary is real, not analytical.',deal:'In a JLR-level financing deal (not a Tata Motors acquisition), lenders would use the convergence zone floor (₹750) as the equity cushion reference. A rights issue would anchor at ₹800–₹900 (lower convergence) to ensure institutional demand.'}},
+
+  {id:'sunpharma',name:'Sun Pharma',ticker:'SUNPHARMA',flag:'🇮\N',sector:'Pharma',tags:['india'],cur:'₹',price:1600,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Sensitive to US specialty pipeline success and FDA compliance risk',lo:1200,hi:2200},
+            {label:'Trading Comps',desc:'EV/EBITDA Range',hint:'18x–28x EV/EBITDA across India pharma and global specialty peers',lo:1300,hi:1900},
+            {label:'SOTP',desc:'US Specialty + India + Generics + API',hint:'Four segments at very different multiples (9x–28x EV/EBITDA)',lo:1400,hi:1900},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% EV, adjusted for ₹15,000 Cr net cash',lo:1300,hi:2000},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'NSE 52-week high and low',lo:1400,hi:1900}],
+   ctx:{conv:'Methods converge between ₹1,400–₹1,900. The current price of ₹1,600 sits in the lower-middle of this zone — suggesting moderate upside potential if the US specialty pipeline delivers.',spread:'Moderate spread with DCF as the widest range. This reflects the binary nature of US FDA regulatory decisions — a warning letter can move the stock 15% in a day. The football field\'s wide DCF bar visually captures this event risk.',deal:'In an M&A scenario (Sun has historically been an acquirer), the football field anchors at ₹1,700–₹1,900 for a target premium. Sun Pharma itself, as a target, would require a 30-40% premium above convergence zone to get board approval.'}},
+
+  {id:'adaniports',name:'Adani Ports',ticker:'ADANIPORTS',flag:'🇮\N',sector:'Infrastructure',tags:['india'],cur:'₹',price:1050,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Sensitive to cargo CAGR assumptions and governance risk discount rate',lo:750,hi:1400},
+            {label:'Trading Comps',desc:'EV/EBITDA Range',hint:'10x–18x EV/EBITDA across global port operators',lo:850,hi:1200},
+            {label:'SOTP',desc:'India Ports + International + Logistics',hint:'Three segments at slightly different port and logistics multiples',lo:800,hi:1200},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% EV, adjusted for ₹39,000 Cr net debt',lo:800,hi:1300},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'NSE 52-week high and low',lo:850,hi:1200}],
+   ctx:{conv:'Methods converge tightly between ₹850–₹1,200. The current price of ₹1,050 sits in the middle of this zone. Post-Hindenburg recovery is broadly complete — the football field reflects a stock at fair value with no strong multi-method directional signal.',spread:'Relatively narrow spread across methods — unusual for a company with Adani Group-level headline risk. This reflects the underlying port business stability: captive cargo volumes and concession-backed revenues anchor all models.',deal:'Adani Ports has been an active acquirer (Colombo, Haifa). In evaluating a target port acquisition, the buyer (Adani) would use this football field to benchmark the target\'s enterprise value against its own implied value — ensuring the acquisition is accretive to the convergence zone.'}},
+
+  {id:'kotak',name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',flag:'🇮\N',sector:'Banking',tags:['india','banking'],cur:'₹',price:1900,
+   methods:[{label:'DDM',desc:'Dividend Discount Model',hint:'Long-run dividend growth assumption post founder transition',lo:1400,hi:2400},
+            {label:'P/B Multiple',desc:'Price-to-Book Range',hint:'2.5x–5.0x P/B range — ICICI at 3.5x, Kotak premium at 4.5x',lo:1500,hi:2300},
+            {label:'P/E Multiple',desc:'Price-to-Earnings Range',hint:'22x–32x P/E range based on earnings growth and franchise premium',lo:1600,hi:2200},
+            {label:'SOTP',desc:'Bank + Securities + AMC + Insurance',hint:'Four Kotak financial services businesses valued separately by P/E',lo:1700,hi:2200},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'NSE 52-week high and low',lo:1600,hi:2200}],
+   ctx:{conv:'Methods converge between ₹1,600–₹2,200. The current price of ₹1,900 sits in the middle of this zone. The Uday Kotak succession narrative is the primary risk — resolution in either direction (new leadership proves themselves, or disappoints) will move the stock outside the convergence zone.',spread:'Relatively narrow spread for a financial company — a positive sign. P/B has the narrowest range (₹1,500–₹2,300) because RoE is the primary driver and it\'s predictable. DDM has the widest because it\'s sensitive to long-term dividend growth assumptions.',deal:'Kotak Mahindra is too large and too strategically important (private banking, AMC, insurance) to be acquired without regulatory approval. A hypothetical foreign bank acquisition would anchor a bid at ₹2,200–₹2,400 (upper convergence + control premium).'}},
+
+  // GLOBAL
+  {id:'apple',name:'Apple',ticker:'AAPL',flag:'🇺🇸',sector:'Consumer Tech',tags:['global','it'],cur:'$',price:190,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Sensitive to Services CAGR and terminal multiple assumption',lo:130,hi:260},
+            {label:'Trading Comps',desc:'P/E Peer Range',hint:'22x–32x blended hardware + software P/E across tech peers',lo:145,hi:215},
+            {label:'SOTP',desc:'iPhone + Mac/iPad + Services',hint:'Services at 12x EV/Revenue, hardware at 3-4x',lo:155,hi:230},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% EV, adjusted for $50B net cash',lo:140,hi:240},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'NYSE 52-week high and low',lo:165,hi:240}],
+   ctx:{conv:'Methods converge between $155–$240. The current price of $190 sits in the lower-middle of this zone — suggesting moderate upside if Services reaches 30% of gross profit and triggers the SOTP rerating.',spread:'Moderate spread with DCF the widest ($130–$260). DCF variability is driven by what Services multiple you use in the terminal value — apply Netflix\'s 4x or Visa\'s 15x and you get dramatically different outcomes.',deal:'In a hypothetical acquisition of Apple (which no company can realistically afford), the football field anchors at $200–$230 (upper convergence) as the minimum premium zone. Apple\'s board would require $250+ based on DCF bull case. The field sets the negotiating corridor.'}},
+
+  {id:'microsoft',name:'Microsoft',ticker:'MSFT',flag:'🇺🇸',sector:'Cloud / Enterprise',tags:['global','it'],cur:'$',price:420,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Sensitive to Azure CAGR and Copilot monetisation assumptions',lo:290,hi:580},
+            {label:'Trading Comps',desc:'P/E Peer Range',hint:'25x–40x P/E range across enterprise software and cloud peers',lo:350,hi:490},
+            {label:'SOTP',desc:'M365 + Azure + Gaming',hint:'Three segments at 18x–30x EV/EBITDA each',lo:370,hi:500},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% EV, adjusted for $26B net cash',lo:340,hi:520},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'Nasdaq 52-week high and low',lo:370,hi:510}],
+   ctx:{conv:'Methods converge tightly between $370–$510 — the narrowest convergence zone in our global coverage relative to price. This reflects Microsoft\'s near-perfect predictability: recurring revenue, high margins, low execution risk across all divisions.',spread:'Narrow spread across methods — a sign of analytical confidence and business model predictability. DCF is the only outlier (wider) due to sensitivity in Copilot\'s long-term revenue addition estimates.',deal:'Microsoft is essentially unacquirable. But the football field is used internally by Microsoft\'s treasury team to evaluate share buyback attractiveness: when the stock falls below $370 (lower convergence), the stock is cheap on every method.'}},
+
+  {id:'tesla',name:'Tesla',ticker:'TSLA',flag:'🇺🇸',sector:'EV / Energy',tags:['global'],cur:'$',price:250,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Extremely sensitive to FSD regulatory approval — binary outcome',lo:80,hi:520},
+            {label:'Trading Comps',desc:'EV/Revenue Range',hint:'1.8x auto peers to 15x tech premium — widest in universe',lo:120,hi:400},
+            {label:'SOTP',desc:'Auto + Energy + FSD Option Value',hint:'$150B option value on FSD drives the bull case',lo:120,hi:450},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% EV, adjusted for $17B net cash',lo:100,hi:480},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'Nasdaq 52-week high and low',lo:140,hi:380}],
+   ctx:{conv:'Methods show the WIDEST spread in our global universe — no other stock has such fundamental disagreement between methods. DCF at $80–$520 spans 6.5x the current price. This is not uncertain analysis — Tesla\'s business model genuinely spans multiple possible futures.',spread:'The extraordinary spread reflects Tesla\'s fundamental ambiguity: is it an auto company (DCF floor $80) or an AI company (SOTP bull $450)? The answer determines everything. No football field in modern finance has this breadth — and that itself is the insight.',deal:'Tesla\'s football field makes it essentially unacquirable on fundamental analysis — no acquirer can agree on a price range. Any deal would be based on strategic control value, not fundamental convergence. The football field shows why the two sides of any Tesla deal would disagree on price by $300+.'}},
+
+  {id:'alphabet',name:'Alphabet',ticker:'GOOGL',flag:'🇺🇸',sector:'Search / Cloud',tags:['global','it'],cur:'$',price:175,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Sensitive to Search share retention and Cloud CAGR assumptions',lo:120,hi:240},
+            {label:'Trading Comps',desc:'P/E Peer Range',hint:'18x–28x P/E range — at discount to peers due to AI disruption fear',lo:145,hi:210},
+            {label:'SOTP',desc:'Search + YouTube + Cloud + Other Bets',hint:'Four segments with $50B option value for Other Bets',lo:155,hi:220},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% EV, adjusted for $96B net cash',lo:140,hi:220},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'Nasdaq 52-week high and low',lo:155,hi:215}],
+   ctx:{conv:'Methods converge between $155–$215. The current price of $175 sits in the lower portion of this zone — potentially offering upside if the AI search threat is overpriced by the market. This is a stock where the football field suggests mild undervaluation.',spread:'Moderate spread. DCF has the widest range ($120–$240) driven by: if Search share falls 10%, DCF falls to $120; if Gemini defends search and Cloud accelerates, DCF reaches $240. The 52-Week range is narrow ($155–$215) — the market is not wildly uncertain on Alphabet.',deal:'Alphabet is a regulatory and antitrust minefield for acquisitions. But in a hypothetical leveraged recapitalisation (returning all cash), the football field anchors at $170–$210. Cloud and YouTube alone justify $140+.'}},
+
+  {id:'amazon',name:'Amazon',ticker:'AMZN',flag:'🇺🇸',sector:'Cloud / E-commerce',tags:['global','it'],cur:'$',price:171,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Sensitive to AWS margin expansion and retail profitability assumptions',lo:115,hi:240},
+            {label:'Trading Comps',desc:'EV/EBITDA Range',hint:'14x–22x blended EV/EBITDA across cloud and e-commerce peers',lo:140,hi:210},
+            {label:'SOTP',desc:'AWS + Advertising + NA Retail + International',hint:'Four segments at dramatically different multiples (6x–25x EV/EBITDA)',lo:145,hi:220},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% EV, adjusted for $26B net cash',lo:130,hi:220},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'Nasdaq 52-week high and low',lo:150,hi:210}],
+   ctx:{conv:'Methods converge between $145–$210 with the current price of $171 in the lower-middle — suggesting moderate upside potential if AWS margins continue expanding and advertising reaches $60B.',spread:'Moderate spread driven by DCF variability. If AWS EBITDA margin reaches 45% (bull case) vs 35% (base case), the DCF output varies by $60/share. The football field visualises why AWS margin expansion is the single most important variable for Amazon\'s fair value.',deal:'Amazon is too large for traditional M&A, but the football field informs its own acquisition strategy. When Amazon evaluates acquiring MGM, iRobot, or Whole Foods, it benchmarks the target\'s football field against its own implied value premium from AWS.'}},
+
+  {id:'meta',name:'Meta',ticker:'META',flag:'🇺🇸',sector:'Social / AI',tags:['global','it'],cur:'$',price:550,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Sensitive to Reality Labs NPV and AI ad revenue assumptions',lo:380,hi:780},
+            {label:'Trading Comps',desc:'P/E Peer Range',hint:'22x–35x P/E range across advertising and social platform peers',lo:440,hi:660},
+            {label:'SOTP',desc:'Family of Apps + Reality Labs Option',hint:'Apps at 18x EV/EBITDA + $20B Reality Labs option value',lo:460,hi:680},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% EV, adjusted for $43B net cash',lo:420,hi:700},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'Nasdaq 52-week high and low',lo:460,hi:700}],
+   ctx:{conv:'Methods converge between $460–$680. The current price of $550 sits in the lower-middle of this zone — suggesting moderate upside if AI ad tools continue to improve ARPU and Reality Labs doesn\'t expand losses beyond $20B.',spread:'Moderate spread with DCF the widest ($380–$780). The $400 range in DCF is driven by whether Reality Labs succeeds ($50B+ NPV) or fails ($0). This binary is real — and the football field visualises it by making DCF the outlier bar.',deal:'Meta is effectively unacquirable under US antitrust rules post-Instagram/WhatsApp. But the football field is used internally for buyback analysis — when the stock dropped to $90 in 2022, every method would have shown the stock at the extreme lower end. Zuckerberg used the football field (implicitly) to justify the year of efficiency.'}},
+
+  {id:'berkshire',name:'Berkshire Hathaway',ticker:'BRK.B',flag:'🇺🇸',sector:'Conglomerate',tags:['global','banking'],cur:'$',price:620,
+   methods:[{label:'Book Value',desc:'P/B Implied Range',hint:'1.3x–2.1x P/B — Buffett\'s own repurchase floor is ~1.5x',lo:490,hi:790},
+            {label:'Operating P/E',desc:'Operating Earnings Range',hint:'16x–24x operating P/E, excluding investment gains/losses',lo:460,hi:720},
+            {label:'SOTP',desc:'Insurance + BNSF + BHE + Portfolio',hint:'Four segments including $320B listed equity portfolio at market value',lo:510,hi:740},
+            {label:'Analyst Consensus',desc:'Analyst Target Range',hint:'Street consensus range from bottom to top analyst targets',lo:580,hi:780},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'NYSE 52-week high and low',lo:530,hi:720}],
+   ctx:{conv:'Methods converge between $530–$740. The current price of $620 sits in the lower portion of this zone — historically a point where Berkshire itself begins buying back stock, suggesting fair value or mild undervaluation.',spread:'Moderate spread. The widest variance is between P/B (conservative, $460–$720) and Analyst Consensus (tighter, $580–$780). The SOTP ($510–$740) includes the full equity portfolio at market value — making it sensitive to Apple\'s stock price.',deal:'Berkshire is the acquirer, not the target. Buffett uses his own football field (implicitly book value ranges) to determine when to buy back Berkshire stock. When the stock falls below 1.5x P/B ($490), Berkshire aggressively buys. The football field IS the capital allocation framework.'}},
+
+  {id:'nvidia',name:'NVIDIA',ticker:'NVDA',flag:'🇺🇸',sector:'Semiconductors / AI',tags:['global','it'],cur:'$',price:135,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Extremely sensitive to AI capex cycle duration and Data Center CAGR',lo:60,hi:280},
+            {label:'Trading Comps',desc:'P/E / EV/Revenue Range',hint:'25x–55x forward P/E range — AI premium vs semiconductor peer',lo:90,hi:210},
+            {label:'SOTP',desc:'Data Center + Gaming + Pro/Auto',hint:'Data Center at 18x EV/Revenue dominates — 78% of SOTP value',lo:100,hi:200},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% EV, adjusted for $26B net cash',lo:80,hi:240},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'Nasdaq 52-week high and low',lo:90,hi:200}],
+   ctx:{conv:'Methods converge between $90–$200. The current price of $135 sits in the lower-middle. DCF at $280 bull is the major outlier — driven by a scenario where the AI capex cycle continues for 5+ more years with NVIDIA maintaining 70% margins.',spread:'Wide spread — particularly DCF ($60–$280). This reflects the fundamental debate: is NVIDIA\'s AI leadership a 3-year cycle (DCF floor) or a structural decade-long platform (DCF bull)? Every investor is essentially making this bet.',deal:'NVIDIA has been blocked from major acquisitions (Arm in 2022 was blocked by regulators). The football field is used internally to evaluate smaller acquisitions (Mellanox, Run:ai) — NVIDIA\'s own implied value premium allows it to use stock as currency at high-value multiples.'}},
+
+  {id:'netflix',name:'Netflix',ticker:'NFLX',flag:'🇺🇸',sector:'Streaming',tags:['global','it'],cur:'$',price:900,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Sensitive to ad tier ARPU growth and content spend as % of revenue',lo:620,hi:1300},
+            {label:'Trading Comps',desc:'EV/Revenue Range',hint:'3.5x–11x EV/Revenue range across streaming and media peers',lo:720,hi:1100},
+            {label:'SOTP',desc:'Subscription + Ad Tier Split',hint:'Standard at 4x EV/Rev + Ad tier at 8x EV/Rev',lo:750,hi:1100},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% EV, after subtracting $7B net debt',lo:700,hi:1200},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'Nasdaq 52-week high and low',lo:720,hi:1100}],
+   ctx:{conv:'Methods converge between $720–$1,100. The current price of $900 sits in the lower-middle of this zone — suggesting moderate upside if the ad tier scales faster than Street consensus.',spread:'Moderate spread with DCF the widest ($620–$1,300). DCF variability is driven by the ad tier\'s long-term ARPU relative to traditional subscription — a $5/month difference in ad ARPU compounds to $80/share in DCF output over 10 years.',deal:'Netflix has historically been an organic growth company, not an M&A target. But in a hypothetical strategic acquisition scenario (Disney, Apple, or Amazon), the football field anchors at $1,000–$1,200 (upper convergence + control premium). The ad tier valuation justifies the premium.'}},
+
+  {id:'samsung',name:'Samsung Electronics',ticker:'005930',flag:'🇰🇷',sector:'Semiconductors',tags:['global','it'],cur:'$',price:58,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Highly sensitive to memory cycle timing and foundry market share assumptions',lo:35,hi:95},
+            {label:'Trading Comps',desc:'EV/EBITDA Range',hint:'6x–15x mid-cycle EV/EBITDA across semiconductor peers',lo:40,hi:80},
+            {label:'SOTP',desc:'Memory + Foundry + Consumer + Display',hint:'Four segments — Memory at mid-cycle 10x, Foundry at discount to TSMC',lo:38,hi:78},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% EV, adjusted for $70B net cash',lo:38,hi:85},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'KRX 52-week high and low (converted to USD)',lo:42,hi:78}],
+   ctx:{conv:'Methods converge between $40–$78. The current price of $58 sits in the middle. Samsung is a perennially "cheap on paper" stock that never fully closes the gap to intrinsic value — due to chaebol governance discount and memory cycle unpredictability.',spread:'Wide spread — particularly DCF ($35–$95). This is the typical semiconductor cycle problem: at trough EBITDA (memory downcycle), all methods give low values; at peak EBITDA (HBM supercycle), all give high values. The football field shows both.',deal:'Samsung is a target only in a geopolitical scenario. Korea\'s CHIP4 alliance and strategic semiconductor positioning make Samsung effectively a national asset. Any acquisition attempt would face Korean government resistance regardless of the football field.'}},
+
+  {id:'alibaba',name:'Alibaba',ticker:'BABA',flag:'🇨🇳',sector:'E-commerce / Cloud',tags:['global','it'],cur:'$',price:80,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Sensitive to China regulatory risk discount rate and Cloud CAGR',lo:50,hi:140},
+            {label:'Trading Comps',desc:'P/E Range',hint:'8x–18x P/E — applying China tech discount vs global e-commerce peers',lo:60,hi:110},
+            {label:'SOTP',desc:'Commerce + Cloud + International + Logistics',hint:'Four segments with heavy regulatory haircuts on all multiples',lo:55,hi:120},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% EV, adjusted for $63B net cash (minus Ant)',lo:55,hi:120},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'NYSE (ADR) 52-week high and low',lo:65,hi:110}],
+   ctx:{conv:'Methods converge between $65–$110. The current price of $80 sits in the lower portion — suggesting moderate upside if China\'s regulatory environment stabilises. The convergence zone is BELOW where all methods would place Alibaba without the regulatory discount.',spread:'Wide spread driven by DCF ($50–$140). DCF at $50 reflects a scenario of continued regulatory tightening + PDD taking core commerce share. DCF at $140 reflects full regulatory normalisation + Cloud reaching AWS-like margins. Both are plausible China scenarios.',deal:'Alibaba cannot be acquired by a foreign entity under Chinese law. But in a going-private scenario (Chinese buyout fund + founder), the football field anchors at $85–$110 (upper convergence). A going-private offer below $90 would face shareholder resistance based on the football field.'}},
+
+  {id:'tsmc',name:'TSMC',ticker:'TSM',flag:'🇹🇼',sector:'Semiconductor Foundry',tags:['global','it'],cur:'$',price:175,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Sensitive to Arizona fab margin impact and leading-edge pricing power',lo:120,hi:250},
+            {label:'Trading Comps',desc:'P/E Range',hint:'20x–30x P/E range — no peer at leading-edge, premium justified',lo:145,hi:215},
+            {label:'SOTP',desc:'Advanced Logic + Mature Node',hint:'Advanced at 22x EV/EBITDA + Mature at 10x EV/EBITDA',lo:155,hi:225},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% EV, adjusted for $35B net cash',lo:140,hi:230},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'NYSE (ADR) 52-week high and low',lo:145,hi:220}],
+   ctx:{conv:'Methods converge between $150–$220. The current price of $175 sits in the lower portion of this zone — suggesting moderate upside potential particularly if geopolitical risk premium compresses.',spread:'Moderate spread. The outlier is DCF at $120–$250, driven by the Arizona fab\'s margin impact. At current Arizona cost structure (3-4x Taiwan), DCF falls to $120. If Arizona reaches Taiwan cost parity over 10 years, DCF rises toward $250.',deal:'TSMC is legally protected from foreign acquisition under Taiwan\'s semiconductor sovereignty laws. In a hypothetical deal, the football field anchors at $190–$220. Any acquirer would need to commit to retaining Taiwan operations, making the Arizona cost structure the key valuation variable.'}},
+
+  {id:'toyota',name:'Toyota',ticker:'TM',flag:'🇯🇵',sector:'Auto OEM',tags:['global'],cur:'$',price:24,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Sensitive to yen/dollar rate and EV transition timeline assumptions',lo:15,hi:35},
+            {label:'Trading Comps',desc:'P/E Range',hint:'8x–14x P/E across global auto OEM peers',lo:18,hi:30},
+            {label:'SOTP',desc:'Vehicles + Toyota Financial + Mobility',hint:'Industrial at 7x EV/EBITDA + TFS at P/E + $20B mobility option',lo:18,hi:32},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% industrial EV, excluding TFS financial leverage',lo:16,hi:33},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'NYSE (ADR) 52-week high and low',lo:18,hi:29}],
+   ctx:{conv:'Methods converge between $18–$30. The current price of $24 sits in the middle. Toyota is fairly valued on every method — which is appropriate for a world-class auto manufacturer with predictable cash flows trading at cyclical-average multiples.',spread:'Moderate spread. DCF has the widest range ($15–$35) driven by two key variables: (1) yen depreciation adds $3–$5 per ADR in bull scenario; (2) EV transition assumptions change CAPEX and terminal value significantly.',deal:'Toyota has been the consolidating force in global auto (Daihatsu, Subaru stakes). The football field anchors any Toyota target acquisition at the upper convergence zone. For Toyota itself as a target, its Japan strategic importance makes any foreign acquisition politically impossible.'}},
+
+  {id:'nestle',name:'Nestle',ticker:'NESN',flag:'🇨🇭',sector:'FMCG',tags:['global','fmcg'],cur:'$',price:100,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Sensitive to organic growth recovery and GLP-1 drug impact on food demand',lo:70,hi:140},
+            {label:'Trading Comps',desc:'EV/EBITDA Range',hint:'14x–22x EV/EBITDA range across global FMCG peers',lo:82,hi:118},
+            {label:'SOTP',desc:'Coffee + Pet Care + Nutrition + Other',hint:'Four product categories with different FMCG peer multiples',lo:85,hi:115},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% EV, subtracting $40B net debt',lo:75,hi:130},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'SIX Swiss Exchange 52-week high and low (CHF, approximated to USD)',lo:82,hi:115}],
+   ctx:{conv:'Methods converge between $82–$115. The current price of $100 sits in the middle of this zone — fair value by every measure. Nestle is the definition of a "fully priced quality company" — no deep value, no extreme premium.',spread:'Narrow spread relative to price — reflecting Nestle\'s 190-country diversification and near-zero single-point-of-failure risk. DCF at $70–$140 is the widest — driven by whether GLP-1 drug adoption genuinely changes processed food demand. If it does, all methods move lower.',deal:'Nestle has historically been an acquirer, not a target. The football field anchors at $105–$120 (upper convergence) for any hypothetical acquisition premium. No single strategic buyer could afford Nestle — only a consortium or private equity-type transaction.'}},
+
+  {id:'bhp',name:'BHP Group',ticker:'BHP',flag:'🇦🇺',sector:'Mining',tags:['global'],cur:'$',price:43,
+   methods:[{label:'DCF',desc:'Intrinsic Value',hint:'Highly sensitive to iron ore, copper, and coal price cycle assumptions',lo:28,hi:62},
+            {label:'Trading Comps',desc:'EV/EBITDA Range',hint:'4x–8x mid-cycle EV/EBITDA across global mining peers',lo:35,hi:54},
+            {label:'SOTP',desc:'Iron Ore + Copper + Coal + Potash',hint:'Four commodities at different multiples — copper at premium',lo:33,hi:56},
+            {label:'EV Bridge',desc:'EV Sensitivity',hint:'Implied price at ±20% EV, adjusted for $9B net debt',lo:32,hi:58},
+            {label:'52-Week Range',desc:'Market Trading Range',hint:'ASX 52-week high and low (converted to USD)',lo:36,hi:56}],
+   ctx:{conv:'Methods converge between $35–$56. The current price of $43 sits in the lower portion of this zone — suggesting moderate upside if the copper supercycle thesis plays out and iron ore stays above $80/ton.',spread:'Wide spread — typical for a diversified mining company. DCF ($28–$62) has the widest range because commodity price assumptions drive everything. At iron ore $60/ton, DCF = $28. At $120/ton, DCF = $62. The football field is essentially a commodity price sensitivity chart.',deal:'Mining M&A happens regularly. BHP has bid for Anglo American and Copper companies. The football field anchors any BHP acquisition offer at the upper convergence zone ($50–$56), using DCF bull case ($62) to justify the premium. The copper optionality is the deal rationale.'}}
+];
+
+// ─── STATE ─────────────────────────────────────────────────────────────────
+let selId = null, calcState = {};
+
+window.onload = () => renderGrid('all');
+
+function renderGrid(f) {
+  const g = document.getElementById('companyGrid'); g.innerHTML = '';
+  CO.forEach(co => {
+    const show = f === 'all' || co.tags.includes(f);
+    const el = document.createElement('div');
+    el.className = 'company-card' + (co.id === selId ? ' selected' : '') + (!show ? ' hidden' : '');
+    el.innerHTML = `<div class="co-flag">${co.flag}</div><div class="co-name">${co.name}</div><div class="co-ticker">${co.ticker}</div><div class="co-sector">${co.sector}</div>`;
+    el.onclick = () => { selId = co.id; document.querySelectorAll('.company-card').forEach(c => c.classList.remove('selected')); el.classList.add('selected'); document.getElementById('continueBtn').classList.add('enabled'); };
+    g.appendChild(el);
+  });
+}
+function filterGrid(f, btn) { document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); renderGrid(f); }
+
+function goToStep(n) {
+  document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('step' + n).classList.add('active');
+  updateProg(n);
+  if (n === 2) renderCtx();
+  if (n === 3) buildMethodTable();
+  if (n === 4) renderResults();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function updateProg(n) {
+  [1,2,3,4].forEach(i => {
+    const ps = document.getElementById('ps' + i); ps.classList.remove('active','done');
+    if (i < n) ps.classList.add('done'); if (i === n) ps.classList.add('active');
+    if (i < 4) { const pl = document.getElementById('pl' + i); pl.classList[i < n ? 'add' : 'remove']('done'); }
+  });
+}
+
+function renderCtx() {
+  const co = CO.find(c => c.id === selId); if (!co) return;
+  document.getElementById('ctxFlag').textContent = co.flag;
+  document.getElementById('ctxName').textContent = co.name;
+  document.getElementById('ctxMeta').innerHTML = `<span class="ctx-tag">${co.ticker}</span><span class="ctx-tag">${co.sector}</span>`;
+  document.getElementById('ctxConv').textContent = co.ctx.conv;
+  document.getElementById('ctxSpread').textContent = co.ctx.spread;
+  document.getElementById('ctxDeal').textContent = co.ctx.deal;
+}
+
+function buildMethodTable() {
+  const co = CO.find(c => c.id === selId); if (!co) return;
+  document.getElementById('curRefVal').textContent = `${co.cur}${co.price.toLocaleString()}`;
+  let html = '';
+  co.methods.forEach((m, i) => {
+    const mid = ((m.lo + m.hi) / 2).toFixed(co.price >= 100 ? 0 : 2);
+    html += `<tr>
+      <td><div class="method-name-cell"><span class="method-dot" style="background:${M_COLORS[i]}"></span><div><div style="font-weight:700">${m.label}</div><div class="method-desc">${m.desc}</div></div></div></td>
+      <td><input class="method-input" id="m_lo_${i}" type="number" step="any" value="${m.lo}" oninput="calcMid(${i})"></td>
+      <td><input class="method-input" id="m_mid_${i}" type="text" value="${co.cur}${mid}" readonly style="background:var(--card);color:var(--muted)"></td>
+      <td><input class="method-input" id="m_hi_${i}" type="number" step="any" value="${m.hi}" oninput="calcMid(${i})"></td>
+      <td style="font-size:12px;color:var(--muted)">${m.hint}</td>
+    </tr>`;
+  });
+  document.getElementById('methodTableBody').innerHTML = html;
+}
+
+function calcMid(i) {
+  const co = CO.find(c => c.id === selId); if (!co) return;
+  const lo = parseFloat(document.getElementById(`m_lo_${i}`)?.value) || 0;
+  const hi = parseFloat(document.getElementById(`m_hi_${i}`)?.value) || 0;
+  const mid = ((lo + hi) / 2).toFixed(co.price >= 100 ? 0 : 2);
+  const midEl = document.getElementById(`m_mid_${i}`);
+  if (midEl) midEl.value = `${co.cur}${mid}`;
+}
+
+function startCalc() {
+  const co = CO.find(c => c.id === selId); if (!co) return;
+  // Save ranges
+  const ranges = co.methods.map((m, i) => ({
+    label: m.label,
+    desc: m.desc,
+    lo: parseFloat(document.getElementById(`m_lo_${i}`)?.value) || m.lo,
+    hi: parseFloat(document.getElementById(`m_hi_${i}`)?.value) || m.hi,
+  }));
+  calcState = { co, ranges };
+
+  document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('stepLoading').classList.add('active');
+  updateProg(4); window.scrollTo({ top: 0, behavior: 'smooth' });
+  [1,2,3,4,5,6].forEach(i => { const el = document.getElementById('ls'+i); el.classList.remove('show','active','done'); });
+  document.getElementById('loadingBarFill').style.width = '0%';
+  document.getElementById('loadingPct').textContent = '0%';
+  const steps = [{s:200,d:700},{s:800,d:1400},{s:1500,d:2100},{s:2200,d:2800},{s:2900,d:3800},{s:3900,d:4600}];
+  const pcts = [10,25,42,60,80,100];
+  steps.forEach((st,i) => {
+    setTimeout(() => { const el = document.getElementById('ls'+(i+1)); el.classList.add('show','active'); }, st.s);
+    setTimeout(() => { const el = document.getElementById('ls'+(i+1)); el.classList.remove('active'); el.classList.add('done'); document.getElementById('loadingBarFill').style.width=pcts[i]+'%'; document.getElementById('loadingPct').textContent=pcts[i]+'%'; }, st.d);
+  });
+  setTimeout(() => { document.querySelectorAll('.step-section').forEach(s=>s.classList.remove('active')); document.getElementById('step4').classList.add('active'); renderResults(); window.scrollTo({top:0,behavior:'smooth'}); }, 5200);
+}
+
+function renderResults() {
+  const s = calcState; if (!s || !s.co) return;
+  const co = s.co;
+  const ranges = s.ranges;
+  const price = co.price;
+
+  document.getElementById('rCoLbl').textContent = `${co.flag} ${co.name} · ${co.ticker}`;
+
+  // Compute convergence zone (where ≥3 methods overlap)
+  const lows = ranges.map(r => r.lo);
+  const highs = ranges.map(r => r.hi);
+  const sortedLows = [...lows].sort((a, b) => b - a); // desc
+  const sortedHighs = [...highs].sort((a, b) => a - b); // asc
+  const convLo = sortedLows[2]; // 3rd highest low
+  const convHi = sortedHighs[2]; // 3rd lowest high
+  const hasConv = convLo < convHi;
+
+  const convStr = hasConv ? `${co.cur}${fmtP(convLo, price)} – ${co.cur}${fmtP(convHi, price)}` : 'Methods diverge — no strong convergence zone';
+  document.getElementById('rConvZone').textContent = hasConv ? `Zone of Convergence: ${convStr}` : convStr;
+
+  // How many methods suggest upside
+  const midsUpside = ranges.filter(r => (r.lo + r.hi) / 2 > price).length;
+  const loUpside = ranges.filter(r => r.lo > price).length; // even bears say above
+
+  // Summary grid
+  const avgLo = lows.reduce((a, b) => a + b, 0) / lows.length;
+  const avgHi = highs.reduce((a, b) => a + b, 0) / highs.length;
+  const avgMid = (avgLo + avgHi) / 2;
+  const chgFromAvg = ((avgMid - price) / price * 100).toFixed(1);
+  const chgClr = chgFromAvg > 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('summaryGrid').innerHTML = `
+    <div class="summary-card"><div class="summary-lbl">Methods Suggesting Upside</div><div class="summary-val">${midsUpside} / 5</div><div class="summary-sub">Based on midpoint vs current price</div></div>
+    <div class="summary-card"><div class="summary-lbl">Zone of Convergence</div><div class="summary-val" style="font-size:14px">${hasConv ? convStr : 'Divergent'}</div><div class="summary-sub">${hasConv ? 'Where 3+ methods agree' : 'Methods disagree significantly'}</div></div>
+    <div class="summary-card"><div class="summary-lbl">Avg Implied vs Current</div><div class="summary-val" style="color:${chgClr}">${chgFromAvg > 0 ? '+' : ''}${chgFromAvg}%</div><div class="summary-sub">Average midpoint: ${co.cur}${fmtP(avgMid, price)}</div></div>`;
+
+  // Football field chart
+  const allVals = [...lows, ...highs, price];
+  const chartMin = Math.min(...allVals) * 0.92;
+  const chartMax = Math.max(...allVals) * 1.08;
+  const pct = v => ((v - chartMin) / (chartMax - chartMin) * 100).toFixed(2);
+  const curPct = pct(price);
+  const convLoPct = hasConv ? pct(convLo) : 0;
+  const convWidthPct = hasConv ? (parseFloat(pct(convHi)) - parseFloat(pct(convLo))).toFixed(2) : 0;
+
+  document.getElementById('ffCurTxt').textContent = `Current market price: ${co.cur}${price.toLocaleString()} — ${
+    price < convLo ? 'Trading below the convergence zone — multiple methods suggest upside' :
+    price > convHi ? 'Trading above the convergence zone — multiple methods suggest premium to consensus' :
+    'Trading within the convergence zone — near fair value on multiple methods'
+  }`;
+  document.getElementById('ffConvTxt').textContent = hasConv ? `Zone: ${convStr}` : 'No convergence zone';
+
+  let chartHTML = '';
+  ranges.forEach((r, i) => {
+    const loPct = parseFloat(pct(r.lo));
+    const barW = parseFloat(pct(r.hi)) - loPct;
+    const chgMid = ((((r.lo + r.hi) / 2) - price) / price * 100).toFixed(1);
+    chartHTML += `<div class="ff-row">
+      <div class="ff-row-lbl">${r.label}<span>${r.desc}</span></div>
+      <div class="ff-row-track">
+        ${hasConv ? `<div class="ff-conv-zone" style="left:${convLoPct}%;width:${convWidthPct}%"></div>` : ''}
+        <div class="ff-bar" style="left:${loPct}%;width:${barW}%;background:${M_COLORS[i]}">
+          <span class="ff-price-lo">${co.cur}${fmtP(r.lo, price)}</span>
+          <span class="ff-price-hi">${co.cur}${fmtP(r.hi, price)}</span>
+        </div>
+        <div class="ff-cur-line" style="left:${curPct}%">
+          ${i === 0 ? `<div class="ff-cur-top">▼ ${co.cur}${price.toLocaleString()}</div>` : ''}
+        </div>
+      </div>
+    </div>`;
+  });
+  document.getElementById('ffChartInner').innerHTML = chartHTML;
+
+  // X-axis
+  const step = (chartMax - chartMin) / 4;
+  const axisTicks = [0, 1, 2, 3, 4].map(i => chartMin + step * i);
+  document.getElementById('ffXaxis').innerHTML = axisTicks.map(v => `<span>${co.cur}${fmtP(v, price)}</span>`).join('');
+
+  // Method detail table
+  let detailHTML = `<tr><th>Method</th><th>Bear / Low</th><th>Midpoint</th><th>Bull / High</th><th>vs Current</th><th>Signal</th></tr>`;
+  ranges.forEach((r, i) => {
+    const mid = (r.lo + r.hi) / 2;
+    const chg = ((mid - price) / price * 100).toFixed(1);
+    const signal = chg > 10 ? `<span class="signal-up">↑ UPSIDE</span>` : chg < -10 ? `<span class="signal-dn">↓ PREMIUM</span>` : `<span class="signal-neutral">~ FAIR</span>`;
+    detailHTML += `<tr>
+      <td><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${M_COLORS[i]};margin-right:8px"></span>${r.label}</td>
+      <td style="font-family:var(--mono);font-weight:600">${co.cur}${fmtP(r.lo, price)}</td>
+      <td style="font-family:var(--mono);font-weight:700">${co.cur}${fmtP(mid, price)}</td>
+      <td style="font-family:var(--mono);font-weight:600">${co.cur}${fmtP(r.hi, price)}</td>
+      <td style="font-family:var(--mono);font-weight:700;color:${chg > 0 ? 'var(--green)' : 'var(--red)'};">${chg > 0 ? '+' : ''}${chg}%</td>
+      <td>${signal}</td>
+    </tr>`;
+  });
+  document.getElementById('methodDetailTable').innerHTML = detailHTML;
+
+  // Synthesis
+  document.getElementById('rSynthesis').innerHTML = `Based on five valuation methods, <strong>${co.name}</strong> shows ${midsUpside >= 4 ? 'strong multi-method upside conviction' : midsUpside >= 3 ? 'moderate upside across most methods' : midsUpside >= 2 ? 'a mixed picture — some methods suggest upside, others suggest premium' : 'limited upside on most methods — stock appears at or above consensus fair value'}. ${hasConv ? `The zone of convergence is <strong>${co.cur}${fmtP(convLo, price)}–${co.cur}${fmtP(convHi, price)}</strong> — this is where three or more independent methods agree on fair value. ${price >= convLo && price <= convHi ? `The current price of <strong>${co.cur}${price.toLocaleString()}</strong> sits within this zone, confirming the stock is broadly at consensus fair value.` : price < convLo ? `The current price of <strong>${co.cur}${price.toLocaleString()}</strong> is below this zone — this is a multi-method buy signal.` : `The current price of <strong>${co.cur}${price.toLocaleString()}</strong> is above this zone — the market is pricing in a premium above multi-method consensus.`}` : 'The five methods disagree significantly — this is not analytical uncertainty, it reflects genuine business model ambiguity. Revisit your assumptions for each method and identify which one you have the highest conviction in.'} DCF typically carries the most weight for long-term investors; Comps and 52-Week Range carry the most weight for short-term relative value traders. In any pitch book, this football field would be presented on slide 3, followed by an analyst recommendation that anchors at the convergence zone midpoint.`;
+
+  // Conviction table
+  const entryPcts = [0.70, 0.80, 0.90, 1.00, 1.05, 1.10, 1.20, 1.30];
+  let sensHTML = `<tr><th>Entry Price</th><th>vs Current</th><th>Methods with Upside</th><th>Methods with Downside</th><th>Conviction</th></tr>`;
+  entryPcts.forEach(ep => {
+    const entryPrice = price * ep;
+    const upCount = ranges.filter(r => (r.lo + r.hi) / 2 > entryPrice).length;
+    const dnCount = 5 - upCount;
+    const cls = upCount >= 4 ? 'conv-5' : upCount >= 3 ? 'conv-4' : upCount >= 2 ? 'conv-3' : upCount >= 1 ? 'conv-2' : 'conv-0';
+    const label = upCount >= 4 ? 'STRONG BUY' : upCount >= 3 ? 'BUY' : upCount >= 2 ? 'NEUTRAL' : upCount >= 1 ? 'CAUTION' : 'OVERVALUED';
+    const pctChg = ((ep - 1) * 100).toFixed(0);
+    sensHTML += `<tr>
+      <td>${co.cur}${fmtP(entryPrice, price)}</td>
+      <td style="font-family:var(--mono);font-weight:600;color:${ep < 1 ? 'var(--green)' : ep > 1 ? 'var(--red)' : ''}">${pctChg > 0 ? '+' : ''}${pctChg}%</td>
+      <td style="font-family:var(--mono);font-weight:700;color:var(--green)">${upCount} / 5</td>
+      <td style="font-family:var(--mono);font-weight:700;color:var(--red)">${dnCount} / 5</td>
+      <td><span class="${cls}" style="padding:3px 10px;border-radius:4px;font-size:11px;font-weight:700">${label}</span></td>
+    </tr>`;
+  });
+  document.getElementById('sensTable').innerHTML = sensHTML;
+}
+
+function fmtP(n, ref) {
+  if (ref >= 1000) return n.toLocaleString(undefined, {maximumFractionDigits: 0});
+  if (ref >= 100) return n.toFixed(0);
+  if (ref >= 10) return n.toFixed(1);
+  return n.toFixed(2);
+}
+function resetAll() { selId = null; calcState = {}; goToStep(1); renderGrid('all'); document.getElementById('continueBtn').classList.remove('enabled'); }
+</script>
+</body>
+</html>
