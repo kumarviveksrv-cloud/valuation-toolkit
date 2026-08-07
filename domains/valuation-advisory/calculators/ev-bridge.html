@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EV Bridge — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+.top-nav{border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;height:56px;gap:28px}
+.logo{font-size:17px;font-weight:700}.logo strong{font-weight:900}
+.nav-links{display:flex;gap:20px;flex:1}.nav-links a{font-size:13px;color:var(--muted);font-weight:500}.nav-links a:hover{color:var(--text)}
+.nav-cta{display:flex;gap:8px;align-items:center;margin-left:auto}
+.vault-btn{font-size:12px;font-weight:600;padding:6px 12px;border:1px solid var(--border);border-radius:6px;color:var(--text)}
+.pro-btn{font-size:12px;font-weight:700;padding:6px 14px;background:var(--text);color:#fff;border-radius:6px}
+.domain-nav{border-bottom:1px solid var(--border);background:var(--bg)}
+.domain-nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex}
+.domain-nav a{font-size:13px;font-weight:500;color:var(--muted);padding:10px 16px;border-bottom:2px solid transparent;transition:all .15s}
+.domain-nav a:hover,.domain-nav a.active{color:var(--text);border-bottom-color:var(--text)}
+.progress-wrap{max-width:820px;margin:36px auto 0;padding:0 24px}
+.prog-bar{display:flex;align-items:center}
+.prog-step{display:flex;align-items:center;gap:8px;flex:1}.prog-step:last-child{flex:none}
+.step-num{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--muted);font-family:var(--mono);flex-shrink:0;transition:all .2s}
+.prog-step.active .step-num{background:var(--text);border-color:var(--text);color:#fff}
+.prog-step.done .step-num{background:var(--green);border-color:var(--green);color:#fff}
+.step-label{font-size:12px;font-weight:500;color:var(--muted);white-space:nowrap}
+.prog-step.active .step-label{color:var(--text);font-weight:600}.prog-step.done .step-label{color:var(--green)}
+.prog-line{flex:1;height:1px;background:var(--border);margin:0 8px}.prog-line.done{background:var(--green)}
+.step-section{display:none;max-width:960px;margin:0 auto;padding:36px 24px 80px}.step-section.active{display:block}
+.step-headline{font-size:26px;font-weight:800;margin-bottom:6px}
+.step-sub{font-size:14px;color:var(--muted);margin-bottom:24px}
+.filter-bar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.filter-btn{padding:6px 14px;border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;background:var(--bg);color:var(--muted);transition:all .15s;font-family:var(--font)}
+.filter-btn:hover{border-color:var(--text);color:var(--text)}.filter-btn.active{background:var(--text);color:#fff;border-color:var(--text)}
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:9px;margin-bottom:20px}
+.company-card{border:1.5px solid var(--border);border-radius:10px;padding:13px;cursor:pointer;transition:all .15s;background:var(--bg)}
+.company-card:hover{border-color:#999}.company-card.selected{border-color:var(--text);border-width:2px;background:#f3f3f3}.company-card.hidden{display:none}
+.co-flag{font-size:18px;margin-bottom:5px}.co-name{font-size:12px;font-weight:700;margin-bottom:2px}
+.co-ticker{font-size:10px;font-family:var(--mono);color:var(--muted)}.co-sector{font-size:10px;color:var(--muted);margin-top:3px}
+.continue-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);opacity:.35;pointer-events:none;transition:opacity .2s}
+.continue-btn.enabled{opacity:1;pointer-events:all}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer;margin-bottom:20px;border:none;background:none;font-family:var(--font);padding:0}
+.back-link:hover{color:var(--text)}
+.ctx-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:22px}
+.ctx-flag{font-size:30px;line-height:1}
+.ctx-co-name{font-size:22px;font-weight:800;margin-bottom:3px}.ctx-meta{font-size:13px;color:var(--muted)}
+.ctx-tag{display:inline-block;padding:2px 8px;border:1px solid var(--border);border-radius:12px;font-size:10px;font-weight:600;color:var(--muted);margin-right:5px;text-transform:uppercase;letter-spacing:.5px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:22px}
+.stat-card{border:1px solid var(--border);border-radius:8px;padding:13px}
+.stat-lbl{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.stat-val{font-size:17px;font-weight:700;font-family:var(--mono)}.stat-note{font-size:10px;color:var(--muted);margin-top:3px}
+.edu-block{border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:10px}
+.edu-icon{font-size:16px;margin-bottom:6px}
+.edu-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:7px}
+.edu-text{font-size:14px;line-height:1.7;color:var(--text)}
+.trap-card{border:1.5px solid #fde68a;border-radius:10px;padding:16px;background:#fffbeb;margin-bottom:14px}
+.trap-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#92400e;margin-bottom:7px}
+.trap-text{font-size:13px;color:#78350f;line-height:1.6}
+.bank-block{border:1px solid var(--border);border-radius:10px;padding:18px;background:var(--card);margin-bottom:14px}
+/* ASSUMPTIONS */
+.live-bar{position:sticky;top:113px;background:var(--bg);border-bottom:1px solid var(--border);padding:10px 0;margin-bottom:26px;z-index:50}
+.live-inner{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.live-left{display:flex;align-items:baseline;gap:12px}
+.live-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.live-implied{font-size:30px;font-weight:900;font-family:var(--mono)}
+.live-right{text-align:right}
+.live-current-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.live-current-val{font-size:20px;font-weight:700;font-family:var(--mono)}
+.live-chg{font-size:13px;font-family:var(--mono);font-weight:600}
+.live-chg.up{color:var(--green)}.live-chg.dn{color:var(--red)}
+.assume-section{margin-bottom:26px}
+.assume-sec-head{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-top:2px solid var(--text);padding-top:9px;margin-bottom:12px;display:flex;justify-content:space-between}
+.assume-formula{font-family:var(--mono);font-size:11px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0}
+.assume-table{width:100%;border-collapse:collapse}
+.assume-tr{border-bottom:1px solid var(--border)}.assume-tr:last-child{border-bottom:none}
+.assume-td{padding:11px 0;vertical-align:middle}
+.assume-td.label-col{width:55%}.assume-td.type-col{width:20%;text-align:center}.assume-td.input-col{width:25%;text-align:right}
+.assume-label{font-size:14px;font-weight:500;display:flex;align-items:center;gap:7px}
+.dir-badge{font-size:12px;font-weight:700;width:18px;flex-shrink:0;text-align:center}
+.dir-add{color:var(--green)}.dir-sub{color:var(--red)}
+.hint-wrap{position:relative;display:inline-block}
+.hint-icon{width:16px;height:16px;border-radius:50%;border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:var(--muted);cursor:default;vertical-align:middle}
+.hint-tip{display:none;position:absolute;left:22px;top:-6px;background:var(--text);color:#fff;font-size:11px;line-height:1.5;padding:8px 12px;border-radius:6px;width:230px;z-index:200;font-weight:400;white-space:normal;font-family:var(--font)}
+.hint-wrap:hover .hint-tip{display:block}
+.type-badge{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:600}
+.type-pre{background:#dbeafe;color:#1e40af}.type-yours{background:#fef3c7;color:#92400e}.type-calc{background:#f3f4f6;color:#6b7280}
+.assume-input{width:110px;border:1.5px solid var(--border);border-radius:6px;padding:7px 9px;font-size:14px;font-family:var(--mono);font-weight:600;text-align:right;background:var(--bg);color:var(--text)}
+.assume-input:focus{outline:none;border-color:var(--text)}
+.assume-input.calc{background:var(--card);cursor:default;font-weight:700;border-color:var(--border)}
+.assume-input.calc-strong{background:var(--text);color:#fff;border-color:var(--text)}
+.run-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:800;cursor:pointer;font-family:var(--font);margin-top:8px}
+.run-btn:hover{background:#222}
+/* LOADING */
+.loading-wrap{text-align:center;padding:80px 24px 60px;max-width:480px;margin:0 auto}
+.loading-headline{font-size:22px;font-weight:800;margin-bottom:8px}
+.loading-sub{font-size:14px;color:var(--muted);margin-bottom:52px}
+.loading-steps-list{list-style:none;text-align:left;margin-bottom:40px}
+.ls-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--muted);opacity:0;transform:translateY(6px);transition:opacity .35s ease,transform .35s ease}
+.ls-item.show{opacity:1;transform:translateY(0)}.ls-item.active{color:var(--text);font-weight:600}.ls-item.done{color:var(--text)}
+.ls-dot{width:9px;height:9px;border-radius:50%;background:var(--border);flex-shrink:0;transition:background .3s}
+.ls-item.active .ls-dot{background:var(--text);animation:dotpulse .7s ease-in-out infinite}
+.ls-item.done .ls-dot{background:var(--green)}
+.ls-check{font-size:13px;color:var(--green);margin-left:auto;opacity:0;transition:opacity .3s}
+.ls-item.done .ls-check{opacity:1}
+@keyframes dotpulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.5}}
+.loading-bar-track{height:3px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:16px}
+.loading-bar-fill{height:100%;width:0%;background:var(--text);border-radius:3px;transition:width .4s ease}
+.loading-pct{font-size:12px;font-family:var(--mono);color:var(--muted);font-weight:600}
+/* WATERFALL */
+.wfall-wrap{margin-bottom:32px}
+.wfall-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.wfall-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.wfall-row{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+.wfall-lbl{font-size:13px;width:200px;flex-shrink:0;display:flex;align-items:center;gap:6px}
+.wfall-dir{font-size:11px;font-weight:700;width:16px;flex-shrink:0}
+.wfall-dir.add{color:var(--green)}.wfall-dir.sub{color:var(--red)}
+.wfall-track{flex:1;height:28px;background:var(--card);border-radius:4px;overflow:hidden;position:relative}
+.wfall-bar{height:100%;border-radius:4px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;transition:width .5s ease}
+.wfall-bar.ev-bar{background:var(--text)}
+.wfall-bar.debt-bar{background:#dc2626}
+.wfall-bar.cash-bar{background:#16a34a}
+.wfall-bar.minority-bar{background:#f59e0b}
+.wfall-bar.preferred-bar{background:#8b5cf6}
+.wfall-bar.associates-bar{background:#0ea5e9}
+.wfall-bar.result-bar{background:var(--text);opacity:.8}
+.wfall-bar span{font-size:10px;font-family:var(--mono);font-weight:700;color:#fff;white-space:nowrap}
+.wfall-val{font-size:12px;font-family:var(--mono);font-weight:700;width:100px;text-align:right;flex-shrink:0}
+.wfall-divider{border-top:2px solid var(--text);margin:8px 0 8px 212px}
+.wfall-price-row{display:flex;align-items:baseline;gap:10px;margin-top:14px;padding:16px;border:2px solid var(--text);border-radius:10px}
+.wfall-price-lbl{font-size:13px;font-weight:600}
+.wfall-price-val{font-size:36px;font-weight:900;font-family:var(--mono)}
+.wfall-price-vs{font-size:13px;font-family:var(--mono);margin-left:auto}
+/* BRIDGE TABLE */
+.bridge-table-wrap{margin-bottom:28px}
+.bridge-table{width:100%;border-collapse:collapse}
+.bridge-table td{padding:10px 14px;border:1px solid var(--border);font-size:14px}
+.bridge-table td:first-child{font-weight:600;font-size:13px}
+.bridge-table td:last-child{font-family:var(--mono);font-weight:700;text-align:right}
+.bridge-table tr.total-row td{background:var(--card);font-weight:700}
+.bridge-table tr.result-row td{background:var(--text);color:#fff;font-weight:800}
+.bridge-table tr.result-row td:last-child{font-family:var(--mono);font-size:16px}
+.bridge-table .green-val{color:var(--green)}.bridge-table .red-val{color:var(--red)}
+/* SENSITIVITY */
+.sens-section{margin-bottom:28px}
+.sens-title{font-size:14px;font-weight:700;margin-bottom:3px}
+.sens-sub{font-size:13px;color:var(--muted);margin-bottom:14px}
+.sens-table{border-collapse:collapse;width:100%;font-size:12px}
+.sens-table th{font-size:10px;font-weight:600;color:var(--muted);padding:7px 10px;text-align:center;background:var(--card);border:1px solid var(--border)}
+.sens-table th:first-child{text-align:left}
+.sens-table td{font-family:var(--mono);font-weight:600;padding:7px 10px;text-align:center;border:1px solid var(--border)}
+.sens-table td:first-child{font-family:var(--font);color:var(--muted);background:var(--card);font-weight:600;text-align:left}
+.cell-low{background:#dcfce7;color:#14532d}.cell-mid{background:#fef9c3;color:#713f12}
+.cell-high{background:#fee2e2;color:#7f1d1d}.cell-base{background:var(--text);color:#fff}
+.impl-card{border:2px solid var(--text);border-radius:10px;padding:20px;margin-bottom:22px}
+.impl-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px}
+.impl-text{font-size:14px;line-height:1.7}
+.action-row{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap}
+.act-primary{padding:11px 22px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);text-decoration:none;display:inline-flex;align-items:center;gap:7px}
+.act-secondary{padding:11px 22px;border:1.5px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);background:var(--bg);text-decoration:none;display:inline-flex;align-items:center;gap:7px}
+.act-secondary:hover{border-color:var(--text)}
+@media(max-width:640px){.stat-grid{grid-template-columns:1fr 1fr}.company-grid{grid-template-columns:repeat(2,1fr)}.nav-links,.domain-nav{display:none}.wfall-lbl{width:120px;font-size:11px}.wfall-val{width:70px;font-size:11px}}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <div class="nav-inner">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/" class="logo">Valuation<strong>Desk</strong></a>
+    <div class="nav-links">
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/">Valuation Advisory</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/">My Vault</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/deal-room/">Deal Room</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/daily-brief/">Daily Brief</a>
+    </div>
+    <div class="nav-cta">
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/" class="vault-btn">🗄 Vault (0)</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/#pricing" class="pro-btn">Get Pro — ₹799/mo</a>
+    </div>
+  </div>
+</nav>
+<div class="domain-nav">
+  <div class="domain-nav-inner">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/">Overview</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/learn/">📖 Learn</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/" class="active">🌉 EV Bridge</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/">🗄 My Vault</a>
+  </div>
+</div>
+<div class="progress-wrap">
+  <div class="prog-bar" id="progressBar">
+    <div class="prog-step active" id="ps1"><div class="step-num">1</div><span class="step-label">Pick a company</span></div>
+    <div class="prog-line" id="pl1"></div>
+    <div class="prog-step" id="ps2"><div class="step-num">2</div><span class="step-label">Study the bridge</span></div>
+    <div class="prog-line" id="pl2"></div>
+    <div class="prog-step" id="ps3"><div class="step-num">3</div><span class="step-label">Set the inputs</span></div>
+    <div class="prog-line" id="pl3"></div>
+    <div class="prog-step" id="ps4"><div class="step-num">4</div><span class="step-label">See the bridge</span></div>
+  </div>
+</div>
+
+<!-- STEP 1 -->
+<section class="step-section active" id="step1">
+  <h1 class="step-headline">Which company do you want to bridge?</h1>
+  <p class="step-sub">Pick one. We'll start from Enterprise Value and walk every adjustment — debt, cash, minority interest, preferred equity, associates — down to the implied share price. Every line matters.</p>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterGrid('all',this)">All (30)</button>
+    <button class="filter-btn" onclick="filterGrid('india',this)">🇮🇳 India</button>
+    <button class="filter-btn" onclick="filterGrid('global',this)">🌍 Global</button>
+    <button class="filter-btn" onclick="filterGrid('it',this)">IT</button>
+    <button class="filter-btn" onclick="filterGrid('banking',this)">Banking</button>
+    <button class="filter-btn" onclick="filterGrid('fmcg',this)">FMCG</button>
+  </div>
+  <div class="company-grid" id="companyGrid"></div>
+  <button class="continue-btn" id="continueBtn" onclick="goToStep(2)">Continue with selected company →</button>
+</section>
+
+<!-- STEP 2 -->
+<section class="step-section" id="step2">
+  <button class="back-link" onclick="goToStep(1)">← Change company</button>
+  <div class="ctx-header">
+    <div class="ctx-flag" id="ctxFlag"></div>
+    <div><div class="ctx-co-name" id="ctxName"></div><div class="ctx-meta" id="ctxMeta"></div></div>
+  </div>
+  <div class="stat-grid" id="statGrid"></div>
+  <div class="edu-block">
+    <div class="edu-icon">🏗️</div>
+    <div class="edu-title">What this company's bridge structure looks like</div>
+    <div class="edu-text" id="ctxStructure"></div>
+  </div>
+  <div class="edu-block">
+    <div class="edu-icon">🔑</div>
+    <div class="edu-title">The adjustment that matters most — and why</div>
+    <div class="edu-text" id="ctxKeyItem"></div>
+  </div>
+  <div class="trap-card">
+    <div class="trap-title">⚠️ The Common Analyst Trap</div>
+    <div class="trap-text" id="ctxTrap"></div>
+  </div>
+  <div class="edu-block">
+    <div class="edu-icon">✓</div>
+    <div class="edu-title">The self-check — how to know your bridge is right</div>
+    <div class="edu-text" id="ctxCheck"></div>
+  </div>
+  <button class="continue-btn enabled" onclick="goToStep(3)">I've understood it. Build the bridge →</button>
+</section>
+
+<!-- STEP 3 -->
+<section class="step-section" id="step3">
+  <button class="back-link" onclick="goToStep(2)">← Back to context</button>
+  <h2 class="step-headline">Set the bridge inputs</h2>
+  <p class="step-sub">Start with your Enterprise Value — use the current market EV, or replace it with your DCF or Comps output. The bridge items below are pre-filled from public filings.</p>
+  <div class="live-bar">
+    <div class="live-inner">
+      <div class="live-left">
+        <span class="live-lbl">Implied Price</span>
+        <span class="live-implied" id="liveImplied">—</span>
+      </div>
+      <div>
+        <div id="liveChg" class="live-chg"></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">vs current market price</div>
+      </div>
+      <div class="live-right">
+        <div class="live-current-lbl">Market Price (reference)</div>
+        <div class="live-current-val" id="liveCurrentPrice">—</div>
+      </div>
+    </div>
+  </div>
+  <div class="assume-section">
+    <div class="assume-sec-head"><span>Bridge Inputs</span><span class="assume-formula">EV → Equity Value → Share Price</span></div>
+    <table class="assume-table" id="bridgeTable"></table>
+  </div>
+  <button class="run-btn" onclick="startCalc()">🌉 BUILD THE BRIDGE 🌉</button>
+</section>
+
+<!-- LOADING -->
+<section class="step-section" id="stepLoading">
+  <div class="loading-wrap">
+    <div class="loading-headline">Building your EV bridge...</div>
+    <div class="loading-sub">Mapping every claim on the enterprise — from lenders to minority holders to preference shareholders</div>
+    <ul class="loading-steps-list">
+      <li class="ls-item" id="ls1"><span class="ls-dot"></span>Computing enterprise value from market data<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls2"><span class="ls-dot"></span>Identifying all debt obligations<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls3"><span class="ls-dot"></span>Adding back cash and liquid equivalents<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls4"><span class="ls-dot"></span>Adjusting for minority interest claims<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls5"><span class="ls-dot"></span>Incorporating associates and equity investments<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls6"><span class="ls-dot"></span>Deriving equity value and implied share price<span class="ls-check">✓</span></li>
+    </ul>
+    <div class="loading-bar-track"><div class="loading-bar-fill" id="loadingBarFill"></div></div>
+    <div class="loading-pct" id="loadingPct">0%</div>
+  </div>
+</section>
+
+<!-- STEP 4 -->
+<section class="step-section" id="step4">
+  <button class="back-link" onclick="goToStep(3)">← Adjust inputs</button>
+  <div style="text-align:center;padding:36px 0 24px;border-bottom:1px solid var(--border);margin-bottom:28px">
+    <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px" id="rCoLbl"></div>
+    <div style="font-size:15px;color:var(--muted);margin-bottom:6px">Enterprise Value → Equity Value → Implied Share Price</div>
+    <div style="font-size:64px;font-weight:900;font-family:var(--mono)" id="rImpliedPrice"></div>
+    <div style="font-size:13px;margin-top:8px" id="rVsCurrent"></div>
+  </div>
+
+  <div class="wfall-wrap">
+    <div class="wfall-title">The Waterfall Bridge</div>
+    <div class="wfall-sub">Read it top to bottom: start at Enterprise Value, apply each adjustment, arrive at Equity Value, then divide by shares for the implied price.</div>
+    <div id="waterfallChart"></div>
+    <div class="wfall-divider"></div>
+    <div class="wfall-price-row">
+      <span class="wfall-price-lbl">÷ Shares Outstanding: <span id="sharesLabel" style="font-family:var(--mono);font-weight:700"></span></span>
+      <span class="wfall-price-val" id="wfallPriceVal"></span>
+      <span class="wfall-price-vs" id="wfallVs"></span>
+    </div>
+  </div>
+
+  <div class="bridge-table-wrap">
+    <div style="font-size:14px;font-weight:700;margin-bottom:14px">Full Bridge Table</div>
+    <table class="bridge-table" id="bridgeResultTable"></table>
+  </div>
+
+  <div class="impl-card">
+    <div class="impl-title">🎓 What this bridge tells you</div>
+    <div class="impl-text" id="rInsight"></div>
+  </div>
+
+  <div class="sens-section">
+    <div class="sens-title">Sensitivity: Implied Price vs EV</div>
+    <div class="sens-sub">How the implied share price changes at different Enterprise Values. Use this when your DCF or Comps gives a different EV than the current market EV.</div>
+    <div style="overflow-x:auto"><table class="sens-table" id="sensTable"></table></div>
+  </div>
+
+  <div class="action-row">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/dcf.html" class="act-primary">📈 Get EV from DCF →</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/comps.html" class="act-primary" style="background:#374151">📊 Get EV from Comps →</a>
+    <button class="act-secondary" onclick="resetAll()">↺ Bridge another company</button>
+  </div>
+</section>
+
+<script>
+const CO = [
+  // INDIA
+  {id:'reliance',name:'Reliance Industries',ticker:'RELIANCE',flag:'🇮🇳',sector:'Conglomerate',tags:['india'],cur:'₹',unit:'Cr',isBank:false,
+   ev:2006000,debt:340000,cash:224000,minority:8000,preferred:0,associates:0,shares:1350,price:1400,
+   ctx:{s:'Reliance has one of the most complex bridges among Indian large-caps. Gross debt of ₹3.4 lakh Cr is offset by ₹2.24 lakh Cr of cash — a massive number on both sides that reveals the sheer scale of Jio and Retail\'s capital investments. A minority interest line also exists from external investors in Jio Platforms (Facebook, Google, KKR collectively hold ~33% of Jio Infocomm).',k:'The gross debt vs cash split is what matters most. Reliance\'s net debt of ₹1.16 lakh Cr is frequently used in a single line, but the GROSS positions are far more revealing. ₹3.4 lakh Cr of gross debt tells you the refinancing risk; ₹2.24 lakh Cr of cash tells you the liquidity buffer.',t:'Using net debt as a single bridge item instead of showing gross debt and cash separately. When stress-testing Reliance in a credit tightening scenario, it\'s the ₹3.4 lakh Cr gross debt that needs to be refinanced, not the net ₹1.16 lakh Cr figure.',c:'Your implied price from the bridge should be within 2-3% of the current market price of ₹1,400 when using the current market EV. If it differs significantly, check whether you\'re adding cash back (not subtracting it) and subtracting debt (not adding it).'}},
+
+  {id:'tcs',name:'TCS',ticker:'TCS',flag:'🇮🇳',sector:'IT Services',tags:['india','it'],cur:'₹',unit:'Cr',isBank:false,
+   ev:1381000,debt:8000,cash:79000,minority:0,preferred:0,associates:0,shares:363,price:4000,
+   ctx:{s:'TCS has one of the cleanest bridges in Indian markets. Almost entirely equity-funded with ₹79,000 Cr of cash against just ₹8,000 Cr of debt — creating a net cash position of ₹71,000 Cr. No minority interest, no preferred, no associates. The entire bridge is: EV + Cash − Debt = Equity Value.',k:'The cash ADD-BACK is what matters here. TCS\'s EV is ₹13.81 lakh Cr, but the equity value is ₹14.52 lakh Cr — HIGHER than EV because the company has more cash than debt. This is the rare but important case where the bridge increases value from EV to equity.',t:'Treating cash as a deduction instead of an addition. The bridge logic is: debt holders have a claim BEFORE equity (deduct debt), cash BELONGS to equity holders already (add back cash). Many beginners intuitively subtract cash — that is exactly wrong.',c:'EV + net cash position = Equity Value. For TCS: ₹13.81 lakh Cr + ₹71,000 Cr = ₹14.52 lakh Cr ÷ 363 Cr shares = ₹4,000/share. The self-check works perfectly here.'}},
+
+  {id:'hdfc',name:'HDFC Bank',ticker:'HDFCBANK',flag:'🇮🇳',sector:'Banking',tags:['india','banking'],cur:'₹',unit:'Cr',isBank:true,
+   ev:0,debt:1600000,cash:120000,minority:0,preferred:0,associates:0,shares:750,price:1600,
+   ctx:{s:'For banks, the EV bridge is fundamentally different. Debt IS the business — deposits and borrowings fund loans, which is the core operation. The bridge from EV to equity value doesn\'t apply because there is no meaningful separation between operating and financial capital structure.',k:'For HDFC Bank, analysts go directly to Equity Value (= Market Capitalisation = ₹12 lakh Cr) and then use P/B or P/E multiples. The bridge from EV to equity is replaced by the question: what is the fair value of the equity directly, given returns on equity?',t:'Applying the standard EV bridge to a bank. If you calculate EV for a bank (market cap + deposits + borrowings − cash), you get a number that\'s mathematically meaningless — deposits aren\'t financial debt, they\'re the raw material of the business.',c:'For banks, the correct self-check is: Equity Value implied by your valuation multiple (P/B or P/E) should be within 5% of current market cap. Don\'t compute an EV bridge — validate the equity value directly.'}},
+
+  {id:'infosys',name:'Infosys',ticker:'INFY',flag:'🇮🇳',sector:'IT Services',tags:['india','it'],cur:'₹',unit:'Cr',isBank:false,
+   ev:601000,debt:10000,cash:48000,minority:0,preferred:0,associates:0,shares:415,price:1540,
+   ctx:{s:'Like TCS, Infosys has a clean bridge. ₹48,000 Cr cash against ₹10,000 Cr debt gives a net cash position of ₹38,000 Cr. The equity value is higher than EV because of this net cash. No minority interest or preferred equity to complicate the picture.',k:'The cash position is the key item — and it represents nearly 6% of the current market cap. In any acquisition scenario, Infosys\'s cash pile significantly reduces the effective acquisition cost for a potential buyer, making the EV vs Equity Value distinction commercially important.',t:'Using market cap and EV interchangeably. A common error in interviews: "Infosys\'s EV is ₹6 lakh Cr." Wrong — the equity value (market cap) is ₹6.39 lakh Cr, but EV is only ₹6.01 lakh Cr because the net cash position reduces EV below market cap.',c:'For net-cash companies: EV < Market Cap. The relationship is: EV = Market Cap − Net Cash. Verify: ₹6.39 lakh Cr − ₹38,000 Cr = ₹6.01 lakh Cr EV. If your bridge gives you back ₹6.39 lakh Cr equity value from ₹6.01 lakh Cr EV, it is correct.'}},
+
+  {id:'asianpaint',name:'Asian Paints',ticker:'ASIANPAINT',flag:'🇮🇳',sector:'FMCG/Paints',tags:['india','fmcg'],cur:'₹',unit:'Cr',isBank:false,
+   ev:276400,debt:15000,cash:17000,minority:150,preferred:0,associates:0,shares:96,price:2900,
+   ctx:{s:'Asian Paints has a nearly clean bridge. The company runs a small net cash position of ₹2,000 Cr and has negligible minority interest from some subsidiary operations. The bridge has minimal complexity — reflecting the capital-light nature of a premium branded consumer business.',k:'The minority interest of ₹150 Cr is small but worth noting — it represents Asian Paints\' minority shareholders in some regional manufacturing subsidiaries. At this scale, it changes the implied price by less than ₹2/share. Still — include it, because financial discipline requires all items.',t:'Rounding minority interest to zero. ₹150 Cr sounds trivial for a ₹2.76 lakh Cr EV company (0.05%). But in a structured deal or a bank credit model, leaving out any line item establishes a bad habit. Comps and DCF models compound these rounding errors across multiple transactions.',c:'At ₹2.76 lakh Cr EV with a net cash position of ₹2,000 Cr and ₹150 Cr minority interest, the equity value should be: ₹2.76L + ₹2,000 − ₹150 = ₹2.78 lakh Cr. Divide by 96 Cr shares = ₹2,896 ≈ ₹2,900/share. Near-perfect self-check.'}},
+
+  {id:'zomato',name:'Zomato',ticker:'ZOMATO',flag:'🇮🇳',sector:'Consumer Tech',tags:['india'],cur:'₹',unit:'Cr',isBank:false,
+   ev:198000,debt:5000,cash:17000,minority:0,preferred:0,associates:0,shares:875,price:240,
+   ctx:{s:'Zomato\'s bridge is simple because the company is largely equity-funded. Net cash of ₹12,000 Cr (cash ₹17,000 Cr minus debt ₹5,000 Cr) means equity value exceeds EV. No minority interest, no preferred. The real complexity in Zomato\'s capital story is NOT the bridge — it\'s the EV itself.',k:'The ₹12,000 Cr cash position is strategically important. This is Zomato\'s runway for Blinkit expansion and competitive positioning. Unlike a mature company where excess cash might be returned to shareholders, this cash is operational capital for a growth-stage company. EV calculation should reflect this.',t:'Using a low-ball EV for Zomato by forgetting the cash add-back. A common student error: "Zomato EV = market cap" — ignoring that cash reduces EV. With ₹12,000 Cr net cash, Zomato\'s EV is ₹12,000 Cr lower than its market cap. This changes EV/Revenue and EV/EBITDA multiples by ~6%.',c:'Current EV ≈ ₹1,98,000 Cr. Add back ₹12,000 Cr net cash. Equity Value ≈ ₹2,10,000 Cr. ÷ 875 Cr shares = ₹240/share. Self-check matches current market price.'}},
+
+  {id:'wipro',name:'Wipro',ticker:'WIPRO',flag:'🇮🇳',sector:'IT Services',tags:['india','it'],cur:'₹',unit:'Cr',isBank:false,
+   ev:244880,debt:12000,cash:37000,minority:200,preferred:0,associates:0,shares:519,price:520,
+   ctx:{s:'Wipro has a clean bridge with a meaningful net cash position of ₹25,000 Cr and a very small minority interest from subsidiaries. The Capco acquisition added some entity complexity but no material minority interest. Straightforward bridge for an IT services company.',k:'The ₹25,000 Cr net cash position is 9% of equity value — material enough that analysts MUST include it. Getting this wrong changes your implied price by ₹48/share (9% of ₹520). That\'s the difference between a BUY and a HOLD signal for many portfolio mandates.',t:'Missing the minority interest of ₹200 Cr. Though small, analysts who skip minority interest on every deal build a compounding gap between their models and the actual bid price in M&A situations. Wipro\'s ₹200 Cr minority changes the implied price by less than ₹0.40, but the discipline of including it matters.',c:'EV ₹2.45 lakh Cr + net cash ₹25,000 Cr − minority ₹200 Cr = equity value ₹2.70 lakh Cr. ÷ 519 Cr shares = ₹520/share. Clean self-check.'}},
+
+  {id:'maruti',name:'Maruti Suzuki',ticker:'MARUTI',flag:'🇮🇳',sector:'Auto OEM',tags:['india'],cur:'₹',unit:'Cr',isBank:false,
+   ev:341000,debt:25000,cash:59000,minority:0,preferred:0,associates:5000,shares:30,price:12500,
+   ctx:{s:'Maruti\'s bridge has one notable non-standard item: ₹5,000 Cr in associate investments, primarily equity stakes in Suzuki-related entities and component suppliers. These are NOT included in the EBITDA-based EV calculation — so they must be ADDED to the bridge to arrive at correct equity value.',k:'The associates line of ₹5,000 Cr is the item most analysts miss. These are equity investments in other companies that sit outside the operating EBITDA used to compute EV. Since the EV multiple doesn\'t price them in, the bridge must add them back — they belong to equity shareholders.',t:'Forgetting to ADD associates back in the bridge. Associates are a POSITIVE item: they increase equity value above what EV captures. A common error is including associates as a deduction (confusing them with minority interest, which IS a deduction). The direction is opposite.',c:'EV ₹3.41 lakh Cr + net cash ₹34,000 Cr + associates ₹5,000 Cr = equity value ₹3.80 lakh Cr. ÷ 30.4 Cr shares = ₹12,500/share. Self-check confirms the associates ADD-BACK is correct.'}},
+
+  {id:'bajfinance',name:'Bajaj Finance',ticker:'BAJFINANCE',flag:'🇮🇳',sector:'NBFC',tags:['india','banking'],cur:'₹',unit:'Cr',isBank:true,
+   ev:0,debt:280000,cash:0,minority:0,preferred:0,associates:0,shares:61,price:7400,
+   ctx:{s:'Like banks, the EV bridge does not apply to Bajaj Finance. Its "debt" of ₹2.8 lakh Cr is wholesale borrowings used to fund consumer loans — this is the business, not financing. Separating financial debt from operating enterprise value is conceptually meaningless for an NBFC.',k:'For Bajaj Finance, the entire valuation is about the equity directly. The question is not "what is the equity value after bridging from EV" but "what P/B or P/E should this equity trade at given RoE and growth?" Go straight to equity.',t:'Calculating an EV for Bajaj Finance using EBITDA multiples. NBFCs do not have an EBITDA in the traditional sense — interest income IS revenue, and interest expense IS cost of goods sold. Applying EV/EBITDA to a financial company produces a number that has no economic meaning.',c:'The correct self-check for Bajaj Finance is: implied price from P/B should match current price of ₹7,400. At 6.8x P/B on ₹1,082 BVPS = ₹7,358 ≈ ₹7,400. Alternatively, 28x P/E on ₹275 EPS = ₹7,700. Bracketing between P/B and P/E gives confidence in the equity value.'}},
+
+  {id:'itc',name:'ITC',ticker:'ITC',flag:'🇮🇳',sector:'FMCG/Tobacco',tags:['india','fmcg'],cur:'₹',unit:'Cr',isBank:false,
+   ev:532500,debt:8000,cash:38000,minority:500,preferred:0,associates:3000,shares:1250,price:450,
+   ctx:{s:'ITC has two non-standard bridge items: ₹500 Cr of minority interest from subsidiaries (ITC Hotels, WIMCO) and ₹3,000 Cr of associate investments in various industrial and agricultural companies. Both are small relative to ITC\'s size but the associate ADD-BACK is educational — it rewards careful analysis.',k:'The ₹3,000 Cr associates line is the most interesting item. These include stakes in various agri-tech and logistics businesses that ITC has invested in over decades. They sit outside the cigarettes/FMCG EBITDA-based EV but belong to shareholders.',t:'Confusing minority interest (DEDUCT) with associates (ADD). For ITC: minority interest of ₹500 Cr is subtracted (these people own part of ITC\'s subsidiaries). Associates of ₹3,000 Cr are added (ITC owns stakes in OTHER companies). The direction of each adjustment is easy to reverse — check it twice.',c:'EV ₹5.33 lakh Cr + net cash ₹30,000 Cr − minority ₹500 Cr + associates ₹3,000 Cr = equity value ₹5.62 lakh Cr. ÷ 1,250 Cr shares = ₹450/share. Self-check works.'}},
+
+  {id:'hul',name:'Hindustan Unilever',ticker:'HINDUNILVR',flag:'🇮🇳',sector:'FMCG',tags:['india','fmcg'],cur:'₹',unit:'Cr',isBank:false,
+   ev:559000,debt:12000,cash:17000,minority:0,preferred:0,associates:0,shares:235,price:2400,
+   ctx:{s:'HUL has one of the cleanest bridges in Indian FMCG. Net cash of ₹5,000 Cr, no minority interest, no associates, no preferred. The bridge is a single adjustment: add cash, subtract debt. This simplicity reflects Unilever\'s global discipline — subsidiaries are typically wholly owned.',k:'The small net cash position of ₹5,000 Cr is deliberately managed. HUL returns most of its cash to shareholders via dividends — it doesn\'t accumulate cash. Unilever\'s global treasury management means HUL runs a lean balance sheet. The bridge reflects this operational philosophy.',t:'Assuming HUL has no debt because it\'s a branded FMCG company. HUL does carry ₹12,000 Cr of gross debt — primarily short-term working capital facilities and commercial paper. Missing this in the bridge understates liabilities and overvalues equity slightly.',c:'EV ₹5.59 lakh Cr + net cash ₹5,000 Cr = equity value ₹5.64 lakh Cr. ÷ 235 Cr shares = ₹2,400/share. Clean self-check with zero complexity.'}},
+
+  {id:'tatamotors',name:'Tata Motors',ticker:'TATAMOTORS',flag:'🇮🇳',sector:'Auto OEM',tags:['india'],cur:'₹',unit:'Cr',isBank:false,
+   ev:442000,debt:180000,cash:104000,minority:5000,preferred:0,associates:0,shares:366,price:1000,
+   ctx:{s:'Tata Motors has the most complex India auto bridge. Gross debt of ₹1.80 lakh Cr (primarily JLR bonds and India term loans) partially offset by ₹1.04 lakh Cr of cash, PLUS a ₹5,000 Cr minority interest from JLR subsidiary entities. Net debt of ₹76,000 Cr is the third-highest in India large-caps among non-financials.',k:'The gross debt position of ₹1.80 lakh Cr is the defining item. JLR raised significant debt in the UK bond market for its electrification programme — this debt is denominated in GBP and USD, creating a currency risk in the bridge. A 10% currency move changes JLR\'s debt in INR by ₹18,000 Cr.',t:'Using consolidated net debt without flagging the currency composition. In a stress scenario where GBP/INR moves significantly, the bridge shifts dramatically. Most India analysts present Tata Motors\' bridge in a single "net debt" line — masking this currency exposure in the gross debt structure.',c:'EV ₹4.42 lakh Cr − gross debt ₹1.80 lakh Cr + cash ₹1.04 lakh Cr − minority ₹5,000 Cr = equity value ₹3.66 lakh Cr. ÷ 366 Cr shares = ₹1,000/share. The complex bridge self-checks correctly.'}},
+
+  {id:'sunpharma',name:'Sun Pharma',ticker:'SUNPHARMA',flag:'🇮🇳',sector:'Pharma',tags:['india'],cur:'₹',unit:'Cr',isBank:false,
+   ev:369000,debt:8000,cash:23000,minority:1500,preferred:0,associates:0,shares:240,price:1600,
+   ctx:{s:'Sun Pharma carries a ₹1,500 Cr minority interest from its listed Indian subsidiary Taro Pharmaceutical (Israeli listed company of which Sun owns 78%). This is a meaningful item — Taro\'s non-controlling shareholders have a real claim that reduces equity value available to Sun\'s common shareholders.',k:'The Taro minority interest is the most important bridge item for Sun Pharma. Taro contributes ~15% of Sun Pharma\'s US specialty revenues. If analysts value Sun at an EV multiple but forget the minority claim on Taro, they overstate equity value by ₹1,500 Cr — equivalent to ₹6.25/share.',t:'Missing the Taro minority interest. It\'s a disclosed item in every annual report, but analysts building a quick bridge from EV to equity often omit minority interest unless the subsidiary is very large. For Sun Pharma, ₹1,500 Cr on a ₹3.84 lakh Cr equity value is 0.4% — small but the principle of completeness matters.',c:'EV ₹3.69 lakh Cr + net cash ₹15,000 Cr − minority ₹1,500 Cr = equity value ₹3.83 lakh Cr. ÷ 240 Cr shares = ₹1,596 ≈ ₹1,600/share. The Taro minority makes the self-check work.'}},
+
+  {id:'adaniports',name:'Adani Ports',ticker:'ADANIPORTS',flag:'🇮🇳',sector:'Infrastructure',tags:['india'],cur:'₹',unit:'Cr',isBank:false,
+   ev:264750,debt:55000,cash:16000,minority:2000,preferred:0,associates:0,shares:215,price:1050,
+   ctx:{s:'Adani Ports carries a ₹2,000 Cr minority interest from partners in some of its port concession entities. The gross debt of ₹55,000 Cr is infrastructure debt — long-duration, tied to specific port concessions with captive revenue streams. This type of debt is structurally different from corporate debt.',k:'Infrastructure debt should be understood differently in this bridge. Adani Ports\' ₹55,000 Cr of borrowings is backed by port concession revenues — it\'s essentially non-recourse, ring-fenced debt tied to specific assets. A proper bridge should ideally separate corporate debt from project-level debt, though most practitioners consolidate.',t:'Treating infrastructure concession debt identically to corporate debt in a credit stress scenario. In a liquidity crisis, Adani Ports\' concession-level debt cannot be called in against the parent company — it\'s structurally ring-fenced. Using blended debt in the bridge overstates default risk vs a standard corporate borrower.',c:'EV ₹2.65 lakh Cr − gross debt ₹55,000 Cr + cash ₹16,000 Cr − minority ₹2,000 Cr = equity value ₹2.24 lakh Cr. ÷ 215 Cr shares = ₹1,042 ≈ ₹1,050/share. Self-check holds.'}},
+
+  {id:'kotak',name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',flag:'🇮🇳',sector:'Banking',tags:['india','banking'],cur:'₹',unit:'Cr',isBank:true,
+   ev:0,debt:300000,cash:0,minority:0,preferred:0,associates:0,shares:200,price:1900,
+   ctx:{s:'Like all private banks, the EV bridge is not applicable to Kotak. Borrowings of ₹3 lakh Cr are customer deposits and market borrowings — the raw material of the lending business. The equity story is about what multiple of book value the franchise commands, not an EV bridge.',k:'For Kotak, the relevant analytical framework is P/B and P/E with direct equity value as the anchor. The key question: at 4.2x P/B, is the premium to private bank peers of 2.8x P/B sustainable post the founder\'s active management transition?',t:'Calculating an EV multiple for Kotak using NII (net interest income) or pre-provision profit as the "EBITDA". While some analysts do this, the resulting EV has no standard peer comparable — banks globally are valued on equity multiples, not EV multiples. You will confuse yourself and your audience.',c:'Kotak self-check: Current P/B = ₹1,900 ÷ ₹450 BVPS = 4.2x. Target P/E = 1,900 ÷ ₹68.9 EPS = 27.6x. Both are internally consistent with stated data. If your P/B and P/E calculations give you the same implied equity value, your data is consistent.'}},
+
+  // GLOBAL
+  {id:'apple',name:'Apple',ticker:'AAPL',flag:'🇺🇸',sector:'Consumer Tech',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   ev:2876,debt:110,cash:160,minority:0,preferred:0,associates:0,shares:15.4,price:190,
+   ctx:{s:'Apple\'s bridge is deliberately complex — not because the business is complex, but because Apple engineered its capital structure for tax efficiency. ₹160B of cash (mostly offshore) sits against ₹110B of US-domiciled debt. The cash doesn\'t repatriate without a tax cost — so the \'add back cash\' step in the bridge overstates freely accessible cash by a meaningful margin.',k:'The offshore vs domestic cash split is the nuance most analysts miss. Of Apple\'s $160B cash, approximately $90B is held in international subsidiaries. Repatriating it to fund US share buybacks incurs tax. A sophisticated bridge should use \'freely accessible cash\' rather than total cash.',t:'Adding back $160B of cash at full face value without haircut for repatriation tax. In a deal scenario, an acquirer buying Apple could not immediately deploy all $160B — some portion would incur a 10-15% repatriation tax. For a corporate acquirer, the bridge should reflect accessible net cash, not total gross cash.',c:'Market EV $2,876B + net cash $50B = equity value $2,926B ÷ 15.4B shares = $190/share. Clean self-check. The offshore cash complexity doesn\'t change the bridge mathematics — it only matters for cash deployment analysis.'}},
+
+  {id:'microsoft',name:'Microsoft',ticker:'MSFT',flag:'🇺🇸',sector:'Cloud / Enterprise',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   ev:3082,debt:78,cash:104,minority:0,preferred:0,associates:0,shares:7.4,price:420,
+   ctx:{s:'Microsoft has a very clean bridge. $104B cash against $78B debt gives a net cash position of $26B. No minority interest, no preferred, no associates of materiality. This reflects Microsoft\'s disciplined treasury management — they use debt strategically for capital returns rather than for operations.',k:'Microsoft\'s net cash position of $26B means equity value EXCEEDS EV. This is the same dynamic as TCS — a sign of extraordinary financial strength. For a $3.1T company, $26B net cash is relatively modest (less than 1% of equity value), so the bridge adjustment is small.',t:'Using market cap and EV interchangeably for Microsoft in conversations or quick analyses. "Microsoft is worth $3.1T" — correct for equity (market cap). "Microsoft\'s enterprise value is $3.1T" — wrong, it\'s $3.08T because net cash reduces EV below market cap. Small difference, but the distinction matters in deal analysis.',c:'EV $3,082B + net cash $26B = equity value $3,108B ÷ 7.4B shares = $420/share. Perfect self-check.'}},
+
+  {id:'tesla',name:'Tesla',ticker:'TSLA',flag:'🇺🇸',sector:'EV / Energy',tags:['global'],cur:'$',unit:'B',isBank:false,
+   ev:778,debt:9,cash:26,minority:0,preferred:0,associates:0,shares:3.18,price:250,
+   ctx:{s:'Tesla\'s bridge is unusually simple for a company of its valuation complexity. $26B cash against just $9B debt = $17B net cash. No minority interests, no preferred equity. The bridge is clean — but the EV is where the debate happens. Whether Tesla\'s $778B EV is justified is the real question, not the mechanics of getting to equity.',k:'The net cash position of $17B is strategically significant. Tesla no longer needs external capital to fund operations or expansion — it generates enough free cash flow. This is a profound change from 2019 when Tesla was continuously raising equity. The clean bridge reflects this financial maturity.',t:'Assigning EV/Revenue multiple to Tesla without first arriving at EV through a rigorous bridge. Many retail analysts say "Tesla is worth X times revenue" without correctly computing the equity value bridge. Even a simple bridge matters: the $17B net cash changes the equity value by $5.3/share.',c:'EV $778B + net cash $17B = equity value $795B ÷ 3.18B shares = $250/share. Self-check confirms the bridge correctly arrives at current market price.'}},
+
+  {id:'alphabet',name:'Alphabet',ticker:'GOOGL',flag:'🇺🇸',sector:'Search / Cloud',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   ev:2109,debt:15,cash:111,minority:1,preferred:0,associates:5,shares:12.6,price:175,
+   ctx:{s:'Alphabet has a large net cash position of $96B — one of the largest in global markets. This creates a significant gap between EV ($2,109B) and market cap ($2,205B). There are also minor adjustments for minority interests in some YouTube and Google Cloud joint ventures, plus some associate investments.',k:'The $96B net cash is equivalent to 4.3% of Alphabet\'s equity value — meaningful enough to materially change your implied price if missed. In valuation discussions, missing this would undervalue Alphabet by $7.60/share. At this scale of company, that\'s a number portfolio managers care about.',t:'Building an EV/EBITDA multiple for Alphabet without computing EV correctly. If you use market cap instead of EV to compute EV/EBITDA, you get an inflated multiple — making Alphabet look more expensive than it is. The correct EV is $96B lower than market cap.',c:'EV $2,109B + net cash $96B − minority $1B + associates $5B = equity value $2,209B ÷ 12.6B shares = $175/share. The minor items barely move the needle but practicing completeness matters.'}},
+
+  {id:'amazon',name:'Amazon',ticker:'AMZN',flag:'🇺🇸',sector:'Cloud / E-commerce',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   ev:1770,debt:85,cash:111,minority:2,preferred:0,associates:3,shares:10.5,price:171,
+   ctx:{s:'Amazon\'s bridge has a small net cash position ($111B cash vs $85B debt = $26B net cash) and minor adjustments for minority interests in some AWS joint ventures and small associate investments. The bridge is relatively clean — the complexity in Amazon\'s capital story is in the EV, not the bridge itself.',k:'The $85B of gross debt is AWS-infrastructure financing — Amazon has borrowed to build data centres at scale. This is strategic debt that funds assets generating 35%+ operating margins. Understanding why the debt exists makes the bridge more informative than just doing arithmetic.',t:'Using a low EV/EBITDA for Amazon by computing EV incorrectly. If you use market cap ($1,795B) instead of true EV ($1,770B) as the numerator, every EBITDA-based multiple is slightly inflated. More commonly: analysts use the wrong share count after stock splits, getting the equity value wrong.',c:'EV $1,770B + net cash $26B − minority $2B + associates $3B = equity value $1,797B ÷ 10.5B shares = $171/share. Self-check confirms the bridge.'}},
+
+  {id:'meta',name:'Meta',ticker:'META',flag:'🇺🇸',sector:'Social / AI',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   ev:1365,debt:18,cash:61,minority:0,preferred:0,associates:0,shares:2.56,price:550,
+   ctx:{s:'Meta has a large net cash position of $43B — built up after the 2022 cost-cutting programme. No minority interests, no preferred, no associates. The bridge is clean. Meta\'s complexity is in the valuation of Reality Labs (which loses $5B+ annually) — but that doesn\'t appear in the bridge mechanics.',k:'The $43B net cash (3% of equity value) is meaningful for the bridge. Meta has been building cash deliberately — partly to fund Reality Labs investments, partly as a buffer against regulatory fines (EU GDPR penalties can reach 4% of global revenue). The cash has strategic purpose beyond financial returns.',t:'Not asking "why is Meta accumulating cash instead of returning it?" A proper bridge analysis surfaces strategic intent. $43B is significant for a company this size. That Meta isn\'t paying it out signals either capital deployment plans (Reality Labs) or legal risk buffering.',c:'EV $1,365B + net cash $43B = equity value $1,408B ÷ 2.56B shares = $550/share. Clean self-check.'}},
+
+  {id:'berkshire',name:'Berkshire Hathaway',ticker:'BRK.B',flag:'🇺🇸',sector:'Conglomerate',tags:['global','banking'],cur:'$',unit:'B',isBank:true,
+   ev:0,debt:120,cash:180,minority:0,preferred:0,associates:0,shares:1.45,price:620,
+   ctx:{s:'Berkshire is unique — the EV bridge framework is not applicable. Berkshire IS a portfolio of businesses plus an insurance float. Computing an EV using EBITDA multiples is meaningless because the underlying assets include: insurance operations, railroads, energy utilities, manufacturing, retail, and a $350B+ equity portfolio. It requires sum-of-parts analysis.',k:'For Berkshire, analysts use P/B applied directly to equity (book value). Operating earnings P/E is also used, but Berkshire\'s reported earnings include massive investment gains/losses that make reported P/E meaningless. Book value growth has tracked Berkshire\'s intrinsic value closely over 40+ years.',t:'Attempting to compute an EV for Berkshire using any EBITDA metric. Berkshire\'s insurance float ($170B+) looks like "debt" in the EV formula but it\'s actually a source of free capital. Including it as EV debt completely distorts the bridge.',c:'Berkshire self-check: at $620/share and $500B book value / 1.45B shares = $345 BVPS, current P/B is 1.8x. Buffett has indicated the company will repurchase shares below 1.5x P/B. If your P/B calculation gives 1.8x on these numbers, your equity value math is internally consistent.'}},
+
+  {id:'nvidia',name:'NVIDIA',ticker:'NVDA',flag:'🇺🇸',sector:'Semiconductors / AI',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   ev:3268,debt:12,cash:38,minority:0,preferred:0,associates:0,shares:24.4,price:135,
+   ctx:{s:'NVIDIA has an exceptionally clean bridge. $38B cash against $12B debt = $26B net cash. No minority interests, no preferred, no associates of materiality. The simplicity of the bridge belies the complexity of the business valuation — the debate on NVIDIA is entirely about what EV you assign, not about bridge mechanics.',k:'NVIDIA\'s $26B net cash position means equity value exceeds EV by $26B. For a $3.3T company, this is less than 1% — the bridge adjustment barely moves the needle. But the $12B debt is interesting: it was raised when NVIDIA\'s stock was lower, effectively locking in cheap financing for a rapidly appreciating company.',t:'Spending time on NVIDIA\'s bridge and not enough time on the EV assumption. The bridge is trivial. What matters is: what is the right EV/Revenue or forward P/E to apply? The bridge will give you the right share price for any EV assumption you put in — that\'s actually the point of the calculator.',c:'EV $3,268B + net cash $26B = equity value $3,294B ÷ 24.4B shares = $135/share. Self-check holds.'}},
+
+  {id:'netflix',name:'Netflix',ticker:'NFLX',flag:'🇺🇸',sector:'Streaming',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   ev:394,debt:14,cash:7,minority:0,preferred:0,associates:0,shares:0.43,price:900,
+   ctx:{s:'Netflix has a small net debt position of $7B ($14B debt minus $7B cash). This is declining as the business becomes self-funding. The content financing structure is interesting — Netflix\'s content obligations are NOT included in reported debt but are economic liabilities. A fully comprehensive bridge would include streaming content obligations.',k:'Netflix\'s off-balance-sheet content obligations (~$20B+ in committed streaming deals) are the hidden item in this bridge. These are legally binding payment obligations but are NOT classified as financial debt under GAAP. An analyst building a deal bridge should add these to the debt side.',t:'Reading Netflix\'s debt balance without understanding content obligations. Netflix commits to pay content studios billions in licensing fees over multi-year contracts. These are debt-like obligations — if you\'re building a bridge for an acquisition model, include them. They change equity value by $20B+.',c:'Standard bridge: EV $394B − net debt $7B = equity value $387B ÷ 0.43B shares = $900/share. If you add content obligations of $20B as debt: equity value = $367B ÷ 0.43B = $854/share. The hidden obligation bridge is the right one for deal analysis.'}},
+
+  {id:'samsung',name:'Samsung Electronics',ticker:'005930',flag:'🇰🇷',sector:'Semiconductors',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   ev:278,debt:15,cash:85,minority:5,preferred:0,associates:2,shares:6.0,price:46,
+   ctx:{s:'Samsung has a large net cash position of $70B — typical for a Korean chaebol that historically didn\'t return cash aggressively. There\'s also a $5B minority interest from Samsung Electronics\' own subsidiaries (Samsung Display, Samsung SDI minority shareholders). Associates of $2B include small equity stakes in suppliers.',k:'The $70B net cash position on a $348B market cap is 20% of equity value — one of the largest relative cash hoards among global large-caps. This is the source of the chaebol governance discount: investors know the cash is there but distrust management\'s willingness to deploy it for shareholder benefit.',t:'Forgetting that Samsung\'s share count requires care. Samsung has multiple share classes (common and preferred) and a complex cross-shareholding structure through Samsung C&T. The bridge should use the common shareholder equity only, which requires stripping out preferred shares and inter-company holdings.',c:'EV $278B + net cash $70B − minority $5B + associates $2B = equity value $345B ÷ 6.0B shares = $57.5/share (vs current $58/share — close enough given rounding in large numbers).'}},
+
+  {id:'alibaba',name:'Alibaba',ticker:'BABA',flag:'🇨🇳',sector:'E-commerce / Cloud',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   ev:187,debt:28,cash:91,minority:5,preferred:0,associates:20,shares:3.1,price:80,
+   ctx:{s:'Alibaba\'s bridge has two unusual items: a $5B minority interest from Alibaba\'s subsidiaries (including Cainiao logistics which has external shareholders) and $20B of associates — primarily the remaining equity stake in Ant Group following the cancelled IPO. These associates are valued at cost and likely significantly understate fair value.',k:'The $20B Ant Group associate stake is the most controversial item in Alibaba\'s bridge. Ant Group was valued at ~$350B before its IPO was cancelled in 2020. Today, Alibaba carries the Ant stake at a much lower book value. A fair-value bridge would add significantly more than $20B for Ant.',t:'Using Alibaba\'s stated associate value for Ant Group at face value. The $20B carrying value is almost certainly below Ant\'s intrinsic value — but regulatory uncertainty makes any independent estimate speculative. A complete bridge should note this and present a range of Ant valuations.',c:'Using stated values: EV $187B + net cash $63B − minority $5B + associates $20B = equity value $265B ÷ 3.1B ADR shares = $85/share (close to current $80 given approximations and rounding).'}},
+
+  {id:'tsmc',name:'TSMC',ticker:'TSM',flag:'🇹🇼',sector:'Semiconductor Foundry',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   ev:750,debt:30,cash:65,minority:0,preferred:0,associates:0,shares:4.7,price:175,
+   ctx:{s:'TSMC has a substantial net cash position of $35B against a backdrop of massive annual capex ($30-35B/year). No minority interest, no associates of note. The bridge is clean but the interplay between cash generation and capex spend is critical — TSMC\'s cash position is a function of how much capex it\'s committing in any given year.',k:'TSMC\'s $65B cash balance vs $30B debt tells a story: the company generates enough cash to self-fund its capex without taking on much debt. The Arizona fab expansion ($40B total commitment) is the variable — as this capex ramps, the cash balance will likely decline and debt may increase.',t:'Assuming TSMC\'s cash position is stable when modelling the bridge forward. The Arizona fab commitment will absorb $10-15B of additional capex per year for 3-4 years. A forward-looking bridge should reflect reduced cash and potentially higher debt, which changes the equity value assumption.',c:'EV $750B + net cash $35B = equity value $785B ÷ 4.7B ADR-equivalent shares = $167/share (vs current $175 — small gap due to share count approximation in ADR conversion).'}},
+
+  {id:'toyota',name:'Toyota',ticker:'TM',flag:'🇯🇵',sector:'Auto OEM',tags:['global'],cur:'$',unit:'B',isBank:false,
+   ev:330,debt:50,cash:10,minority:8,preferred:0,associates:20,shares:14.5,price:24,
+   ctx:{s:'Toyota\'s bridge requires separating industrial operations from Toyota Financial Services (TFS). TFS is a bank-like entity with $170B+ of auto loan receivables funded by equivalent debt. Including TFS debt in the bridge conflates financial and industrial leverage. The industrial bridge uses only Toyota Motor Corporation\'s operational debt (~$50B) and cash ($10B).',k:'The $20B in associates is important for Toyota. These include significant equity stakes in Denso (25% stake worth ~$18B), Aisin, and JTEKT — component suppliers that are also strategic partners. These associates sit outside Toyota\'s EBITDA-based EV but belong to equity holders.',t:'Including Toyota Financial Services debt in the industrial bridge. TFS borrows $170B+ to fund auto loans — this is operational, not financial debt. Including it makes Toyota look like the most leveraged auto company in the world. The correct industrial net debt is far lower.',c:'Industrial bridge: EV $330B − industrial debt $50B + cash $10B − minority $8B + associates $20B = equity value $302B ÷ 14.5B shares = $20.8/share (vs actual ~$24 — gap due to TFS separation approximation and yen/USD rate).'}},
+
+  {id:'nestle',name:'Nestle',ticker:'NESN',flag:'🇨🇭',sector:'FMCG',tags:['global','fmcg'],cur:'$',unit:'B',isBank:false,
+   ev:330,debt:45,cash:5,minority:1,preferred:0,associates:2,shares:2.8,price:118,
+   ctx:{s:'Nestle carries net debt of $40B — deliberately maintained for capital efficiency in a near-zero Swiss rate environment. There are minor minority interests from some regional subsidiaries and small associate investments. The bridge is straightforward for a global FMCG company of this quality.',k:'Nestle\'s $40B net debt is intentional financial engineering. With Swiss rates near zero for a decade, carrying debt was essentially free — Nestle borrowed cheaply and used the proceeds for dividends and buybacks. As rates normalise, this strategy is being revisited and debt may decline.',t:'Treating Nestle\'s leverage as a sign of financial weakness. The $40B net debt on a $280B equity is 14% gearing — conservative by any measure. The confusion comes from comparing Nestle\'s absolute debt number to smaller companies. Relative to its EBITDA ($18B), the leverage is only 2.2x — very manageable.',c:'EV $330B − debt $45B + cash $5B − minority $1B + associates $2B = equity value $291B ÷ 2.8B shares = $104/share (vs approximate current CHF 100 ≈ $110 — close enough given FX approximation).'}},
+
+  {id:'bhp',name:'BHP Group',ticker:'BHP',flag:'🇦🇺',sector:'Mining',tags:['global'],cur:'$',unit:'B',isBank:false,
+   ev:238,debt:12,cash:3,minority:2,preferred:0,associates:3,shares:5.08,price:46,
+   ctx:{s:'BHP has a small net debt position of $9B — conservative for a commodity business that operates through boom-bust cycles. Minor minority interests ($2B) from joint venture partners in some mines, and $3B in associates primarily from the Samarco iron ore joint venture (25% Samarco stake). Samarco carries its own significant legal liability from the 2015 dam failure.',k:'The Samarco associate carrying value of $3B is complex — Samarco is subject to billions in cleanup and compensation liabilities from the Fundão dam disaster. The $3B associate ADD-BACK in the bridge may overstate fair value given these contingent liabilities. A conservative analyst would haircut this.',t:'Adding back Samarco associates at book value without accounting for legal liabilities. The Samarco mine restart and ongoing litigation mean the $3B carrying value is questionable. Best practice is to footnote the liability and either exclude the Samarco value or haircut it by 40-50%.',c:'EV $238B − debt $12B + cash $3B − minority $2B + associates $3B = equity value $230B ÷ 5.08B shares = $45.3/share ≈ $46/share. Self-check holds. The Samarco note is a qualitative caveat on the associates line.'}}
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let selId = null, calcState = {};
+
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+window.onload = () => renderGrid('all');
+
+function renderGrid(f) {
+  const g = document.getElementById('companyGrid'); g.innerHTML = '';
+  CO.forEach(co => {
+    const show = f === 'all' || co.tags.includes(f);
+    const el = document.createElement('div');
+    el.className = 'company-card' + (co.id === selId ? ' selected' : '') + (!show ? ' hidden' : '');
+    el.innerHTML = `<div class="co-flag">${co.flag}</div><div class="co-name">${co.name}</div><div class="co-ticker">${co.ticker}</div><div class="co-sector">${co.sector}</div>`;
+    el.onclick = () => { selId = co.id; document.querySelectorAll('.company-card').forEach(c => c.classList.remove('selected')); el.classList.add('selected'); document.getElementById('continueBtn').classList.add('enabled'); };
+    g.appendChild(el);
+  });
+}
+function filterGrid(f, btn) { document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); renderGrid(f); }
+
+function goToStep(n) {
+  document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('step' + n).classList.add('active');
+  updateProg(n);
+  if (n === 2) renderContext();
+  if (n === 3) populateInputs();
+  if (n === 4) renderResults();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function updateProg(n) {
+  [1,2,3,4].forEach(i => {
+    const ps = document.getElementById('ps' + i); ps.classList.remove('active','done');
+    if (i < n) ps.classList.add('done'); if (i === n) ps.classList.add('active');
+    if (i < 4) { const pl = document.getElementById('pl' + i); pl.classList[i < n ? 'add' : 'remove']('done'); }
+  });
+}
+
+// ─── CONTEXT ──────────────────────────────────────────────────────────────────
+function renderContext() {
+  const co = CO.find(c => c.id === selId); if (!co) return;
+  document.getElementById('ctxFlag').textContent = co.flag;
+  document.getElementById('ctxName').textContent = co.name;
+  document.getElementById('ctxMeta').innerHTML = `<span class="ctx-tag">${co.ticker}</span><span class="ctx-tag">${co.sector}</span>`;
+  const ev = co.isBank ? co.price * (co.cur === '₹' ? co.shares : co.shares) : co.ev;
+  const mc = co.price * co.shares;
+  const netD = co.debt - co.cash;
+  document.getElementById('statGrid').innerHTML = co.isBank
+    ? `<div class="stat-card"><div class="stat-lbl">Market Cap</div><div class="stat-val">${co.cur}${fmt(mc)}</div><div class="stat-note">${co.unit}</div></div>
+       <div class="stat-card"><div class="stat-lbl">EV Bridge</div><div class="stat-val">N/A</div><div class="stat-note">Banks use equity multiples</div></div>
+       <div class="stat-card"><div class="stat-lbl">Shares</div><div class="stat-val">${co.shares}</div><div class="stat-note">${co.unit === 'Cr' ? 'Crores' : 'Billions'}</div></div>
+       <div class="stat-card"><div class="stat-lbl">Price</div><div class="stat-val">${co.cur}${co.price.toLocaleString()}</div><div class="stat-note">Current</div></div>`
+    : `<div class="stat-card"><div class="stat-lbl">Enterprise Value</div><div class="stat-val">${co.cur}${fmt(co.ev)}</div><div class="stat-note">${co.unit}</div></div>
+       <div class="stat-card"><div class="stat-lbl">Net Debt / (Cash)</div><div class="stat-val">${netD < 0 ? '(' : ''}${co.cur}${fmt(Math.abs(netD))}${netD < 0 ? ')' : ''}</div><div class="stat-note">${netD < 0 ? 'Net cash' : 'Net debt'}</div></div>
+       <div class="stat-card"><div class="stat-lbl">Minority Interest</div><div class="stat-val">${co.minority > 0 ? co.cur+fmt(co.minority) : '—'}</div><div class="stat-note">${co.minority > 0 ? co.unit : 'None'}</div></div>
+       <div class="stat-card"><div class="stat-lbl">Associates</div><div class="stat-val">${co.associates > 0 ? co.cur+fmt(co.associates) : '—'}</div><div class="stat-note">${co.associates > 0 ? co.unit+' (added back)' : 'None'}</div></div>`;
+  document.getElementById('ctxStructure').textContent = co.ctx.s;
+  document.getElementById('ctxKeyItem').textContent = co.ctx.k;
+  document.getElementById('ctxTrap').textContent = co.ctx.t;
+  document.getElementById('ctxCheck').textContent = co.ctx.c;
+}
+
+// ─── ASSUMPTIONS ──────────────────────────────────────────────────────────────
+function hr(label, id, type, hint, val, dir='') {
+  const badge = type === 'pre' ? '<span class="type-badge type-pre">Pre-filled</span>' : type === 'calc' ? '<span class="type-badge type-calc">Calculated</span>' : '<span class="type-badge type-yours">Your estimate</span>';
+  const ro = type === 'calc';
+  const cls = ro ? 'assume-input calc' + (id === 'out_equity' || id === 'out_price' ? ' calc-strong' : '') : 'assume-input';
+  const dirHTML = dir === '+' ? '<span class="dir-badge dir-add">+</span>' : dir === '-' ? '<span class="dir-badge dir-sub">−</span>' : '<span style="width:16px;display:inline-block"></span>';
+  return `<tr class="assume-tr"><td class="assume-td label-col"><span class="assume-label">${dirHTML}<span>${label}</span><span class="hint-wrap"><span class="hint-icon">?</span><span class="hint-tip">${hint}</span></span></span></td><td class="assume-td type-col">${badge}</td><td class="assume-td input-col"><input class="${cls}" id="${id}" type="${ro ? 'text' : 'number'}" step="any" ${ro ? 'readonly' : ''} value="${val}" oninput="recalc()"></td></tr>`;
+}
+
+function populateInputs() {
+  const co = CO.find(c => c.id === selId); if (!co) return;
+  document.getElementById('liveCurrentPrice').textContent = `${co.cur}${co.price.toLocaleString()}`;
+  let html = '';
+  if (co.isBank) {
+    html = `<tr class="assume-tr"><td class="assume-td label-col" colspan="3" style="font-size:13px;color:var(--muted);padding:12px 0">⚠️ EV Bridge doesn't apply to ${co.sector} companies. The equity value is assessed directly via P/B and P/E multiples.</td></tr>`;
+    html += hr('Market Capitalisation (Equity Value)','inp_ev','your','For banks, equity value = market cap. This is your starting point.',co.price * co.shares,'');
+    html += hr('Shares Outstanding','inp_shares','pre',co.cur === '₹' ? 'Shares in Crores' : 'Shares in Billions',co.shares,'');
+    html += hr('→ Implied Price per Share','out_price','calc','Equity Value ÷ Shares. Should match current market price.',co.price,'');
+  } else {
+    html += hr('Enterprise Value (starting point)','inp_ev','yours','Enter your DCF or Comps EV estimate, or use the current market EV pre-filled here. This is where the bridge starts.',co.ev,'');
+    html += hr('Total Gross Debt','inp_debt','pre','All short-term and long-term borrowings. Holders of debt get paid before equity — so this is deducted.',co.debt,'-');
+    html += hr('Cash & Cash Equivalents','inp_cash','pre','Cash, short-term investments, liquid assets. Belongs to equity holders — so this is added back.',co.cash,'+');
+    html += hr('Minority Interest','inp_mi','pre','Market value of the non-controlling interest in subsidiaries. These shareholders get paid before the parent equity holder.',co.minority,'-');
+    html += hr('Preferred Stock / Preference Shares','inp_pref','pre','Preference shareholders get paid before common equity. Zero for most modern companies.',co.preferred,'-');
+    html += hr('Associates / Equity Investments','inp_assoc','pre','Equity stakes in other companies not captured in the EBITDA-based EV. These belong to equity holders — so they are added back.',co.associates,'+');
+    html += hr('→ Equity Value','out_equity','calc','EV − Debt + Cash − Minority − Preferred + Associates. The total value belonging to common equity shareholders.','-','');
+    html += hr('Shares Outstanding','inp_shares','pre',co.cur === '₹' ? 'Shares in Crores' : 'Shares in Billions',co.shares,'');
+    html += hr('→ Implied Price per Share','out_price','calc','Equity Value ÷ Shares Outstanding. This should closely match the current market price when using market EV.','-','');
+  }
+  document.getElementById('bridgeTable').innerHTML = html;
+  recalc();
+}
+
+function recalc() {
+  const co = CO.find(c => c.id === selId); if (!co) return;
+  const ev = parseFloat(document.getElementById('inp_ev')?.value) || co.ev;
+  const sh = parseFloat(document.getElementById('inp_shares')?.value) || co.shares;
+  let implied;
+  if (co.isBank) {
+    implied = ev / sh;
+    setV('out_price', `${co.cur}${fmtP(implied)}`);
+  } else {
+    const debt = parseFloat(document.getElementById('inp_debt')?.value) || 0;
+    const cash = parseFloat(document.getElementById('inp_cash')?.value) || 0;
+    const mi = parseFloat(document.getElementById('inp_mi')?.value) || 0;
+    const pref = parseFloat(document.getElementById('inp_pref')?.value) || 0;
+    const assoc = parseFloat(document.getElementById('inp_assoc')?.value) || 0;
+    const eqV = ev - debt + cash - mi - pref + assoc;
+    implied = eqV / sh;
+    setV('out_equity', `${co.cur}${fmt(Math.round(eqV))}`);
+    setV('out_price', `${co.cur}${fmtP(implied)}`);
+    calcState = { co, ev, debt, cash, mi, pref, assoc, eqV, sh, implied };
+  }
+  const chg = ((implied - co.price) / co.price * 100).toFixed(1);
+  document.getElementById('liveImplied').textContent = `${co.cur}${fmtP(implied)}`;
+  const chgEl = document.getElementById('liveChg');
+  chgEl.textContent = `${chg > 0 ? '+' : ''}${chg}%`;
+  chgEl.className = 'live-chg ' + (chg > 0 ? 'up' : 'dn');
+  if (!co.isBank) calcState = { co, ev, debt: parseFloat(document.getElementById('inp_debt')?.value)||0, cash: parseFloat(document.getElementById('inp_cash')?.value)||0, mi: parseFloat(document.getElementById('inp_mi')?.value)||0, pref: parseFloat(document.getElementById('inp_pref')?.value)||0, assoc: parseFloat(document.getElementById('inp_assoc')?.value)||0, eqV: parseFloat(document.getElementById('inp_ev')?.value||co.ev) - (parseFloat(document.getElementById('inp_debt')?.value)||0) + (parseFloat(document.getElementById('inp_cash')?.value)||0) - (parseFloat(document.getElementById('inp_mi')?.value)||0) - (parseFloat(document.getElementById('inp_pref')?.value)||0) + (parseFloat(document.getElementById('inp_assoc')?.value)||0), sh, implied };
+}
+
+function setV(id, v) { const el = document.getElementById(id); if (el) el.value = v; }
+
+// ─── LOADING ──────────────────────────────────────────────────────────────────
+function startCalc() {
+  recalc();
+  document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('stepLoading').classList.add('active');
+  updateProg(4); window.scrollTo({ top: 0, behavior: 'smooth' });
+  [1,2,3,4,5,6].forEach(i => { const el = document.getElementById('ls'+i); el.classList.remove('show','active','done'); });
+  document.getElementById('loadingBarFill').style.width = '0%';
+  document.getElementById('loadingPct').textContent = '0%';
+  const steps = [{id:'ls1',s:200,d:700},{id:'ls2',s:800,d:1400},{id:'ls3',s:1500,d:2100},{id:'ls4',s:2200,d:2800},{id:'ls5',s:2900,d:3800},{id:'ls6',s:3900,d:4600}];
+  const pcts = [10,25,42,60,80,100];
+  steps.forEach((st,i) => {
+    setTimeout(() => { const el = document.getElementById(st.id); el.classList.add('show','active'); }, st.s);
+    setTimeout(() => { const el = document.getElementById(st.id); el.classList.remove('active'); el.classList.add('done'); document.getElementById('loadingBarFill').style.width=pcts[i]+'%'; document.getElementById('loadingPct').textContent=pcts[i]+'%'; }, st.d);
+  });
+  setTimeout(() => { document.querySelectorAll('.step-section').forEach(s=>s.classList.remove('active')); document.getElementById('step4').classList.add('active'); renderResults(); window.scrollTo({top:0,behavior:'smooth'}); }, 5200);
+}
+
+// ─── RESULTS ──────────────────────────────────────────────────────────────────
+function renderResults() {
+  const s = calcState; if (!s || !s.co) { recalc(); return; }
+  const co = s.co;
+  document.getElementById('rCoLbl').textContent = `${co.flag} ${co.name} · ${co.ticker}`;
+  document.getElementById('rImpliedPrice').textContent = `${co.cur}${fmtP(s.implied)}`;
+  const chgPct = ((s.implied - co.price) / co.price * 100).toFixed(1);
+  const chgClr = chgPct > 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('rVsCurrent').innerHTML = `Current market price: <strong>${co.cur}${co.price.toLocaleString()}</strong> &nbsp;·&nbsp; Bridge implies: <strong style="color:${chgClr}">${chgPct > 0 ? '+' : ''}${chgPct}%</strong> vs current`;
+
+  // Waterfall
+  const maxVal = s.ev;
+  const pct = v => Math.max(2, Math.min(96, (Math.abs(v) / maxVal) * 90));
+  const rows = [
+    { label: 'Enterprise Value', val: s.ev, dir: 'start', cls: 'ev-bar', desc: 'Starting point' },
+    { label: '− Total Gross Debt', val: s.debt, dir: 'sub', cls: 'debt-bar', desc: 'Claim of lenders' },
+    { label: '+ Cash & Equivalents', val: s.cash, dir: 'add', cls: 'cash-bar', desc: 'Belongs to equity' },
+    { label: '− Minority Interest', val: s.mi, dir: 'sub', cls: 'minority-bar', desc: 'Non-controlling claim' },
+    { label: '− Preferred Stock', val: s.pref, dir: 'sub', cls: 'preferred-bar', desc: 'Preferred claim' },
+    { label: '+ Associates', val: s.assoc, dir: 'add', cls: 'associates-bar', desc: 'Equity investments' },
+    { label: '= Equity Value', val: s.eqV, dir: 'result', cls: 'result-bar', desc: 'Belongs to common equity' },
+  ];
+
+  let wHTML = '';
+  rows.forEach(r => {
+    if (r.val === 0 && r.dir !== 'start' && r.dir !== 'result') return; // skip zero items
+    const w = pct(r.val);
+    const valStr = `${co.cur}${fmt(Math.round(Math.abs(r.val)))}`;
+    const isResult = r.dir === 'result';
+    const lw = isResult ? 'font-weight:800' : '';
+    wHTML += `<div class="wfall-row">
+      <div class="wfall-lbl" style="${lw}">${r.label}</div>
+      <div class="wfall-track"><div class="wfall-bar ${r.cls}" style="width:${w}%"><span>${valStr}</span></div></div>
+      <div class="wfall-val" style="${lw}">${isResult ? `<strong>${valStr}</strong>` : valStr}</div>
+    </div>`;
+    if (isResult) return;
+  });
+  document.getElementById('waterfallChart').innerHTML = wHTML;
+
+  document.getElementById('sharesLabel').textContent = `${s.sh} ${co.unit === 'Cr' ? 'Crore' : 'Billion'} shares`;
+  document.getElementById('wfallPriceVal').textContent = `${co.cur}${fmtP(s.implied)}`;
+  document.getElementById('wfallVs').innerHTML = `<span style="color:${chgClr};font-weight:700">${chgPct > 0 ? '+' : ''}${chgPct}% vs market</span>`;
+
+  // Full bridge table
+  let tHTML = '';
+  const tRows = [
+    { label: 'Enterprise Value', val: s.ev, sign: '', cls: '' },
+    { label: '− Total Gross Debt', val: s.debt, sign: '-', cls: 'red-val' },
+    { label: '+ Cash & Equivalents', val: s.cash, sign: '+', cls: 'green-val' },
+    { label: '− Minority Interest', val: s.mi, sign: '-', cls: '' },
+    { label: '− Preferred Stock', val: s.pref, sign: '-', cls: '' },
+    { label: '+ Associates / Equity Investments', val: s.assoc, sign: '+', cls: 'green-val' },
+    { label: '= Equity Value', val: s.eqV, sign: '=', isTotal: true },
+    { label: `÷ Shares Outstanding (${s.sh} ${co.unit === 'Cr' ? 'Cr' : 'B'})`, val: s.sh, sign: '÷', isTotal: true },
+    { label: 'Implied Share Price', val: s.implied, sign: '=', isResult: true },
+    { label: 'Current Market Price (reference)', val: co.price, sign: '', isTotal: false },
+    { label: `Bridge vs Market (${chgPct > 0 ? '+' : ''}${chgPct}%)`, val: s.implied - co.price, sign: '', isTotal: true }
+  ];
+  tRows.forEach(r => {
+    const cls = r.isResult ? 'result-row' : r.isTotal ? 'total-row' : '';
+    const valDisp = r.isResult ? `${co.cur}${fmtP(r.val)}` : r.label.includes('÷') ? r.val : `${co.cur}${fmt(Math.round(r.val))}`;
+    tHTML += `<tr class="${cls}"><td>${r.sign ? `<span style="font-family:var(--mono);color:var(--muted);font-size:12px">${r.sign}</span> ` : ''}${r.label}</td><td class="${r.cls || ''}">${valDisp}</td></tr>`;
+  });
+  document.getElementById('bridgeResultTable').innerHTML = tHTML;
+
+  // Insight
+  const netD = s.debt - s.cash;
+  const netDPct = (Math.abs(netD) / s.ev * 100).toFixed(1);
+  document.getElementById('rInsight').innerHTML = `This bridge converts an Enterprise Value of <strong>${co.cur}${fmt(Math.round(s.ev))} ${co.unit}</strong> into an implied equity value of <strong>${co.cur}${fmt(Math.round(s.eqV))} ${co.unit}</strong> — a difference of <strong>${co.cur}${fmt(Math.round(Math.abs(netD + s.mi + s.pref - s.assoc)))} ${co.unit}</strong> or ${netDPct}% of EV. The implied share price of <strong>${co.cur}${fmtP(s.implied)}</strong> is ${Math.abs(chgPct) < 3 ? 'essentially in line with the current market price — your bridge is internally consistent.' : Math.abs(chgPct) < 10 ? `within ${Math.abs(chgPct)}% of current market price — a reasonable variance for approximated inputs.` : `${Math.abs(chgPct)}% ${chgPct > 0 ? 'above' : 'below'} current market price — check whether your EV input differs from the current market EV, or whether a bridge item needs adjustment.`} The largest bridge item is ${s.debt > s.cash ? `gross debt of ${co.cur}${fmt(Math.round(s.debt))} ${co.unit}` : `cash of ${co.cur}${fmt(Math.round(s.cash))} ${co.unit}`} — always verify the direction of this adjustment. Use this bridge with your DCF output for a complete valuation model.`;
+
+  // Sensitivity table
+  const evPcts = [0.70, 0.80, 0.90, 1.00, 1.10, 1.20, 1.30];
+  const ndPcts = [0.80, 0.90, 1.00, 1.10, 1.20];
+  let sHTML = `<tr><th>EV / Net Debt</th>` + ndPcts.map(p => `<th>ND × ${p.toFixed(1)}</th>`).join('') + '</tr>';
+  evPcts.forEach(ep => {
+    const adjEV = s.ev * ep;
+    sHTML += `<tr><td>EV × ${ep.toFixed(2)}</td>`;
+    ndPcts.forEach(np => {
+      const adjDebt = s.debt * np;
+      const adjCash = s.cash;
+      const adjEqV = adjEV - adjDebt + adjCash - s.mi - s.pref + s.assoc;
+      const adjP = adjEqV / s.sh;
+      const isBase = Math.abs(ep - 1) < 0.01 && Math.abs(np - 1) < 0.01;
+      const chg = (adjP - co.price) / co.price;
+      const cls = isBase ? 'cell-base' : chg > 0.1 ? 'cell-low' : chg < -0.1 ? 'cell-high' : 'cell-mid';
+      sHTML += `<td class="${cls}">${co.cur}${fmtP(adjP)}</td>`;
+    });
+    sHTML += '</tr>';
+  });
+  document.getElementById('sensTable').innerHTML = sHTML;
+}
+
+function fmt(n) { if (n >= 100000) return (n/100000).toFixed(1)+'L'; if (n >= 1000) return (n/1000).toFixed(1)+'K'; return Math.abs(n) < 1 ? n.toFixed(2) : n.toLocaleString(); }
+function fmtP(n) { return Math.abs(n) >= 1000 ? n.toLocaleString(undefined,{maximumFractionDigits:0}) : n.toFixed(2); }
+function resetAll() { selId = null; calcState = {}; goToStep(1); renderGrid('all'); document.getElementById('continueBtn').classList.remove('enabled'); }
+</script>
+</body>
+</html>
