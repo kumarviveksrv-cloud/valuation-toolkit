@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NAV — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+.top-nav{border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;height:56px;gap:28px}
+.logo{font-size:17px;font-weight:700}.logo strong{font-weight:900}
+.nav-links{display:flex;gap:20px;flex:1}.nav-links a{font-size:13px;color:var(--muted);font-weight:500}.nav-links a:hover{color:var(--text)}
+.nav-cta{display:flex;gap:8px;align-items:center;margin-left:auto}
+.vault-btn{font-size:12px;font-weight:600;padding:6px 12px;border:1px solid var(--border);border-radius:6px;color:var(--text)}
+.pro-btn{font-size:12px;font-weight:700;padding:6px 14px;background:var(--text);color:#fff;border-radius:6px}
+.domain-nav{border-bottom:1px solid var(--border);background:var(--bg)}
+.domain-nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex}
+.domain-nav a{font-size:13px;font-weight:500;color:var(--muted);padding:10px 16px;border-bottom:2px solid transparent}
+.domain-nav a:hover,.domain-nav a.active{color:var(--text);border-bottom-color:var(--text)}
+.progress-wrap{max-width:820px;margin:36px auto 0;padding:0 24px}
+.prog-bar{display:flex;align-items:center}
+.prog-step{display:flex;align-items:center;gap:8px;flex:1}.prog-step:last-child{flex:none}
+.step-num{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--muted);font-family:var(--mono);flex-shrink:0;transition:all .2s}
+.prog-step.active .step-num{background:var(--text);border-color:var(--text);color:#fff}
+.prog-step.done .step-num{background:var(--green);border-color:var(--green);color:#fff}
+.step-label{font-size:12px;font-weight:500;color:var(--muted);white-space:nowrap}
+.prog-step.active .step-label{color:var(--text);font-weight:600}.prog-step.done .step-label{color:var(--green)}
+.prog-line{flex:1;height:1px;background:var(--border);margin:0 8px}.prog-line.done{background:var(--green)}
+.step-section{display:none;max-width:960px;margin:0 auto;padding:36px 24px 80px}.step-section.active{display:block}
+.step-headline{font-size:26px;font-weight:800;margin-bottom:6px}
+.step-sub{font-size:14px;color:var(--muted);margin-bottom:24px}
+.filter-bar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.filter-btn{padding:6px 14px;border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;background:var(--bg);color:var(--muted);font-family:var(--font)}
+.filter-btn:hover{border-color:var(--text);color:var(--text)}.filter-btn.active{background:var(--text);color:#fff;border-color:var(--text)}
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:9px;margin-bottom:20px}
+.company-card{border:1.5px solid var(--border);border-radius:10px;padding:13px;cursor:pointer;transition:all .15s;background:var(--bg)}
+.company-card:hover{border-color:#999}.company-card.selected{border-color:var(--text);border-width:2px;background:#f3f3f3}.company-card.hidden{display:none}
+.co-flag{font-size:18px;margin-bottom:5px}.co-name{font-size:12px;font-weight:700;margin-bottom:2px}.co-ticker{font-size:10px;font-family:var(--mono);color:var(--muted)}.co-sector{font-size:10px;color:var(--muted);margin-top:3px}
+.continue-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);opacity:.35;pointer-events:none}.continue-btn.enabled{opacity:1;pointer-events:all}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer;margin-bottom:20px;border:none;background:none;font-family:var(--font);padding:0}.back-link:hover{color:var(--text)}
+.ctx-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:22px}
+.ctx-flag{font-size:30px;line-height:1}.ctx-co-name{font-size:22px;font-weight:800;margin-bottom:3px}.ctx-meta{font-size:13px;color:var(--muted)}
+.ctx-tag{display:inline-block;padding:2px 8px;border:1px solid var(--border);border-radius:12px;font-size:10px;font-weight:600;color:var(--muted);margin-right:5px;text-transform:uppercase;letter-spacing:.5px}
+.relevance-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;margin-bottom:16px}
+.rel-high{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
+.rel-med{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
+.rel-low{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:22px}
+.stat-card{border:1px solid var(--border);border-radius:8px;padding:13px}
+.stat-lbl{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.stat-val{font-size:17px;font-weight:700;font-family:var(--mono)}.stat-note{font-size:10px;color:var(--muted);margin-top:3px}
+.edu-block{border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:10px}
+.edu-icon{font-size:16px;margin-bottom:6px}.edu-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:7px}.edu-text{font-size:14px;line-height:1.7}
+.franchise-card{border:1.5px solid var(--text);border-radius:10px;padding:16px;background:var(--text);color:#fff;margin-bottom:18px}
+.fc-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;opacity:.6;margin-bottom:6px}
+.fc-val{font-size:24px;font-weight:900;font-family:var(--mono);margin-bottom:4px}
+.fc-note{font-size:13px;opacity:.8}
+/* ASSUMPTIONS */
+.live-bar{position:sticky;top:113px;background:var(--bg);border-bottom:1px solid var(--border);padding:10px 0;margin-bottom:26px;z-index:50}
+.live-inner{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.live-left{display:flex;align-items:baseline;gap:10px}
+.live-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.live-nav{font-size:28px;font-weight:900;font-family:var(--mono)}
+.live-pnav{font-size:15px;font-family:var(--mono);font-weight:700;margin-left:4px}
+.live-right{text-align:right}
+.live-cur-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}
+.live-cur-val{font-size:18px;font-weight:900;font-family:var(--mono)}
+.assume-section{margin-bottom:22px}
+.assume-sec-head{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-top:2px solid var(--text);padding-top:9px;margin-bottom:12px;display:flex;justify-content:space-between}
+.assume-table{width:100%;border-collapse:collapse}
+.assume-tr{border-bottom:1px solid var(--border)}.assume-tr:last-child{border-bottom:none}
+.assume-td{padding:11px 0;vertical-align:middle}
+.assume-td.label-col{width:55%}.assume-td.type-col{width:20%;text-align:center}.assume-td.input-col{width:25%;text-align:right}
+.assume-label{font-size:14px;font-weight:500;display:flex;align-items:center;gap:7px}
+.dir-badge{font-size:13px;font-weight:700;flex-shrink:0}
+.dir-add{color:var(--green)}.dir-sub{color:var(--red)}
+.hint-wrap{position:relative;display:inline-block}
+.hint-icon{width:16px;height:16px;border-radius:50%;border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:var(--muted);cursor:default;vertical-align:middle}
+.hint-tip{display:none;position:absolute;left:22px;top:-6px;background:var(--text);color:#fff;font-size:11px;line-height:1.5;padding:8px 12px;border-radius:6px;width:230px;z-index:200;font-weight:400;white-space:normal;font-family:var(--font)}.hint-wrap:hover .hint-tip{display:block}
+.type-badge{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:600}
+.type-pre{background:#dbeafe;color:#1e40af}.type-calc{background:#f3f4f6;color:#6b7280}
+.assume-input{width:110px;border:1.5px solid var(--border);border-radius:6px;padding:7px 9px;font-size:14px;font-family:var(--mono);font-weight:600;text-align:right;background:var(--bg);color:var(--text)}
+.assume-input:focus{outline:none;border-color:var(--text)}
+.assume-input.calc{background:var(--card);cursor:default;font-weight:700;border-color:var(--border)}
+.assume-input.calc-nav{background:var(--text);color:#fff;border-color:var(--text)}
+.run-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:800;cursor:pointer;font-family:var(--font);margin-top:8px}.run-btn:hover{background:#222}
+/* LOADING */
+.loading-wrap{text-align:center;padding:80px 24px 60px;max-width:480px;margin:0 auto}
+.loading-headline{font-size:22px;font-weight:800;margin-bottom:8px}.loading-sub{font-size:14px;color:var(--muted);margin-bottom:52px}
+.loading-steps-list{list-style:none;text-align:left;margin-bottom:40px}
+.ls-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--muted);opacity:0;transform:translateY(6px);transition:opacity .35s ease,transform .35s ease}
+.ls-item.show{opacity:1;transform:translateY(0)}.ls-item.active{color:var(--text);font-weight:600}.ls-item.done{color:var(--text)}
+.ls-dot{width:9px;height:9px;border-radius:50%;background:var(--border);flex-shrink:0}
+.ls-item.active .ls-dot{background:var(--text);animation:dotpulse .7s ease-in-out infinite}
+.ls-item.done .ls-dot{background:var(--green)}
+.ls-check{font-size:13px;color:var(--green);margin-left:auto;opacity:0}.ls-item.done .ls-check{opacity:1}
+@keyframes dotpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.4);opacity:.5}}
+.loading-bar-track{height:3px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:16px}
+.loading-bar-fill{height:100%;width:0%;background:var(--text);border-radius:3px;transition:width .4s ease}
+.loading-pct{font-size:12px;font-family:var(--mono);color:var(--muted);font-weight:600}
+/* RESULTS */
+.result-hero{text-align:center;padding:40px 0 28px;border-bottom:1px solid var(--border);margin-bottom:28px}
+.r-co-lbl{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.r-nav-price{font-size:72px;font-weight:900;font-family:var(--mono);line-height:1;margin-bottom:8px}
+.r-vs{font-size:14px;color:var(--muted)}
+/* COMPARISON PANEL */
+.compare-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:28px}
+.compare-card{border:1px solid var(--border);border-radius:10px;padding:16px}
+.compare-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px}
+.compare-val{font-size:22px;font-weight:800;font-family:var(--mono)}
+.compare-sub{font-size:11px;color:var(--muted);margin-top:3px}
+/* WATERFALL */
+.wfall-wrap{margin-bottom:28px}
+.wfall-title{font-size:14px;font-weight:700;margin-bottom:14px}
+.wfall-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.wfall-lbl{font-size:13px;width:230px;flex-shrink:0;display:flex;align-items:center;gap:6px}
+.wfall-track{flex:1;height:26px;background:var(--card);border-radius:4px;overflow:hidden}
+.wfall-bar{height:100%;border-radius:4px;display:flex;align-items:center;padding-right:8px;justify-content:flex-end}
+.wfall-bar.start-bar{background:var(--text)}
+.wfall-bar.add-bar{background:var(--green)}
+.wfall-bar.sub-bar{background:var(--red)}
+.wfall-bar.nav-bar{background:var(--text);opacity:.75}
+.wfall-bar span{font-size:10px;font-family:var(--mono);font-weight:700;color:#fff;white-space:nowrap}
+.wfall-val{font-size:12px;font-family:var(--mono);font-weight:700;width:110px;text-align:right;flex-shrink:0}
+.wfall-divider{border-top:2px solid var(--text);margin:8px 0 8px 240px}
+/* FRANCHISE GAP */
+.franchise-gap-wrap{margin-bottom:28px}
+.franchise-gap-title{font-size:14px;font-weight:700;margin-bottom:4px}
+.franchise-gap-sub{font-size:13px;color:var(--muted);margin-bottom:16px}
+.franchise-bar{height:52px;background:var(--card);border-radius:8px;position:relative;overflow:hidden;margin-bottom:12px;border:1px solid var(--border)}
+.franchise-nav-fill{position:absolute;left:0;top:0;height:100%;background:var(--text);opacity:.9;display:flex;align-items:center;padding:0 12px}
+.franchise-nav-lbl{font-size:11px;font-weight:700;color:#fff}
+.franchise-gap-fill{position:absolute;top:0;height:100%;background:repeating-linear-gradient(45deg,transparent,transparent 6px,rgba(10,10,10,.04) 6px,rgba(10,10,10,.04) 12px);display:flex;align-items:center;justify-content:center}
+.franchise-gap-lbl{font-size:12px;font-weight:700;color:var(--text)}
+.franchise-total-lbl{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:11px;font-family:var(--mono);font-weight:700;color:var(--muted)}
+/* SENSITIVITY */
+.sens-section{margin-bottom:28px}
+.sens-title{font-size:14px;font-weight:700;margin-bottom:3px}.sens-sub{font-size:13px;color:var(--muted);margin-bottom:14px}
+.sens-table{border-collapse:collapse;width:100%;font-size:12px}
+.sens-table th{font-size:10px;font-weight:600;color:var(--muted);padding:7px 10px;text-align:center;background:var(--card);border:1px solid var(--border)}
+.sens-table th:first-child{text-align:left}
+.sens-table td{font-family:var(--mono);font-weight:600;padding:7px 10px;text-align:center;border:1px solid var(--border)}
+.sens-table td:first-child{font-family:var(--font);color:var(--muted);background:var(--card);font-weight:600;text-align:left}
+.cell-low{background:#dcfce7;color:#14532d}.cell-mid{background:#fef9c3;color:#713f12}.cell-high{background:#fee2e2;color:#7f1d1d}.cell-base{background:var(--text);color:#fff}
+.impl-card{border:2px solid var(--text);border-radius:10px;padding:20px;margin-bottom:22px}
+.impl-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px}
+.impl-text{font-size:14px;line-height:1.7}
+.action-row{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap}
+.act-primary{padding:11px 22px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);text-decoration:none;display:inline-flex;align-items:center;gap:7px}
+.act-secondary{padding:11px 22px;border:1.5px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);background:var(--bg);text-decoration:none;display:inline-flex;align-items:center;gap:7px}.act-secondary:hover{border-color:var(--text)}
+@media(max-width:640px){.company-grid{grid-template-columns:repeat(2,1fr)}.nav-links,.domain-nav{display:none}.compare-grid{grid-template-columns:1fr 1fr}.wfall-lbl{width:140px;font-size:11px}}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <div class="nav-inner">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/" class="logo">Valuation<strong>Desk</strong></a>
+    <div class="nav-links">
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/">Valuation Advisory</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/">My Vault</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/deal-room/">Deal Room</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/daily-brief/">Daily Brief</a>
+    </div>
+    <div class="nav-cta">
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/" class="vault-btn">🗄 Vault (0)</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/#pricing" class="pro-btn">Get Pro — ₹799/mo</a>
+    </div>
+  </div>
+</nav>
+<div class="domain-nav">
+  <div class="domain-nav-inner">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/">Overview</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/learn/">📖 Learn</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/" class="active">🏦 NAV</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/">🗄 My Vault</a>
+  </div>
+</div>
+<div class="progress-wrap">
+  <div class="prog-bar">
+    <div class="prog-step active" id="ps1"><div class="step-num">1</div><span class="step-label">Pick a company</span></div>
+    <div class="prog-line" id="pl1"></div>
+    <div class="prog-step" id="ps2"><div class="step-num">2</div><span class="step-label">Study the assets</span></div>
+    <div class="prog-line" id="pl2"></div>
+    <div class="prog-step" id="ps3"><div class="step-num">3</div><span class="step-label">Restate the balance sheet</span></div>
+    <div class="prog-line" id="pl3"></div>
+    <div class="prog-step" id="ps4"><div class="step-num">4</div><span class="step-label">See the NAV</span></div>
+  </div>
+</div>
+
+<!-- STEP 1 -->
+<section class="step-section active" id="step1">
+  <h1 class="step-headline">Which company do you want to value by assets?</h1>
+  <p class="step-sub">NAV asks a different question from DCF and Comps: what would this company be worth if you liquidated every asset and paid off every liability today? The gap between NAV and market price is the franchise value — the brand, talent, and customer relationships that never appear on the balance sheet.</p>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterGrid('all',this)">All (30)</button>
+    <button class="filter-btn" onclick="filterGrid('india',this)">🇮🇳 India</button>
+    <button class="filter-btn" onclick="filterGrid('global',this)">🌍 Global</button>
+    <button class="filter-btn" onclick="filterGrid('it',this)">IT</button>
+    <button class="filter-btn" onclick="filterGrid('banking',this)">Banking</button>
+    <button class="filter-btn" onclick="filterGrid('fmcg',this)">FMCG</button>
+  </div>
+  <div class="company-grid" id="companyGrid"></div>
+  <button class="continue-btn" id="continueBtn" onclick="goToStep(2)">Continue with selected company →</button>
+</section>
+
+<!-- STEP 2 -->
+<section class="step-section" id="step2">
+  <button class="back-link" onclick="goToStep(1)">← Change company</button>
+  <div class="ctx-header">
+    <div class="ctx-flag" id="ctxFlag"></div>
+    <div><div class="ctx-co-name" id="ctxName"></div><div class="ctx-meta" id="ctxMeta"></div></div>
+  </div>
+  <div id="relevanceBadge"></div>
+  <div class="stat-grid" id="statGrid"></div>
+  <div class="franchise-card" id="franchiseCard">
+    <div class="fc-lbl">Estimated Franchise Value Gap</div>
+    <div class="fc-val" id="fcVal">—</div>
+    <div class="fc-note" id="fcNote">Market price premium above adjusted NAV per share — this is the brand, talent, and relationships that don't appear on any balance sheet</div>
+  </div>
+  <div class="edu-block">
+    <div class="edu-icon">🏗️</div>
+    <div class="edu-title">How relevant NAV is for this company — and why</div>
+    <div class="edu-text" id="ctxRelevance"></div>
+  </div>
+  <div class="edu-block">
+    <div class="edu-icon">💎</div>
+    <div class="edu-title">The key asset being restated — and what it reveals</div>
+    <div class="edu-text" id="ctxKeyAsset"></div>
+  </div>
+  <div class="edu-block">
+    <div class="edu-icon">🎯</div>
+    <div class="edu-title">What the P/NAV ratio tells you about this business</div>
+    <div class="edu-text" id="ctxPNav"></div>
+  </div>
+  <button class="continue-btn enabled" onclick="goToStep(3)">I've understood it. Restate the balance sheet →</button>
+</section>
+
+<!-- STEP 3 -->
+<section class="step-section" id="step3">
+  <button class="back-link" onclick="goToStep(2)">← Back to context</button>
+  <h2 class="step-headline">Restate the balance sheet at fair value</h2>
+  <p class="step-sub">Start with book equity from the balance sheet. Add upward adjustments where assets are understated (real estate, mineral reserves, investments). Subtract where liabilities are understated. The result is Adjusted NAV.</p>
+
+  <div class="live-bar">
+    <div class="live-inner">
+      <div class="live-left">
+        <span class="live-lbl">NAV / Share</span>
+        <span class="live-nav" id="liveNav">—</span>
+        <span class="live-pnav" id="livePNav"></span>
+      </div>
+      <div class="live-right">
+        <div class="live-cur-lbl">Market Price</div>
+        <div class="live-cur-val" id="liveCurPrice">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="assume-section">
+    <div class="assume-sec-head"><span>Balance Sheet Restatement</span><span style="font-family:var(--mono);font-size:11px;font-weight:400;color:var(--muted)">Book Equity → Adjusted NAV</span></div>
+    <table class="assume-table" id="navTable"></table>
+  </div>
+  <button class="run-btn" onclick="startCalc()">🏦 CALCULATE NAV 🏦</button>
+</section>
+
+<!-- LOADING -->
+<section class="step-section" id="stepLoading">
+  <div class="loading-wrap">
+    <div class="loading-headline">Restating the balance sheet...</div>
+    <div class="loading-sub">Marking assets to fair value, adjusting for off-balance-sheet items, and computing adjusted NAV</div>
+    <ul class="loading-steps-list">
+      <li class="ls-item" id="ls1"><span class="ls-dot"></span>Loading balance sheet equity<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls2"><span class="ls-dot"></span>Restating PP&E at fair value<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls3"><span class="ls-dot"></span>Marking investment portfolio to market<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls4"><span class="ls-dot"></span>Adjusting for off-balance-sheet tangible assets<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls5"><span class="ls-dot"></span>Deducting contingent and understated liabilities<span class="ls-check">✓</span></li>
+      <li class="ls-item" id="ls6"><span class="ls-dot"></span>Computing adjusted NAV per share<span class="ls-check">✓</span></li>
+    </ul>
+    <div class="loading-bar-track"><div class="loading-bar-fill" id="loadingBarFill"></div></div>
+    <div class="loading-pct" id="loadingPct">0%</div>
+  </div>
+</section>
+
+<!-- STEP 4 -->
+<section class="step-section" id="step4">
+  <button class="back-link" onclick="goToStep(3)">← Adjust restatement</button>
+  <div class="result-hero">
+    <div class="r-co-lbl" id="rCoLbl"></div>
+    <div style="font-size:15px;color:var(--muted);margin-bottom:6px">Adjusted Net Asset Value per Share</div>
+    <div class="r-nav-price" id="rNavPrice"></div>
+    <div class="r-vs" id="rVs"></div>
+  </div>
+
+  <div class="compare-grid" id="compareGrid"></div>
+
+  <div class="wfall-wrap">
+    <div class="wfall-title">NAV Restatement Waterfall</div>
+    <div id="wfallChart"></div>
+    <div class="wfall-divider"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-top:1px solid var(--border)">
+      <span style="font-size:14px;font-weight:800">÷ Shares: <span id="sharesLbl" style="font-family:var(--mono)"></span></span>
+      <span style="font-size:28px;font-weight:900;font-family:var(--mono)" id="wfallNavPS"></span>
+    </div>
+  </div>
+
+  <div class="franchise-gap-wrap">
+    <div class="franchise-gap-title">Franchise Value — The Gap Between NAV and Market Price</div>
+    <div class="franchise-gap-sub">The shaded portion is the franchise value: brand, talent, customer relationships, and competitive advantages that don't appear on any balance sheet.</div>
+    <div class="franchise-bar" id="franchiseBar"></div>
+    <div class="ff-legend" style="display:flex;gap:16px;font-size:12px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;background:var(--text);border-radius:2px"></div><span>Adjusted NAV</span></div>
+      <div style="display:flex;align-items:center;gap:6px"><div style="width:12px;height:12px;background:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(10,10,10,.08) 4px,rgba(10,10,10,.08) 8px);border:1px solid var(--border);border-radius:2px"></div><span>Franchise Value (intangibles not on balance sheet)</span></div>
+    </div>
+  </div>
+
+  <div class="impl-card">
+    <div class="impl-title">🎓 What this NAV tells you</div>
+    <div class="impl-text" id="rInsight"></div>
+  </div>
+
+  <div class="sens-section">
+    <div class="sens-title">Sensitivity: NAV per Share</div>
+    <div class="sens-sub" id="sensSub"></div>
+    <div style="overflow-x:auto"><table class="sens-table" id="sensTable"></table></div>
+  </div>
+
+  <div class="action-row">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/football-field.html" class="act-primary">🏈 Add to Football Field →</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/dcf.html" class="act-primary" style="background:#374151">📈 Compare to DCF →</a>
+    <button class="act-secondary" onclick="resetAll()">↺ Value another company</button>
+  </div>
+</section>
+
+<script>
+// relevance: 'high' | 'medium' | 'low'
+// bookEquity, ppeAdj, invAdj, otherAdj in cur/unit
+// otherLabel: what the 'other' adjustment is (company-specific asset)
+// liabAdj: understated liabilities (negative number)
+const CO = [
+  {id:'reliance',name:'Reliance Industries',ticker:'RELIANCE',flag:'🇮🇳',sector:'Conglomerate',tags:['india'],cur:'₹',unit:'Cr',shares:1350,price:1400,
+   bookEquity:600000,ppeAdj:80000,invAdj:50000,otherAdj:10000,otherLabel:'Pipeline and gas infrastructure premium',liabAdj:0,
+   rel:'medium',ctx:{r:'NAV is a secondary method for Reliance — the company is valued on earnings (EV/EBITDA) not assets. But NAV reveals a crucial insight: the balance sheet book value of ₹6 lakh Cr understates the true replacement cost of Reliance\'s refinery, telecom infrastructure, and pipeline assets.',k:'The PP&E adjustment of ₹80,000 Cr reflects the replacement cost of Reliance\'s refining capacity and Jio\'s network infrastructure versus their depreciated book value. Physical infrastructure with 30+ year life always depreciates faster on the balance sheet than it degrades in real-world value.',p:'At 2.28x P/NAV, Reliance\'s franchise premium reflects three intangibles: (1) Jio\'s first-mover telecom advantage, (2) Retail\'s distribution network built over 20 years, (3) Management\'s track record of capital allocation at scale. These don\'t appear on the balance sheet.'}},
+
+  {id:'tcs',name:'TCS',ticker:'TCS',flag:'🇮\N',sector:'IT Services',tags:['india','it'],cur:'₹',unit:'Cr',shares:363,price:4000,
+   bookEquity:70000,ppeAdj:-5000,invAdj:15000,otherAdj:0,otherLabel:'',liabAdj:0,
+   rel:'low',ctx:{r:'NAV is largely irrelevant for TCS — the company\'s value is almost entirely intangible. Physical assets (offices, computers) are worth less than book value (depreciation overstates them). The entire ₹14.5 lakh Cr market cap rests on talent, client relationships, and brand.',k:'The investment adjustment of ₹15,000 Cr reflects treasury investments at market value vs book. PP&E is adjusted downward (offices depreciate faster in tech than balance sheet implies). The adjusted NAV of ~₹220/share vs ₹4,000 market price makes the franchise gap vivid.',p:'At 18x P/NAV, TCS\'s franchise premium of ₹3,780/share is the book value of 150+ Fortune 500 client relationships, 600,000 employees, and 50+ years of IP and methodologies. This is one of the highest P/NAV ratios in Indian markets — and it\'s earned, not speculative.'}},
+
+  {id:'hdfc',name:'HDFC Bank',ticker:'HDFCBANK',flag:'🇮\N',sector:'Banking',tags:['india','banking'],cur:'₹',unit:'Cr',shares:750,price:1600,
+   bookEquity:350000,ppeAdj:8000,invAdj:15000,otherAdj:0,otherLabel:'',liabAdj:-15000,
+   rel:'high',ctx:{r:'NAV is highly relevant for banks — book value IS the fundamental anchor. Banks create value by earning RoE above cost of equity. P/B (= P/NAV for banks) is the primary valuation metric because the balance sheet IS the business: loan assets funded by deposit liabilities.',k:'For HDFC Bank, the adjusted NAV restates the investment portfolio (bond mark-to-market), branch network (fair value vs book), and applies a conservative loan loss adjustment. The result is a cleaner P/B multiple than raw book equity provides.',p:'At ~3.4x P/NAV, HDFC Bank trades at one of the highest P/B ratios among Indian private banks. This premium reflects 30 years of consistent RoE above cost of equity — the only sustainable justification for any P/B above 1.0x.'}},
+
+  {id:'infosys',name:'Infosys',ticker:'INFY',flag:'🇮\N',sector:'IT Services',tags:['india','it'],cur:'₹',unit:'Cr',shares:415,price:1540,
+   bookEquity:50000,ppeAdj:5000,invAdj:20000,otherAdj:0,otherLabel:'',liabAdj:0,
+   rel:'low',ctx:{r:'Like TCS, NAV is a secondary method for Infosys. Physical assets (offices, servers) are minimal relative to the market cap. The company\'s worth lies in its engineering talent, client trust, and delivery methodology — none of which appear on the balance sheet.',k:'The investment adjustment of ₹20,000 Cr reflects treasury liquid investments and corporate bonds. PP&E is adjusted upward modestly for development centres (owned campuses in Mysuru, Pune) that hold value better than the depreciated book suggests.',p:'At ~8.5x P/NAV, Infosys commands a lower franchise premium than TCS (18x) — consistent with its lower margins, somewhat more volatile client relationships, and smaller brand moat. This gap in P/NAV directly mirrors the gap in P/E between TCS and Infosys.'}},
+
+  {id:'asianpaint',name:'Asian Paints',ticker:'ASIANPAINT',flag:'🇮\N',sector:'FMCG/Paints',tags:['india','fmcg'],cur:'₹',unit:'Cr',shares:96,price:2900,
+   bookEquity:12000,ppeAdj:3000,invAdj:2000,otherAdj:2000,otherLabel:'Distribution network infrastructure (warehouses, tinting machines)',liabAdj:0,
+   rel:'low',ctx:{r:'NAV is not the primary method for Asian Paints — a brand-driven consumer company\'s value lies overwhelmingly in intangibles. The physical manufacturing assets (plants, mixing machines) are worth far less than the distribution network and brand equity.',k:'The PP&E adjustment reflects Asian Paints\' manufacturing plants at replacement cost versus historical book. The "other" adjustment values the physical distribution infrastructure — tinting machines installed at 80,000+ dealer locations — which have real economic value not captured in book value.',p:'At 16x P/NAV, Asian Paints\' franchise premium represents the Apcolite, Tractor, and Royale brand equity plus 80 years of dealer relationship building. This intangible is what Grasim is spending thousands of crores to attempt to replicate — and still failing to match.'}},
+
+  {id:'zomato',name:'Zomato',ticker:'ZOMATO',flag:'🇮\N',sector:'Consumer Tech',tags:['india'],cur:'₹',unit:'Cr',shares:875,price:240,
+   bookEquity:15000,ppeAdj:0,invAdj:3000,otherAdj:0,otherLabel:'',liabAdj:0,
+   rel:'low',ctx:{r:'NAV is not applicable for Zomato in any meaningful way — the company has almost no physical assets. Its value lies entirely in its network (restaurants, delivery partners, consumers), the Blinkit dark store density, and the platform data and algorithms.',k:'The entire book equity is essentially cash from the IPO and subsequent fundraising. PP&E is negligible (dark stores are leased, delivery partners are gig workers). Adjusted NAV is barely above book — the entire ₹2.1 lakh Cr market cap is a bet on future earnings.',p:'At ~12x P/NAV, Zomato\'s franchise gap is entirely forward-looking. The question is simple: will Blinkit and food delivery generate enough EBITDA to justify paying 12x book value today? If yes, the franchise value is real. If no, NAV of ₹20/share is the floor price in a distress scenario.'}},
+
+  {id:'wipro',name:'Wipro',ticker:'WIPRO',flag:'🇮\N',sector:'IT Services',tags:['india','it'],cur:'₹',unit:'Cr',shares:519,price:520,
+   bookEquity:55000,ppeAdj:3000,invAdj:15000,otherAdj:0,otherLabel:'',liabAdj:0,
+   rel:'low',ctx:{r:'NAV is secondary for Wipro, like all IT services companies. Physical assets are minimal. The Capco acquisition added goodwill to the balance sheet (not adjusted here) but no tangible assets of note.',k:'PP&E adjustment of ₹3,000 Cr reflects Wipro\'s owned campuses (Sarjapur, Electronic City) at fair value. Investment portfolio of ₹15,000 Cr at market value. No significant understated liabilities.',p:'At 3.7x P/NAV, Wipro\'s franchise premium is notably lower than TCS (18x) or Infosys (8.5x). This directly reflects Wipro\'s more limited brand moat, lower client retention, and smaller competitive advantage in the IT services market. P/NAV is a mirror of competitive position.'}},
+
+  {id:'maruti',name:'Maruti Suzuki',ticker:'MARUTI',flag:'🇮\N',sector:'Auto OEM',tags:['india'],cur:'₹',unit:'Cr',shares:30,price:12500,
+   bookEquity:42000,ppeAdj:15000,invAdj:5000,otherAdj:5000,otherLabel:'Dealer network infrastructure and tooling at replacement cost',liabAdj:0,
+   rel:'medium',ctx:{r:'NAV is moderately relevant for Maruti — auto manufacturing companies have significant physical assets. The manufacturing plants at Gurgaon and Manesar, tooling, and dealer infrastructure have real replacement costs significantly above book depreciation.',k:'PP&E adjustment of ₹15,000 Cr reflects Maruti\'s manufacturing facilities at replacement cost. A plant that generates ₹1.5 lakh Cr of annual revenue requires replacement investment far above the depreciated book value on a 30-year cost basis.',p:'At 6x P/NAV, Maruti\'s franchise premium is moderate for an auto company — reflecting the genuine intangible value of 41% market share, Suzuki Japan\'s technology access, and the most trusted small car brand in India. Lower than IT peers because physical assets matter more in auto manufacturing.'}},
+
+  {id:'bajfinance',name:'Bajaj Finance',ticker:'BAJFINANCE',flag:'🇮\N',sector:'NBFC',tags:['india','banking'],cur:'₹',unit:'Cr',shares:61,price:7400,
+   bookEquity:66000,ppeAdj:0,invAdj:2000,otherAdj:0,otherLabel:'',liabAdj:-5000,
+   rel:'high',ctx:{r:'NAV (= book value) is the primary anchor for NBFCs, just as for banks. Bajaj Finance\'s balance sheet IS the business — the loan portfolio on the asset side, funded by wholesale borrowings and equity on the liabilities side. P/B = P/NAV for NBFCs.',k:'The liability adjustment of -₹5,000 Cr reflects conservative provisioning beyond the regulatory minimum — Bajaj Finance maintains higher-than-required provisions for stressed consumer loans. This is a conservative management practice that reduces reported book value below truly "cleaned" NAV.',p:'At 7x P/NAV (effectively 7x P/B), Bajaj Finance commands the highest franchise premium among Indian financial companies. This premium is earned: 22-24% consistent RoE over a decade, technology-first credit underwriting, and the Bajaj brand trust across India\'s middle class.'}},
+
+  {id:'itc',name:'ITC',ticker:'ITC',flag:'🇮\N',sector:'FMCG/Tobacco',tags:['india','fmcg'],cur:'₹',unit:'Cr',shares:1250,price:450,
+   bookEquity:35000,ppeAdj:10000,invAdj:5000,otherAdj:15000,otherLabel:'Hotel properties (ITC Grand, ITC Maurya, WelcomHotel) at fair value vs book',liabAdj:0,
+   rel:'medium',ctx:{r:'NAV has meaningful relevance for ITC because it owns significant hard assets — luxury hotels, tobacco manufacturing facilities, and paper mills. The book value substantially understates the replacement cost of ITC Grand Chola alone, which is among the most expensive hotels ever built in India.',k:'The hotel asset adjustment of ₹15,000 Cr reflects ITC\'s owned luxury hotel properties at fair market value. A hotel like ITC Grand Chola built for ₹2,000 Cr in 2011 would cost ₹4,000+ Cr to build today — this is the PP&E restatement in one building.',p:'At 8.7x P/NAV, ITC\'s franchise premium is lower than pure FMCG peers (HUL at 51x) because the balance sheet has more tangible value. Cigarettes factories, paper mills, and hotels are real hard assets. The franchise gap is smaller because ITC\'s competitive advantage is more physical.'}},
+
+  {id:'hul',name:'Hindustan Unilever',ticker:'HINDUNILVR',flag:'🇮\N',sector:'FMCG',tags:['india','fmcg'],cur:'₹',unit:'Cr',shares:235,price:2400,
+   bookEquity:8000,ppeAdj:2000,invAdj:1000,otherAdj:0,otherLabel:'',liabAdj:0,
+   rel:'low',ctx:{r:'HUL is the extreme case of NAV irrelevance. With only ₹8,000 Cr of book equity against a ₹5.64 lakh Cr market cap, virtually the entire company value is intangible. Physical manufacturing assets are almost negligible relative to the brand empire HUL has built over 90 years.',k:'HUL\'s physical assets are concentrated in a few owned manufacturing plants (Silvassa, Haridwar, Hindupur). Most production is outsourced. The company deliberately avoids asset intensity — negative working capital means distributors fund operations. The adjusted NAV barely moves from book.',p:'At 51x P/NAV, HUL has the highest franchise premium among Indian large-caps. The ₹2,354/share of franchise value represents Dove, Surf Excel, Lux, Pond\'s, Knorr — 30+ brands each with 30-50% market share in their categories. These brands are built over generations and cannot be replicated.'}},
+
+  {id:'tatamotors',name:'Tata Motors',ticker:'TATAMOTORS',flag:'🇮\N',sector:'Auto OEM',tags:['india'],cur:'₹',unit:'Cr',shares:366,price:1000,
+   bookEquity:60000,ppeAdj:40000,invAdj:5000,otherAdj:0,otherLabel:'',liabAdj:-5000,
+   rel:'medium',ctx:{r:'NAV is moderately relevant for Tata Motors — it owns significant physical assets across JLR\'s UK manufacturing plants (Castle Bromwich, Solihull, Halewood) and India\'s Jamshedpur, Lucknow, Pune facilities. Replacement cost of these assets is substantially above depreciated book value.',k:'The PP&E adjustment of ₹40,000 Cr reflects JLR\'s UK manufacturing facilities at replacement cost. Solihull plant alone produces Range Rovers worth billions annually and would cost £2B+ to rebuild today at original capacity.',p:'At 3.5x P/NAV, Tata Motors\' franchise premium is the JLR brand equity and India\'s Tata brand in EVs. At lower-than-peer P/NAV, the market is saying: Tata Motors\' physical assets are worth a lot relative to their brand premium — which makes sense for a manufacturing-heavy auto company.'}},
+
+  {id:'sunpharma',name:'Sun Pharma',ticker:'SUNPHARMA',flag:'🇮\N',sector:'Pharma',tags:['india'],cur:'₹',unit:'Cr',shares:240,price:1600,
+   bookEquity:40000,ppeAdj:8000,invAdj:5000,otherAdj:15000,otherLabel:'Drug licenses, FDA-approved ANDAs, and specialty drug IP portfolio',liabAdj:0,
+   rel:'medium',ctx:{r:'NAV has moderate relevance for Sun Pharma because it owns FDA-approved manufacturing facilities (an extremely valuable regulated asset) and drug licenses/ANDAs that aren\'t fully reflected on the balance sheet at fair value.',k:'The "other" adjustment of ₹15,000 Cr reflects the fair value of Sun Pharma\'s FDA-approved ANDA portfolio and specialty drug licenses. Each approved ANDA cost ₹20-50 Cr to develop and is carried at amortised cost — the portfolio\'s market value significantly exceeds book.',p:'At 5.7x P/NAV, Sun Pharma\'s franchise gap represents the US specialty drug business potential (Ilumya, Cequa, Levulan), India branded prescriber relationships, and the regulatory expertise to navigate complex FDA approvals. These are the intangibles that smaller pharma companies pay billions to acquire.'}},
+
+  {id:'adaniports',name:'Adani Ports',ticker:'ADANIPORTS',flag:'🇮\N',sector:'Infrastructure',tags:['india'],cur:'₹',unit:'Cr',shares:215,price:1050,
+   bookEquity:30000,ppeAdj:20000,invAdj:5000,otherAdj:15000,otherLabel:'Port concession rights valued at DCF (30-year Government of India grants)',liabAdj:0,
+   rel:'high',ctx:{r:'NAV is highly relevant for Adani Ports — infrastructure assets have predictable cash flows, long useful lives, and replacement costs far above book depreciation. Port concession rights (government grants for 30-50 years) are the most critical asset to restate at fair value.',k:'The concession rights adjustment of ₹15,000 Cr reflects the NPV of long-term port operating rights granted by the Government of India. These rights are carried at amortised cost on the balance sheet but are worth their DCF value in any asset transaction.',p:'At 3.2x P/NAV, Adani Ports\' franchise premium is modest — appropriate for a capital-heavy infrastructure company where physical assets are the primary value driver. The post-Hindenburg discount reduced the franchise premium from its historical 4x+ level.'}},
+
+  {id:'kotak',name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',flag:'🇮\N',sector:'Banking',tags:['india','banking'],cur:'₹',unit:'Cr',shares:200,price:1900,
+   bookEquity:90000,ppeAdj:0,invAdj:10000,otherAdj:20000,otherLabel:'Kotak AMC, Securities, and Insurance subsidiaries at fair market value vs book cost',liabAdj:-5000,
+   rel:'high',ctx:{r:'NAV is the primary method for Kotak Mahindra Bank. Like all banks, book value is the anchor. But Kotak has a meaningful additional dimension: its subsidiaries (AMC, Securities, Insurance) are carried at book cost in the parent\'s balance sheet but have significantly higher market values.',k:'The "other" adjustment of ₹20,000 Cr reflects the fair market value of Kotak AMC (comparable to HDFC AMC at ₹50,000+ Cr market cap, Kotak owns 100%), Kotak Securities (comparable to ICICI Securities), and Kotak Life Insurance — all carried at historical cost in the parent\'s consolidated NAV.',p:'At 3.3x P/NAV, Kotak commands a significant bank franchise premium. But unlike HDFC Bank, Kotak\'s P/NAV includes a meaningful subsidiary premium — the AMC and securities businesses alone justify a large portion of the premium above book value.'}},
+
+  // GLOBAL
+  {id:'apple',name:'Apple',ticker:'AAPL',flag:'🇺🇸',sector:'Consumer Tech',tags:['global','it'],cur:'$',unit:'B',shares:15.4,price:190,
+   bookEquity:57,ppeAdj:10,invAdj:15,otherAdj:0,otherLabel:'',liabAdj:0,
+   rel:'low',ctx:{r:'NAV is almost completely irrelevant for Apple. With only $57B of book equity (after decades of buybacks) against a $2.9T market cap, the company has systematically returned book value to shareholders through buybacks — which reduces book value but increases per-share economics.',k:'The PP&E adjustment reflects Apple\'s Cupertino campus and global retail stores at market value. The investment portfolio ($70B+ in marketable securities) is marked at market. Even with restatements, adjusted NAV is barely $82B — 2.8% of the market cap.',p:'At 35x P/NAV, Apple has the highest franchise premium in our global universe alongside NVIDIA. The $184/share of franchise value represents the iPhone ecosystem lock-in, the App Store\'s 1 billion+ paying users, and 25 years of the world\'s most powerful consumer hardware brand.'}},
+
+  {id:'microsoft',name:'Microsoft',ticker:'MSFT',flag:'🇺🇸',sector:'Cloud / Enterprise',tags:['global','it'],cur:'$',unit:'B',shares:7.4,price:420,
+   bookEquity:206,ppeAdj:20,invAdj:40,otherAdj:0,otherLabel:'',liabAdj:0,
+   rel:'low',ctx:{r:'NAV is secondary for Microsoft, though higher book equity ($206B post-Activision) than most tech peers gives it a more meaningful floor. The majority of Microsoft\'s value is in recurring SaaS revenue, Azure infrastructure, and the CUDA-equivalent lock-in that GitHub Copilot and M365 Copilot create.',k:'PP&E adjustment of $20B reflects Microsoft\'s global data centre infrastructure at replacement cost. Building 200+ data centres globally at today\'s construction costs substantially exceeds the depreciated book value of those assets.',p:'At 11.7x P/NAV, Microsoft\'s franchise premium is lower than Apple or NVIDIA — because $206B of book equity is a real, substantial asset base (Activision goodwill, Azure infrastructure, LinkedIn). The franchise gap per share is still enormous at $384/share.'}},
+
+  {id:'tesla',name:'Tesla',ticker:'TSLA',flag:'🇺🇸',sector:'EV / Energy',tags:['global'],cur:'$',unit:'B',shares:3.18,price:250,
+   bookEquity:63,ppeAdj:20,invAdj:10,otherAdj:0,otherLabel:'',liabAdj:0,
+   rel:'medium',ctx:{r:'NAV is moderately relevant for Tesla — it owns significant physical assets in the Gigafactories (Austin, Berlin, Shanghai, Fremont). These capital-intensive manufacturing assets have replacement costs substantially above depreciated book value.',k:'Gigafactory Texas alone cost $5B+ to build. Gigafactory Shanghai is valued in the books at historical CNY cost. Restating all four active Gigafactories at replacement cost adds approximately $20B to the balance sheet.',p:'At 8.6x P/NAV, Tesla\'s franchise premium is the Supercharger network (now licensed to other OEMs), the FSD software option value, the Elon Musk brand association, and the head start in large-format battery manufacturing. Moderate P/NAV reflects Tesla\'s balance between physical assets and intangible platform value.'}},
+
+  {id:'alphabet',name:'Alphabet',ticker:'GOOGL',flag:'🇺🇸',sector:'Search / Cloud',tags:['global','it'],cur:'$',unit:'B',shares:12.6,price:175,
+   bookEquity:269,ppeAdj:50,invAdj:30,otherAdj:0,otherLabel:'',liabAdj:0,
+   rel:'low',ctx:{r:'NAV is secondary for Alphabet, though its $269B book equity is one of the largest among US tech companies. This book value includes significant accumulated data centre and subsea cable infrastructure — hard assets that hold real value beyond their depreciated book amount.',k:'The PP&E adjustment of $50B reflects Alphabet\'s global data centre portfolio (70+ data centres), quantum computing infrastructure, and subsea cable investments at replacement cost. Google has spent $200B+ on data centres over a decade — replacement cost substantially exceeds net book value.',p:'At 6.3x P/NAV, Alphabet\'s franchise premium is lower than Apple or NVIDIA — because its $349B adjusted NAV is a real, substantial asset base. The franchise gap per share of $147 represents Google Search\'s 30-year brand equity, YouTube\'s creator ecosystem, and Waymo\'s autonomous vehicle data. All off the balance sheet.'}},
+
+  {id:'amazon',name:'Amazon',ticker:'AMZN',flag:'🇺🇸',sector:'Cloud / E-commerce',tags:['global','it'],cur:'$',unit:'B',shares:10.5,price:171,
+   bookEquity:164,ppeAdj:60,invAdj:10,otherAdj:0,otherLabel:'',liabAdj:0,
+   rel:'low',ctx:{r:'NAV is secondary for Amazon but has more relevance than for pure software companies. Amazon owns an enormous physical infrastructure: 250+ fulfilment centres, 100+ sort centres, 1,200+ delivery stations, and 200+ data centres globally. These assets depreciate in book value but hold real economic value.',k:'The PP&E adjustment of $60B reflects fulfilment and data centre infrastructure at replacement cost. Building an equivalent fulfilment network from scratch today would cost $150-200B — the adjusted NAV only captures a fraction of this because we\'re restating to fair value, not speculative replacement cost.',p:'At 7.7x P/NAV, Amazon\'s franchise premium reflects AWS\'s software and customer lock-in, Prime\'s 200M member loyalty programme, and Alexa\'s smart home ecosystem. Lower P/NAV than Apple or NVIDIA because Amazon\'s physical infrastructure is large enough to anchor a meaningful NAV floor.'}},
+
+  {id:'meta',name:'Meta',ticker:'META',flag:'🇺🇸',sector:'Social / AI',tags:['global','it'],cur:'$',unit:'B',shares:2.56,price:550,
+   bookEquity:125,ppeAdj:20,invAdj:15,otherAdj:0,otherLabel:'',liabAdj:0,
+   rel:'low',ctx:{r:'NAV is secondary for Meta — the company\'s value is in its network of 3B+ daily active users, not physical assets. Data centres and servers (PP&E) are substantial but a small fraction of the market cap.',k:'The PP&E adjustment of $20B reflects Meta\'s global data centre infrastructure (100+ facilities) at replacement cost. Meta invested $35B in capex in FY24 alone — annual new investment significantly exceeds the depreciation of older assets, creating a widening gap between net book value and replacement cost.',p:'At 8.8x P/NAV, Meta\'s franchise premium is the social network moat: Instagram\'s 2B users, WhatsApp\'s 2.5B users, Facebook\'s 3B users, and the AI ad-targeting advantage that generates 85%+ gross margins on advertising. These networks took 20 years to build and cannot be purchased at any book value.'}},
+
+  {id:'berkshire',name:'Berkshire Hathaway',ticker:'BRK.B',flag:'🇺🇸',sector:'Conglomerate',tags:['global','banking'],cur:'$',unit:'B',shares:1.45,price:620,
+   bookEquity:520,ppeAdj:30,invAdj:30,otherAdj:0,otherLabel:'',liabAdj:0,
+   rel:'high',ctx:{r:'NAV is HIGHLY relevant for Berkshire — Buffett himself has said that book value growth tracks intrinsic value closely. Berkshire\'s balance sheet is the product: it\'s a collection of quality businesses and equity stakes, all valued at book or market. P/B IS P/NAV for Berkshire.',k:'The PP&E adjustment of $30B reflects BNSF\'s rail infrastructure and BHE\'s utility assets at replacement cost vs depreciated book. The investment portfolio adjustment of $30B captures the remaining gap between cost basis and fair value for private equity and unlisted holdings.',p:'At 1.55x P/NAV, Berkshire trades closer to NAV than any other company in our universe (alongside Samsung and Toyota). Buffett\'s own share repurchase floor is ~1.5x book — meaning at current prices, Berkshire itself considers the stock at or near fair NAV value.'}},
+
+  {id:'nvidia',name:'NVIDIA',ticker:'NVDA',flag:'🇺🇸',sector:'Semiconductors / AI',tags:['global','it'],cur:'$',unit:'B',shares:24.4,price:135,
+   bookEquity:42,ppeAdj:5,invAdj:15,otherAdj:0,otherLabel:'',liabAdj:0,
+   rel:'low',ctx:{r:'NAV is almost completely irrelevant for NVIDIA — a fabless semiconductor company with minimal physical assets. NVIDIA doesn\'t own any fabs (TSMC manufactures its chips). Physical assets are offices, servers for development, and some testing equipment.',k:'The PP&E adjustment of $5B is very modest — NVIDIA\'s R&D facilities and HQ at Santa Clara have some fair value above depreciated book. The investment portfolio of $15B is marked at market. Even fully adjusted, NAV barely reaches $62B.',p:'At 53x P/NAV, NVIDIA has the highest franchise premium in our universe. The $132/share franchise value is the CUDA software ecosystem (17 million developers), the H100/Blackwell monopoly on AI training, and the NIM microservices platform — intangibles that take a decade to build and that no amount of book value can replicate.'}},
+
+  {id:'netflix',name:'Netflix',ticker:'NFLX',flag:'🇺🇸',sector:'Streaming',tags:['global','it'],cur:'$',unit:'B',shares:0.43,price:900,
+   bookEquity:9,ppeAdj:2,invAdj:3,otherAdj:10,otherLabel:'Content library at fair value (owned originals vs amortised book cost)',liabAdj:0,
+   rel:'low',ctx:{r:'NAV is secondary for Netflix, but the content library is worth exploring. Originals like Squid Game, Stranger Things, and Wednesday are amortised aggressively on the books — their true audience value may exceed their net book value.',k:'The content library adjustment of $10B reflects Netflix-owned original content at fair value versus aggressively amortised book cost. A show like Squid Game with 300M household viewers has real licensing and franchise value that disappears from the balance sheet within 3 years under standard amortisation.',p:'At 16x P/NAV, Netflix\'s franchise premium is the subscriber base (270M+), the global content production infrastructure, and the recommendation algorithm that has become the world\'s most influential content curator. These are intangibles built over 25 years.'}},
+
+  {id:'samsung',name:'Samsung Electronics',ticker:'005930',flag:'🇰🇷',sector:'Semiconductors',tags:['global','it'],cur:'$',unit:'B',shares:6.0,price:58,
+   bookEquity:230,ppeAdj:50,invAdj:20,otherAdj:0,otherLabel:'',liabAdj:0,
+   rel:'high',ctx:{r:'NAV is highly relevant for Samsung — it is one of the most asset-heavy technology companies in the world. Semiconductor fabs, OLED display manufacturing facilities, and appliance factories have enormous replacement costs. Samsung trades remarkably close to NAV — a persistent chaebol governance discount.',k:'The PP&E adjustment of $50B reflects Samsung\'s semiconductor fabs (each fab costs $15-20B to build) and OLED display factories at replacement cost. Constructing equivalent manufacturing capacity today would cost hundreds of billions — the adjusted NAV only partially captures this.',p:'At 1.16x P/NAV — the lowest in our universe outside of Berkshire and Toyota — Samsung trades essentially at book value. This is the chaebol governance discount: despite owning irreplaceable assets and $70B+ net cash, the market ascribes minimal franchise premium due to opacity, cross-shareholding, and minority shareholder concerns.'}},
+
+  {id:'alibaba',name:'Alibaba',ticker:'BABA',flag:'🇨\N',sector:'E-commerce / Cloud',tags:['global','it'],cur:'$',unit:'B',shares:3.1,price:80,
+   bookEquity:125,ppeAdj:10,invAdj:20,otherAdj:0,otherLabel:'',liabAdj:0,
+   rel:'low',ctx:{r:'NAV is secondary for Alibaba. Most value is intangible: the Taobao/Tmall marketplace network, Alibaba Cloud\'s customer relationships, and the Cainiao logistics network. Physical assets (data centres, warehouses) are relatively minor.',k:'The investment portfolio adjustment of $20B reflects Alibaba\'s equity stakes in listed companies (including various China tech investments) at current market value versus cost basis. PP&E adjustment is modest — data centres at replacement cost.',p:'At 1.6x P/NAV, Alibaba trades remarkably close to book value — a consequence of the regulatory crackdown that has compressed the franchise premium from its historical 5-8x level. At 1.6x, the market is saying: the regulatory and governance risk is so high that almost no intangible franchise premium is warranted.'}},
+
+  {id:'tsmc',name:'TSMC',ticker:'TSM',flag:'🇹\W',sector:'Semiconductor Foundry',tags:['global','it'],cur:'$',unit:'B',shares:4.7,price:175,
+   bookEquity:115,ppeAdj:80,invAdj:0,otherAdj:0,otherLabel:'',liabAdj:0,
+   rel:'high',ctx:{r:'NAV is highly relevant for TSMC — semiconductor fabs are among the most expensive manufactured assets in human history. A leading-edge N3 fab costs $15-20B to build and requires 10+ years of process development to operate at viable yield rates.',k:'The PP&E adjustment of $80B is the largest in our global universe. TSMC operates 14+ fabs globally. At N3/N2 process nodes, building equivalent capacity today would cost $200B+. The depreciated book value of ₹115B is a fraction of the true replacement cost.',p:'At 4.2x P/NAV, TSMC\'s franchise premium is moderate for a technology monopoly — because the physical fabs ARE the moat. Unlike NVIDIA or Apple where assets are tiny and franchise premium is extreme, TSMC\'s moat is partly physical (the fabs themselves) and partly intangible (the yield rate expertise that no competitor can replicate).'}},
+
+  {id:'toyota',name:'Toyota',ticker:'TM',flag:'🇯\P',sector:'Auto OEM',tags:['global'],cur:'$',unit:'B',shares:14.5,price:24,
+   bookEquity:195,ppeAdj:40,invAdj:30,otherAdj:0,otherLabel:'',liabAdj:0,
+   rel:'high',ctx:{r:'NAV is highly relevant for Toyota — one of the world\'s most asset-intensive manufacturers. Global assembly plants across 28 countries, supplier relationships, and the cross-shareholding portfolio with component makers (Denso, Aisin, etc.) all carry significant fair value above book.',k:'The investment portfolio adjustment of $30B reflects Toyota\'s equity stakes in Denso, Aisin, Subaru, Mazda, Hino, and other affiliated companies at current market value versus their cost basis on Toyota\'s balance sheet.',p:'At 1.31x P/NAV, Toyota trades very close to book value — typical for Japanese auto OEMs which combine enormous physical assets with compressed governance-driven valuation multiples. The franchise premium of $5.7/share reflects the Lexus brand, Toyota Production System IP, and hybrid technology — modest franchise value for a company of this quality.'}},
+
+  {id:'nestle',name:'Nestle',ticker:'NESN',flag:'🇨\H',sector:'FMCG',tags:['global','fmcg'],cur:'$',unit:'B',shares:2.8,price:100,
+   bookEquity:22,ppeAdj:8,invAdj:5,otherAdj:0,otherLabel:'',liabAdj:0,
+   rel:'low',ctx:{r:'NAV is secondary for Nestle — the company has systematically returned book equity through dividends and buybacks for decades, leaving a small book equity relative to its market cap. The real value is in 90+ years of brand building across 2,000+ products in 190 countries.',k:'PP&E adjustment of $8B reflects Nestle\'s global manufacturing facilities (340+ factories) at replacement cost. Many factories are 50+ years old with accumulated depreciation far exceeding their still-operational economic value. The investment portfolio includes several minority stakes in food and beverage companies.',p:'At 8x P/NAV, Nestle\'s franchise premium reflects the Nespresso, Purina, KitKat, and Nesquik brand portfolios — built through generations of marketing investment that never appears as an asset on the balance sheet. Lower than HUL (51x) because Nestle\'s physical manufacturing network is larger and more asset-intensive.'}},
+
+  {id:'bhp',name:'BHP Group',ticker:'BHP',flag:'🇦\U',sector:'Mining',tags:['global'],cur:'$',unit:'B',shares:5.08,price:43,
+   bookEquity:60,ppeAdj:40,invAdj:5,otherAdj:5,otherLabel:'Mineral reserves in ground valued at long-run commodity prices (not historical exploration cost)',liabAdj:-5,
+   rel:'high',ctx:{r:'NAV is highly relevant for mining companies — the primary value driver is mineral reserves in the ground, which are carried at exploration cost on the balance sheet but should be valued at the NPV of future commodity cash flows.',k:'The PP&E adjustment of $40B reflects mining equipment, infrastructure, and processing plants at replacement cost. The "other" adjustment of $5B values BHP\'s copper reserves (Escondida, Olympic Dam) at long-run copper prices — the difference between exploration cost and economic value of proven reserves.',p:'At 2.08x P/NAV, BHP trades at a moderate premium to book — reflecting the copper optionality (Olympic Dam at long-run prices) and the franchise premium of BHP\'s operational expertise in bulk commodities. Mining companies without reserve quality command only 0.8-1.2x P/NAV; BHP\'s copper position justifies the premium.'}},
+];
+
+let selId = null, calcState = {};
+
+window.onload = () => renderGrid('all');
+
+function renderGrid(f) {
+  const g = document.getElementById('companyGrid'); g.innerHTML = '';
+  CO.forEach(co => {
+    const show = f === 'all' || co.tags.includes(f);
+    const el = document.createElement('div');
+    el.className = 'company-card' + (co.id === selId ? ' selected' : '') + (!show ? ' hidden' : '');
+    el.innerHTML = `<div class="co-flag">${co.flag}</div><div class="co-name">${co.name}</div><div class="co-ticker">${co.ticker}</div><div class="co-sector">${co.sector}</div>`;
+    el.onclick = () => { selId = co.id; document.querySelectorAll('.company-card').forEach(c => c.classList.remove('selected')); el.classList.add('selected'); document.getElementById('continueBtn').classList.add('enabled'); };
+    g.appendChild(el);
+  });
+}
+function filterGrid(f, btn) { document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); renderGrid(f); }
+
+function goToStep(n) {
+  document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('step' + n).classList.add('active');
+  updateProg(n);
+  if (n === 2) renderCtx();
+  if (n === 3) buildTable();
+  if (n === 4) renderResults();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function updateProg(n) {
+  [1,2,3,4].forEach(i => {
+    const ps = document.getElementById('ps' + i); ps.classList.remove('active','done');
+    if (i < n) ps.classList.add('done'); if (i === n) ps.classList.add('active');
+    if (i < 4) { const pl = document.getElementById('pl' + i); pl.classList[i < n ? 'add' : 'remove']('done'); }
+  });
+}
+
+function renderCtx() {
+  const co = CO.find(c => c.id === selId); if (!co) return;
+  document.getElementById('ctxFlag').textContent = co.flag;
+  document.getElementById('ctxName').textContent = co.name;
+  document.getElementById('ctxMeta').innerHTML = `<span class="ctx-tag">${co.ticker}</span><span class="ctx-tag">${co.sector}</span>`;
+  const relLabels = {high:'🟢 Highly Relevant — asset-driven business',medium:'🟡 Moderately Relevant — meaningful physical assets',low:'🔴 Limited Relevance — primarily intangible value'};
+  const relCls = {high:'rel-high',medium:'rel-med',low:'rel-low'};
+  document.getElementById('relevanceBadge').innerHTML = `<div class="relevance-badge ${relCls[co.rel]}">${relLabels[co.rel]}</div>`;
+  const adjNav = co.bookEquity + co.ppeAdj + co.invAdj + co.otherAdj + co.liabAdj;
+  const navPS = adjNav / co.shares;
+  const pNav = co.price / navPS;
+  const franchisePS = co.price - navPS;
+  document.getElementById('fcVal').textContent = `${co.cur}${fmtP(franchisePS)} / share`;
+  document.getElementById('fcNote').textContent = `Market price premium above adjusted NAV — represents brand, talent, customer relationships, and IP that don\'t appear on the balance sheet. P/NAV ratio: ${pNav.toFixed(1)}x`;
+  const mc = co.price * co.shares;
+  const pb = co.price / (co.bookEquity / co.shares);
+  document.getElementById('statGrid').innerHTML = `
+    <div class="stat-card"><div class="stat-lbl">Book Equity</div><div class="stat-val">${co.cur}${fmt(co.bookEquity)}</div><div class="stat-note">${co.unit} — balance sheet</div></div>
+    <div class="stat-card"><div class="stat-lbl">Adjusted NAV</div><div class="stat-val">${co.cur}${fmt(adjNav)}</div><div class="stat-note">${co.unit} — fair value restated</div></div>
+    <div class="stat-card"><div class="stat-lbl">P/B Ratio</div><div class="stat-val">${pb.toFixed(1)}x</div><div class="stat-note">Book value anchor</div></div>
+    <div class="stat-card"><div class="stat-lbl">P/NAV Ratio</div><div class="stat-val">${pNav.toFixed(1)}x</div><div class="stat-note">Restated NAV anchor</div></div>`;
+  document.getElementById('ctxRelevance').textContent = co.ctx.r;
+  document.getElementById('ctxKeyAsset').textContent = co.ctx.k;
+  document.getElementById('ctxPNav').textContent = co.ctx.p;
+}
+
+function buildTable() {
+  const co = CO.find(c => c.id === selId); if (!co) return;
+  document.getElementById('liveCurPrice').textContent = `${co.cur}${co.price.toLocaleString()}`;
+  const rows = [
+    {label:'Book Equity (Balance Sheet)',id:'inp_book',hint:'Shareholders\' equity / net worth from the latest annual report balance sheet.',val:co.bookEquity,dir:'start',type:'pre'},
+    {label:'PP&E Fair Value Adjustment',id:'inp_ppe',hint:'Restate property, plant and equipment at replacement cost or fair market value vs depreciated book. Positive = assets worth more than book.',val:co.ppeAdj,dir:'+',type:'pre'},
+    {label:'Investment Portfolio (Market Value)',id:'inp_inv',hint:'Mark investments and financial assets to current market value. Includes treasury securities, equity stakes, and corporate bonds.',val:co.invAdj,dir:'+',type:'pre'},
+    {label:`${co.otherAdj !== 0 ? co.otherLabel || 'Other Tangible Asset Adjustment' : 'Other Tangible Adjustments'}`,id:'inp_other',hint:'Company-specific asset restatements: mineral reserves, concession rights, content libraries, drug licenses, etc.',val:co.otherAdj,dir:'+',type:'pre'},
+    {label:'Understated Liabilities',id:'inp_liab',hint:'Contingent liabilities, environmental obligations, or underfunded pension not fully reflected in book. Enter as negative number.',val:co.liabAdj,dir:'-',type:'pre'},
+    {label:'→ Adjusted NAV',id:'out_nav',hint:'Sum of all adjustments. This is the restated net asset value.',val:0,dir:'=',type:'calc'},
+    {label:'Shares Outstanding',id:'inp_shares',hint:co.cur === '₹' ? 'Shares in Crores' : 'Shares in Billions',val:co.shares,dir:'÷',type:'pre'},
+    {label:'→ NAV per Share',id:'out_navps',hint:'Adjusted NAV divided by shares outstanding.',val:0,dir:'=',type:'calc-strong'},
+  ];
+  let html = '';
+  rows.forEach(r => {
+    const badge = r.type === 'pre' ? '<span class="type-badge type-pre">Pre-filled</span>' : '<span class="type-badge type-calc">Calculated</span>';
+    const dirHtml = r.dir === 'start' ? '' : r.dir === '=' || r.dir === '÷' ? `<span style="font-family:var(--mono);font-size:14px;font-weight:700;color:var(--muted)">${r.dir}</span>` : `<span class="dir-badge ${r.dir === '+' ? 'dir-add' : 'dir-sub'}">${r.dir}</span>`;
+    const ro = r.type.startsWith('calc');
+    const inputCls = `assume-input ${ro ? ('calc' + (r.type === 'calc-strong' ? ' calc-nav' : '')) : ''}`;
+    html += `<tr class="assume-tr">
+      <td class="assume-td label-col"><span class="assume-label" style="gap:8px">${dirHtml}<span style="${r.type.startsWith('calc') ? 'font-weight:700' : ''}">${r.label}</span><span class="hint-wrap"><span class="hint-icon">?</span><span class="hint-tip">${r.hint}</span></span></span></td>
+      <td class="assume-td type-col">${badge}</td>
+      <td class="assume-td input-col"><input class="${inputCls}" id="${r.id}" type="${ro ? 'text' : 'number'}" step="any" ${ro ? 'readonly' : ''} value="${r.val}" oninput="recalc()"></td>
+    </tr>`;
+  });
+  document.getElementById('navTable').innerHTML = html;
+  recalc();
+}
+
+function recalc() {
+  const co = CO.find(c => c.id === selId); if (!co) return;
+  const book = parseFloat(document.getElementById('inp_book')?.value) || 0;
+  const ppe = parseFloat(document.getElementById('inp_ppe')?.value) || 0;
+  const inv = parseFloat(document.getElementById('inp_inv')?.value) || 0;
+  const other = parseFloat(document.getElementById('inp_other')?.value) || 0;
+  const liab = parseFloat(document.getElementById('inp_liab')?.value) || 0;
+  const shares = parseFloat(document.getElementById('inp_shares')?.value) || co.shares;
+  const adjNav = book + ppe + inv + other + liab;
+  const navPS = adjNav / shares;
+  const pNav = co.price / navPS;
+  setV('out_nav', `${co.cur}${fmt(Math.round(adjNav))}`);
+  setV('out_navps', `${co.cur}${fmtP(navPS)}`);
+  document.getElementById('liveNav').textContent = `${co.cur}${fmtP(navPS)}`;
+  document.getElementById('livePNav').textContent = `P/NAV: ${pNav.toFixed(1)}x`;
+  calcState = { co, book, ppe, inv, other, liab, adjNav, navPS, pNav, shares };
+}
+
+function setV(id, v) { const el = document.getElementById(id); if (el) el.value = v; }
+
+function startCalc() {
+  recalc();
+  document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('stepLoading').classList.add('active');
+  updateProg(4); window.scrollTo({ top: 0, behavior: 'smooth' });
+  [1,2,3,4,5,6].forEach(i => { const el = document.getElementById('ls'+i); el.classList.remove('show','active','done'); });
+  document.getElementById('loadingBarFill').style.width = '0%';
+  document.getElementById('loadingPct').textContent = '0%';
+  const steps = [{s:200,d:700},{s:800,d:1400},{s:1500,d:2100},{s:2200,d:2800},{s:2900,d:3800},{s:3900,d:4600}];
+  const pcts = [10,25,42,60,80,100];
+  steps.forEach((st,i) => {
+    setTimeout(() => { const el = document.getElementById('ls'+(i+1)); el.classList.add('show','active'); }, st.s);
+    setTimeout(() => { const el = document.getElementById('ls'+(i+1)); el.classList.remove('active'); el.classList.add('done'); document.getElementById('loadingBarFill').style.width=pcts[i]+'%'; document.getElementById('loadingPct').textContent=pcts[i]+'%'; }, st.d);
+  });
+  setTimeout(() => { document.querySelectorAll('.step-section').forEach(s=>s.classList.remove('active')); document.getElementById('step4').classList.add('active'); renderResults(); window.scrollTo({top:0,behavior:'smooth'}); }, 5200);
+}
+
+function renderResults() {
+  const s = calcState; if (!s || !s.co) return;
+  const co = s.co;
+  document.getElementById('rCoLbl').textContent = `${co.flag} ${co.name} · ${co.ticker}`;
+  document.getElementById('rNavPrice').textContent = `${co.cur}${fmtP(s.navPS)}`;
+  const chgPct = ((s.navPS - co.price) / co.price * 100).toFixed(1);
+  const franchisePS = co.price - s.navPS;
+  const franchisePct = (franchisePS / co.price * 100).toFixed(0);
+  document.getElementById('rVs').innerHTML = `Current market price: <strong>${co.cur}${co.price.toLocaleString()}</strong> &nbsp;·&nbsp; P/NAV: <strong>${s.pNav.toFixed(1)}x</strong> &nbsp;·&nbsp; Franchise value: <strong>${co.cur}${fmtP(franchisePS)}/share</strong> (${franchisePct}% of price)`;
+
+  const pb = co.price / (s.book / s.shares);
+  document.getElementById('compareGrid').innerHTML = `
+    <div class="compare-card"><div class="compare-lbl">Book Value / Share</div><div class="compare-val">${co.cur}${fmtP(s.book / s.shares)}</div><div class="compare-sub">P/B: ${pb.toFixed(1)}x — unadjusted</div></div>
+    <div class="compare-card"><div class="compare-lbl">Adjusted NAV / Share</div><div class="compare-val">${co.cur}${fmtP(s.navPS)}</div><div class="compare-sub">P/NAV: ${s.pNav.toFixed(1)}x — fair value restated</div></div>
+    <div class="compare-card" style="border-color:var(--text)"><div class="compare-lbl">Franchise Value / Share</div><div class="compare-val">${co.cur}${fmtP(franchisePS)}</div><div class="compare-sub">${franchisePct}% of market price</div></div>`;
+
+  // Waterfall
+  const maxV = Math.max(s.adjNav, s.book) * 1.05;
+  const barW = v => Math.max(2, Math.min(96, (Math.abs(v) / maxV * 88)));
+  const wRows = [
+    {label:'Book Equity',val:s.book,cls:'start-bar'},
+    ...(s.ppe !== 0 ? [{label:`+ PP&E Fair Value Adj`,val:s.ppe,cls:s.ppe >= 0 ? 'add-bar' : 'sub-bar'}] : []),
+    ...(s.inv !== 0 ? [{label:`+ Investment Portfolio`,val:s.inv,cls:'add-bar'}] : []),
+    ...(s.other !== 0 ? [{label:`+ Other Assets`,val:s.other,cls:'add-bar'}] : []),
+    ...(s.liab !== 0 ? [{label:`+ Liability Adjustment`,val:s.liab,cls:'sub-bar'}] : []),
+    {label:'= Adjusted NAV',val:s.adjNav,cls:'nav-bar'},
+  ];
+  document.getElementById('wfallChart').innerHTML = wRows.map(r =>
+    `<div class="wfall-row"><div class="wfall-lbl">${r.label}</div><div class="wfall-track"><div class="wfall-bar ${r.cls}" style="width:${barW(r.val)}%"><span>${co.cur}${fmt(Math.round(Math.abs(r.val)))}</span></div></div><div class="wfall-val" style="${r.cls==='nav-bar'?'font-weight:800':''}">${r.val >= 0 ? '+' : ''}${co.cur}${fmt(Math.round(r.val))}</div></div>`
+  ).join('');
+  document.getElementById('sharesLbl').textContent = `${s.shares} ${co.unit === 'Cr' ? 'Cr' : 'B'} shares`;
+  document.getElementById('wfallNavPS').textContent = `${co.cur}${fmtP(s.navPS)}`;
+
+  // Franchise gap bar
+  const navPct = Math.max(5, Math.min(90, (s.navPS / co.price * 100)));
+  const gapPct = 100 - navPct;
+  document.getElementById('franchiseBar').innerHTML = `
+    <div class="franchise-nav-fill" style="width:${navPct}%"><div class="franchise-nav-lbl">NAV ${co.cur}${fmtP(s.navPS)}</div></div>
+    <div class="franchise-gap-fill" style="left:${navPct}%;width:${gapPct}%"><div class="franchise-gap-lbl">Franchise ${co.cur}${fmtP(franchisePS)}</div></div>
+    <div class="franchise-total-lbl">${co.cur}${co.price.toLocaleString()}</div>`;
+
+  // Insight
+  const relWord = co.rel === 'high' ? 'primary' : co.rel === 'medium' ? 'secondary' : 'tertiary';
+  document.getElementById('rInsight').innerHTML = `NAV is a <strong>${relWord} valuation method</strong> for ${co.name}. The adjusted NAV of <strong>${co.cur}${fmtP(s.navPS)}/share</strong> represents what the company would be worth if every asset were sold at fair value and every liability paid off today. The market is paying <strong>${s.pNav.toFixed(1)}x</strong> this NAV — meaning <strong>${co.cur}${fmtP(franchisePS)}/share</strong> (${franchisePct}% of the market price) is the franchise value: brand equity, customer relationships, technology, and human capital that appear nowhere on the balance sheet. ${co.rel === 'low' ? 'For this company, the NAV floor ('+co.cur+fmtP(s.navPS)+'/share) is the liquidation value in a distress scenario — not a fair business value. The business is worth many times more than its assets.' : co.rel === 'high' ? 'For this asset-intensive company, NAV is a meaningful valuation anchor. A significant discount to NAV would signal undervaluation; a large premium signals franchise value above the physical asset base.' : 'Cross-reference this NAV with DCF and Comps — for this company type, no single method dominates.'} Use this NAV in the Football Field as your asset-based range anchor.`;
+
+  // Sensitivity on PP&E adjustment (the most judgment-intensive input)
+  const ppeAdjs = [s.ppe * 0.5, s.ppe * 0.75, s.ppe, s.ppe * 1.25, s.ppe * 1.5];
+  const invAdjs = [s.inv * 0.8, s.inv * 0.9, s.inv, s.inv * 1.1, s.inv * 1.2];
+  document.getElementById('sensSub').textContent = `NAV per share at different PP&E (rows) and Investment Portfolio (columns) restatement assumptions.`;
+  let sHTML = `<tr><th>PP&E Adj / Inv Adj</th>` + invAdjs.map(v => `<th>${co.cur}${fmt(Math.round(v))}</th>`).join('') + '</tr>';
+  ppeAdjs.forEach(p => {
+    sHTML += `<tr><td>${co.cur}${fmt(Math.round(p))}</td>`;
+    invAdjs.forEach(iv => {
+      const adjN = s.book + p + iv + s.other + s.liab;
+      const navS = adjN / s.shares;
+      const pN = co.price / navS;
+      const isBase = Math.abs(p - s.ppe) < 1 && Math.abs(iv - s.inv) < 1;
+      const cls = isBase ? 'cell-base' : pN < 2 ? 'cell-low' : pN < 8 ? 'cell-mid' : 'cell-high';
+      sHTML += `<td class="${cls}">${co.cur}${fmtP(navS)}</td>`;
+    });
+    sHTML += '</tr>';
+  });
+  document.getElementById('sensTable').innerHTML = sHTML;
+}
+
+function fmt(n) { if (Math.abs(n)>=100000) return (n/100000).toFixed(1)+'L'; if (Math.abs(n)>=1000) return (n/1000).toFixed(1)+'K'; return Math.abs(n)<10 ? n.toFixed(2) : n.toLocaleString(); }
+function fmtP(n) { return Math.abs(n)>=1000 ? n.toLocaleString(undefined,{maximumFractionDigits:0}) : Math.abs(n)>=100 ? n.toFixed(0) : Math.abs(n)>=10 ? n.toFixed(1) : n.toFixed(2); }
+function resetAll() { selId = null; calcState = {}; goToStep(1); renderGrid('all'); document.getElementById('continueBtn').classList.remove('enabled'); }
+</script>
+</body>
+</html>
