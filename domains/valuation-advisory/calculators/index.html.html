@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculators — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+.top-nav{border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;height:56px;gap:28px}
+.logo{font-size:17px;font-weight:700}.logo strong{font-weight:900}
+.nav-links{display:flex;gap:20px;flex:1}.nav-links a{font-size:13px;color:var(--muted);font-weight:500}.nav-links a:hover{color:var(--text)}
+.nav-cta{display:flex;gap:8px;align-items:center;margin-left:auto}
+.vault-btn{font-size:12px;font-weight:600;padding:6px 12px;border:1px solid var(--border);border-radius:6px;color:var(--text)}
+.pro-btn{font-size:12px;font-weight:700;padding:6px 14px;background:var(--text);color:#fff;border-radius:6px}
+.domain-nav{border-bottom:1px solid var(--border);background:var(--bg)}
+.domain-nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex}
+.domain-nav a{font-size:13px;font-weight:500;color:var(--muted);padding:10px 16px;border-bottom:2px solid transparent}
+.domain-nav a:hover,.domain-nav a.active{color:var(--text);border-bottom-color:var(--text)}
+/* HERO */
+.hero{max-width:1200px;margin:0 auto;padding:64px 24px 48px}
+.hero-tag{display:inline-block;padding:4px 12px;border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:20px}
+.hero-headline{font-size:48px;font-weight:900;letter-spacing:-1px;line-height:1.1;margin-bottom:16px;max-width:700px}
+.hero-sub{font-size:18px;color:var(--muted);max-width:600px;line-height:1.6;margin-bottom:36px}
+.hero-meta{display:flex;gap:24px;align-items:center;flex-wrap:wrap}
+.hero-stat{display:flex;align-items:baseline;gap:6px}
+.hero-stat-num{font-size:28px;font-weight:900;font-family:var(--mono)}
+.hero-stat-lbl{font-size:13px;color:var(--muted)}
+.hero-divider{width:1px;height:28px;background:var(--border)}
+/* WORKFLOW */
+.workflow-section{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--card);padding:32px 0;margin-bottom:64px}
+.workflow-inner{max-width:1200px;margin:0 auto;padding:0 24px}
+.workflow-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:20px}
+.workflow-steps{display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding-bottom:4px}
+.wf-step{display:flex;align-items:flex-start;gap:0;flex-shrink:0}
+.wf-item{width:130px;flex-shrink:0}
+.wf-num{width:24px;height:24px;border-radius:50%;background:var(--text);color:#fff;font-size:11px;font-weight:700;font-family:var(--mono);display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.wf-name{font-size:12px;font-weight:700;margin-bottom:3px}
+.wf-desc{font-size:11px;color:var(--muted);line-height:1.4}
+.wf-arrow{font-size:18px;color:var(--border);margin:6px 8px 0;flex-shrink:0}
+/* CALCULATOR GRID */
+.calc-section{max-width:1200px;margin:0 auto;padding:0 24px 80px}
+.section-title{font-size:22px;font-weight:800;margin-bottom:6px}
+.section-sub{font-size:14px;color:var(--muted);margin-bottom:32px}
+.calc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.calc-card{border:1.5px solid var(--border);border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:16px;transition:border-color .15s;position:relative}
+.calc-card:hover{border-color:#999}
+.calc-card.flagship{border-color:var(--text);border-width:2px}
+.calc-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.calc-icon{font-size:28px;line-height:1}
+.calc-badges{display:flex;gap:6px;flex-direction:column;align-items:flex-end}
+.badge-free{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
+.badge-pro{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;background:var(--text);color:#fff}
+.calc-name{font-size:18px;font-weight:800;line-height:1.2}
+.calc-method{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-top:2px}
+.calc-desc{font-size:14px;color:var(--muted);line-height:1.6;flex:1}
+.calc-insight{border-top:1px solid var(--border);padding-top:12px}
+.calc-insight-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:4px}
+.calc-insight-txt{font-size:12px;color:var(--text);line-height:1.5;font-family:var(--mono)}
+.calc-launch{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:11px;background:var(--text);color:#fff;border-radius:8px;font-size:13px;font-weight:700;transition:opacity .15s}
+.calc-launch:hover{opacity:.88}
+.calc-card.flagship .calc-launch{background:var(--text)}
+/* BOTTOM CTA */
+.cta-section{background:var(--text);color:#fff;padding:64px 24px;text-align:center}
+.cta-inner{max-width:600px;margin:0 auto}
+.cta-headline{font-size:32px;font-weight:900;margin-bottom:12px;letter-spacing:-.5px}
+.cta-sub{font-size:16px;opacity:.7;margin-bottom:28px}
+.cta-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:#fff;color:var(--text);border-radius:8px;font-size:14px;font-weight:800}
+@media(max-width:768px){.calc-grid{grid-template-columns:1fr 1fr}.hero-headline{font-size:32px}.workflow-steps{gap:0}}
+@media(max-width:480px){.calc-grid{grid-template-columns:1fr}.nav-links{display:none}}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <div class="nav-inner">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/" class="logo">Valuation<strong>Desk</strong></a>
+    <div class="nav-links">
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/">Valuation Advisory</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/">My Vault</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/deal-room/">Deal Room</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/daily-brief/">Daily Brief</a>
+    </div>
+    <div class="nav-cta">
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/" class="vault-btn">🗄 Vault (0)</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/#pricing" class="pro-btn">Get Pro — ₹799/mo</a>
+    </div>
+  </div>
+</nav>
+<div class="domain-nav">
+  <div class="domain-nav-inner">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/">Overview</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/learn/">📖 Learn</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/" class="active">🧮 Calculators</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/">🗄 My Vault</a>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-tag">Valuation Advisory</div>
+  <h1 class="hero-headline">7 professional calculators. One complete toolkit.</h1>
+  <p class="hero-sub">Every method an analyst uses in a real pitch book — built for learning, built for practice, built to make the numbers make sense.</p>
+  <div class="hero-meta">
+    <div class="hero-stat"><span class="hero-stat-num">30</span><span class="hero-stat-lbl">companies pre-loaded</span></div>
+    <div class="hero-divider"></div>
+    <div class="hero-stat"><span class="hero-stat-num">7</span><span class="hero-stat-lbl">valuation methods</span></div>
+    <div class="hero-divider"></div>
+    <div class="hero-stat"><span class="hero-stat-num">India + Global</span><span class="hero-stat-lbl">coverage</span></div>
+  </div>
+</div>
+
+<div class="workflow-section">
+  <div class="workflow-inner">
+    <div class="workflow-title">The analyst's workflow — how the 7 calculators connect</div>
+    <div class="workflow-steps">
+      <div class="wf-step">
+        <div class="wf-item">
+          <div class="wf-num">1</div>
+          <div class="wf-name">WACC Builder</div>
+          <div class="wf-desc">Build your discount rate first. This feeds directly into DCF.</div>
+        </div>
+        <div class="wf-arrow">→</div>
+      </div>
+      <div class="wf-step">
+        <div class="wf-item">
+          <div class="wf-num">2</div>
+          <div class="wf-name">DCF</div>
+          <div class="wf-desc">Use your WACC to value the business on future cash flows.</div>
+        </div>
+        <div class="wf-arrow">→</div>
+      </div>
+      <div class="wf-step">
+        <div class="wf-item">
+          <div class="wf-num">3</div>
+          <div class="wf-name">Trading Comps</div>
+          <div class="wf-desc">Sanity-check DCF against what the market pays for peers.</div>
+        </div>
+        <div class="wf-arrow">→</div>
+      </div>
+      <div class="wf-step">
+        <div class="wf-item">
+          <div class="wf-num">4</div>
+          <div class="wf-name">SOTP</div>
+          <div class="wf-desc">For multi-business companies, value each segment separately.</div>
+        </div>
+        <div class="wf-arrow">→</div>
+      </div>
+      <div class="wf-step">
+        <div class="wf-item">
+          <div class="wf-num">5</div>
+          <div class="wf-name">EV Bridge</div>
+          <div class="wf-desc">Convert Enterprise Value from DCF/Comps to a share price.</div>
+        </div>
+        <div class="wf-arrow">→</div>
+      </div>
+      <div class="wf-step">
+        <div class="wf-item">
+          <div class="wf-num">6</div>
+          <div class="wf-name">NAV</div>
+          <div class="wf-desc">Check the asset floor — what is the company worth liquidated?</div>
+        </div>
+        <div class="wf-arrow">→</div>
+      </div>
+      <div class="wf-step">
+        <div class="wf-item">
+          <div class="wf-num">7</div>
+          <div class="wf-name">Football Field</div>
+          <div class="wf-desc">Aggregate all methods into one chart. This is slide 3 of every pitch book.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="calc-section">
+  <h2 class="section-title">All 7 calculators</h2>
+  <p class="section-sub">Each calculator covers all 30 companies across India and global markets. Pre-filled with real financial data, peer benchmarks, and educational context per company.</p>
+
+  <div class="calc-grid">
+
+    <div class="calc-card flagship">
+      <div class="calc-card-top">
+        <div class="calc-icon">📈</div>
+        <div class="calc-badges"><span class="badge-free">Free</span></div>
+      </div>
+      <div>
+        <div class="calc-name">DCF Calculator</div>
+        <div class="calc-method">Discounted Cash Flow · Intrinsic Value</div>
+      </div>
+      <div class="calc-desc">Value a company on the cash flows it will generate over the next 10 years, discounted back to today. The foundational method of investment banking. If you understand one method, make it this one.</div>
+      <div class="calc-insight">
+        <div class="calc-insight-lbl">Key insight this teaches</div>
+        <div class="calc-insight-txt">Terminal value drives 70-80% of DCF output. The growth rate assumption you make for year 11+ matters more than any near-term forecast.</div>
+      </div>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/dcf.html" class="calc-launch">Launch DCF Calculator →</a>
+    </div>
+
+    <div class="calc-card">
+      <div class="calc-card-top">
+        <div class="calc-icon">⚙️</div>
+        <div class="calc-badges"><span class="badge-pro">Pro</span></div>
+      </div>
+      <div>
+        <div class="calc-name">WACC Builder</div>
+        <div class="calc-method">Cost of Capital · Discount Rate</div>
+      </div>
+      <div class="calc-desc">Build the discount rate you use in DCF — from scratch. CAPM for cost of equity, tax shield for cost of debt, and capital structure weights. Build WACC before you build DCF.</div>
+      <div class="calc-insight">
+        <div class="calc-insight-lbl">Key insight this teaches</div>
+        <div class="calc-insight-txt">TCS WACC is 12%. Tesla WACC is 15.4%. That 3.4% gap means every dollar of Tesla's future cash flow is worth less — which is why high-beta companies trade at lower P/E.</div>
+      </div>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/wacc.html" class="calc-launch">Launch WACC Builder →</a>
+    </div>
+
+    <div class="calc-card">
+      <div class="calc-card-top">
+        <div class="calc-icon">📊</div>
+        <div class="calc-badges"><span class="badge-pro">Pro</span></div>
+      </div>
+      <div>
+        <div class="calc-name">Trading Comps</div>
+        <div class="calc-method">Comparable Company Analysis · Relative Value</div>
+      </div>
+      <div class="calc-desc">Value a company relative to what the market pays for comparable businesses. Apply peer median multiples (EV/EBITDA, EV/Revenue, P/E) to the target's financials. The most-used method in real IB work.</div>
+      <div class="calc-insight">
+        <div class="calc-insight-lbl">Key insight this teaches</div>
+        <div class="calc-insight-txt">Comps doesn't tell you what a business is worth — it tells you what the market currently pays for similar businesses. Those are two different questions.</div>
+      </div>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/comps.html" class="calc-launch">Launch Trading Comps →</a>
+    </div>
+
+    <div class="calc-card">
+      <div class="calc-card-top">
+        <div class="calc-icon">🌉</div>
+        <div class="calc-badges"><span class="badge-pro">Pro</span></div>
+      </div>
+      <div>
+        <div class="calc-name">EV Bridge</div>
+        <div class="calc-method">Enterprise Value → Equity Value → Share Price</div>
+      </div>
+      <div class="calc-desc">Bridge from Enterprise Value to an implied share price — accounting for debt, cash, minority interest, and equity investments. The step every analyst must do after DCF or Comps, and the step most students get wrong.</div>
+      <div class="calc-insight">
+        <div class="calc-insight-lbl">Key insight this teaches</div>
+        <div class="calc-insight-txt">Cash is ADDED to equity value (not subtracted). Debt is SUBTRACTED. Getting this direction wrong is the single most common analyst error on Day 1 of an IB internship.</div>
+      </div>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/ev-bridge.html" class="calc-launch">Launch EV Bridge →</a>
+    </div>
+
+    <div class="calc-card">
+      <div class="calc-card-top">
+        <div class="calc-icon">🧩</div>
+        <div class="calc-badges"><span class="badge-pro">Pro</span></div>
+      </div>
+      <div>
+        <div class="calc-name">SOTP</div>
+        <div class="calc-method">Sum of the Parts · Segment Valuation</div>
+      </div>
+      <div class="calc-desc">Value each business segment on its own peer multiple, then sum them up. Essential for conglomerates, holding companies, and any company with meaningfully different divisions. Reveals hidden value that blended multiples obscure.</div>
+      <div class="calc-insight">
+        <div class="calc-insight-lbl">Key insight this teaches</div>
+        <div class="calc-insight-txt">Jio at 18x EV/EBITDA + Reliance Retail at 35x + O2C at 8x = a total that's very different from the blended 11x the market uses. That gap is the thesis.</div>
+      </div>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/sotp.html" class="calc-launch">Launch SOTP →</a>
+    </div>
+
+    <div class="calc-card">
+      <div class="calc-card-top">
+        <div class="calc-icon">🏈</div>
+        <div class="calc-badges"><span class="badge-pro">Pro</span></div>
+      </div>
+      <div>
+        <div class="calc-name">Football Field</div>
+        <div class="calc-method">Valuation Summary · Multi-Method Chart</div>
+      </div>
+      <div class="calc-desc">Aggregate all five valuation methods into one chart — exactly as it appears in every IB pitch book. The zone where methods converge is your conviction zone. Build this after the other calculators, not before.</div>
+      <div class="calc-insight">
+        <div class="calc-insight-lbl">Key insight this teaches</div>
+        <div class="calc-insight-txt">When five independent methods point to the same price range, that's not coincidence — that's conviction. When they wildly disagree, that's a signal to question your assumptions, not your methods.</div>
+      </div>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/football-field.html" class="calc-launch">Launch Football Field →</a>
+    </div>
+
+    <div class="calc-card">
+      <div class="calc-card-top">
+        <div class="calc-icon">🏦</div>
+        <div class="calc-badges"><span class="badge-pro">Pro</span></div>
+      </div>
+      <div>
+        <div class="calc-name">NAV</div>
+        <div class="calc-method">Net Asset Value · Balance Sheet Method</div>
+      </div>
+      <div class="calc-desc">Restate a company's balance sheet at fair value and compute NAV per share. The gap between NAV and market price IS the franchise value — the brand, talent, and relationships that never appear on any balance sheet.</div>
+      <div class="calc-insight">
+        <div class="calc-insight-lbl">Key insight this teaches</div>
+        <div class="calc-insight-txt">HUL's NAV is ₹47/share. Its market price is ₹2,400. The ₹2,353 gap is Dove, Surf Excel, and Lux — 90 years of brand building that never touches the balance sheet.</div>
+      </div>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/nav.html" class="calc-launch">Launch NAV →</a>
+    </div>
+
+  </div>
+</div>
+
+<div class="cta-section">
+  <div class="cta-inner">
+    <div class="cta-headline">Unlock all 7 calculators</div>
+    <div class="cta-sub">DCF is free. The remaining 6 — WACC, Comps, EV Bridge, SOTP, Football Field, and NAV — are Pro. ₹799/month, cancel anytime.</div>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/#pricing" class="cta-btn">Get Pro Access →</a>
+  </div>
+</div>
+
+</body>
+</html>
