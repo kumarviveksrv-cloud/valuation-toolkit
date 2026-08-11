@@ -1,848 +1,750 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>DCF Valuation Calculator — ValuationDesk</title>
-<link rel="stylesheet" href="/valuation-toolkit/assets/vd.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DCF Calculator — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* ── EXPERIENCE STYLES ── */
-.step { display:none; }
-.step.active { display:block; }
-
-.company-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:8px; margin-top:1rem; }
-.company-card { border:1px solid var(--gray-200); border-radius:var(--r); padding:0.9rem; cursor:pointer; transition:var(--t); background:var(--white); }
-.company-card:hover { border-color:var(--gray-400); box-shadow:var(--shadow-sm); }
-.company-card.selected { border-color:var(--black); border-width:2px; background:var(--gray-50); }
-.company-card .co-name { font-size:0.82rem; font-weight:600; color:var(--black); margin-bottom:0.2rem; }
-.company-card .co-sector { font-size:0.68rem; color:var(--gray-400); }
-.company-card .co-ticker { font-family:var(--mono); font-size:0.65rem; color:var(--gray-400); }
-
-/* Context card */
-.context-card { background:var(--black); color:var(--white); border-radius:var(--r-lg); padding:1.5rem; margin-bottom:1.5rem; }
-.context-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-top:1rem; }
-.context-stat { }
-.context-stat-label { font-size:0.62rem; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:0.2rem; }
-.context-stat-val { font-size:1.3rem; font-weight:800; color:var(--white); letter-spacing:-0.02em; }
-.context-stat-sub { font-size:0.68rem; color:rgba(255,255,255,0.45); margin-top:0.1rem; }
-
-/* Assumption table */
-.assumption-table { width:100%; border-collapse:collapse; }
-.assumption-table th { font-size:0.62rem; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:var(--gray-400); padding:0.5rem 0.75rem; text-align:left; border-bottom:2px solid var(--gray-200); background:var(--gray-50); }
-.assumption-table th.input-col { text-align:center; }
-.assumption-table td { padding:0.5rem 0.75rem; border-bottom:1px solid var(--gray-100); vertical-align:middle; }
-.assumption-table tr:hover td { background:rgba(0,0,0,0.01); }
-.assumption-table tr.section-header td { background:var(--gray-50); font-size:0.65rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--gray-500); padding:0.6rem 0.75rem; }
-
-/* Input cells */
-.cell-label { font-size:0.82rem; color:var(--black); font-weight:500; }
-.cell-hint { font-size:0.7rem; color:var(--gray-400); margin-top:0.15rem; line-height:1.4; }
-.cell-input-wrap { display:flex; align-items:center; gap:0.4rem; justify-content:center; }
-.cell-input { font-family:var(--mono); font-size:0.88rem; font-weight:600; color:var(--black); background:var(--white); border:1.5px solid var(--gray-200); border-radius:var(--r-sm); padding:0.45rem 0.65rem; width:90px; text-align:right; outline:none; transition:var(--t); }
-.cell-input:focus { border-color:var(--black); box-shadow:0 0 0 3px rgba(17,24,39,0.06); }
-.cell-input.pre-filled { background:var(--gray-50); border-color:var(--gray-200); color:var(--gray-500); }
-.cell-input.pre-filled:focus { background:var(--white); border-color:var(--black); color:var(--black); }
-.cell-unit { font-size:0.72rem; color:var(--gray-400); flex-shrink:0; }
-.hint-badge { display:inline-flex; align-items:center; gap:0.3rem; font-size:0.65rem; color:var(--gray-400); cursor:pointer; }
-.hint-badge:hover { color:var(--black); }
-.hint-tooltip { display:none; position:absolute; z-index:50; background:var(--black); color:var(--white); font-size:0.72rem; line-height:1.55; padding:0.65rem 0.85rem; border-radius:var(--r-sm); width:240px; box-shadow:var(--shadow-lg); }
-.hint-wrap { position:relative; }
-.hint-wrap:hover .hint-tooltip { display:block; top:100%; left:0; margin-top:4px; }
-
-/* Typical range badge */
-.range-badge { font-family:var(--mono); font-size:0.62rem; color:var(--gray-400); background:var(--gray-100); padding:0.15rem 0.4rem; border-radius:3px; margin-top:0.2rem; display:inline-block; }
-
-/* The big button */
-.run-btn { width:100%; padding:1.1rem; font-size:1rem; font-weight:700; letter-spacing:-0.01em; background:var(--black); color:var(--white); border:none; border-radius:var(--r); cursor:pointer; transition:var(--t); display:flex; align-items:center; justify-content:center; gap:0.75rem; }
-.run-btn:hover { background:var(--black-2); transform:translateY(-1px); box-shadow:var(--shadow-lg); }
-.run-btn:disabled { background:var(--gray-300); cursor:not-allowed; transform:none; }
-
-/* Loading reveal */
-.reveal-loader { text-align:center; padding:3rem; }
-.reveal-loader .big-num { font-size:4rem; font-weight:800; letter-spacing:-0.04em; color:var(--black); animation:countReveal 0.8s ease both; }
-@keyframes countReveal { from { opacity:0; transform:scale(0.85); } to { opacity:1; transform:scale(1); } }
-
-/* Output */
-.output-section { animation:fadeInUp 0.5s ease both; }
-@keyframes fadeInUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
-
-.output-hero { background:var(--black); color:var(--white); border-radius:var(--r-lg); padding:2rem; margin-bottom:1.5rem; }
-.output-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.5rem; margin-top:1.5rem; }
-.output-stat { }
-.output-stat-label { font-size:0.62rem; font-weight:600; letter-spacing:0.07em; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:0.3rem; }
-.output-stat-val { font-size:1.5rem; font-weight:800; letter-spacing:-0.02em; }
-
-.verdict { padding:1rem 1.25rem; border-radius:var(--r); margin-bottom:1.5rem; font-size:0.88rem; line-height:1.6; }
-.verdict-bull { background:#f0fdf4; border:1px solid #bbf7d0; color:#14532d; }
-.verdict-bear { background:#fef2f2; border:1px solid #fecaca; color:#7f1d1d; }
-.verdict-fair { background:var(--gray-50); border:1px solid var(--gray-200); color:var(--gray-500); }
-
-/* Sensitivity heat table */
-.sens-wrap { overflow-x:auto; }
-.w-bar-row { display:flex; align-items:center; gap:0.6rem; margin-bottom:0.4rem; }
-.wlabel { font-family:var(--mono); font-size:0.6rem; color:var(--gray-400); width:95px; text-align:right; flex-shrink:0; }
-.wtrack { flex:1; height:20px; background:var(--gray-100); border-radius:2px; overflow:hidden; }
-.wfill { height:100%; border-radius:2px; display:flex; align-items:center; padding-left:0.4rem; transition:width 0.6s ease; }
-.wfill span { font-family:var(--mono); font-size:0.6rem; color:white; white-space:nowrap; }
-
-/* Progress steps */
-.steps-bar { display:flex; gap:0; margin-bottom:2rem; }
-.step-pill { flex:1; display:flex; align-items:center; gap:0.5rem; padding:0.6rem 0.75rem; font-size:0.75rem; font-weight:500; color:var(--gray-400); border-bottom:2px solid var(--gray-200); transition:var(--t); }
-.step-pill.done { color:var(--green); border-bottom-color:var(--green); }
-.step-pill.active { color:var(--black); border-bottom-color:var(--black); font-weight:600; }
-.step-num { width:20px; height:20px; border-radius:50%; background:var(--gray-200); color:var(--gray-500); font-size:0.65rem; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.step-pill.active .step-num { background:var(--black); color:var(--white); }
-.step-pill.done .step-num { background:var(--green); color:var(--white); }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+.top-nav{border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;height:56px;gap:28px}
+.logo{font-size:17px;font-weight:700}.logo strong{font-weight:900}
+.nav-links{display:flex;gap:20px;flex:1}.nav-links a{font-size:13px;color:var(--muted);font-weight:500}.nav-links a:hover{color:var(--text)}
+.nav-cta{display:flex;gap:8px;align-items:center;margin-left:auto}
+.vault-btn{font-size:12px;font-weight:600;padding:6px 12px;border:1px solid var(--border);border-radius:6px;color:var(--text)}
+.pro-btn{font-size:12px;font-weight:700;padding:6px 14px;background:var(--text);color:#fff;border-radius:6px}
+.domain-nav{border-bottom:1px solid var(--border);background:var(--bg)}
+.domain-nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex}
+.domain-nav a{font-size:13px;font-weight:500;color:var(--muted);padding:10px 16px;border-bottom:2px solid transparent;transition:all .15s}
+.domain-nav a:hover,.domain-nav a.active{color:var(--text);border-bottom-color:var(--text)}
+.progress-wrap{max-width:820px;margin:36px auto 0;padding:0 24px}
+.prog-bar{display:flex;align-items:center}
+.prog-step{display:flex;align-items:center;gap:8px;flex:1}.prog-step:last-child{flex:none}
+.step-num{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--muted);font-family:var(--mono);flex-shrink:0;transition:all .2s}
+.prog-step.active .step-num{background:var(--text);border-color:var(--text);color:#fff}
+.prog-step.done .step-num{background:var(--green);border-color:var(--green);color:#fff}
+.step-label{font-size:12px;font-weight:500;color:var(--muted);white-space:nowrap}
+.prog-step.active .step-label{color:var(--text);font-weight:600}.prog-step.done .step-label{color:var(--green)}
+.prog-line{flex:1;height:1px;background:var(--border);margin:0 8px}.prog-line.done{background:var(--green)}
+.step-section{display:none;max-width:960px;margin:0 auto;padding:36px 24px 80px}.step-section.active{display:block}
+.step-headline{font-size:26px;font-weight:800;margin-bottom:6px}
+.step-sub{font-size:14px;color:var(--muted);margin-bottom:24px}
+.filter-bar{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.filter-btn{padding:6px 14px;border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;background:var(--bg);color:var(--muted);font-family:var(--font)}
+.filter-btn:hover{border-color:var(--text);color:var(--text)}.filter-btn.active{background:var(--text);color:#fff;border-color:var(--text)}
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:9px;margin-bottom:20px}
+.company-card{border:1.5px solid var(--border);border-radius:10px;padding:13px;cursor:pointer;transition:all .15s;background:var(--bg)}
+.company-card:hover{border-color:#999}.company-card.selected{border-color:var(--text);border-width:2px;background:#f3f3f3}.company-card.hidden{display:none}
+.co-flag{font-size:18px;margin-bottom:5px}.co-name{font-size:12px;font-weight:700;margin-bottom:2px}.co-ticker{font-size:10px;font-family:var(--mono);color:var(--muted)}.co-sector{font-size:10px;color:var(--muted);margin-top:3px}
+.continue-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);opacity:.35;pointer-events:none}.continue-btn.enabled{opacity:1;pointer-events:all}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer;margin-bottom:20px;border:none;background:none;font-family:var(--font);padding:0}.back-link:hover{color:var(--text)}
+.ctx-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:22px}
+.ctx-flag{font-size:30px;line-height:1}.ctx-co-name{font-size:22px;font-weight:800;margin-bottom:3px}.ctx-meta{font-size:13px;color:var(--muted)}
+.ctx-tag{display:inline-block;padding:2px 8px;border:1px solid var(--border);border-radius:12px;font-size:10px;font-weight:600;color:var(--muted);margin-right:5px;text-transform:uppercase;letter-spacing:.5px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-bottom:22px}
+.stat-card{border:1px solid var(--border);border-radius:8px;padding:13px}
+.stat-lbl{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.stat-val{font-size:17px;font-weight:700;font-family:var(--mono)}.stat-note{font-size:10px;color:var(--muted);margin-top:3px}
+.edu-block{border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:10px}
+.edu-icon{font-size:16px;margin-bottom:6px}.edu-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:7px}.edu-text{font-size:14px;line-height:1.7}
+.bull-bear{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:22px}
+.bull-box{border:1px solid #bbf7d0;border-radius:10px;padding:15px;background:#f0fdf4}.bear-box{border:1px solid #fecaca;border-radius:10px;padding:15px;background:#fef2f2}
+.bb-ttl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px}.bull-box .bb-ttl{color:var(--green)}.bear-box .bb-ttl{color:var(--red)}
+.bb-row{display:flex;gap:7px;margin-bottom:5px;font-size:13px}.bb-row:last-child{margin-bottom:0}.bb-arrow{font-weight:700;flex-shrink:0}.bull-box .bb-arrow{color:var(--green)}.bear-box .bb-arrow{color:var(--red)}
+.bank-note{border:1px solid #fde68a;border-radius:10px;padding:15px;background:#fffbeb;margin-bottom:14px}
+.bank-note-ttl{font-size:12px;font-weight:700;color:#92400e;margin-bottom:5px}.bank-note-txt{font-size:13px;color:#78350f;line-height:1.6}
+/* ASSUMPTIONS */
+.live-bar{position:sticky;top:113px;background:var(--bg);border-bottom:1px solid var(--border);padding:10px 0;margin-bottom:26px;z-index:50}
+.live-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.live-stats{display:flex;gap:20px}
+.ls-item{text-align:center}.ls-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}.ls-val{font-size:16px;font-weight:800;font-family:var(--mono)}
+.live-right{text-align:right}.live-cur-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted)}.live-cur-val{font-size:20px;font-weight:900;font-family:var(--mono)}
+.live-chg{font-size:12px;font-family:var(--mono);font-weight:700}.live-chg.up{color:var(--green)}.live-chg.dn{color:var(--red)}
+.assume-section{margin-bottom:22px}
+.assume-sec-head{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);border-top:2px solid var(--text);padding-top:9px;margin-bottom:12px;display:flex;justify-content:space-between}
+.assume-formula{font-family:var(--mono);font-size:11px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0}
+.assume-table{width:100%;border-collapse:collapse}
+.assume-tr{border-bottom:1px solid var(--border)}.assume-tr:last-child{border-bottom:none}
+.assume-td{padding:11px 0;vertical-align:middle}
+.assume-td.label-col{width:55%}.assume-td.type-col{width:20%;text-align:center}.assume-td.input-col{width:25%;text-align:right}
+.assume-label{font-size:14px;font-weight:500;display:flex;align-items:center;gap:7px}
+.hint-wrap{position:relative;display:inline-block}
+.hint-icon{width:16px;height:16px;border-radius:50%;border:1px solid var(--border);display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:var(--muted);cursor:default;vertical-align:middle}
+.hint-tip{display:none;position:absolute;left:22px;top:-6px;background:var(--text);color:#fff;font-size:11px;line-height:1.5;padding:8px 12px;border-radius:6px;width:230px;z-index:200;font-weight:400;white-space:normal;font-family:var(--font)}.hint-wrap:hover .hint-tip{display:block}
+.type-badge{font-size:10px;padding:2px 8px;border-radius:4px;font-weight:600}
+.type-pre{background:#dbeafe;color:#1e40af}.type-calc{background:#f3f4f6;color:#6b7280}
+.assume-input{width:110px;border:1.5px solid var(--border);border-radius:6px;padding:7px 9px;font-size:14px;font-family:var(--mono);font-weight:600;text-align:right;background:var(--bg);color:var(--text)}
+.assume-input:focus{outline:none;border-color:var(--text)}
+.assume-input.calc{background:var(--card);cursor:default;font-weight:700;border-color:var(--border)}
+.assume-input.calc-strong{background:var(--text);color:#fff;border-color:var(--text)}
+.run-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:800;cursor:pointer;font-family:var(--font);margin-top:8px}.run-btn:hover{background:#222}
+/* LOADING */
+.loading-wrap{text-align:center;padding:80px 24px 60px;max-width:480px;margin:0 auto}
+.loading-headline{font-size:22px;font-weight:800;margin-bottom:8px}.loading-sub{font-size:14px;color:var(--muted);margin-bottom:52px}
+.loading-steps-list{list-style:none;text-align:left;margin-bottom:40px}
+.ls-item-l{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--muted);opacity:0;transform:translateY(6px);transition:opacity .35s ease,transform .35s ease}
+.ls-item-l.show{opacity:1;transform:translateY(0)}.ls-item-l.active{color:var(--text);font-weight:600}.ls-item-l.done{color:var(--text)}
+.ls-dot{width:9px;height:9px;border-radius:50%;background:var(--border);flex-shrink:0}
+.ls-item-l.active .ls-dot{background:var(--text);animation:dotpulse .7s ease-in-out infinite}
+.ls-item-l.done .ls-dot{background:var(--green)}
+.ls-check{font-size:13px;color:var(--green);margin-left:auto;opacity:0}.ls-item-l.done .ls-check{opacity:1}
+@keyframes dotpulse{0%,100%{transform:scale(1)}50%{transform:scale(1.4);opacity:.5}}
+.loading-bar-track{height:3px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:16px}
+.loading-bar-fill{height:100%;width:0%;background:var(--text);border-radius:3px;transition:width .4s ease}
+.loading-pct{font-size:12px;font-family:var(--mono);color:var(--muted);font-weight:600}
+/* RESULTS */
+.result-hero{text-align:center;padding:40px 0 28px;border-bottom:1px solid var(--border);margin-bottom:28px}
+.r-co-lbl{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.r-price{font-size:72px;font-weight:900;font-family:var(--mono);line-height:1;margin-bottom:8px}
+.r-vs{font-size:14px;color:var(--muted)}
+.metrics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:28px}
+.metric-box{border:1px solid var(--border);border-radius:10px;padding:15px}
+.metric-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:7px}
+.metric-val{font-size:22px;font-weight:800;font-family:var(--mono)}.metric-sub{font-size:11px;color:var(--muted);margin-top:3px}
+/* VALUE ATTRIBUTION */
+.vattr-section{margin-bottom:28px}
+.vattr-title{font-size:14px;font-weight:700;margin-bottom:14px}
+.vattr-bar{height:36px;background:var(--card);border-radius:6px;overflow:hidden;display:flex;margin-bottom:10px}
+.vattr-fcf{background:var(--text);display:flex;align-items:center;padding:0 12px;transition:width .5s ease}
+.vattr-tv{background:#6b7280;display:flex;align-items:center;padding:0 12px;transition:width .5s ease}
+.vattr-lbl{font-size:11px;font-weight:700;color:#fff;white-space:nowrap}
+.vattr-legend{display:flex;gap:16px;font-size:12px}
+.vleg{display:flex;align-items:center;gap:6px}
+.vleg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+/* FCF TABLE */
+.fcf-section{margin-bottom:28px}
+.fcf-title{font-size:14px;font-weight:700;margin-bottom:14px}
+.fcf-table{width:100%;border-collapse:collapse;font-size:12px}
+.fcf-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding:8px 10px;text-align:right;background:var(--card);border:1px solid var(--border)}
+.fcf-table th:first-child{text-align:left}
+.fcf-table td{padding:8px 10px;border:1px solid var(--border);text-align:right;font-family:var(--mono);font-size:11px}
+.fcf-table td:first-child{text-align:left;font-family:var(--font);font-weight:600;font-size:12px}
+.fcf-table tr:last-child td{background:var(--card);font-weight:700}
+/* SENSITIVITY */
+.sens-section{margin-bottom:28px}
+.sens-title{font-size:14px;font-weight:700;margin-bottom:3px}
+.sens-sub{font-size:13px;color:var(--muted);margin-bottom:14px}
+.sens-table{border-collapse:collapse;width:100%;font-size:12px}
+.sens-table th{font-size:10px;font-weight:600;color:var(--muted);padding:7px 10px;text-align:center;background:var(--card);border:1px solid var(--border)}
+.sens-table th:first-child{text-align:left}
+.sens-table td{font-family:var(--mono);font-weight:600;padding:7px 10px;text-align:center;border:1px solid var(--border)}
+.sens-table td:first-child{font-family:var(--font);color:var(--muted);background:var(--card);font-weight:600;text-align:left}
+.cell-low{background:#dcfce7;color:#14532d}.cell-mid{background:#fef9c3;color:#713f12}.cell-high{background:#fee2e2;color:#7f1d1d}.cell-base{background:var(--text);color:#fff}
+.impl-card{border:2px solid var(--text);border-radius:10px;padding:20px;margin-bottom:22px}
+.impl-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:9px}
+.impl-text{font-size:14px;line-height:1.7}
+.action-row{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap}
+.act-primary{padding:11px 22px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);text-decoration:none;display:inline-flex;align-items:center;gap:7px}
+.act-secondary{padding:11px 22px;border:1.5px solid var(--border);color:var(--text);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font);background:var(--bg);text-decoration:none;display:inline-flex;align-items:center;gap:7px}.act-secondary:hover{border-color:var(--text)}
+@media(max-width:640px){.company-grid{grid-template-columns:repeat(2,1fr)}.nav-links,.domain-nav{display:none}.metrics-grid{grid-template-columns:1fr 1fr}.bull-bear{grid-template-columns:1fr}.live-stats{display:none}}
 </style>
 </head>
 <body>
-
-<nav class="nav">
-  <a href="/valuation-toolkit/" class="nav-logo">Valuation<strong>Desk</strong></a>
-  <ul class="nav-links">
-    <li><a href="/valuation-toolkit/domains/valuation-advisory/" class="active">Valuation Advisory</a></li>
-    <li><a href="/valuation-toolkit/vault/">My Vault</a></li>
-    <li><a href="/valuation-toolkit/deal-room/">Deal Room</a></li>
-    <li><a href="/valuation-toolkit/daily-brief/">Daily Brief</a></li>
-  </ul>
-  <div class="nav-right">
-    <a href="/valuation-toolkit/vault/" class="nav-pill">🗄 Vault (<span id="vault-count">0</span>)</a>
-    <a href="/valuation-toolkit/#pricing" class="nav-cta">Get Pro — ₹799/mo</a>
+<nav class="top-nav">
+  <div class="nav-inner">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/" class="logo">Valuation<strong>Desk</strong></a>
+    <div class="nav-links">
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/">Valuation Advisory</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/">My Vault</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/deal-room/">Deal Room</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/daily-brief/">Daily Brief</a>
+    </div>
+    <div class="nav-cta">
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/" class="vault-btn">🗄 Vault (0)</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/#pricing" class="pro-btn">Get Pro — ₹799/mo</a>
+    </div>
   </div>
 </nav>
-
-<div class="domain-bar">
-  <a href="/valuation-toolkit/domains/valuation-advisory/" class="domain-link">Overview</a>
-  <a href="/valuation-toolkit/domains/valuation-advisory/learn/" class="domain-link">📖 Learn</a>
-  <a href="/valuation-toolkit/domains/valuation-advisory/calculators/" class="domain-link active">🧮 Calculators</a>
-  <a href="/valuation-toolkit/vault/" class="domain-link">🗄 My Vault</a>
+<div class="domain-nav">
+  <div class="domain-nav-inner">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/">Overview</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/learn/">📖 Learn</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/" class="active">🧮 Calculators</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/">🗄 My Vault</a>
+  </div>
+</div>
+<div class="progress-wrap">
+  <div class="prog-bar" id="progressBar">
+    <div class="prog-step active" id="ps1"><div class="step-num">1</div><span class="step-label">Pick a company</span></div>
+    <div class="prog-line" id="pl1"></div>
+    <div class="prog-step" id="ps2"><div class="step-num">2</div><span class="step-label">Study the context</span></div>
+    <div class="prog-line" id="pl2"></div>
+    <div class="prog-step" id="ps3"><div class="step-num">3</div><span class="step-label">Set assumptions</span></div>
+    <div class="prog-line" id="pl3"></div>
+    <div class="prog-step" id="ps4"><div class="step-num">4</div><span class="step-label">Run valuation</span></div>
+  </div>
 </div>
 
-<div class="page" style="padding-bottom:4rem;">
-<div class="container" style="padding-top:2rem;">
-
-  <!-- PROGRESS BAR -->
-  <div class="steps-bar" id="steps-bar">
-    <div class="step-pill active" id="sp-1"><div class="step-num">1</div>Pick a company</div>
-    <div class="step-pill" id="sp-2"><div class="step-num">2</div>Study the context</div>
-    <div class="step-pill" id="sp-3"><div class="step-num">3</div>Set your assumptions</div>
-    <div class="step-pill" id="sp-4"><div class="step-num">4</div>Run the valuation</div>
+<!-- STEP 1 -->
+<section class="step-section active" id="step1">
+  <h1 class="step-headline">Which company do you want to value?</h1>
+  <p class="step-sub">Pick one. We'll load 10 years of financial projections, a pre-built context card, and walk you through every assumption — the way a real analyst would.</p>
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterGrid('all',this)">All (30)</button>
+    <button class="filter-btn" onclick="filterGrid('india',this)">🇮🇳 India</button>
+    <button class="filter-btn" onclick="filterGrid('global',this)">🌍 Global</button>
+    <button class="filter-btn" onclick="filterGrid('it',this)">IT</button>
+    <button class="filter-btn" onclick="filterGrid('banking',this)">Banking</button>
+    <button class="filter-btn" onclick="filterGrid('fmcg',this)">FMCG</button>
   </div>
+  <div class="company-grid" id="companyGrid"></div>
+  <button class="continue-btn" id="continueBtn" onclick="goToStep(2)">Continue with selected company →</button>
+</section>
 
-  <!-- ══ STEP 1: PICK COMPANY ══ -->
-  <div class="step active" id="step-1">
-    <div style="margin-bottom:1.25rem;">
-      <h2 class="h2" style="margin-bottom:0.4rem;">Which company do you want to value?</h2>
-      <p class="lead" style="font-size:0.88rem;">Pick one. We'll load the real financials from public filings — and you'll build the DCF from there.</p>
-    </div>
-
-    <!-- Search / Filter -->
-    <div style="display:flex;gap:0.75rem;margin-bottom:0.75rem;flex-wrap:wrap;">
-      <input type="text" class="input" id="co-search" placeholder="Search company..." style="max-width:260px;" oninput="filterCompanies()">
-      <div style="display:flex;gap:0.4rem;flex-wrap:wrap;" id="filter-btns">
-        <button class="btn btn-outline btn-sm filter-btn active" onclick="filterBy('all',this)">All (30)</button>
-        <button class="btn btn-outline btn-sm filter-btn" onclick="filterBy('India',this)">🇮🇳 India</button>
-        <button class="btn btn-outline btn-sm filter-btn" onclick="filterBy('Global',this)">🌍 Global</button>
-        <button class="btn btn-outline btn-sm filter-btn" onclick="filterBy('IT Services',this)">IT</button>
-        <button class="btn btn-outline btn-sm filter-btn" onclick="filterBy('Banking',this)">Banking</button>
-        <button class="btn btn-outline btn-sm filter-btn" onclick="filterBy('FMCG',this)">FMCG</button>
-      </div>
-    </div>
-
-    <div class="company-grid" id="company-grid"></div>
-
-    <div style="margin-top:1.5rem;">
-      <button class="btn btn-black" id="btn-to-step2" onclick="goToStep(2)" disabled style="min-width:200px;">
-        Continue with selected company →
-      </button>
-    </div>
+<!-- STEP 2 -->
+<section class="step-section" id="step2">
+  <button class="back-link" onclick="goToStep(1)">← Change company</button>
+  <div class="ctx-header">
+    <div class="ctx-flag" id="ctxFlag"></div>
+    <div><div class="ctx-co-name" id="ctxName"></div><div class="ctx-meta" id="ctxMeta"></div></div>
   </div>
+  <div class="stat-grid" id="statGrid"></div>
+  <div id="bankNote" style="display:none" class="bank-note">
+    <div class="bank-note-ttl">⚠️ Modified DCF for Financial Companies</div>
+    <div class="bank-note-txt" id="bankNoteTxt"></div>
+  </div>
+  <div class="edu-block">
+    <div class="edu-icon">📊</div>
+    <div class="edu-title">What drives this company's DCF — the analyst's view</div>
+    <div class="edu-text" id="ctxAnalyst"></div>
+  </div>
+  <div class="edu-block">
+    <div class="edu-icon">🔑</div>
+    <div class="edu-title">The single most important DCF assumption for this company</div>
+    <div class="edu-text" id="ctxKeyAssumption"></div>
+  </div>
+  <div class="bull-bear">
+    <div class="bull-box"><div class="bb-ttl">Bull Case — Higher Intrinsic Value</div><div id="ctxBull"></div></div>
+    <div class="bear-box"><div class="bb-ttl">Bear Case — Lower Intrinsic Value</div><div id="ctxBear"></div></div>
+  </div>
+  <button class="continue-btn enabled" onclick="goToStep(3)">I've studied it. Set the assumptions →</button>
+</section>
 
-  <!-- ══ STEP 2: CONTEXT ══ -->
-  <div class="step" id="step-2">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:0.75rem;">
+<!-- STEP 3 -->
+<section class="step-section" id="step3">
+  <button class="back-link" onclick="goToStep(2)">← Back to context</button>
+  <h2 class="step-headline">Set your assumptions</h2>
+  <p class="step-sub">Pre-filled from public filings and sector benchmarks. Override any assumption you disagree with. The intrinsic value updates live as you change inputs.</p>
+  <div class="live-bar">
+    <div class="live-inner">
       <div>
-        <h2 class="h2" style="margin-bottom:0.3rem;" id="ctx-heading">Study the company</h2>
-        <p class="lead" style="font-size:0.88rem;">Before you build the model, understand what you're valuing. Real analysts spend 30 minutes here before opening Excel.</p>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:4px">Live DCF Output</div>
+        <div class="live-stats" id="liveStats"></div>
       </div>
-      <button class="btn btn-outline btn-sm" onclick="goToStep(1)">← Change company</button>
-    </div>
-
-    <!-- Context card -->
-    <div class="context-card" id="ctx-card">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
-        <div>
-          <div style="font-size:0.65rem;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:0.3rem;" id="ctx-sector-label">—</div>
-          <div style="font-size:1.5rem;font-weight:800;letter-spacing:-0.02em;color:var(--white);" id="ctx-name">—</div>
-          <div style="font-size:0.78rem;color:rgba(255,255,255,0.55);margin-top:0.25rem;" id="ctx-description">—</div>
-        </div>
-        <div style="font-family:var(--mono);font-size:0.72rem;color:rgba(255,255,255,0.35);" id="ctx-ticker-exchange">—</div>
+      <div class="live-right">
+        <div class="live-cur-lbl">Current Market Price</div>
+        <div class="live-cur-val" id="liveCurPrice">—</div>
+        <div class="live-chg" id="liveChg"></div>
       </div>
-      <div class="context-grid" id="ctx-financials">
-        <!-- filled by JS -->
-      </div>
-    </div>
-
-    <!-- Analyst note -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
-      <div style="border:1px solid var(--gray-200);border-radius:var(--r);padding:1.1rem;">
-        <div class="eyebrow" style="margin-bottom:0.4rem;">Analyst's View</div>
-        <div style="font-size:0.82rem;color:var(--gray-500);line-height:1.65;" id="ctx-analyst-note">—</div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:0.75rem;">
-        <div style="border:1px solid #bbf7d0;border-radius:var(--r);padding:1rem;background:#f0fdf4;">
-          <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--green);margin-bottom:0.35rem;">Bull Case</div>
-          <div style="font-size:0.78rem;color:#166534;line-height:1.55;" id="ctx-bull">—</div>
-        </div>
-        <div style="border:1px solid #fecaca;border-radius:var(--r);padding:1rem;background:#fef2f2;">
-          <div style="font-size:0.62rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;color:var(--red);margin-bottom:0.35rem;">Bear Case</div>
-          <div style="font-size:0.78rem;color:#7f1d1d;line-height:1.55;" id="ctx-bear">—</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- TEACHING ANALYSIS (populated by JS) -->
-    <div id="ctx-teaching"></div>
-
-    <button class="btn btn-black" onclick="goToStep(3)" style="min-width:240px;">
-      I've studied it. Build the DCF →
-    </button>
-  </div>
-
-  <!-- ══ STEP 3: ASSUMPTIONS TABLE ══ -->
-  <div class="step" id="step-3">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:0.75rem;">
-      <div>
-        <div class="eyebrow" id="tbl-eyebrow">DCF Assumptions</div>
-        <h2 class="h2" style="margin-bottom:0.3rem;" id="tbl-heading">Set your assumptions</h2>
-        <p class="lead" style="font-size:0.85rem;">Green cells are pre-filled from public filings — review and override if you disagree. Grey cells need your judgment.</p>
-      </div>
-      <button class="btn btn-outline btn-sm" onclick="goToStep(2)">← Back to context</button>
-    </div>
-
-    <!-- Legend -->
-    <div style="display:flex;gap:1rem;margin-bottom:1rem;flex-wrap:wrap;">
-      <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;color:var(--gray-500);">
-        <div style="width:12px;height:12px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:2px;"></div>
-        Pre-filled from filings (can override)
-      </div>
-      <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;color:var(--gray-500);">
-        <div style="width:12px;height:12px;background:var(--white);border:1.5px solid var(--black);border-radius:2px;"></div>
-        Your judgment required
-      </div>
-      <div style="display:flex;align-items:center;gap:0.4rem;font-size:0.72rem;color:var(--gray-400);">
-        💡 Hover the hint icon for guidance
-      </div>
-    </div>
-
-    <div style="background:var(--white);border:1px solid var(--gray-200);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-sm);margin-bottom:1.5rem;">
-      <table class="assumption-table" id="assumption-table">
-        <!-- Built by JS -->
-      </table>
-    </div>
-
-    <!-- Run button -->
-    <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--r-lg);padding:1.5rem;">
-      <div style="font-size:0.82rem;color:var(--gray-500);margin-bottom:1rem;text-align:center;">
-        You've set <strong id="filled-count">0</strong> assumptions. Ready to see what this company is worth?
-      </div>
-      <button class="run-btn" id="run-btn" onclick="runValuation()">
-        <span style="font-size:1.4rem;">⚡</span>
-        RUN VALUATION
-        <span style="font-size:1.4rem;">⚡</span>
-      </button>
     </div>
   </div>
+  <div id="assumptionSections"></div>
+  <button class="run-btn" onclick="startCalc()">📈 RUN DCF VALUATION 📈</button>
+</section>
 
-  <!-- ══ STEP 4: LOADING → REVEAL ══ -->
-  <div class="step" id="step-4">
+<!-- LOADING -->
+<section class="step-section" id="stepLoading">
+  <div class="loading-wrap">
+    <div class="loading-headline">Running your DCF model...</div>
+    <div class="loading-sub">Projecting 10 years of free cash flows, discounting at WACC, computing terminal value</div>
+    <ul class="loading-steps-list">
+      <li class="ls-item-l" id="ls1"><span class="ls-dot"></span>Projecting 10-year revenue and EBIT<span class="ls-check">✓</span></li>
+      <li class="ls-item-l" id="ls2"><span class="ls-dot"></span>Calculating NOPAT and free cash flows<span class="ls-check">✓</span></li>
+      <li class="ls-item-l" id="ls3"><span class="ls-dot"></span>Discounting FCFs at WACC<span class="ls-check">✓</span></li>
+      <li class="ls-item-l" id="ls4"><span class="ls-dot"></span>Computing terminal value and PV<span class="ls-check">✓</span></li>
+      <li class="ls-item-l" id="ls5"><span class="ls-dot"></span>Building sensitivity analysis<span class="ls-check">✓</span></li>
+      <li class="ls-item-l" id="ls6"><span class="ls-dot"></span>Revealing intrinsic value<span class="ls-check">✓</span></li>
+    </ul>
+    <div class="loading-bar-track"><div class="loading-bar-fill" id="loadingBarFill"></div></div>
+    <div class="loading-pct" id="loadingPct">0%</div>
+  </div>
+</section>
 
-    <!-- LOADER (shown briefly) -->
-    <div id="loader-screen" style="text-align:center;padding:4rem 2rem;">
-      <div style="font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--gray-400);margin-bottom:1rem;">Calculating your valuation...</div>
-      <div style="width:48px;height:48px;border:3px solid var(--gray-200);border-top-color:var(--black);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 1.5rem;"></div>
-      <div style="font-size:0.82rem;color:var(--gray-400);" id="loader-msg">Projecting 5-year free cash flows...</div>
-    </div>
-
-    <!-- OUTPUT (shown after loader) -->
-    <div id="output-screen" style="display:none;" class="output-section">
-
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:0.75rem;">
-        <div>
-          <div class="eyebrow" id="out-eyebrow">DCF Valuation Result</div>
-          <h2 class="h2" id="out-heading">Your valuation of — is complete</h2>
-        </div>
-        <div style="display:flex;gap:0.6rem;flex-wrap:wrap;">
-          <button onclick="saveToVault()" class="btn btn-outline btn-sm">🗄 Save to Vault</button>
-          <button onclick="resetCalculator()" class="btn btn-outline btn-sm">↺ Value another company</button>
-        </div>
-      </div>
-
-      <!-- HERO OUTPUT -->
-      <div class="output-hero" id="output-hero">
-        <div style="font-size:0.65rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:0.75rem;">Your DCF Intrinsic Value</div>
-        <div style="font-size:4.5rem;font-weight:800;letter-spacing:-0.04em;line-height:1;color:var(--white);margin-bottom:0.5rem;" id="out-big-price">—</div>
-        <div style="font-size:0.88rem;color:rgba(255,255,255,0.5);margin-bottom:1.5rem;" id="out-vs-market">vs market price: —</div>
-
-        <div class="output-grid">
-          <div class="output-stat">
-            <div class="output-stat-label">Upside / Downside</div>
-            <div class="output-stat-val" id="out-upside">—</div>
-          </div>
-          <div class="output-stat">
-            <div class="output-stat-label">WACC</div>
-            <div class="output-stat-val" id="out-wacc">—</div>
-          </div>
-          <div class="output-stat">
-            <div class="output-stat-label">Enterprise Value</div>
-            <div class="output-stat-val" id="out-ev">—</div>
-          </div>
-          <div class="output-stat">
-            <div class="output-stat-label">PV of FCFs (5yr)</div>
-            <div class="output-stat-val" id="out-pv-fcf">—</div>
-          </div>
-          <div class="output-stat">
-            <div class="output-stat-label">PV of Terminal Value</div>
-            <div class="output-stat-val" id="out-pv-tv">—</div>
-          </div>
-          <div class="output-stat">
-            <div class="output-stat-label">TV as % of EV</div>
-            <div class="output-stat-val" id="out-tv-pct">—</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- VERDICT -->
-      <div class="verdict" id="verdict-box">—</div>
-
-      <!-- ANALYST COMPARISON -->
-      <div style="background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--r);padding:1.1rem;margin-bottom:1.5rem;" id="analyst-compare">
-        <div class="eyebrow" style="margin-bottom:0.5rem;">How does your view compare?</div>
-        <div style="font-size:0.82rem;color:var(--gray-500);line-height:1.6;" id="analyst-compare-text">—</div>
-      </div>
-
-      <!-- VALUE BRIDGE -->
-      <div style="background:var(--white);border:1px solid var(--gray-200);border-radius:var(--r-lg);padding:1.5rem;margin-bottom:1.5rem;">
-        <div class="eyebrow" style="margin-bottom:1rem;">Value Attribution Bridge</div>
-        <div id="output-waterfall"></div>
-      </div>
-
-      <!-- SENSITIVITY TABLE -->
-      <div style="background:var(--white);border:1px solid var(--gray-200);border-radius:var(--r-lg);padding:1.5rem;margin-bottom:1.5rem;">
-        <div class="eyebrow" style="margin-bottom:0.4rem;">Sensitivity Analysis</div>
-        <div style="font-size:0.78rem;color:var(--gray-400);margin-bottom:1rem;">Share price (₹ or $) across WACC and Terminal Growth Rate combinations. Your base case is highlighted.</div>
-        <div class="sens-wrap"><table class="table" id="output-sens"></table></div>
-      </div>
-
-      <!-- WHAT WOULD CHANGE YOUR MIND -->
-      <div style="background:var(--black);color:var(--white);border-radius:var(--r-lg);padding:1.5rem;">
-        <div style="font-size:0.65rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:0.75rem;">What would change your view?</div>
-        <div style="font-size:0.88rem;color:rgba(255,255,255,0.7);line-height:1.7;margin-bottom:1rem;" id="change-view-text">—</div>
-        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
-          <button onclick="tweakAssumption('growth')" style="font-family:var(--font);font-size:0.78rem;font-weight:500;color:rgba(255,255,255,0.7);background:transparent;border:1px solid rgba(255,255,255,0.2);padding:0.5rem 1rem;border-radius:6px;cursor:pointer;">Change growth rate →</button>
-          <button onclick="tweakAssumption('margin')" style="font-family:var(--font);font-size:0.78rem;font-weight:500;color:rgba(255,255,255,0.7);background:transparent;border:1px solid rgba(255,255,255,0.2);padding:0.5rem 1rem;border-radius:6px;cursor:pointer;">Change margins →</button>
-          <button onclick="tweakAssumption('wacc')" style="font-family:var(--font);font-size:0.78rem;font-weight:500;color:rgba(255,255,255,0.7);background:transparent;border:1px solid rgba(255,255,255,0.2);padding:0.5rem 1rem;border-radius:6px;cursor:pointer;">Change WACC →</button>
-        </div>
-      </div>
-
+<!-- STEP 4 -->
+<section class="step-section" id="step4">
+  <button class="back-link" onclick="goToStep(3)">← Adjust assumptions</button>
+  <div class="result-hero">
+    <div class="r-co-lbl" id="rCoLbl"></div>
+    <div style="font-size:15px;color:var(--muted);margin-bottom:6px">DCF Intrinsic Value per Share</div>
+    <div class="r-price" id="rPrice"></div>
+    <div class="r-vs" id="rVs"></div>
+  </div>
+  <div class="metrics-grid" id="metricsGrid"></div>
+  <div class="vattr-section">
+    <div class="vattr-title">Value Attribution — FCFs vs Terminal Value</div>
+    <div class="vattr-bar" id="vattrBar"></div>
+    <div class="vattr-legend">
+      <div class="vleg"><div class="vleg-dot" style="background:var(--text)"></div><span id="vattrFCFLbl">PV of FCFs</span></div>
+      <div class="vleg"><div class="vleg-dot" style="background:#6b7280"></div><span id="vattrTVLbl">PV of Terminal Value</span></div>
     </div>
   </div>
+  <div class="fcf-section">
+    <div class="fcf-title">10-Year FCF Projection</div>
+    <div style="overflow-x:auto"><table class="fcf-table" id="fcfTable"></table></div>
+  </div>
+  <div class="impl-card">
+    <div class="impl-title">🎓 What this DCF tells you</div>
+    <div class="impl-text" id="rInsight"></div>
+  </div>
+  <div class="sens-section">
+    <div class="sens-title">Sensitivity Analysis</div>
+    <div class="sens-sub">Intrinsic value per share at different WACC (rows) and Terminal Growth Rate (columns). Your base case is highlighted.</div>
+    <div style="overflow-x:auto"><table class="sens-table" id="sensTable"></table></div>
+  </div>
+  <div class="action-row">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/wacc.html" class="act-primary">⚙️ Refine WACC →</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/comps.html" class="act-primary" style="background:#374151">📊 Cross-check Comps →</a>
+    <button class="act-secondary" onclick="saveToVault()">🗄 Save to Vault</button>
+    <button class="act-secondary" onclick="resetAll()">↺ Value another company</button>
+  </div>
+</section>
 
-</div>
-</div>
-
-<footer class="footer">
-  <div class="footer-logo">Valuation<strong>Desk</strong></div>
-  <div class="footer-note">© 2025 ValuationDesk · Financial models are educational tools, not investment advice.</div>
-</footer>
-
-<div id="toast-container"></div>
-<script src="/valuation-toolkit/assets/vd.js"></script>
-<script src="/valuation-toolkit/data/companies.js"></script>
 <script>
-// ── STATE ──
-let selectedCompany = null;
-let currentStep = 1;
-let calcResult = null;
+// ─── COMPANY DATA ─────────────────────────────────────────────────────────────
+// isBank: uses equity DCF (net income as proxy) with Ke instead of WACC
+// nd: net debt (positive = owes, negative = net cash)
+// rev: revenue, ebitM: EBIT margin %, da: D&A % of rev, capex: % of rev, wc: WC change % of rev
+// wacc: discount rate, g1: growth Y1-5, g2: growth Y6-10, gt: terminal growth
+// For banks: ni: net income, ke: cost of equity, g1/g2/gt: NI growth rates
+const CO = [
+  {id:'reliance',name:'Reliance Industries',ticker:'RELIANCE',flag:'🇮🇳',sector:'Conglomerate',tags:['india'],cur:'₹',unit:'Cr',isBank:false,
+   rev:902000,ebitM:11.2,da:2.5,capex:6.0,wc:0.5,tax:25.2,wacc:13.3,g1:8,g2:5,gt:4.5,nd:116000,sh:1350,price:1400,
+   ctx:{a:'Reliance\'s DCF is driven by three distinct business trajectories. Jio\'s EBITDA is growing at 20%+ (high margin, subscription model). Retail is scaling but still margin-thin. O2C (refining) is stable but low-growth. The blended EBIT margin of 11.2% understates Jio\'s contribution and overstates the O2C drag.',k:'The terminal growth rate. At Jio\'s scale and 5G penetration trajectory, whether you assume 4.5% or 5.5% terminal growth changes intrinsic value by ₹200-300/share. This is the single number where an analyst\'s India thesis gets expressed.',bull:['Jio ARPU crosses ₹200/month — raises blended EBIT margin to 13-14%','Retail EBITDA margin reaches 8% — comparable to DMart\'s 9% — at ₹5 lakh Cr revenue','New Energy earns first revenues from green hydrogen by 2027, adding a new EBITDA stream'],bear:['New energy capex of ₹5.75 lakh Cr absorbs FCF for 3-4 years, delaying equity value creation','O2C margins compress as global refining capacity expands in Asia','Rising G-Sec yields force WACC higher by 1%, cutting intrinsic value by 15-18%']}},
 
-// ── STEP NAVIGATION ──
+  {id:'tcs',name:'TCS',ticker:'TCS',flag:'🇮🇳',sector:'IT Services',tags:['india','it'],cur:'₹',unit:'Cr',isBank:false,
+   rev:240893,ebitM:26.0,da:1.2,capex:1.5,wc:0.5,tax:26.1,wacc:12.0,g1:9,g2:7,gt:4.0,nd:-71000,sh:363,price:4000,
+   ctx:{a:'TCS DCF is deceptively simple — high margins, minimal capex, net cash balance. The entire model is sensitive to just two variables: revenue growth rate and EBIT margin sustainability. 26% margin over 10 years vs 22% margin changes intrinsic value by ₹800/share.',k:'EBIT margin in the terminal year. TCS has sustained 25-26% EBITDA margin for 7 consecutive years through pricing discipline and scale. The bear case is AI commoditisation compressing this to 20%. The bull case is AI services commanding premium margins above 28%.',bull:['AI services portfolio reaches 30% of revenue at 32%+ margins, lifting blended margin','BFSI client stickiness sustains 10%+ revenue CAGR through 2028','Net cash position of ₹71,000 Cr earns 7%+ returns, reducing effective WACC'],bear:['AI commoditises legacy IT maintenance (45% of revenue) — margin falls to 22%','US visa restrictions raise delivery costs by 2-3%, compressing EBIT margin','Revenue CAGR falls to 6% as discretionary tech spending slows globally']}},
+
+  {id:'hdfc',name:'HDFC Bank',ticker:'HDFCBANK',flag:'🇮🇳',sector:'Banking',tags:['india','banking'],cur:'₹',unit:'Cr',isBank:true,
+   ni:65000,ke:13.5,g1:15,g2:10,gt:5.0,nd:0,sh:750,price:1600,
+   bankNote:'Traditional DCF using WACC and FCF doesn\'t apply to banks. This uses an equity DCF — projecting net income growth (proxy for equity cash flows) and discounting at the cost of equity (Ke). Terminal value assumes stable growth in net income.',
+   ctx:{a:'HDFC Bank\'s equity DCF is about RoE sustainability. With FY24 net income of ₹65,000 Cr and cost of equity at 13.5%, the bank must grow net income at 15%+ in the near term and 10% in the medium term to generate upside. The HDFC Ltd merger has complicated the near-term NIM picture.',k:'Near-term net income growth rate (Y1-5). If the merger integration goes smoothly and NIM normalises above 4%, 15% net income growth is achievable. If NIMs compress to 3.5% due to higher cost of funds, growth could fall to 10-12%. This assumption drives everything in the bank DCF.',bull:['Post-merger RoE sustains above 16%, justifying 15%+ net income CAGR','CASA ratio recovers to pre-merger levels (45%+), reducing funding costs','Credit quality stays pristine — zero NPA spike through the rate cycle'],bear:['Merger integration extends 2 more years — NIM stays suppressed at 3.5%','RBI tightening forces higher capital ratios, reducing distributable income','HDFC loan book shows higher slippages than TCS loan book — provisioning rises']}},
+
+  {id:'infosys',name:'Infosys',ticker:'INFY',flag:'🇮🇳',sector:'IT Services',tags:['india','it'],cur:'₹',unit:'Cr',isBank:false,
+   rev:153670,ebitM:21.0,da:1.5,capex:1.8,wc:0.5,tax:26.0,wacc:12.3,g1:8,g2:6,gt:4.0,nd:-38000,sh:415,price:1540,
+   ctx:{a:'Infosys DCF is a margin recovery story. At 21% EBIT margin vs historical band of 22-23%, any margin improvement creates significant intrinsic value. The net cash of ₹38,000 Cr also meaningfully boosts equity value above Enterprise Value.',k:'Whether Infosys can recover margins from 21% to 22-23%. Management has repeatedly guided for this. AI-driven automation of delivery, lower subcontracting, and pricing discipline are the levers. Achieving 22.5% EBIT margin sustainably adds ₹200+ per share to intrinsic value.',bull:['AI-native delivery reduces subcontracting costs — margin recovery to 22.5% by FY26','Large deal pipeline converts — revenue CAGR accelerates to 10%','Attrition normalises at 13-14%, reducing hiring and training overhead'],bear:['Discretionary tech budgets cut across BFSI and retail — CAGR falls to 5%','Margin recovery delayed as AI transition costs exceed savings through FY27','Currency appreciation compresses dollar earnings in INR terms']}},
+
+  {id:'asianpaint',name:'Asian Paints',ticker:'ASIANPAINT',flag:'🇮\N',sector:'FMCG/Paints',tags:['india','fmcg'],cur:'₹',unit:'Cr',isBank:false,
+   rev:35000,ebitM:18.0,da:1.8,capex:3.5,wc:0.8,tax:25.2,wacc:12.3,g1:10,g2:7,gt:5.0,nd:-2000,sh:96,price:2900,
+   ctx:{a:'Asian Paints DCF is almost entirely a volume growth story. EBIT margin of 18% is structurally stable — pricing power covers input cost volatility. The question the DCF asks is: what happens to volumes in a world where Grasim\'s Birla Opus actively fights for share?',k:'Revenue growth rate in years 1-5. The pre-Grasim entry assumption was 12-14% CAGR. Post-Grasim, the realistic range is 8-12%. This 4 percentage point range changes intrinsic value by ~₹400/share. The Grasim threat is a direct input into your DCF growth assumption.',bull:['Birla Opus market share gain stalls at 2-3% — Asian Paints growth sustains at 12%','Real estate super-cycle drives decorative paint volumes 15% above trend','International markets reach 20% of revenue, diversifying the geographic growth profile'],bear:['Grasim wins 8-10% market share — revenue growth falls to 7% CAGR','Crude oil spike compresses EBIT margin to 15% for 2 consecutive years','Real estate slowdown cuts premium decorative volumes by 20% in FY26']}},
+
+  {id:'zomato',name:'Zomato',ticker:'ZOMATO',flag:'🇮\N',sector:'Consumer Tech',tags:['india'],cur:'₹',unit:'Cr',isBank:false,
+   rev:14170,ebitM:8.5,da:1.0,capex:1.5,wc:1.0,tax:25.0,wacc:16.3,g1:35,g2:20,gt:5.0,nd:-12000,sh:875,price:240,
+   ctx:{a:'Zomato DCF is a venture-style model — high early growth, negative or thin early FCFs, and a terminal value that drives most of the intrinsic value. At 35% revenue CAGR in Y1-5, the model is pricing in Blinkit scaling rapidly alongside food delivery. The EBIT margin assumption of 8.5% is the near-term target, growing over time.',k:'EBIT margin in the terminal year. The food delivery global analog (DoorDash, Delivery Hero) suggests 8-12% EBIT margins at maturity. Zomato\'s India cost structure and pricing power could yield 15% if Blinkit dominates quick commerce. The terminal margin assumption is the most judgment-intensive input in this DCF.',bull:['Blinkit EBIT margin reaches 15% by FY28 — total EBIT margin lifts to 12%','India food delivery GOV doubles to ₹2 lakh Cr by FY29','Hyperpure B2B reaches ₹10,000 Cr revenue at 5% EBIT margin'],bear:['Swiggy IPO funds aggressive discounting — margins stay at 6% through FY28','Blinkit expansion into Tier-2 cities destroys unit economics — EBIT margin at 4%','High WACC of 16.3% means every delay in profitability is disproportionately punished']}},
+
+  {id:'wipro',name:'Wipro',ticker:'WIPRO',flag:'🇮\N',sector:'IT Services',tags:['india','it'],cur:'₹',unit:'Cr',isBank:false,
+   rev:89800,ebitM:17.5,da:1.5,capex:1.8,wc:0.5,tax:26.0,wacc:11.9,g1:7,g2:5,gt:3.5,nd:-25000,sh:519,price:520,
+   ctx:{a:'Wipro DCF reflects a discount-to-peers situation. At 17.5% EBIT margin vs TCS at 26% and Infosys at 21%, Wipro needs margin expansion to close the valuation gap. The Capco acquisition was supposed to be that lever — premium consulting margins should lift the blended margin over time.',k:'Revenue growth rate. Wipro has been the laggard in India IT on growth — 7% CAGR assumption is generous. If organic growth doesn\'t accelerate post-Capco, the DCF justifies significantly less than current market price. Growth is more important for Wipro than margin in the near term.',bull:['Capco cross-sell generates ₹5,000 Cr incremental revenue by FY27 — growth re-rates to 9%','Margin recovery to 19% on AI-driven delivery efficiency gains','BFSI vertical recovery drives consulting demand in financial services'],bear:['Organic revenue growth stalls at 5% — Capco integration takes 3 years longer','Margin stays at 17% — new management unable to close the gap vs peers','US visa restrictions disproportionately affect Wipro\'s US delivery model']}},
+
+  {id:'maruti',name:'Maruti Suzuki',ticker:'MARUTI',flag:'🇮\N',sector:'Auto OEM',tags:['india'],cur:'₹',unit:'Cr',isBank:false,
+   rev:141800,ebitM:13.5,da:2.0,capex:4.0,wc:1.0,tax:25.2,wacc:12.6,g1:12,g2:8,gt:4.5,nd:-34000,sh:30,price:12500,
+   ctx:{a:'Maruti DCF is fundamentally an India car penetration story. At 3% car ownership vs 80% in the US, the long runway is clear. The DCF asks: at what pace does India\'s middle class buy cars, and does Maruti keep 40% of that market? The ₹34,000 Cr net cash also meaningfully boosts equity value.',k:'Revenue growth rate in years 1-5. India auto volume growth has been 8-15% in recent years. Whether Maruti grows revenue at 10% (conservative) or 15% (bull, driven by SUV mix and EV entry) changes intrinsic value by ₹2,000-3,000/share. The growth assumption IS the Maruti thesis.',bull:['SUV and EV portfolio captures 35% of India\'s fastest-growing segment','India car penetration accelerates — industry volumes grow 15% CAGR through FY28','Suzuki Japan EV platform eliminates India-level R&D cost of transition'],bear:['EV disruption happens faster than Maruti\'s ICE-heavy product mix can absorb','Competition from Tata, Mahindra, and Chinese OEMs in SUV/EV cuts market share to 35%','Commodity inflation compresses EBIT margin to 11% for 2 years']}},
+
+  {id:'bajfinance',name:'Bajaj Finance',ticker:'BAJFINANCE',flag:'🇮\N',sector:'NBFC',tags:['india','banking'],cur:'₹',unit:'Cr',isBank:true,
+   ni:16778,ke:15.2,g1:25,g2:18,gt:6.0,nd:0,sh:61,price:7400,
+   bankNote:'NBFC equity DCF — net income is used as a proxy for equity cash flows. Ke (cost of equity at 15.2%) is the discount rate. High near-term growth (25%) reflects Bajaj Finance\'s demonstrated track record of 22-24% AUM and earnings growth.',
+   ctx:{a:'Bajaj Finance equity DCF is about whether its 22-24% RoE and 25% net income growth are sustainable as AUM crosses ₹4 lakh Cr. The DCF embeds a deceleration to 18% growth in Y6-10 and 6% terminal — this is the prudent assumption given scale effects.',k:'Near-term NI growth rate (Y1-5). Bajaj Finance has delivered 25%+ net income CAGR for 8 consecutive years. Whether this decelerates to 20% (scale effects) or sustains at 25% (new product categories) is the key assumption. Each 1% change in near-term growth = ₹300+ per share.',bull:['New product categories (insurance, MF, digital lending) sustain 25% NI CAGR through FY28','Rural finance expansion maintains high RoE above 22%','RBI regulations settle — no further restrictions on co-lending or digital distribution'],bear:['Consumer credit NPA cycle turns — provisioning spikes, NI growth falls to 15%','RBI FLDG ban slows AUM growth below 20% — NI CAGR decelerates to 18%','Competition from banks and new-age fintechs in EMI Finance compresses margins']}},
+
+  {id:'itc',name:'ITC',ticker:'ITC',flag:'🇮\N',sector:'FMCG/Tobacco',tags:['india','fmcg'],cur:'₹',unit:'Cr',isBank:false,
+   rev:74000,ebitM:28.4,da:1.5,capex:2.5,wc:0.5,tax:25.5,wacc:12.3,g1:8,g2:6,gt:4.0,nd:-30000,sh:1250,price:450,
+   ctx:{a:'ITC DCF has a structural complexity: the cigarette business (50%+ of EBIT) generates high-margin, predictable cash flows but is under regulatory pressure. FMCG, hotels, and paper require capex but offer growth. The high EBIT margin of 28.4% is almost entirely from cigarettes.',k:'Revenue growth in years 1-5. ITC\'s headline growth depends on: (1) cigarette pricing power vs volume erosion, (2) FMCG revenue scaling past ₹25,000 Cr. If FMCG grows 20% while cigarettes grow 5%, the blended rate is 8% — but the margin mix improves. If cigarettes volume falls, both growth AND margin come under pressure.',bull:['FMCG business reaches ₹25,000 Cr revenue by FY27 — blended growth accelerates to 12%','Cigarette taxation plateau allows volume recovery in mid-price segment','Hotels profitability contributes ₹500 Cr+ annual PAT — new DCF growth vector'],bear:['Tobacco taxation destroys 3% volume annually — cigarette EBIT falls 5% per year','FMCG loses share to Patanjali and private labels — ₹5,000 Cr revenue miss vs plan','Demerger indefinitely deferred — conglomerate discount stays, WACC stays elevated']}},
+
+  {id:'hul',name:'Hindustan Unilever',ticker:'HINDUNILVR',flag:'🇮\N',sector:'FMCG',tags:['india','fmcg'],cur:'₹',unit:'Cr',isBank:false,
+   rev:62700,ebitM:22.2,da:1.2,capex:2.0,wc:0.3,tax:25.8,wacc:12.0,g1:9,g2:7,gt:5.0,nd:-5000,sh:235,price:2400,
+   ctx:{a:'HUL DCF is a premiumisation and operating leverage story. With negative working capital and minimal capex needs, almost every incremental rupee of revenue flows through to EBIT and FCF. EBIT margin of 22.2% could reach 25% by FY28 if premiumisation continues on track.',k:'EBIT margin trajectory. HUL\'s premiumisation thesis says Beauty & Personal Care (40x P/E equivalent profitability) grows faster than Home Care (28x), improving the blended margin over time. If rural consumption recovers, Home Care volumes grow without margin sacrifice. The margin trajectory drives the terminal value.',bull:['Premiumisation drives EBIT margin to 25% by FY28 — terminal FCF 12% higher','Rural consumption recovery accelerates revenue CAGR to 11% through FY27','Parent Unilever brings global innovation pipelines — faster category launches'],bear:['Private label disruption in e-commerce channels erodes Home Care pricing','EBIT margin stays at 22% — premiumisation offset by rural affordability constraints','Input cost inflation (palm oil, crude) compresses gross margin by 2-3%']}},
+
+  {id:'tatamotors',name:'Tata Motors',ticker:'TATAMOTORS',flag:'🇮\N',sector:'Auto OEM',tags:['india'],cur:'₹',unit:'Cr',isBank:false,
+   rev:440000,ebitM:12.3,da:3.5,capex:7.0,wc:1.5,tax:25.0,wacc:12.9,g1:10,g2:7,gt:4.0,nd:76000,sh:366,price:1000,
+   ctx:{a:'Tata Motors DCF is a high-capex, high-conviction story. JLR\'s electrification programme (£15B+ capex through 2030) is the dominant investment — the DCF is essentially a bet on whether Range Rover EV commands premium margins in a competitive luxury EV market. India CV cycles provide predictable near-term cash flow.',k:'Capex as % of revenue. At 7%, Tata Motors is the most capex-intensive company in our India coverage. JLR\'s EV commitment means this stays elevated through 2027-28. If capex stays at 7% and EBIT margin stays at 12%, FCF generation is modest. The bull case requires EBIT margin to expand to 14% as JLR scale effects kick in.',bull:['JLR Range Rover EV commands 25% EBIT margin — total EBIT margin lifts to 14%','India CV upcycle adds ₹3,000 Cr annual FCF from the domestic business','Debt repayment of ₹30,000 Cr by FY27 reduces interest burden and boosts equity value'],bear:['JLR EV transition capex exceeds £15B — FCF remains near zero for 3 more years','China JLR sales continue declining — EBIT margin stays below 10%','India CV cycle turns — domestic business FCF contribution disappears']}},
+
+  {id:'sunpharma',name:'Sun Pharma',ticker:'SUNPHARMA',flag:'🇮\N',sector:'Pharma',tags:['india'],cur:'₹',unit:'Cr',isBank:false,
+   rev:48000,ebitM:28.1,da:2.5,capex:4.0,wc:1.0,tax:25.2,wacc:11.9,g1:12,g2:9,gt:4.0,nd:-15000,sh:240,price:1600,
+   ctx:{a:'Sun Pharma DCF is a specialty transition story. EBIT margin of 28.1% is deceptively strong — it includes both the low-margin generics drag and the high-margin specialty drugs premium. As the specialty portfolio grows, blended margins could expand to 32-35% over the next 7 years.',k:'Revenue growth from US specialty drugs. Three specialty products (Ilumya, Cequa, Levulan) drive the US margin premium. If 3-4 pipeline launches succeed in the next 18 months, US revenue grows 20%+. If FDA throws another warning letter at a manufacturing facility, the specialty ramp stalls. This binary is the key DCF assumption.',bull:['4 specialty drug launches drive US revenue to ₹18,000 Cr by FY28 — EBIT margin reaches 32%','India branded generic portfolio gains 2 percentage points of market share annually','FDA manufacturing concerns resolved permanently — no quality-related revenue disruptions'],bear:['USFDA warning letter on manufacturing plant disrupts ₹6,000 Cr of US supply','US specialty pricing pressure from PBMs caps revenue at ₹12,000 Cr','India generic competition intensifies — domestic branded portfolio loses pricing power']}},
+
+  {id:'adaniports',name:'Adani Ports',ticker:'ADANIPORTS',flag:'🇮\N',sector:'Infrastructure',tags:['india'],cur:'₹',unit:'Cr',isBank:false,
+   rev:26500,ebitM:57.4,da:3.0,capex:8.0,wc:1.0,tax:25.2,wacc:12.7,g1:15,g2:10,gt:5.0,nd:39000,sh:215,price:1050,
+   ctx:{a:'Adani Ports DCF is unusual — EBIT margin of 57.4% reflects the economics of captive, concession-based port operations. The capex of 8% of revenue is high (port infrastructure) but generates 25-year concession revenues. The net debt of ₹39,000 Cr is infrastructure debt backed by port cash flows.',k:'Revenue growth in Y1-5. Container volume CAGR of 8-10% drives revenue. The government\'s Sagarmala Port development initiative provides tailwind. Whether Adani Ports captures 25% of India\'s incremental cargo (bull) or 20% (base) drives a ₹80-100/share difference in intrinsic value.',bull:['Colombo and Haifa international ports reach EBITDA positive — international revenue reaches ₹4,000 Cr','Container volumes grow at 12% as India\'s exports reach $1 trillion by FY30','Governance improvement post-Hindenburg compresses the group-level risk premium in WACC'],bear:['Trade war slowdown reduces container volumes below 8% CAGR','Further Adani Group concerns force higher borrowing costs — WACC rises to 14%','New JSW Infrastructure ports take share at key western India cargo hubs']}},
+
+  {id:'kotak',name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',flag:'🇮\N',sector:'Banking',tags:['india','banking'],cur:'₹',unit:'Cr',isBank:true,
+   ni:13782,ke:13.4,g1:18,g2:12,gt:5.0,nd:0,sh:200,price:1900,
+   bankNote:'Equity DCF for Kotak Mahindra Bank — net income projected forward with different growth rates, discounted at cost of equity (13.4%). Post-Uday Kotak succession is the primary uncertainty in the growth rate assumption.',
+   ctx:{a:'Kotak\'s equity DCF is about whether the founder premium in RoE is structural or personal. With Ke of 13.4% and near-term NI growth of 18%, the DCF generates significant upside. The key question: does new management sustain Kotak\'s credit discipline that produced 16%+ RoE through full cycles?',k:'NI growth rate in Y1-5 under new management. If RoE sustains at 16-18%, 18% NI growth is achievable. If the founder premium erodes and RoE settles at 14%, the NI growth rate falls to 12-13% — and intrinsic value falls ₹200-300/share.',bull:['New management maintains conservative credit culture — RoE sustains at 17%','Corporate banking expansion adds high-NIM book without proportional NPA risk','Kotak AMC and Securities compound earnings above the bank growth rate'],bear:['Post-succession culture shift leads to faster loan growth — NPA cycle follows','Retail unsecured loan book stress surfaces — provisioning spikes in FY26','Regulatory action on technology infrastructure creates operational risk to earnings']}},
+
+  // ─── GLOBAL ──────────────────────────────────────────────────────────────────
+  {id:'apple',name:'Apple',ticker:'AAPL',flag:'🇺🇸',sector:'Consumer Tech',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   rev:385,ebitM:29.8,da:1.5,capex:3.0,wc:0.5,tax:14.7,wacc:10.8,g1:7,g2:5,gt:3.0,nd:-50,sh:15.4,price:190,
+   ctx:{a:'Apple DCF is a Services mix-shift story. Hardware revenue is growing at 5-6% — mature. Services (App Store, Apple Pay, iCloud, TV+, Music) grows at 12-15% with 70%+ gross margins. As Services reaches 30% of revenue, the blended EBIT margin moves from 30% toward 35%, driving disproportionate FCF growth.',k:'Services revenue growth rate. At 15% Services CAGR, the blended EBIT margin expands 0.5% annually. Over 10 years, this compounds significantly. The bear case for Services is antitrust ruling on App Store — which caps revenue growth at 8%. This single regulatory outcome could swing intrinsic value by $20-30/share.',bull:['Services reaches 35% of revenue by FY30 — blended EBIT margin expands to 34%','AI features drive iPhone upgrade cycle — hardware revenue accelerates to 8% CAGR','India manufacturing scales to 30% of iPhone production — geopolitical risk premium falls'],bear:['App Store antitrust ruling forces 15% fee cut — Services revenue misses by $10B annually','iPhone saturation in developed markets — hardware growth falls to 3% CAGR','China sales decline 20% as geopolitical tensions restrict iPhone sales in government sector']}},
+
+  {id:'microsoft',name:'Microsoft',ticker:'MSFT',flag:'🇺🇸',sector:'Cloud / Enterprise',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   rev:228,ebitM:44.6,da:2.0,capex:4.5,wc:0.5,tax:13.0,wacc:9.3,g1:14,g2:10,gt:4.0,nd:-26,sh:7.4,price:420,
+   ctx:{a:'Microsoft DCF is the cleanest large-cap model in global markets — 45% EBIT margin, minimal working capital, predictable subscription revenue. Azure growing at 28%+ is the primary driver. At current trajectory, Azure alone will be a $100B+ revenue business by FY28, with 40%+ EBIT margins.',k:'Azure revenue CAGR. At 28%, Azure adds $12B in revenue annually. At 20%, it adds $8B. The difference is $40B over 4 years — at 40% EBIT margin, that\'s $16B of extra EBIT, worth $160B+ of enterprise value at 10x. Azure growth is the most value-leveraged assumption in the Microsoft DCF.',bull:['Azure captures 35% cloud market share from AWS — revenue CAGR stays at 28% through FY28','Copilot Enterprise reaches $10B annual recurring revenue by FY27','LinkedIn and Gaming generate $5B+ annual synergies from Activision integration'],bear:['Azure growth decelerates to 18% as hyperscaler in-house chips reduce GPU dependency','AI capex of $80B/year sustains — EBIT margin falls to 40% for 2 years','Antitrust ruling forces M365 bundle unbundling — per-seat revenue falls']}},
+
+  {id:'tesla',name:'Tesla',ticker:'TSLA',flag:'🇺🇸',sector:'EV / Energy',tags:['global'],cur:'$',unit:'B',isBank:false,
+   rev:97,ebitM:12.4,da:3.5,capex:7.0,wc:1.5,tax:20.0,wacc:15.4,g1:25,g2:18,gt:4.0,nd:-17,sh:3.18,price:250,
+   ctx:{a:'Tesla DCF requires a clear thesis on what kind of company Tesla is. At 25% revenue CAGR in Y1-5, the model assumes Tesla captures significant share of the $4T+ global auto market AND scales Energy and FSD software. EBIT margin of 12.4% must expand as scale effects kick in and software revenue grows.',k:'EBIT margin in years 5-10. If Tesla\'s margin expands to 18% as FSD monetisation kicks in, FCF generation becomes exceptional. If margins stay at 12% from EV price competition, the high WACC of 15.4% makes intrinsic value highly sensitive to the terminal value assumption. This is the most consequential assumption in the model.',bull:['FSD regulatory approval in 2025-26 — FSD software becomes $5,000+ annual subscription revenue per vehicle','EBIT margin expands to 20% as software mix improves','Energy storage (Megapack) reaches $20B revenue at 15% EBIT margin'],bear:['BYD price competition forces GM-level margins of 7% by 2027','FSD never achieves regulatory approval — $150B option value goes to zero','Elon controversy creates brand damage in EU and California — volume falls 15%']}},
+
+  {id:'alphabet',name:'Alphabet',ticker:'GOOGL',flag:'🇺🇸',sector:'Search / Cloud',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   rev:307,ebitM:31.3,da:3.0,capex:6.0,wc:0.5,tax:13.9,wacc:10.2,g1:11,g2:8,gt:4.0,nd:-96,sh:12.6,price:175,
+   ctx:{a:'Alphabet DCF has an unusual feature — the $96B net cash position adds $7.6 to the intrinsic value per share directly through the equity bridge. The operating model (Search at 15% capex, Cloud at 30% capex) requires understanding which segment drives terminal value. Cloud is currently subscale but growing toward AWS-like margins.',k:'Whether Search advertising revenue sustains above $200B by FY28. If ChatGPT takes 5% of global search queries, Google Search revenue falls by $10B — at 35% EBIT margin, that\'s $3.5B EBIT loss, worth $35B+ of enterprise value. The AI disruption risk to Search is the defining assumption.',bull:['Gemini defends Search share — revenue sustains 10% CAGR through FY28','Cloud reaches 35% EBIT margin on scale — adds $15B of annual EBIT by FY27','Waymo generates $2B+ of revenue — Other Bets turns FCF-positive by FY27'],bear:['Search share falls 8% to OpenAI/Perplexity — revenue misses by $20B by FY28','AI capex of $50B+ annually depresses FCF margin for 3 years','DOJ antitrust forces Chrome/Android unbundling — Search distribution costs rise by $10B']}},
+
+  {id:'amazon',name:'Amazon',ticker:'AMZN',flag:'🇺🇸',sector:'Cloud / E-commerce',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   rev:575,ebitM:16.7,da:4.0,capex:8.0,wc:1.0,tax:12.5,wacc:10.5,g1:12,g2:9,gt:4.0,nd:-26,sh:10.5,price:171,
+   ctx:{a:'Amazon DCF is effectively an AWS DCF with a retail business attached. AWS contributes 60%+ of EBIT from 15% of revenue — the blended EBIT margin of 16.7% massively understates AWS\'s contribution and overstates retail\'s drag. The FCF model is complex because high capex (8% of revenue) is concentrated in AWS infrastructure.',k:'AWS EBIT margin expansion. If AWS reaches 40% EBIT margin (from 35% today), that adds $12B of annual EBIT. At 20x EV/EBITDA — consistent with Azure multiples — that\'s $240B of additional enterprise value, or $23/share. This single assumption drives more value than the entire retail business.',bull:['AWS margin reaches 42% by FY28 — adds $20B annual EBIT at scale','Advertising business reaches $65B — third business with 30%+ EBIT margin','International retail turns EBIT-positive by FY26 — drag eliminated'],bear:['AWS growth decelerates to 10% as in-house chips (Google, Amazon Trainium) reduce demand','Retail EBIT margin stays below 5% — capex-heavy logistics never reaches full efficiency','Regulatory action on marketplace practices creates compliance cost']}},
+
+  {id:'meta',name:'Meta',ticker:'META',flag:'🇺🇸',sector:'Social / AI',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   rev:134,ebitM:52.2,da:2.5,capex:8.0,wc:0.5,tax:12.6,wacc:11.0,g1:18,g2:12,gt:4.0,nd:-43,sh:2.56,price:550,
+   ctx:{a:'Meta DCF has an unusual capex structure — $8 of capex per $100 of revenue, largely for Reality Labs. If you exclude Reality Labs capex and losses, the Family of Apps FCF is extraordinary — 35%+ FCF margin on $130B revenue. The DCF question is: how much do you penalise Meta for the Reality Labs bet?',k:'Reality Labs capex as a drag on consolidated FCF. At $8B+ annual Reality Labs opex, this reduces FCF by $6B after tax. Over 10 years, discounted at 11%, that\'s ~$40B in value destruction if Reality Labs never monetises. Whether you include this drag or model a bullish Reality Labs path changes intrinsic value by $15-20/share.',bull:['Reality Labs reaches EBITDA positive by FY27 — $8B drag converts to small positive','AI advertising tools drive 25% ARPU improvement — blended EBIT margin reaches 56%','Threads reaches 500M daily users — new advertising surface adds $5B revenue by FY27'],bear:['Reality Labs losses exceed $30B cumulative — write-down triggers','TikTok returns — Gen Z engagement time on Meta platforms falls 20%','FTC forces Instagram divestiture — highest-monetisation platform separated from FB']}},
+
+  {id:'berkshire',name:'Berkshire Hathaway',ticker:'BRK.B',flag:'🇺🇸',sector:'Conglomerate',tags:['global','banking'],cur:'$',unit:'B',isBank:true,
+   ni:36,ke:9.2,g1:8,g2:6,gt:3.0,nd:0,sh:1.45,price:620,
+   bankNote:'Berkshire uses operating earnings DCF — reported GAAP net income includes investment gains/losses that distort the model. Using ~$36B operating earnings as the base (ex-investment gains) with cost of equity 9.2% is the standard approach.',
+   ctx:{a:'Berkshire equity DCF uses operating earnings ($36B) rather than reported earnings because investment mark-to-market swings ($50B+ in good years, ($40B) in bad years) completely distort GAAP net income. Operating earnings from insurance, BNSF, BHE, and manufacturing are the true economic cash flows.',k:'Operating earnings growth rate. BNSF railroad and BHE utilities are low-growth (3-5%). Insurance underwriting is variable. The equity portfolio ($350B+) earns dividends and generates capital gains. At 8% operating earnings growth in Y1-5, the DCF is conservative — this growth has historically come from acquisitions.',bull:['Buffett deploys $80B in a single acquisition at 12% ROIC — transforms operating earnings growth','Japan equity stakes (Mitsubishi, Mitsui etc.) generate $5B+ annual dividends by FY27','Insurance float exceeds $200B — zero-cost capital compounds at 12% annually'],bear:['$180B cash drag continues — 10% of capital earns 5% vs the overall 12% return hurdle','Super-cat insurance event $50B — wipes 2 years of operating earnings','Succession discount post-Buffett — market assigns 15% holding company discount']}},
+
+  {id:'nvidia',name:'NVIDIA',ticker:'NVDA',flag:'🇺🇸',sector:'Semiconductors / AI',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   rev:60,ebitM:60.5,da:1.5,capex:2.5,wc:0.5,tax:12.0,wacc:13.8,g1:60,g2:25,gt:5.0,nd:-26,sh:24.4,price:135,
+   ctx:{a:'NVIDIA DCF is the most extreme model in this universe. 60% EBIT margin — the highest of any semiconductor company in history. 60% revenue CAGR in Y1-5 — pricing in the full AI infrastructure supercycle. The model essentially asks: is the AI capex cycle a 3-year event (bear) or a structural decade-long platform shift (bull)?',k:'Revenue CAGR in Y6-10 (the deceleration phase). Even the most bullish analyst assumes NVIDIA\'s growth decelerates from 60% to 25% by the mid-decade. Whether Y6-10 CAGR is 20% (maturity) or 30% (extended supercycle) swings intrinsic value by $20-40/share. The deceleration assumption is the most consequential.',bull:['Sovereign AI government demand creates $40B+ TAM outside hyperscalers','Blackwell architecture maintains 2-year lead over AMD — pricing premium preserved','Software (CUDA, NIM) contributes 25% of revenue by FY30 — margin expands to 65%'],bear:['Hyperscaler in-house chips (Google TPU, Amazon Trainium) reduce GPU orders 30%','AI investment pause as enterprise ROI disappointment triggers budget cuts','Export restrictions permanently cap China revenue — $5B annual headwind']}},
+
+  {id:'netflix',name:'Netflix',ticker:'NFLX',flag:'🇺🇸',sector:'Streaming',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   rev:36,ebitM:20.8,da:1.5,capex:3.0,wc:0.5,tax:15.0,wacc:11.4,g1:15,g2:10,gt:4.0,nd:7,sh:0.43,price:900,
+   ctx:{a:'Netflix DCF is a subscriber monetisation story. At 270M+ subscribers, Netflix is approaching saturation in developed markets. The next growth lever is the ad-supported tier — which improves ARPU from the new subscriber base. EBIT margin of 20.8% should expand to 25-28% as content costs plateau relative to revenue.',k:'Ad-supported tier ARPU and subscriber growth. If the ad tier reaches 80M subscribers at $10 average monthly ARPU ($8 subscription + $2 average ad revenue), that\'s $9.6B annual incremental revenue. At 40% EBIT margin on incremental ads revenue, that\'s $3.8B additional EBIT. This single segment drives most of the DCF upside.',bull:['Ad tier reaches 100M subscribers at $12 ARPU — adds $14.4B annual revenue','Live sports rights (NFL, FIFA) drive subscription ARPU to $18 on premium tier','Password sharing crackdown adds 30M new paid subscribers over 2 years'],bear:['Disney+ bundle successfully retains subscribers who would have migrated to Netflix','Content spending must increase $5B to defend vs Apple and Amazon — margin stays at 20%','Ad market softness compresses CPM rates — ad revenue per subscriber disappoints']}},
+
+  {id:'samsung',name:'Samsung Electronics',ticker:'005930',flag:'🇰🇷',sector:'Semiconductors',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   rev:224,ebitM:14.3,da:5.0,capex:10.0,wc:2.0,tax:24.0,wacc:9.8,g1:8,g2:6,gt:3.0,nd:-70,sh:6.0,price:58,
+   ctx:{a:'Samsung DCF must account for the memory semiconductor cycle. EBIT margin of 14.3% reflects a mid-cycle estimate — at peak DRAM cycle (HBM supercycle), EBIT margin can reach 25-30%. At trough (2023-style oversupply), margins fall to 2-5%. The 10-year average is 14-18%. The DCF uses mid-cycle assumptions deliberately.',k:'Mid-cycle EBIT margin assumption. Samsung\'s memory business makes EBIT margin highly volatile. A 1% EBIT margin change at $224B revenue = $2.24B EBIT change = ~$9/share in intrinsic value change at 10x EV/EBITDA. The margin assumption is the entire Samsung DCF.',bull:['HBM3E memory for AI creates persistent 30% EBIT margin for 3 years — not a one-cycle event','Foundry wins NVIDIA or Apple N2 order — revenue mix improves to higher-multiple segment','Chaebol restructuring returns ₹70B cash to shareholders — NAV discount narrows'],bear:['Memory oversupply in 2026 collapses EBIT margin to 5% for 2 consecutive years','TSMC wins foundry orders for all leading-edge nodes — Samsung foundry stays sub-scale','Korean won appreciation reduces dollar-denominated earnings']}},
+
+  {id:'alibaba',name:'Alibaba',ticker:'BABA',flag:'🇨\N',sector:'E-commerce / Cloud',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   rev:130,ebitM:19.2,da:2.0,capex:3.5,wc:0.5,tax:25.0,wacc:8.3,g1:8,g2:5,gt:3.0,nd:-63,sh:3.1,price:80,
+   ctx:{a:'Alibaba DCF carries the highest regulatory uncertainty in our universe. The 8.3% WACC appears low — but it reflects the structural reality that China\'s risk-free rate is lower and the equity risk premium for a company of Alibaba\'s scale is partially offset by China\'s lower benchmark rates.',k:'Revenue growth in Y1-5. PDD (Pinduoduo) has structurally damaged Alibaba\'s core commerce GMV share. Whether Alibaba\'s core commerce revenue grows at 6% (PDD continues winning) or 10% (Alibaba fights back with AI-powered recommendations) is the key assumption. Cloud growth at 25%+ is bullish but smaller in absolute terms.',bull:['Xi Jinping pro-growth pivot ends regulatory uncertainty — P/E re-rates from 11x to 18x','Cloud reaches 30% EBIT margin — value-creating business becomes the primary DCF driver','International commerce (AliExpress, Lazada) opens new TAM — revenue diversification'],bear:['PDD takes another 5% GMV share — Alibaba core commerce revenue stagnates at 2% CAGR','US-China tension escalates — ADR forced delisting adds structural risk premium to WACC','Alibaba Cloud faces government preference for Huawei and Tencent Cloud']}},
+
+  {id:'tsmc',name:'TSMC',ticker:'TSM',flag:'🇹\W',sector:'Semiconductor Foundry',tags:['global','it'],cur:'$',unit:'B',isBank:false,
+   rev:69,ebitM:65.2,da:8.0,capex:35.0,wc:1.0,tax:20.0,wacc:8.9,g1:20,g2:12,gt:4.0,nd:-35,sh:4.7,price:175,
+   ctx:{a:'TSMC DCF has an unusual structure — 65% EBIT margin paired with 35% capex-to-revenue. The net FCF margin (EBIT×(1-t) + D&A - Capex - ΔWC) is surprisingly modest for such a high-margin business. This is the economics of leading-edge semiconductor manufacturing: extraordinary margins but insatiable capital requirements.',k:'Capex as % of revenue — and whether Arizona fabs change this ratio permanently. Taiwan fabs cost $5-7B each. Arizona fabs cost $15-20B. If TSMC\'s geographic diversification increases the capex-to-revenue ratio from 35% to 45%, FCF falls dramatically despite unchanged EBIT margins. The Arizona bet is the key capex assumption.',bull:['N2 process node success — 30% revenue CAGR for 3 years as Apple and NVIDIA both commit','Arizona cost structure improves to 2x Taiwan (vs current 3-4x) by FY28','Geopolitical risk premium falls as Taiwan Strait tensions ease — WACC falls to 7.5%'],bear:['Arizona fab cost stays at 4x Taiwan — EBIT margin falls to 55% as geographic mix shifts','Intel Foundry wins Qualcomm N2 order — TSMC loses first meaningful advanced node share','Taiwan geopolitical risk premium forces WACC to 11% — intrinsic value falls 20%']}},
+
+  {id:'toyota',name:'Toyota',ticker:'TM',flag:'🇯\P',sector:'Auto OEM',tags:['global'],cur:'$',unit:'B',isBank:false,
+   rev:308,ebitM:11.4,da:3.5,capex:5.5,wc:1.0,tax:29.7,wacc:3.4,g1:4,g2:3,gt:2.0,nd:40,sh:14.5,price:24,
+   ctx:{a:'Toyota DCF has a structural quirk: WACC of 3.4% is among the lowest in our universe, driven by Japan\'s near-zero interest rates. This means terminal value dominates the model even more than usual. A 1% WACC change (from 3.4% to 4.4%) cuts intrinsic value by 25-30% — making this extremely sensitive to the Japanese rate environment.',k:'WACC assumption — specifically the risk-free rate. Japan\'s 10-year bond yield has risen from 0% to 1.0% in 2024-25. If it reaches 2%, WACC rises to ~5.5%, and intrinsic value falls substantially. The BOJ\'s rate normalisation path is literally the most important input in Toyota\'s DCF — more than any operational assumption.',bull:['Solid-state battery commercialisation by 2027 — Toyota leads EV transition instead of lagging','Yen depreciation sustains record profits — FY25-26 outperformance vs model','Governance reforms (shareholder returns) increase equity value without operational change'],bear:['BOJ rate normalisation raises Japan risk-free rate to 2% — WACC rises to 5.5%','BYD wins Toyota\'s compact car market in China and SEA — 25% volume loss by FY29','Solid-state battery development delay leaves Toyota exposed as ICE regulations tighten']}},
+
+  {id:'nestle',name:'Nestle',ticker:'NESN',flag:'🇨\H',sector:'FMCG',tags:['global','fmcg'],cur:'$',unit:'B',isBank:false,
+   rev:93,ebitM:19.4,da:2.5,capex:3.5,wc:0.5,tax:21.3,wacc:3.3,g1:4,g2:3,gt:2.0,nd:40,sh:2.8,price:100,
+   ctx:{a:'Nestle DCF shares the Japanese-rate dynamic: ultra-low Swiss interest rates create a very low WACC (3.3%), making even modest growth assumptions generate very high terminal values. This is why European FMCG companies appear structurally expensive on P/E vs US peers — the discount rate, not the growth, drives the premium.',k:'Organic revenue growth rate in Y1-5. Nestle\'s organic growth has slowed from 7-8% (COVID premiumisation) to 2-3% (volume recovery phase). Whether this recovers to 4-5% (bull) or stays at 2-3% (bear) with stable margins determines the DCF output. GLP-1 drug impact on processed food demand is the new wildcard.',bull:['GLP-1 drug demand shifts consumer preference to Nestle\'s nutrition brands — Purina and Gerber win','Nespresso premium expansion drives 6% CAGR in coffee segment — highest-margin category','Emerging market premiumisation drives overall ARPU growth above volume growth'],bear:['GLP-1 drugs structurally reduce KitKat and confectionery demand by 10% globally','ECB rate normalisation raises Swiss WACC from 3.3% to 5% — intrinsic value falls 25%','Volume recovery stalls at 1-2% — pricing power exhausted post-COVID inflation']}},
+
+  {id:'bhp',name:'BHP Group',ticker:'BHP',flag:'🇦\U',sector:'Mining',tags:['global'],cur:'$',unit:'B',isBank:false,
+   rev:55,ebitM:47.3,da:4.0,capex:6.0,wc:1.0,tax:30.0,wacc:9.2,g1:5,g2:3,gt:2.0,nd:9,sh:5.08,price:43,
+   ctx:{a:'BHP DCF requires mid-cycle commodity price assumptions — not current spot. Using current iron ore at $100/ton in a DCF overstates value because spot is above mid-cycle. Using mid-cycle ~$75/ton is more defensible. The copper business (small today, growing fast) deserves a higher multiple and longer growth runway.',k:'Commodity price assumptions — specifically iron ore mid-cycle price. BHP\'s revenue moves $2B+ per $10/ton iron ore price change. At $100/ton, EBIT margin is 47%. At $70/ton, it\'s 35%. This 12 percentage point margin swing changes FCF by $6-7B annually. Mid-cycle pricing discipline is the most important methodological choice in this DCF.',bull:['Iron ore sustains above $90 as China stimulus exceeds expectations through 2027','Copper price reaches $5+/lb as EV and grid demand materialises — Escondida economics improve','Olympic Dam copper expansion delivers on time — copper EBITDA doubles by FY29'],bear:['China steel demand structural decline brings iron ore to $60/ton sustainably','Olympic Dam capex overruns by $5B — copper timeline delayed 3 years','ESG pressure increases cost of capital as institutional investors exit mining']}},
+];
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let selId = null, calcState = {};
+
+window.onload = () => renderGrid('all');
+
+function renderGrid(f) {
+  const g = document.getElementById('companyGrid'); g.innerHTML = '';
+  CO.forEach(co => {
+    const show = f === 'all' || co.tags.includes(f);
+    const el = document.createElement('div');
+    el.className = 'company-card' + (co.id === selId ? ' selected' : '') + (!show ? ' hidden' : '');
+    el.innerHTML = `<div class="co-flag">${co.flag}</div><div class="co-name">${co.name}</div><div class="co-ticker">${co.ticker}</div><div class="co-sector">${co.sector}</div>`;
+    el.onclick = () => { selId = co.id; document.querySelectorAll('.company-card').forEach(c => c.classList.remove('selected')); el.classList.add('selected'); document.getElementById('continueBtn').classList.add('enabled'); };
+    g.appendChild(el);
+  });
+}
+function filterGrid(f, btn) { document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); renderGrid(f); }
+
 function goToStep(n) {
-  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
-  document.getElementById('step-' + n).classList.add('active');
-  for (let i = 1; i <= 4; i++) {
-    const pill = document.getElementById('sp-' + i);
-    pill.classList.remove('active','done');
-    if (i < n) pill.classList.add('done');
-    else if (i === n) pill.classList.add('active');
-  }
-  currentStep = n;
-  // Trigger step-specific loaders
-  if (n === 2 && selectedCompany) loadContext();
-  if (n === 3 && selectedCompany) buildAssumptionTable();
+  document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('step' + n).classList.add('active');
+  updateProg(n);
+  if (n === 2) renderCtx();
+  if (n === 3) buildAssumptions();
+  if (n === 4) renderResults();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
-
-// ── COMPANY GRID ──
-function buildCompanyGrid(filter = 'all', search = '') {
-  const grid = document.getElementById('company-grid');
-  grid.innerHTML = '';
-  Object.entries(COMPANIES).forEach(([key, co]) => {
-    const matchFilter = filter === 'all' || co.market === filter || co.sector.includes(filter);
-    const matchSearch = !search || co.name.toLowerCase().includes(search.toLowerCase()) || co.ticker.toLowerCase().includes(search.toLowerCase());
-    if (!matchFilter || !matchSearch) return;
-    const card = document.createElement('div');
-    card.className = 'company-card' + (selectedCompany === key ? ' selected' : '');
-    card.innerHTML = `<div class="co-name">${co.name}</div><div class="co-sector">${co.sector}</div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:0.4rem;"><span class="co-ticker">${co.ticker}</span><span class="tag tag-gray" style="font-size:0.55rem;">${co.market === 'India' ? '🇮🇳' : '🌍'}</span></div>`;
-    card.onclick = () => {
-      selectedCompany = key;
-      document.querySelectorAll('.company-card').forEach(c => c.classList.remove('selected'));
-      card.classList.add('selected');
-      document.getElementById('btn-to-step2').disabled = false;
-    };
-    grid.appendChild(card);
+function updateProg(n) {
+  [1,2,3,4].forEach(i => {
+    const ps = document.getElementById('ps' + i); ps.classList.remove('active','done');
+    if (i < n) ps.classList.add('done'); if (i === n) ps.classList.add('active');
+    if (i < 4) { const pl = document.getElementById('pl' + i); pl.classList[i < n ? 'add' : 'remove']('done'); }
   });
 }
 
-let activeFilter = 'all';
-function filterBy(val, btn) {
-  activeFilter = val;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  buildCompanyGrid(val, document.getElementById('co-search').value);
-}
-function filterCompanies() {
-  buildCompanyGrid(activeFilter, document.getElementById('co-search').value);
-}
-
-// ── STEP 2: CONTEXT ──
-function loadContext() {
-  const co = COMPANIES[selectedCompany];
-  document.getElementById('ctx-heading').textContent = 'Study ' + co.name;
-  document.getElementById('ctx-name').textContent = co.name;
-  document.getElementById('ctx-sector-label').textContent = co.sector + ' · ' + co.exchange;
-  document.getElementById('ctx-description').textContent = co.description;
-  document.getElementById('ctx-ticker-exchange').textContent = co.ticker + ' · ' + co.exchange;
-  document.getElementById('ctx-analyst-note').textContent = co.analystNote;
-  document.getElementById('ctx-bull').textContent = co.bullCase;
-  document.getElementById('ctx-bear').textContent = co.bearCase;
-
-  const f = co.financials;
-  const cur = co.currency;
-  const isInr = cur === '₹';
-  const fmt = (n) => isInr ? '₹' + Math.round(n/100)/10 + 'K Cr' : '$' + Math.round(n/1000) + 'B';
-  const fmtSm = (n) => isInr ? '₹' + Math.round(n).toLocaleString('en-IN') + ' Cr' : '$' + Math.round(n/100)/10 + 'B';
-
-  // Key financial metrics with explanations
-  document.getElementById('ctx-financials').innerHTML = [
-    { label: 'Revenue (FY24)', val: fmtSm(f.revenue), sub: f.revenueGrowth + '% YoY growth' },
-    { label: 'EBITDA', val: fmtSm(f.ebitda), sub: f.ebitdaMargin + '% margin' },
-    { label: 'PAT', val: fmtSm(f.pat), sub: f.patMargin + '% margin' },
-    { label: 'Market Cap', val: fmtSm(f.marketCap), sub: 'Current market value' },
-    { label: 'Net Debt', val: fmtSm(Math.abs(f.netDebt)), sub: f.netDebt < 0 ? '(Net cash position)' : '(Net debt)' },
-    { label: 'ROE', val: f.roe + '%', sub: 'Return on equity' },
-    { label: 'ROCE', val: f.roce + '%', sub: 'Return on capital' },
-    { label: 'Shares Outstanding', val: f.sharesOutstanding.toLocaleString('en-IN') + ' Cr', sub: 'Fully diluted' },
-  ].map(s => `<div class="context-stat"><div class="context-stat-label">${s.label}</div><div class="context-stat-val">${s.val}</div><div class="context-stat-sub">${s.sub}</div></div>`).join('');
-
-  // ── TEACHING ANALYSIS SECTION ──
-  const mktPrice = Math.round(f.marketCap / f.sharesOutstanding);
-  const impliedPE = f.pat > 0 ? (f.marketCap / f.pat).toFixed(1) : 'N/A (loss-making)';
-  const impliedEV = f.marketCap + f.netDebt;
-  const impliedEVEBITDA = f.ebitda > 0 ? (impliedEV / f.ebitda).toFixed(1) : 'N/A';
-  const fcfProxy = f.pat + (f.revenue * 0.04) - (f.revenue * 0.05); // rough proxy
-  const fcfYield = f.marketCap > 0 ? ((fcfProxy / f.marketCap) * 100).toFixed(1) : '0';
-  const debtToEV = f.netDebt > 0 ? ((f.netDebt / impliedEV) * 100).toFixed(1) : '0 (net cash)';
-
-  const teachEl = document.getElementById('ctx-teaching');
-  if (teachEl) teachEl.innerHTML = `
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.5rem;">
-
-      <div style="border:1px solid var(--gray-200);border-radius:var(--r);padding:1.1rem;">
-        <div class="eyebrow" style="margin-bottom:0.6rem;">What the market is currently pricing in</div>
-        <div style="font-size:0.82rem;color:var(--gray-500);line-height:1.7;">
-          At ${cur}${mktPrice.toLocaleString('en-IN')} per share, the market implies a <strong style="color:var(--black);">P/E of ${impliedPE}x</strong> and <strong style="color:var(--black);">EV/EBITDA of ${impliedEVEBITDA}x</strong>. The question for your DCF: do the cash flows you project justify this price, or is the market over/under-valuing ${co.name}?
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem;margin-top:0.9rem;">
-          <div style="background:var(--gray-50);padding:0.5rem 0.7rem;border-radius:var(--r-sm);">
-            <div style="font-size:0.58rem;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.15rem;">Market Price</div>
-            <div style="font-size:0.95rem;font-weight:700;">${cur}${mktPrice.toLocaleString('en-IN')}</div>
-          </div>
-          <div style="background:var(--gray-50);padding:0.5rem 0.7rem;border-radius:var(--r-sm);">
-            <div style="font-size:0.58rem;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.15rem;">Implied P/E</div>
-            <div style="font-size:0.95rem;font-weight:700;">${impliedPE}x</div>
-          </div>
-          <div style="background:var(--gray-50);padding:0.5rem 0.7rem;border-radius:var(--r-sm);">
-            <div style="font-size:0.58rem;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.15rem;">EV/EBITDA</div>
-            <div style="font-size:0.95rem;font-weight:700;">${impliedEVEBITDA}x</div>
-          </div>
-        </div>
-      </div>
-
-      <div style="border:1px solid var(--gray-200);border-radius:var(--r);padding:1.1rem;">
-        <div class="eyebrow" style="margin-bottom:0.6rem;">Key numbers for your model</div>
-        <div style="font-size:0.82rem;color:var(--gray-500);line-height:1.7;">
-          ${f.ebitdaMargin > 30
-            ? 'This is a <strong style="color:var(--black);">high-margin business</strong> (' + f.ebitdaMargin + '% EBITDA margin). In your DCF, you need to decide if these margins are sustainable or if they compress over time.'
-            : f.ebitdaMargin > 15
-            ? 'At ' + f.ebitdaMargin + '% EBITDA margin, this is a <strong style="color:var(--black);">moderately profitable</strong> business. Your key decision: do margins expand as the company scales, or are they structurally capped?'
-            : 'At ' + f.ebitdaMargin + '% EBITDA margin, profitability is <strong style="color:var(--black);">still developing</strong>. Your DCF hinges on what steady-state margins look like 5 years from now. That single assumption will drive your entire valuation.'
-          }
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.6rem;margin-top:0.9rem;">
-          <div style="background:var(--gray-50);padding:0.5rem 0.7rem;border-radius:var(--r-sm);">
-            <div style="font-size:0.58rem;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.15rem;">FCF Yield (est.)</div>
-            <div style="font-size:0.95rem;font-weight:700;">${fcfYield}%</div>
-          </div>
-          <div style="background:var(--gray-50);padding:0.5rem 0.7rem;border-radius:var(--r-sm);">
-            <div style="font-size:0.58rem;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.15rem;">Net Debt / EV</div>
-            <div style="font-size:0.95rem;font-weight:700;">${debtToEV}${typeof debtToEV === 'string' ? '' : '%'}</div>
-          </div>
-          <div style="background:var(--gray-50);padding:0.5rem 0.7rem;border-radius:var(--r-sm);">
-            <div style="font-size:0.58rem;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--gray-400);margin-bottom:0.15rem;">Rev Growth</div>
-            <div style="font-size:0.95rem;font-weight:700;">${f.revenueGrowth}%</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div style="border:1px solid var(--gray-200);border-radius:var(--r);padding:1.1rem;margin-bottom:1rem;background:var(--gray-50);">
-      <div class="eyebrow" style="margin-bottom:0.5rem;">What to think about before building the model</div>
-      <div style="font-size:0.82rem;color:var(--gray-500);line-height:1.8;">
-        ${f.revenueGrowth > 20
-          ? '<strong style="color:var(--black);">Growth trajectory:</strong> At ' + f.revenueGrowth + '% growth, ' + co.name + ' is growing fast but remember — high growth always decelerates. The market is pricing in sustained high growth. If you use lower growth in your DCF, you will get a lower value than the current market price. That doesn\'t mean you\'re wrong — it might mean the market is overpaying.<br><br>'
-          : '<strong style="color:var(--black);">Growth trajectory:</strong> At ' + f.revenueGrowth + '% growth, ' + co.name + ' is growing moderately. For your DCF, the key question is whether growth accelerates (new products, markets) or stays at this level. Check what management guided in the latest earnings call.<br><br>'
-        }
-        ${f.roe > 20
-          ? '<strong style="color:var(--black);">Return on equity:</strong> At ' + f.roe + '% ROE, this is a high-quality business — it generates strong returns on the capital invested in it. High ROE companies typically deserve higher valuation multiples because every rupee of reinvested profit generates above-average returns.<br><br>'
-          : '<strong style="color:var(--black);">Return on equity:</strong> ROE at ' + f.roe + '% is ' + (f.roe > 12 ? 'reasonable but not exceptional' : 'below average — suggesting the business isn\'t generating strong returns on equity') + '. This affects how much value is created from reinvested earnings.<br><br>'
-        }
-        ${f.netDebt < 0
-          ? '<strong style="color:var(--black);">Balance sheet:</strong> ' + co.name + ' has a net cash position of ' + fmtSm(Math.abs(f.netDebt)) + '. This is positive — it means the company has more cash than debt. In your EV-to-Equity bridge, this net cash ADDS to equity value (i.e., your per-share value goes UP). It also means the company has financial flexibility to invest, acquire, or return capital.'
-          : '<strong style="color:var(--black);">Balance sheet:</strong> ' + co.name + ' has net debt of ' + fmtSm(f.netDebt) + '. In your EV-to-Equity bridge, this net debt SUBTRACTS from equity value. Higher leverage means higher risk and a higher WACC. Think about whether the company will deleverage (pay down debt) or take on more.'
-        }
-      </div>
-    </div>
-  `;
-}
-
-// ── STEP 3: ASSUMPTION TABLE ──
-function buildAssumptionTable() {
-  const co = COMPANIES[selectedCompany];
-  const d = co.dcfDefaults;
-  const f = co.financials;
-  const h = co.hints;
-  const cur = co.currency;
-
-  document.getElementById('tbl-eyebrow').textContent = co.name + ' — DCF Assumptions';
-  document.getElementById('tbl-heading').textContent = 'Set your assumptions';
-
-  const rows = [
-    // Section: Revenue
-    { section: 'Revenue Projections' },
-    { key:'revenueGrowthY1', label:'Revenue Growth — Year 1', hint: h.revenueGrowth, range:'5–35%', val:d.revenueGrowthY1, unit:'%', prefilled:false },
-    { key:'revenueGrowthY2', label:'Revenue Growth — Year 2', hint: h.revenueGrowth, range:'5–35%', val:d.revenueGrowthY2, unit:'%', prefilled:false },
-    { key:'revenueGrowthY3', label:'Revenue Growth — Year 3', hint: h.revenueGrowth, range:'5–35%', val:d.revenueGrowthY3, unit:'%', prefilled:false },
-    { key:'revenueGrowthY4', label:'Revenue Growth — Year 4', hint: 'Growth typically moderates in later years.', range:'3–25%', val:d.revenueGrowthY4, unit:'%', prefilled:false },
-    { key:'revenueGrowthY5', label:'Revenue Growth — Year 5', hint: 'Growth typically moderates in later years.', range:'3–20%', val:d.revenueGrowthY5, unit:'%', prefilled:false },
-    // Section: Margins
-    { section: 'Profitability Assumptions' },
-    { key:'ebitdaMargin', label:'EBITDA Margin (steady state)', hint: h.ebitdaMargin, range:'8–65%', val:d.ebitdaMargin, unit:'%', prefilled:true, filingNote:'FY24: ' + f.ebitdaMargin + '%' },
-    { key:'daPercent', label:'D&A as % of Revenue', hint: 'Depreciation & Amortisation. Higher for capital-intensive businesses.', range:'1–12%', val:d.daPercent, unit:'%', prefilled:true },
-    { key:'capexPercent', label:'CapEx as % of Revenue', hint: 'Capital expenditure. Key driver of free cash flow. Asset-heavy industries have higher CapEx.', range:'1–20%', val:d.capexPercent, unit:'%', prefilled:true },
-    { key:'wcPercent', label:'Working Capital Change (% Rev)', hint: 'Increase in working capital = cash outflow. Negative = working capital improvement (cash inflow).', range:'-10–15%', val:d.wcPercent, unit:'%', prefilled:true },
-    { key:'taxRate', label:'Effective Tax Rate', hint: 'Indian corporate tax is 25.17% (new regime). Use effective rate from P&L if different.', range:'15–35%', val:d.taxRate, unit:'%', prefilled:true },
-    // Section: WACC
-    { section: 'Discount Rate (WACC)' },
-    { key:'riskFreeRate', label:'Risk-Free Rate', hint: cur === '₹' ? '10-year Indian G-Sec yield: ~7%. This is your baseline.' : '10-year US Treasury yield: ~4.5%. This is your baseline.', range: cur === '₹' ? '6–8.5%' : '3.5–5.5%', val:d.riskFreeRate, unit:'%', prefilled:true },
-    { key:'erp', label:'Equity Risk Premium', hint: cur === '₹' ? 'India ERP: 6–7%. Reflects the excess return investors demand for Indian equities over the risk-free rate.' : 'US ERP: 5–6%. Reflects excess return demanded for equities.', range: cur === '₹' ? '5–8%' : '4–7%', val:d.erp, unit:'%', prefilled:true },
-    { key:'beta', label:'Beta (Levered)', hint: h.beta, range:'0.5–2.5', val:d.beta, unit:'', prefilled:true, filingNote:'Based on 2yr weekly returns' },
-    { key:'leveragePercent', label:'Leverage (Debt / EV)', hint: 'Target capital structure. Use current D/EV if stable. Affects WACC through tax shield on debt.', range:'0–60%', val:d.leveragePercent, unit:'%', prefilled:true },
-    // Section: Terminal Value
-    { section: 'Terminal Value' },
-    { key:'terminalGrowth', label:'Terminal Growth Rate', hint: h.terminalGrowth, range:'2–7%', val:d.terminalGrowth, unit:'%', prefilled:false },
-    // Section: Bridge
-    { section: 'Equity Bridge' },
-    { key:'netDebt', label:'Net Debt (current)', hint: 'From latest balance sheet. Negative = net cash. Used to bridge EV to Equity Value.', range:'', val: Math.round(f.netDebt), unit:cur, prefilled:true, filingNote:'From FY24 balance sheet' },
-    { key:'sharesOutstanding', label:'Shares Outstanding', hint: 'Fully diluted share count. From latest filings.', range:'', val:f.sharesOutstanding, unit:'Cr', prefilled:true, filingNote:'From FY24 filings' },
-  ];
-
-  let html = `<thead><tr>
-    <th style="width:40%">Assumption</th>
-    <th style="width:18%;text-align:center;">Your Input</th>
-    <th style="width:22%">Typical Range</th>
-    <th style="width:20%">Guidance</th>
-  </tr></thead><tbody>`;
-
-  rows.forEach(row => {
-    if (row.section) {
-      html += `<tr class="section-header"><td colspan="4">${row.section}</td></tr>`;
-      return;
-    }
-    const isFilled = row.prefilled;
-    const inputStyle = isFilled ? 'pre-filled' : '';
-    const inputBg = isFilled ? 'style="background:#f0fdf4;border-color:#bbf7d0;"' : '';
-    html += `<tr>
-      <td>
-        <div class="cell-label">${row.label}</div>
-        ${row.filingNote ? `<div class="range-badge">${row.filingNote}</div>` : ''}
-      </td>
-      <td>
-        <div class="cell-input-wrap">
-          <input type="number" class="cell-input ${inputStyle}" id="inp-${row.key}"
-            value="${row.val}" step="0.1" ${inputBg}
-            oninput="updateFilledCount()" onchange="updateFilledCount()"
-            title="${row.label}">
-          <span class="cell-unit">${row.unit}</span>
-        </div>
-      </td>
-      <td>
-        ${row.range ? `<span class="range-badge">${row.range}</span>` : '<span style="font-size:0.72rem;color:var(--gray-300);">—</span>'}
-      </td>
-      <td>
-        <div class="hint-wrap">
-          <div class="hint-badge">💡 <span style="text-decoration:underline;text-underline-offset:2px;">Show hint</span></div>
-          <div class="hint-tooltip">${row.hint || 'Use your judgment based on the company context.'}</div>
-        </div>
-      </td>
-    </tr>`;
-  });
-
-  html += '</tbody>';
-  document.getElementById('assumption-table').innerHTML = html;
-  updateFilledCount();
-}
-
-function updateFilledCount() {
-  const inputs = document.querySelectorAll('.cell-input');
-  let filled = 0;
-  inputs.forEach(inp => { if (inp.value !== '') filled++; });
-  document.getElementById('filled-count').textContent = filled;
-}
-
-// ── RUN VALUATION ──
-function getInp(key) { return parseFloat(document.getElementById('inp-' + key).value) || 0; }
-
-function runValuation() {
-  goToStep(4);
-  document.getElementById('loader-screen').style.display = 'block';
-  document.getElementById('output-screen').style.display = 'none';
-
-  const msgs = ['Projecting 5-year free cash flows...', 'Calculating WACC components...', 'Discounting terminal value...', 'Building the equity bridge...', 'Generating sensitivity table...'];
-  let mi = 0;
-  const msgEl = document.getElementById('loader-msg');
-  const msgInterval = setInterval(() => { if (mi < msgs.length) { msgEl.textContent = msgs[mi++]; } }, 340);
-
-  setTimeout(() => {
-    clearInterval(msgInterval);
-    calcResult = computeDCF();
-    renderOutput(calcResult);
-    document.getElementById('loader-screen').style.display = 'none';
-    document.getElementById('output-screen').style.display = 'block';
-  }, 1900);
-}
-
-function computeDCF() {
-  const co = COMPANIES[selectedCompany];
-  const f = co.financials;
-  const isInr = co.currency === '₹';
-
-  const growthRates = [
-    getInp('revenueGrowthY1')/100,
-    getInp('revenueGrowthY2')/100,
-    getInp('revenueGrowthY3')/100,
-    getInp('revenueGrowthY4')/100,
-    getInp('revenueGrowthY5')/100,
-  ];
-  const ebitdaM = getInp('ebitdaMargin')/100;
-  const daP = getInp('daPercent')/100;
-  const capexP = getInp('capexPercent')/100;
-  const wcP = getInp('wcPercent')/100;
-  const taxR = getInp('taxRate')/100;
-  const rf = getInp('riskFreeRate')/100;
-  const erp = getInp('erp')/100;
-  const beta = getInp('beta');
-  const levP = getInp('leveragePercent')/100;
-  const tgr = getInp('terminalGrowth')/100;
-  const netDebt = getInp('netDebt');
-  const shares = getInp('sharesOutstanding');
-
-  const Ke = (rf + beta * erp) * 100;
-  const Kd = (rf * 100) + 1.5;
-  const E = 1 - levP; const D = levP;
-  const wacc = (Ke/100 * E) + (Kd/100 * 0.75 * D);
-
-  let pv = 0, rev = f.revenue;
-  const fcfArr = [];
-  for (let yr = 0; yr < 5; yr++) {
-    rev = rev * (1 + growthRates[yr]);
-    const ebitda = rev * ebitdaM;
-    const da = rev * daP;
-    const ebit = ebitda - da;
-    const nopat = ebit * (1 - taxR);
-    const capex = rev * capexP;
-    const wc = rev * wcP;
-    const fcf = nopat + da - capex - wc;
-    const pvFcf = fcf / Math.pow(1 + wacc, yr + 1);
-    pv += pvFcf;
-    fcfArr.push({ yr: yr+1, rev: Math.round(rev), fcf: Math.round(fcf), pvFcf: Math.round(pvFcf) });
-  }
-
-  const lastFcf = fcfArr[4].fcf;
-  const tv = lastFcf * (1 + tgr) / (wacc - tgr);
-  const pvTv = tv / Math.pow(1 + wacc, 5);
-  const ev = pv + pvTv;
-  const equityVal = ev - netDebt;
-  const pricePerShare = equityVal / shares;
-
-  // Market price estimate (from market cap / shares)
-  const marketPrice = f.marketCap / shares;
-  const upside = ((pricePerShare - marketPrice) / marketPrice * 100);
-
-  return { wacc, Ke, Kd: Kd/100*0.75, pvFcf: pv, pvTv, ev, netDebt, equityVal, pricePerShare, marketPrice, upside, tgr, fcfArr, tvPct: pvTv/ev*100, currency: co.currency, isInr, company: co };
-}
-
-function fmt(n, cur) { return cur === '₹' ? '₹' + Math.round(n).toLocaleString('en-IN') : '$' + Math.round(n).toLocaleString(); }
-function fmtCr(n, cur) { return cur === '₹' ? '₹' + Math.round(n).toLocaleString('en-IN') + ' Cr' : '$' + (Math.round(n/100)/10) + 'B'; }
-function fmtPct(n) { return n.toFixed(1) + '%'; }
-
-function renderOutput(r) {
-  const co = r.company;
-  document.getElementById('out-heading').textContent = 'Your valuation of ' + co.name + ' is complete';
-  document.getElementById('out-eyebrow').textContent = co.name + ' · DCF Valuation Result';
-
-  const mkt = r.marketPrice;
-  const price = r.pricePerShare;
-  const upside = r.upside;
-
-  document.getElementById('out-big-price').textContent = fmt(price, r.currency);
-  document.getElementById('out-big-price').style.color = upside > 0 ? 'white' : '#fca5a5';
-  document.getElementById('out-vs-market').textContent = 'vs current market price: ' + fmt(mkt, r.currency) + ' per share';
-  document.getElementById('out-upside').textContent = (upside > 0 ? '▲ +' : '▼ ') + fmtPct(Math.abs(upside));
-  document.getElementById('out-upside').style.color = upside > 0 ? '#4ade80' : '#fca5a5';
-  document.getElementById('out-wacc').textContent = fmtPct(r.wacc * 100);
-  document.getElementById('out-ev').textContent = fmtCr(r.ev, r.currency);
-  document.getElementById('out-pv-fcf').textContent = fmtCr(r.pvFcf, r.currency);
-  document.getElementById('out-pv-tv').textContent = fmtCr(r.pvTv, r.currency);
-  document.getElementById('out-tv-pct').textContent = fmtPct(r.tvPct);
-
-  // Verdict
-  const vb = document.getElementById('verdict-box');
-  if (upside > 20) {
-    vb.className = 'verdict verdict-bull';
-    vb.innerHTML = `<strong>Your model says: BUY.</strong> At ${fmt(price, r.currency)}, your DCF implies ${fmtPct(upside)} upside to the current market price. Your assumptions are more optimistic than what the market is currently pricing in. The key question: are you right about the growth rate, or is the market right?`;
-  } else if (upside < -20) {
-    vb.className = 'verdict verdict-bear';
-    vb.innerHTML = `<strong>Your model says: OVERVALUED.</strong> At ${fmt(price, r.currency)}, your DCF implies the stock is ${fmtPct(Math.abs(upside))} expensive at current prices. Either the market is wrong and expecting much higher growth — or your assumptions need revisiting. Try raising the terminal growth rate or EBITDA margin to see what the market might be assuming.`;
+function renderCtx() {
+  const co = CO.find(c => c.id === selId); if (!co) return;
+  document.getElementById('ctxFlag').textContent = co.flag;
+  document.getElementById('ctxName').textContent = co.name;
+  document.getElementById('ctxMeta').innerHTML = `<span class="ctx-tag">${co.ticker}</span><span class="ctx-tag">${co.sector}</span>`;
+  const cur = co.cur, u = co.unit;
+  if (co.isBank) {
+    document.getElementById('bankNote').style.display = 'block';
+    document.getElementById('bankNoteTxt').textContent = co.bankNote;
+    document.getElementById('statGrid').innerHTML = `
+      <div class="stat-card"><div class="stat-lbl">Net Income</div><div class="stat-val">${cur}${fmt(co.ni)}</div><div class="stat-note">${u} base year</div></div>
+      <div class="stat-card"><div class="stat-lbl">Cost of Equity (Ke)</div><div class="stat-val">${co.ke}%</div><div class="stat-note">Discount rate</div></div>
+      <div class="stat-card"><div class="stat-lbl">NI Growth Y1-5</div><div class="stat-val">${co.g1}%</div><div class="stat-note">Per annum</div></div>
+      <div class="stat-card"><div class="stat-lbl">Terminal Growth</div><div class="stat-val">${co.gt}%</div><div class="stat-note">Perpetuity</div></div>`;
   } else {
-    vb.className = 'verdict verdict-fair';
-    vb.innerHTML = `<strong>Your model says: FAIRLY VALUED.</strong> At ${fmt(price, r.currency)}, your intrinsic value is close to the current market price. This suggests your assumptions are broadly in line with what the market is pricing in. Use the sensitivity table below to understand what it takes to move the needle.`;
+    document.getElementById('bankNote').style.display = 'none';
+    const fcf1 = co.rev * (1 + co.g1/100) * (co.ebitM/100) * (1 - co.tax/100) + co.rev*(1+co.g1/100)*(co.da - co.capex - co.wc)/100;
+    document.getElementById('statGrid').innerHTML = `
+      <div class="stat-card"><div class="stat-lbl">Revenue</div><div class="stat-val">${cur}${fmt(co.rev)}</div><div class="stat-note">${u} LTM</div></div>
+      <div class="stat-card"><div class="stat-lbl">EBIT Margin</div><div class="stat-val">${co.ebitM}%</div><div class="stat-note">Operating profitability</div></div>
+      <div class="stat-card"><div class="stat-lbl">WACC</div><div class="stat-val">${co.wacc}%</div><div class="stat-note">Discount rate</div></div>
+      <div class="stat-card"><div class="stat-lbl">Net ${co.nd >= 0 ? 'Debt' : 'Cash'}</div><div class="stat-val">${cur}${fmt(Math.abs(co.nd))}</div><div class="stat-note">${u} · ${co.nd >= 0 ? 'owed' : 'available'}</div></div>`;
   }
+  document.getElementById('ctxAnalyst').textContent = co.ctx.a;
+  document.getElementById('ctxKeyAssumption').textContent = co.ctx.k;
+  document.getElementById('ctxBull').innerHTML = co.ctx.bull.map(t => `<div class="bb-row"><span class="bb-arrow">↑</span>${t}</div>`).join('');
+  document.getElementById('ctxBear').innerHTML = co.ctx.bear.map(t => `<div class="bb-row"><span class="bb-arrow">↓</span>${t}</div>`).join('');
+}
 
-  // Analyst comparison
-  document.getElementById('analyst-compare-text').textContent = co.analystNote;
+function buildAssumptions() {
+  const co = CO.find(c => c.id === selId); if (!co) return;
+  document.getElementById('liveCurPrice').textContent = `${co.cur}${co.price.toLocaleString()}`;
+  const iB = co.isBank;
+  let html = '';
+  if (iB) {
+    html = `
+    <div class="assume-section">
+      <div class="assume-sec-head"><span>A · Base Year Earnings</span><span class="assume-formula">Starting net income</span></div>
+      <table class="assume-table">${row('Base Net Income','inp_ni','pre','Net income / profit after tax for the latest financial year.',co.ni,co.cur,co.unit)}</table>
+    </div>
+    <div class="assume-section">
+      <div class="assume-sec-head"><span>B · Growth Assumptions</span><span class="assume-formula">How fast earnings grow</span></div>
+      <table class="assume-table">
+        ${row('Net Income Growth Rate Y1-5 (%)','inp_g1','pre','Near-term NI CAGR — typically higher as the business scales. This is the key variable.',co.g1,'','')}
+        ${row('Net Income Growth Rate Y6-10 (%)','inp_g2','pre','Tapering growth as the business matures toward sector median returns.',co.g2,'','')}
+        ${row('Terminal Growth Rate (%)','inp_gt','pre','Perpetuity growth rate after Year 10. Should be at or below long-run GDP growth rate.',co.gt,'','')}
+      </table>
+    </div>
+    <div class="assume-section">
+      <div class="assume-sec-head"><span>C · Discount Rate</span></div>
+      <table class="assume-table">
+        ${row('Cost of Equity / Ke (%)','inp_wacc','pre','For financial companies, equity cash flows are discounted at the cost of equity (not WACC). Derived from CAPM.',co.ke,'','')}
+      </table>
+    </div>`;
+  } else {
+    html = `
+    <div class="assume-section">
+      <div class="assume-sec-head"><span>A · Revenue Projection</span><span class="assume-formula">How fast the top line grows</span></div>
+      <table class="assume-table">
+        ${row('Base Revenue','inp_rev','pre','LTM revenue from the latest annual report.',co.rev,co.cur,co.unit)}
+        ${row('Revenue Growth Rate Y1-5 (%)','inp_g1','pre','Near-term CAGR — driven by market expansion, pricing, and new product launches.',co.g1,'','')}
+        ${row('Revenue Growth Rate Y6-10 (%)','inp_g2','pre','Tapering growth as the business matures. Usually 2-5% below Y1-5 rate.',co.g2,'','')}
+        ${row('Terminal Growth Rate (%)','inp_gt','pre','Perpetuity growth rate after Year 10. Should not exceed long-run GDP growth rate of the relevant economy.',co.gt,'','')}
+      </table>
+    </div>
+    <div class="assume-section">
+      <div class="assume-sec-head"><span>B · Profitability</span><span class="assume-formula">NOPAT = EBIT × (1 − Tax Rate)</span></div>
+      <table class="assume-table">
+        ${row('EBIT Margin (%)','inp_ebitM','pre','Operating profit margin before interest and tax. Pre-filled from latest annual report. The key structural assumption.',co.ebitM,'','')}
+        ${row('Effective Tax Rate (%)','inp_tax','pre','Corporate tax rate applied to EBIT. From the latest income tax disclosure in the annual report.',co.tax,'','')}
+      </table>
+    </div>
+    <div class="assume-section">
+      <div class="assume-sec-head"><span>C · Capital Requirements</span><span class="assume-formula">FCF = NOPAT + D&A − Capex − ΔWC</span></div>
+      <table class="assume-table">
+        ${row('D&A as % of Revenue','inp_da','pre','Depreciation and amortisation. Non-cash add-back that increases FCF relative to NOPAT.',co.da,'','')}
+        ${row('Capex as % of Revenue','inp_capex','pre','Capital expenditure required to sustain and grow the business. Reduces FCF.',co.capex,'','')}
+        ${row('ΔWorking Capital as % of Revenue','inp_wc','pre','Increase in net working capital needed to support revenue growth. Reduces FCF.',co.wc,'','')}
+      </table>
+    </div>
+    <div class="assume-section">
+      <div class="assume-sec-head"><span>D · Discount Rate & Bridge</span><span class="assume-formula">EV → Equity Value → Price</span></div>
+      <table class="assume-table">
+        ${row('WACC (%)','inp_wacc','pre','Weighted Average Cost of Capital. Use the WACC Builder to derive this precisely. Pre-filled from sector benchmark.',co.wacc,'','')}
+        ${row('Net Debt / (Net Cash)','inp_nd','pre','From EV bridge: positive = net debt (deducted), negative = net cash (added). Bridges EV to equity value.',co.nd,co.cur,co.unit)}
+        ${row('Shares Outstanding','inp_sh','pre','From the latest annual report. Used to divide equity value into per-share intrinsic value.',co.sh,co.cur === '₹' ? 'Crores' : 'Billions','')}
+      </table>
+    </div>`;
+  }
+  document.getElementById('assumptionSections').innerHTML = html;
+  recalc();
+}
 
-  // Waterfall
-  const maxV = Math.max(r.pvFcf, r.pvTv, r.ev) * 1.15;
-  const bars = [
-    { label:'PV FCF (5yr)', val:r.pvFcf, color:'#374151', neg:false },
-    { label:'PV Terminal', val:r.pvTv, color:'#111827', neg:false },
-    { label:'Enterprise Value', val:r.ev, color:'#111827', neg:false },
-    { label:'Less: Net Debt', val:-r.netDebt, color:'#dc2626', neg:r.netDebt>0 },
-    { label:'Equity Value', val:r.equityVal, color:'#16a34a', neg:false },
-  ];
-  document.getElementById('output-waterfall').innerHTML = bars.map(b => {
-    const pct = Math.min(Math.abs(b.val)/maxV*100, 100);
-    const disp = b.neg ? '(' + fmtCr(Math.abs(b.val), r.currency) + ')' : fmtCr(b.val, r.currency);
-    return `<div class="w-bar-row"><div class="wlabel">${b.label}</div><div class="wtrack"><div class="wfill" style="width:${pct}%;background:${b.color};"><span>${disp}</span></div></div></div>`;
-  }).join('');
+function row(label, id, type, hint, val, cur, unit) {
+  const badge = `<span class="type-badge type-pre">Pre-filled</span>`;
+  const displayVal = cur && unit ? `${val}` : val;
+  const unitNote = cur && unit ? ` <span style="font-size:11px;color:var(--muted)">(${cur}${unit})</span>` : unit ? ` <span style="font-size:11px;color:var(--muted)">(${unit})</span>` : '';
+  return `<tr class="assume-tr">
+    <td class="assume-td label-col"><span class="assume-label">${label}${unitNote}<span class="hint-wrap"><span class="hint-icon">?</span><span class="hint-tip">${hint}</span></span></span></td>
+    <td class="assume-td type-col">${badge}</td>
+    <td class="assume-td input-col"><input class="assume-input" id="${id}" type="number" step="any" value="${displayVal}" oninput="recalc()"></td>
+  </tr>`;
+}
+
+function getInp(id, def) { return parseFloat(document.getElementById(id)?.value) ?? def; }
+
+function recalc() {
+  const co = CO.find(c => c.id === selId); if (!co) return;
+  const result = co.isBank ? calcBank(co) : calcDCF(co);
+  calcState = { co, result };
+  const chg = ((result.intrinsic - co.price) / co.price * 100).toFixed(1);
+  const chgEl = document.getElementById('liveChg');
+  if (chgEl) { chgEl.textContent = `${chg > 0 ? '+' : ''}${chg}% vs market`; chgEl.className = 'live-chg ' + (chg > 0 ? 'up' : 'dn'); }
+  const ls = document.getElementById('liveStats');
+  if (ls) ls.innerHTML = `
+    <div class="ls-item"><div class="ls-lbl">Intrinsic Value</div><div class="ls-val">${co.cur}${fmtP(result.intrinsic, co.price)}</div></div>
+    <div class="ls-item"><div class="ls-lbl">TV % of EV</div><div class="ls-val">${result.tvPct.toFixed(0)}%</div></div>
+    <div class="ls-item"><div class="ls-lbl">Enterprise Value</div><div class="ls-val">${co.cur}${fmt(Math.round(result.ev))}</div></div>`;
+}
+
+function calcDCF(co) {
+  const rev = getInp('inp_rev', co.rev);
+  const g1 = getInp('inp_g1', co.g1);
+  const g2 = getInp('inp_g2', co.g2);
+  const gt = getInp('inp_gt', co.gt);
+  const ebitM = getInp('inp_ebitM', co.ebitM);
+  const tax = getInp('inp_tax', co.tax);
+  const da = getInp('inp_da', co.da);
+  const capex = getInp('inp_capex', co.capex);
+  const wc = getInp('inp_wc', co.wc);
+  const wacc = getInp('inp_wacc', co.wacc);
+  const nd = getInp('inp_nd', co.nd);
+  const sh = getInp('inp_sh', co.sh);
+
+  let rows = [], pvs = [], curRev = rev;
+  for (let yr = 1; yr <= 10; yr++) {
+    const g = yr <= 5 ? g1 : g2;
+    curRev = curRev * (1 + g / 100);
+    const ebit = curRev * ebitM / 100;
+    const nopat = ebit * (1 - tax / 100);
+    const daAmt = curRev * da / 100;
+    const capexAmt = curRev * capex / 100;
+    const wcAmt = curRev * wc / 100;
+    const fcf = nopat + daAmt - capexAmt - wcAmt;
+    const pv = fcf / Math.pow(1 + wacc / 100, yr);
+    rows.push({ yr, rev: curRev, ebit, fcf, pv });
+    pvs.push(pv);
+  }
+  const lastFCF = rows[9].fcf;
+  const tv = lastFCF * (1 + gt / 100) / (Math.max(wacc / 100 - gt / 100, 0.001));
+  const pvTV = tv / Math.pow(1 + wacc / 100, 10);
+  const sumPVs = pvs.reduce((a, b) => a + b, 0);
+  const ev = sumPVs + pvTV;
+  const eqV = ev - nd;
+  const intrinsic = eqV / sh;
+  return { rows, pvTV, sumPVs, ev, eqV, intrinsic, tvPct: pvTV / ev * 100, wacc, gt, nd, sh, lastFCF, tv };
+}
+
+function calcBank(co) {
+  const ni = getInp('inp_ni', co.ni);
+  const g1 = getInp('inp_g1', co.g1);
+  const g2 = getInp('inp_g2', co.g2);
+  const gt = getInp('inp_gt', co.gt);
+  const ke = getInp('inp_wacc', co.ke);
+  const sh = co.sh;
+
+  let rows = [], pvs = [], curNI = ni;
+  for (let yr = 1; yr <= 10; yr++) {
+    const g = yr <= 5 ? g1 : g2;
+    curNI = curNI * (1 + g / 100);
+    const pv = curNI / Math.pow(1 + ke / 100, yr);
+    rows.push({ yr, rev: curNI, ebit: curNI, fcf: curNI, pv });
+    pvs.push(pv);
+  }
+  const lastNI = rows[9].fcf;
+  const tv = lastNI * (1 + gt / 100) / (Math.max(ke / 100 - gt / 100, 0.001));
+  const pvTV = tv / Math.pow(1 + ke / 100, 10);
+  const sumPVs = pvs.reduce((a, b) => a + b, 0);
+  const ev = sumPVs + pvTV;
+  const intrinsic = ev / sh;
+  return { rows, pvTV, sumPVs, ev, eqV: ev, intrinsic, tvPct: pvTV / ev * 100, wacc: ke, gt, nd: 0, sh, lastFCF: lastNI, tv };
+}
+
+function startCalc() {
+  recalc();
+  document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active'));
+  document.getElementById('stepLoading').classList.add('active');
+  updateProg(4); window.scrollTo({ top: 0, behavior: 'smooth' });
+  [1,2,3,4,5,6].forEach(i => { const el = document.getElementById('ls' + i); el.classList.remove('show','active','done'); });
+  document.getElementById('loadingBarFill').style.width = '0%';
+  document.getElementById('loadingPct').textContent = '0%';
+  const steps = [{s:200,d:700},{s:800,d:1400},{s:1500,d:2100},{s:2200,d:2800},{s:2900,d:3800},{s:3900,d:4600}];
+  const pcts = [10,25,42,60,80,100];
+  steps.forEach((st, i) => {
+    setTimeout(() => { const el = document.getElementById('ls'+(i+1)); el.classList.add('show','active'); }, st.s);
+    setTimeout(() => { const el = document.getElementById('ls'+(i+1)); el.classList.remove('active'); el.classList.add('done'); document.getElementById('loadingBarFill').style.width = pcts[i]+'%'; document.getElementById('loadingPct').textContent = pcts[i]+'%'; }, st.d);
+  });
+  setTimeout(() => { document.querySelectorAll('.step-section').forEach(s => s.classList.remove('active')); document.getElementById('step4').classList.add('active'); renderResults(); window.scrollTo({ top: 0, behavior: 'smooth' }); }, 5200);
+}
+
+function renderResults() {
+  const s = calcState; if (!s || !s.co) return;
+  const co = s.co, r = s.result;
+  document.getElementById('rCoLbl').textContent = `${co.flag} ${co.name} · ${co.ticker}`;
+  document.getElementById('rPrice').textContent = `${co.cur}${fmtP(r.intrinsic, co.price)}`;
+  const chgPct = ((r.intrinsic - co.price) / co.price * 100).toFixed(1);
+  const chgClr = chgPct > 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('rVs').innerHTML = `Current market price: <strong>${co.cur}${co.price.toLocaleString()}</strong> &nbsp;·&nbsp; <strong style="color:${chgClr}">${chgPct > 0 ? '+' : ''}${chgPct}%</strong> implied ${chgPct > 0 ? 'upside' : 'downside'}`;
+
+  document.getElementById('metricsGrid').innerHTML = `
+    <div class="metric-box"><div class="metric-lbl">PV of 10yr FCFs</div><div class="metric-val">${co.cur}${fmt(Math.round(r.sumPVs))}</div><div class="metric-sub">${co.unit} · ${(100 - r.tvPct).toFixed(0)}% of EV</div></div>
+    <div class="metric-box"><div class="metric-lbl">PV of Terminal Value</div><div class="metric-val">${co.cur}${fmt(Math.round(r.pvTV))}</div><div class="metric-sub">${co.unit} · ${r.tvPct.toFixed(0)}% of EV</div></div>
+    <div class="metric-box"><div class="metric-lbl">Enterprise Value</div><div class="metric-val">${co.cur}${fmt(Math.round(r.ev))}</div><div class="metric-sub">${co.unit} total</div></div>`;
+
+  const fcfPct = Math.max(5, Math.min(90, 100 - r.tvPct));
+  document.getElementById('vattrBar').innerHTML = `
+    <div class="vattr-fcf" style="width:${fcfPct}%"><span class="vattr-lbl">FCFs ${fcfPct.toFixed(0)}%</span></div>
+    <div class="vattr-tv" style="width:${100 - fcfPct}%"><span class="vattr-lbl">TV ${(100 - fcfPct).toFixed(0)}%</span></div>`;
+  document.getElementById('vattrFCFLbl').textContent = `PV of 10yr FCFs: ${co.cur}${fmt(Math.round(r.sumPVs))} ${co.unit} (${(100-r.tvPct).toFixed(0)}%)`;
+  document.getElementById('vattrTVLbl').textContent = `PV of Terminal Value: ${co.cur}${fmt(Math.round(r.pvTV))} ${co.unit} (${r.tvPct.toFixed(0)}%)`;
+
+  // FCF Table
+  const iB = co.isBank;
+  let fcfHTML = `<tr><th>Year</th><th>${iB ? 'Net Income' : 'Revenue'}</th>${!iB ? '<th>EBIT</th>' : ''}<th>${iB ? 'NI' : 'FCF'}</th><th>PV of ${iB ? 'NI' : 'FCF'}</th></tr>`;
+  r.rows.forEach(row => {
+    fcfHTML += `<tr><td>Year ${row.yr}</td><td>${co.cur}${fmt(Math.round(row.rev))}</td>${!iB ? `<td>${co.cur}${fmt(Math.round(row.ebit))}</td>` : ''}<td>${co.cur}${fmt(Math.round(row.fcf))}</td><td>${co.cur}${fmt(Math.round(row.pv))}</td></tr>`;
+  });
+  fcfHTML += `<tr><td>Terminal Value</td><td colspan="${!iB ? 2 : 1}"></td><td>${co.cur}${fmt(Math.round(r.tv))}</td><td>${co.cur}${fmt(Math.round(r.pvTV))}</td></tr>`;
+  document.getElementById('fcfTable').innerHTML = fcfHTML;
+
+  // Insight
+  const method = iB ? 'equity DCF (net income growth model)' : 'free cash flow DCF';
+  document.getElementById('rInsight').innerHTML = `Using a ${method}, <strong>${co.name}</strong> has an intrinsic value of <strong>${co.cur}${fmtP(r.intrinsic, co.price)}/share</strong> — ${chgPct > 0 ? `${chgPct}% above current market price, suggesting potential upside if assumptions hold.` : `${Math.abs(chgPct)}% below current market price, suggesting the stock is priced above this DCF's fair value.`} Terminal value contributes <strong>${r.tvPct.toFixed(0)}%</strong> of total enterprise value — ${r.tvPct > 75 ? 'extremely high, meaning the near-term cash flows matter less than long-term growth and terminal multiple assumptions' : r.tvPct > 60 ? 'high, as expected for a growth business with modest near-term FCFs relative to its long-term potential' : 'moderate, indicating the near-term FCF projection plays a meaningful role in the valuation'}. Test the sensitivity table below to see how sensitive this number is to your key assumptions.`;
 
   // Sensitivity
-  const wB = r.wacc * 100, tB = r.tgr * 100;
-  const deltas = [-1.5, -0.75, 0, 0.75, 1.5];
-  let sHtml = '<thead><tr><th>WACC \\ TGR</th>';
-  deltas.map(t => Math.max(1, Math.min(8, tB + t))).forEach(t => { sHtml += `<th>${t.toFixed(1)}%</th>`; });
-  sHtml += '</tr></thead><tbody>';
-  deltas.forEach((wd, wi) => {
-    const wTest = wB + wd;
-    sHtml += `<tr><td>${wTest.toFixed(1)}%</td>`;
-    deltas.map(t => Math.max(1, Math.min(8, tB + t))).forEach((t, ti) => {
-      const ww = (wTest / 100);
-      const gg = t / 100;
-      let pv2 = 0, rev2 = r.company.financials.revenue;
-      const growthRates = [
-        getInp('revenueGrowthY1')/100, getInp('revenueGrowthY2')/100, getInp('revenueGrowthY3')/100,
-        getInp('revenueGrowthY4')/100, getInp('revenueGrowthY5')/100,
-      ];
-      const ebitdaM = getInp('ebitdaMargin')/100, daP = getInp('daPercent')/100;
-      const capexP = getInp('capexPercent')/100, wcP = getInp('wcPercent')/100, taxR = getInp('taxRate')/100;
-      let lastFcf2 = 0;
-      for (let yr = 0; yr < 5; yr++) {
-        rev2 *= (1 + growthRates[yr]);
-        const fcf2 = (rev2*(ebitdaM-daP)*(1-taxR)) + rev2*daP - rev2*capexP - rev2*wcP;
-        pv2 += fcf2 / Math.pow(1+ww, yr+1);
-        lastFcf2 = fcf2;
+  const baseWacc = r.wacc, baseGt = r.gt;
+  const waccVals = [-1.5, -1, -0.5, 0, 0.5, 1, 1.5].map(d => baseWacc + d);
+  const gtVals = [-1, -0.5, 0, 0.5, 1].map(d => baseGt + d);
+  let sHTML = `<tr><th>WACC \\ Term. Growth</th>` + gtVals.map(g => `<th>${g.toFixed(1)}%</th>`).join('') + '</tr>';
+  waccVals.forEach(w => {
+    sHTML += `<tr><td>${w.toFixed(1)}%</td>`;
+    gtVals.forEach(g => {
+      let iv;
+      if (co.isBank) {
+        const ni10 = r.rows[9].fcf;
+        const pvsum = r.rows.reduce((sum, row, i) => sum + row.fcf / Math.pow(1 + w / 100, row.yr), 0);
+        const tv2 = ni10 * (1 + g / 100) / Math.max(w / 100 - g / 100, 0.001);
+        const pvtv2 = tv2 / Math.pow(1 + w / 100, 10);
+        iv = (pvsum + pvtv2) / r.sh;
+      } else {
+        const fcf10 = r.rows[9].fcf;
+        const pvsum = r.rows.reduce((sum, row) => sum + row.fcf / Math.pow(1 + w / 100, row.yr), 0);
+        const tv2 = fcf10 * (1 + g / 100) / Math.max(w / 100 - g / 100, 0.001);
+        const pvtv2 = tv2 / Math.pow(1 + w / 100, 10);
+        const ev2 = pvsum + pvtv2;
+        iv = (ev2 - r.nd) / r.sh;
       }
-      const tv2 = lastFcf2*(1+gg)/(ww-gg);
-      const ev2 = pv2 + tv2/Math.pow(1+ww,5);
-      const price2 = (ev2 - r.netDebt) / r.company.financials.sharesOutstanding;
-      const upside2 = (price2 - r.marketPrice) / r.marketPrice * 100;
-      let hc = upside2>30?'heat-5':upside2>10?'heat-4':upside2<-20?'heat-1':upside2<0?'heat-2':'heat-3';
-      const hl = (wi===2&&ti===2) ? ' heat-hl' : '';
-      sHtml += `<td class="${hc}${hl}">${fmt(price2, r.currency)}</td>`;
+      const isBase = Math.abs(w - baseWacc) < 0.01 && Math.abs(g - baseGt) < 0.01;
+      const chg = (iv - co.price) / co.price;
+      const cls = isBase ? 'cell-base' : chg > 0.15 ? 'cell-low' : chg < -0.15 ? 'cell-high' : 'cell-mid';
+      sHTML += `<td class="${cls}">${co.cur}${fmtP(iv, co.price)}</td>`;
     });
-    sHtml += '</tr>';
+    sHTML += '</tr>';
   });
-  sHtml += '</tbody>';
-  document.getElementById('output-sens').innerHTML = sHtml;
-
-  // What would change your view
-  const growth = getInp('revenueGrowthY1');
-  const margin = getInp('ebitdaMargin');
-  document.getElementById('change-view-text').textContent = `Your base case uses ${growth}% Year 1 revenue growth and ${margin}% EBITDA margin. Try changing the terminal growth rate — it has an outsized impact on the final number (currently ${fmtPct(r.tvPct)} of Enterprise Value comes from terminal value). A 1% change in terminal growth can move the share price by 15-25%.`;
+  document.getElementById('sensTable').innerHTML = sHTML;
 }
 
-// ── VAULT SAVE ──
-function saveToVault() {
-  if (!calcResult) return;
-  VD.vault.save({
-    type: 'DCF',
-    company: calcResult.company.name,
-    value: fmt(calcResult.pricePerShare, calcResult.currency),
-    domain: 'Valuation Advisory',
-    upside: fmtPct(Math.abs(calcResult.upside)) + (calcResult.upside > 0 ? ' upside' : ' overvalued'),
-  });
-  document.getElementById('vault-count').textContent = VD.vault.count();
-}
-
-function tweakAssumption(type) {
-  goToStep(3);
-  setTimeout(() => {
-    const targets = { growth:'inp-revenueGrowthY1', margin:'inp-ebitdaMargin', wacc:'inp-riskFreeRate' };
-    const el = document.getElementById(targets[type]);
-    if (el) { el.focus(); el.select(); el.style.borderColor='var(--black)'; el.style.boxShadow='0 0 0 3px rgba(17,24,39,0.15)'; setTimeout(()=>{el.style.borderColor=''; el.style.boxShadow='';},2000); }
-  }, 300);
-}
-
-function resetCalculator() {
-  selectedCompany = null;
-  calcResult = null;
-  document.querySelectorAll('.company-card').forEach(c => c.classList.remove('selected'));
-  document.getElementById('btn-to-step2').disabled = true;
-  goToStep(1);
-}
-
-// ── STEP 2 INTERCEPT ──
-const origGoToStep2 = goToStep;
-document.getElementById('btn-to-step2').addEventListener('click', () => {
-  if (!selectedCompany) return;
-  loadContext();
-  goToStep(2);
-});
-
-// ── INIT ──
-document.addEventListener('DOMContentLoaded', () => {
-  buildCompanyGrid();
-  VD.countUp(document.getElementById('vault-count'), VD.vault.count(), 500);
-});
+function fmt(n) { if (Math.abs(n) >= 100000) return (n/100000).toFixed(1)+'L'; if (Math.abs(n) >= 1000) return (n/1000).toFixed(1)+'K'; return Math.abs(n) < 1 ? n.toFixed(2) : n.toLocaleString(); }
+function fmtP(n, ref) { return Math.abs(ref) >= 1000 ? n.toLocaleString(undefined,{maximumFractionDigits:0}) : Math.abs(ref) >= 100 ? n.toFixed(0) : Math.abs(ref) >= 10 ? n.toFixed(1) : n.toFixed(2); }
+function saveToVault() { const co = CO.find(c => c.id === selId); if (!co || !calcState.result) return; const v = JSON.parse(localStorage.getItem('vd_vault') || '[]'); v.push({ type:'DCF', company:co.name, ticker:co.ticker, intrinsic:calcState.result.intrinsic.toFixed(2), current:co.price, date:new Date().toLocaleDateString() }); localStorage.setItem('vd_vault', JSON.stringify(v)); alert(`✅ Saved: ${co.name} DCF intrinsic value ${co.cur}${fmtP(calcState.result.intrinsic, co.price)} → Vault`); }
+function resetAll() { selId = null; calcState = {}; goToStep(1); renderGrid('all'); document.getElementById('continueBtn').classList.remove('enabled'); }
 </script>
 </body>
 </html>
