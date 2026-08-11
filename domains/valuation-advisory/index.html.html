@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valuation Advisory — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+.top-nav{border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;height:56px;gap:28px}
+.logo{font-size:17px;font-weight:700}.logo strong{font-weight:900}
+.nav-links{display:flex;gap:20px;flex:1}.nav-links a{font-size:13px;color:var(--muted);font-weight:500}.nav-links a:hover{color:var(--text)}
+.nav-cta{display:flex;gap:8px;align-items:center;margin-left:auto}
+.vault-btn{font-size:12px;font-weight:600;padding:6px 12px;border:1px solid var(--border);border-radius:6px;color:var(--text)}
+.pro-btn{font-size:12px;font-weight:700;padding:6px 14px;background:var(--text);color:#fff;border-radius:6px}
+.domain-nav{border-bottom:1px solid var(--border);background:var(--bg)}
+.domain-nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex}
+.domain-nav a{font-size:13px;font-weight:500;color:var(--muted);padding:10px 16px;border-bottom:2px solid transparent}
+.domain-nav a:hover,.domain-nav a.active{color:var(--text);border-bottom-color:var(--text)}
+/* PAGE HERO */
+.page-hero{max-width:1200px;margin:0 auto;padding:72px 24px 56px}
+.domain-label{display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:24px}
+.page-headline{font-size:52px;font-weight:900;letter-spacing:-1.5px;line-height:1.05;margin-bottom:18px;max-width:720px}
+.page-sub{font-size:18px;color:var(--muted);max-width:580px;line-height:1.65;margin-bottom:40px}
+.hero-ctas{display:flex;gap:12px;flex-wrap:wrap}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;background:var(--text);color:#fff;border-radius:8px;font-size:14px;font-weight:700}
+.btn-secondary{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border:1.5px solid var(--border);color:var(--text);border-radius:8px;font-size:14px;font-weight:600}.btn-secondary:hover{border-color:var(--text)}
+/* STATS BAR */
+.stats-bar{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--card)}
+.stats-inner{max-width:1200px;margin:0 auto;padding:24px;display:flex;gap:0;flex-wrap:wrap}
+.stat-item{flex:1;min-width:160px;padding:0 24px;border-right:1px solid var(--border)}
+.stat-item:first-child{padding-left:0}
+.stat-item:last-child{border-right:none}
+.stat-num{font-size:32px;font-weight:900;font-family:var(--mono);margin-bottom:4px}
+.stat-lbl{font-size:13px;color:var(--muted)}
+/* CALCULATORS TEASER */
+.section{max-width:1200px;margin:0 auto;padding:64px 24px}
+.section-hd{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:12px}
+.section-title{font-size:26px;font-weight:800}
+.section-link{font-size:14px;font-weight:600;color:var(--text);border-bottom:1px solid var(--text)}
+.section-link:hover{opacity:.7}
+.calc-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px}
+.calc-tile{border:1.5px solid var(--border);border-radius:12px;padding:18px;transition:border-color .15s}
+.calc-tile:hover{border-color:#999}
+.calc-tile.free-tile{border-color:var(--text);border-width:2px}
+.tile-icon{font-size:22px;margin-bottom:10px}
+.tile-name{font-size:14px;font-weight:800;margin-bottom:4px}
+.tile-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-bottom:8px}
+.badge-free{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
+.badge-pro{background:var(--text);color:#fff}
+.tile-desc{font-size:12px;color:var(--muted);line-height:1.5}
+/* CHAPTER TEASER */
+.chapters-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.chapter-card{border:1px solid var(--border);border-radius:12px;padding:22px;transition:border-color .15s}
+.chapter-card:hover{border-color:#999}
+.chapter-num{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px}
+.chapter-title{font-size:16px;font-weight:800;margin-bottom:8px}
+.chapter-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px}
+.chapter-link{font-size:13px;font-weight:600;color:var(--text);border-bottom:1px solid var(--border)}
+/* BOTTOM CTA */
+.cta-strip{background:var(--text);color:#fff;padding:56px 24px;text-align:center}
+.cta-strip-inner{max-width:560px;margin:0 auto}
+.cta-strip h2{font-size:28px;font-weight:900;margin-bottom:10px}
+.cta-strip p{font-size:15px;opacity:.7;margin-bottom:24px}
+.cta-strip-btn{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;background:#fff;color:var(--text);border-radius:8px;font-size:14px;font-weight:800}
+@media(max-width:768px){.page-headline{font-size:34px}.calc-row{grid-template-columns:1fr 1fr}.chapters-grid{grid-template-columns:1fr}.stats-inner{gap:16px}.stat-item{border-right:none;border-bottom:1px solid var(--border);padding:12px 0}.stat-item:last-child{border-bottom:none}}
+@media(max-width:480px){.nav-links{display:none}.calc-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="nav-inner">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/" class="logo">Valuation<strong>Desk</strong></a>
+    <div class="nav-links">
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/" style="color:var(--text)">Valuation Advisory</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/">My Vault</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/deal-room/">Deal Room</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/daily-brief/">Daily Brief</a>
+    </div>
+    <div class="nav-cta">
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/" class="vault-btn">🗄 Vault (0)</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/#pricing" class="pro-btn">Get Pro — ₹799/mo</a>
+    </div>
+  </div>
+</nav>
+
+<div class="domain-nav">
+  <div class="domain-nav-inner">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/" class="active">Overview</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/learn/">📖 Learn</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/">🧮 Calculators</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/">🗄 My Vault</a>
+  </div>
+</div>
+
+<div class="page-hero">
+  <div class="domain-label">🏦 Valuation Advisory</div>
+  <h1 class="page-headline">Learn to value anything. The way analysts actually do it.</h1>
+  <p class="page-sub">Seven professional calculators. Chapters that build from first principles. 30 companies pre-loaded with real data. This is valuation the way it's taught inside investment banks — not textbooks.</p>
+  <div class="hero-ctas">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/" class="btn-primary">🧮 Open Calculators →</a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/learn/" class="btn-secondary">📖 Start Learning</a>
+  </div>
+</div>
+
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-item"><div class="stat-num">7</div><div class="stat-lbl">Valuation calculators</div></div>
+    <div class="stat-item"><div class="stat-num">30</div><div class="stat-lbl">Companies pre-loaded</div></div>
+    <div class="stat-item"><div class="stat-num">15</div><div class="stat-lbl">India large-caps</div></div>
+    <div class="stat-item"><div class="stat-num">15</div><div class="stat-lbl">Global companies</div></div>
+    <div class="stat-item"><div class="stat-num">5</div><div class="stat-lbl">Learning chapters</div></div>
+  </div>
+</div>
+
+<!-- CALCULATORS SECTION -->
+<div class="section">
+  <div class="section-hd">
+    <h2 class="section-title">7 Professional Calculators</h2>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/" class="section-link">See all calculators →</a>
+  </div>
+  <div class="calc-row">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/dcf.html" class="calc-tile free-tile">
+      <div class="tile-icon">📈</div>
+      <div class="tile-name">DCF</div>
+      <span class="tile-badge badge-free">Free</span>
+      <div class="tile-desc">Value a company on its future cash flows, discounted to today.</div>
+    </a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/wacc.html" class="calc-tile">
+      <div class="tile-icon">⚙️</div>
+      <div class="tile-name">WACC Builder</div>
+      <span class="tile-badge badge-pro">Pro</span>
+      <div class="tile-desc">Build your discount rate using CAPM and capital structure weights.</div>
+    </a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/comps.html" class="calc-tile">
+      <div class="tile-icon">📊</div>
+      <div class="tile-name">Trading Comps</div>
+      <span class="tile-badge badge-pro">Pro</span>
+      <div class="tile-desc">Apply peer trading multiples to arrive at a relative implied value.</div>
+    </a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/ev-bridge.html" class="calc-tile">
+      <div class="tile-icon">🌉</div>
+      <div class="tile-name">EV Bridge</div>
+      <span class="tile-badge badge-pro">Pro</span>
+      <div class="tile-desc">Bridge from Enterprise Value to an implied share price.</div>
+    </a>
+  </div>
+  <div class="calc-row">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/sotp.html" class="calc-tile">
+      <div class="tile-icon">🧩</div>
+      <div class="tile-name">SOTP</div>
+      <span class="tile-badge badge-pro">Pro</span>
+      <div class="tile-desc">Value each business segment separately, then sum them up.</div>
+    </a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/football-field.html" class="calc-tile">
+      <div class="tile-icon">🏈</div>
+      <div class="tile-name">Football Field</div>
+      <span class="tile-badge badge-pro">Pro</span>
+      <div class="tile-desc">Aggregate all methods into one pitch-book-style visual chart.</div>
+    </a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/nav.html" class="calc-tile">
+      <div class="tile-icon">🏦</div>
+      <div class="tile-name">NAV</div>
+      <span class="tile-badge badge-pro">Pro</span>
+      <div class="tile-desc">Restate the balance sheet at fair value and compute asset-backed NAV.</div>
+    </a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/" class="calc-tile" style="display:flex;align-items:center;justify-content:center;border-style:dashed;background:var(--card)">
+      <div style="text-align:center">
+        <div style="font-size:22px;margin-bottom:8px">→</div>
+        <div style="font-size:13px;font-weight:700">See all 7</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:3px">with workflow guide</div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<!-- LEARN SECTION -->
+<div class="section" style="border-top:1px solid var(--border);padding-top:64px">
+  <div class="section-hd">
+    <h2 class="section-title">Learning Chapters</h2>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/learn/" class="section-link">All chapters →</a>
+  </div>
+  <div class="chapters-grid">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/learn/" class="chapter-card">
+      <div class="chapter-num">Chapter 1</div>
+      <div class="chapter-title">The Language of Valuation</div>
+      <div class="chapter-desc">Enterprise Value vs Equity Value. What EBITDA actually means. Why EV/EBITDA is more comparable than P/E. The vocabulary every analyst uses by Day 1.</div>
+      <span class="chapter-link">Start reading →</span>
+    </a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/learn/" class="chapter-card">
+      <div class="chapter-num">Chapter 2</div>
+      <div class="chapter-title">Discounted Cash Flow</div>
+      <div class="chapter-desc">How to project free cash flows, why terminal value dominates DCF output, and the WACC debate that every analyst gets wrong at least once.</div>
+      <span class="chapter-link">Coming soon</span>
+    </a>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/learn/" class="chapter-card">
+      <div class="chapter-num">Chapter 3</div>
+      <div class="chapter-title">Comparable Company Analysis</div>
+      <div class="chapter-desc">How bankers select peer companies, which multiples matter by sector, and why the market is not always right — but it's always the starting point.</div>
+      <span class="chapter-link">Coming soon</span>
+    </a>
+  </div>
+</div>
+
+<div class="cta-strip">
+  <div class="cta-strip-inner">
+    <h2>Start with the DCF — it's free</h2>
+    <p>No credit card required. 30 companies pre-loaded. Understand exactly how a discounted cash flow model works before you run one in Excel.</p>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/dcf.html" class="cta-strip-btn">Open DCF Calculator →</a>
+  </div>
+</div>
+
+</body>
+</html>
