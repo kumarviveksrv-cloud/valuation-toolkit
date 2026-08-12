@@ -1,84 +1,208 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Deal Room — ValuationDesk</title>
-<link rel="stylesheet" href="/valuation-toolkit/assets/vd.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+.top-nav{border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;height:56px;gap:28px}
+.logo{font-size:17px;font-weight:700}.logo strong{font-weight:900}
+.nav-links{display:flex;gap:20px;flex:1}.nav-links a{font-size:13px;color:var(--muted);font-weight:500}.nav-links a:hover{color:var(--text)}.nav-links a.active{color:var(--text);font-weight:700}
+.nav-cta{display:flex;gap:8px;align-items:center;margin-left:auto}
+.vault-btn{font-size:12px;font-weight:600;padding:6px 12px;border:1px solid var(--border);border-radius:6px;color:var(--text)}
+.pro-btn{font-size:12px;font-weight:700;padding:6px 14px;background:var(--text);color:#fff;border-radius:6px}
+.page-header{max-width:1200px;margin:0 auto;padding:48px 24px 32px;border-bottom:1px solid var(--border)}
+.page-tag{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px}
+.page-headline{font-size:36px;font-weight:900;letter-spacing:-.5px;margin-bottom:8px}
+.page-sub{font-size:15px;color:var(--muted);max-width:560px;line-height:1.6}
+.content{max-width:1200px;margin:0 auto;padding:40px 24px 80px}
+.section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:16px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.deal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:48px}
+.deal-card{border:1.5px solid var(--border);border-radius:12px;padding:20px;transition:border-color .15s}
+.deal-card:hover{border-color:#999}
+.deal-type{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;padding:3px 8px;border-radius:4px;display:inline-block;margin-bottom:12px}
+.type-ma{background:#fef3c7;color:#92400e}.type-ipo{background:#dbeafe;color:#1e40af}.type-pe{background:#f0fdf4;color:#166534}.type-fundraise{background:#fdf4ff;color:#7c3aed}
+.deal-co{font-size:17px;font-weight:800;margin-bottom:4px}
+.deal-sector{font-size:12px;color:var(--muted);margin-bottom:14px}
+.deal-metrics{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.deal-metric-row{display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.deal-metric-lbl{color:var(--muted)}
+.deal-metric-val{font-family:var(--mono);font-weight:700;font-size:13px}
+.deal-divider{border-top:1px solid var(--border);margin:12px 0}
+.deal-insight{font-size:13px;color:var(--muted);line-height:1.6}
+.deal-insight strong{color:var(--text)}
+.cta-strip{background:var(--text);color:#fff;border-radius:12px;padding:28px;margin-bottom:48px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.cta-strip-text h3{font-size:18px;font-weight:800;margin-bottom:6px}
+.cta-strip-text p{font-size:14px;opacity:.7;line-height:1.6}
+.cta-strip-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:#fff;color:var(--text);border-radius:6px;font-size:13px;font-weight:700;white-space:nowrap;flex-shrink:0}
+.concept-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:48px}
+.concept-card{border:1px solid var(--border);border-radius:12px;padding:20px}
+.concept-icon{font-size:20px;margin-bottom:10px}
+.concept-title{font-size:14px;font-weight:800;margin-bottom:8px}
+.concept-body{font-size:13px;color:var(--muted);line-height:1.65}
+.concept-body strong{color:var(--text)}
+.formula{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:10px;margin-top:10px;font-family:var(--mono);font-size:12px;color:var(--text)}
+.coming-soon{border:1.5px dashed var(--border);border-radius:12px;padding:32px;text-align:center;color:var(--muted)}
+.coming-soon h3{font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px}
+.coming-soon p{font-size:13px;line-height:1.6}
+@media(max-width:768px){.deal-grid{grid-template-columns:1fr}.concept-grid{grid-template-columns:1fr}.nav-links{display:none}.page-headline{font-size:26px}.cta-strip{flex-direction:column}}
+</style>
 </head>
 <body>
-<nav class="nav">
-  <a href="/valuation-toolkit/" class="nav-logo">Valuation<strong>Desk</strong></a>
-  <ul class="nav-links">
-    <li><a href="/valuation-toolkit/domains/valuation-advisory/">Valuation Advisory</a></li>
-    <li><a href="/valuation-toolkit/vault/">My Vault</a></li>
-    <li><a href="/valuation-toolkit/deal-room/" class="active">Deal Room</a></li>
-    <li><a href="/valuation-toolkit/daily-brief/">Daily Brief</a></li>
-  </ul>
-  <div class="nav-right">
-    <a href="/valuation-toolkit/#pricing" class="nav-cta">Get Pro — ₹799/mo</a>
+<nav class="top-nav">
+  <div class="nav-inner">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/" class="logo">Valuation<strong>Desk</strong></a>
+    <div class="nav-links">
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/">Valuation Advisory</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/">My Vault</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/deal-room/" class="active">Deal Room</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/daily-brief/">Daily Brief</a>
+    </div>
+    <div class="nav-cta">
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/" class="vault-btn">🗄 My Vault</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/#pricing" class="pro-btn">Get Pro — ₹799/mo</a>
+    </div>
   </div>
 </nav>
-<div class="page-no-domain">
-  <section class="section">
-    <div class="container">
-      <div class="eyebrow">Weekly live case study</div>
-      <h1 class="h1" style="margin-bottom:0.75rem;">Deal Room</h1>
-      <p class="lead" style="margin-bottom:2.5rem;">Every week, one real company. One real situation. Walk through the complete valuation using the platform's live calculators — the way it's done on an actual IB engagement.</p>
 
-      <!-- THIS WEEK -->
-      <div class="card" style="border-color:var(--black);border-width:2px;margin-bottom:2rem;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;">
-          <span class="tag tag-black">This Week</span>
-          <span style="font-size:0.72rem;color:var(--gray-400);">Week of August 4, 2025</span>
-        </div>
-        <h2 class="h2" style="margin-bottom:0.5rem;">Valuing Zomato: When Growth Beats Profitability</h2>
-        <p class="lead" style="margin-bottom:1.5rem;">Zomato's EV/Revenue at 8.4x looks expensive vs global peers at 3-5x. But India's food delivery market is still early. Is the premium justified — or is this a value trap? We build the full DCF and football field live.</p>
-        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem;">
-          <span class="tag tag-gray">DCF</span>
-          <span class="tag tag-gray">Comps</span>
-          <span class="tag tag-gray">Football Field</span>
-          <span class="tag tag-gray">E-commerce</span>
-          <span class="tag tag-gray">Growth Equity</span>
-        </div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem;">
-          <div class="card-metric"><div class="eyebrow" style="margin-bottom:0.2rem;">Current EV/Revenue</div><div style="font-size:1.4rem;font-weight:800;">8.4x</div></div>
-          <div class="card-metric"><div class="eyebrow" style="margin-bottom:0.2rem;">Global Peer Median</div><div style="font-size:1.4rem;font-weight:800;">3.8x</div></div>
-          <div class="card-metric"><div class="eyebrow" style="margin-bottom:0.2rem;">Revenue Growth (FY25)</div><div style="font-size:1.4rem;font-weight:800;color:var(--green);">68%</div></div>
-        </div>
-        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
-          <a href="/valuation-toolkit/domains/valuation-advisory/calculators/" class="btn btn-black">Open DCF Calculator →</a>
-          <a href="/valuation-toolkit/domains/valuation-advisory/calculators/#comps" class="btn btn-outline">Open Comps Engine →</a>
-        </div>
-      </div>
-
-      <!-- PAST WEEKS -->
-      <div class="eyebrow" style="margin-bottom:1rem;">Previous Deal Rooms</div>
-      <div style="display:flex;flex-direction:column;gap:0.75rem;">
-        <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
-          <div>
-            <div style="font-size:0.72rem;color:var(--gray-400);margin-bottom:0.2rem;">Week of July 28 · M&A</div>
-            <h3 class="h3" style="margin-bottom:0.2rem;">HDFC Bank Post-Merger: Did the Deal Create Value?</h3>
-            <p style="font-size:0.78rem;color:var(--gray-500);">Accretion/dilution analysis on India's largest banking merger. Was the 6.1x book value swap fair?</p>
-          </div>
-          <span class="tag tag-gray">Completed</span>
-        </div>
-        <div class="card" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
-          <div>
-            <div style="font-size:0.72rem;color:var(--gray-400);margin-bottom:0.2rem;">Week of July 21 · PE</div>
-            <h3 class="h3" style="margin-bottom:0.2rem;">Building a PE Model for Delhivery: What Returns Are Possible?</h3>
-            <p style="font-size:0.78rem;color:var(--gray-500);">Full LBO analysis on India's largest logistics player at different entry multiples.</p>
-          </div>
-          <span class="tag tag-gray">Completed</span>
-        </div>
-      </div>
-    </div>
-  </section>
+<div class="page-header">
+  <div class="page-tag">Deal Room</div>
+  <div class="page-headline">Recent Deals — Deconstructed</div>
+  <div class="page-sub">Every deal is a valuation lesson. Here's what the market implied, what method was used, and what you can learn from it.</div>
 </div>
-<footer class="footer">
-  <div class="footer-logo">Valuation<strong>Desk</strong></div>
-  <div class="footer-note">© 2025 ValuationDesk</div>
-</footer>
-<div id="toast-container"></div>
-<script src="/valuation-toolkit/assets/vd.js"></script>
+
+<div class="content">
+
+  <div class="section-title" style="margin-bottom:24px">Featured Deals — Valuation Breakdown</div>
+
+  <div class="deal-grid">
+
+    <div class="deal-card">
+      <div class="deal-type type-ma">M&A</div>
+      <div class="deal-co">Tata Motors × JLR</div>
+      <div class="deal-sector">Auto OEM — Strategic Acquisition</div>
+      <div class="deal-metrics">
+        <div class="deal-metric-row"><span class="deal-metric-lbl">Deal Value</span><span class="deal-metric-val">$2.3B</span></div>
+        <div class="deal-metric-row"><span class="deal-metric-lbl">EV/EBITDA at close</span><span class="deal-metric-val">4.5x</span></div>
+        <div class="deal-metric-row"><span class="deal-metric-val" style="color:var(--green)">Today: 5.5x EV/EBITDA</span></div>
+      </div>
+      <div class="deal-divider"></div>
+      <div class="deal-insight">Tata paid 4.5x EV/EBITDA for JLR in 2008 when Ford was distressed. Current JLR contributes <strong>70% of Tata Motors' EBITDA</strong>. The lesson: distressed asset multiples create asymmetric upside when the underlying business is fundamentally sound.</div>
+    </div>
+
+    <div class="deal-card">
+      <div class="deal-type type-ipo">IPO</div>
+      <div class="deal-co">Zomato IPO</div>
+      <div class="deal-sector">Consumer Tech — Primary Listing</div>
+      <div class="deal-metrics">
+        <div class="deal-metric-row"><span class="deal-metric-lbl">IPO Valuation</span><span class="deal-metric-val">₹64,365 Cr</span></div>
+        <div class="deal-metric-row"><span class="deal-metric-lbl">IPO EV/Revenue</span><span class="deal-metric-val">~8x</span></div>
+        <div class="deal-metric-row"><span class="deal-metric-val">Today: 15x EV/Revenue</span></div>
+      </div>
+      <div class="deal-divider"></div>
+      <div class="deal-insight">Zomato listed at 8x EV/Revenue — already a premium to global food delivery peers. The Blinkit acquisition and quick commerce thesis have re-rated it to <strong>15x EV/Revenue</strong>. IPO valuation is just the opening bid — the market reprices on thesis validation.</div>
+    </div>
+
+    <div class="deal-card">
+      <div class="deal-type type-pe">PE Stake</div>
+      <div class="deal-co">Jio Platforms — Facebook, Google</div>
+      <div class="deal-sector">Telecom / Digital — Minority Stakes</div>
+      <div class="deal-metrics">
+        <div class="deal-metric-row"><span class="deal-metric-lbl">Jio implied value</span><span class="deal-metric-val">$65B (2020)</span></div>
+        <div class="deal-metric-row"><span class="deal-metric-lbl">Implied EV/EBITDA</span><span class="deal-metric-val">~14x</span></div>
+        <div class="deal-metric-row"><span class="deal-metric-val">At SOTP today: ~₹10L Cr</span></div>
+      </div>
+      <div class="deal-divider"></div>
+      <div class="deal-insight">Facebook and Google paid $5.7B and $4.5B respectively for minority Jio stakes at a $65B valuation. This anchored the <strong>SOTP multiple for Jio</strong> at 14x EV/EBITDA — the exact number used in Reliance's SOTP today. Private transactions create public market anchors.</div>
+    </div>
+
+    <div class="deal-card">
+      <div class="deal-type type-ma">Acquisition</div>
+      <div class="deal-co">Microsoft × Activision</div>
+      <div class="deal-sector">Gaming / Cloud — $69B Deal</div>
+      <div class="deal-metrics">
+        <div class="deal-metric-row"><span class="deal-metric-lbl">Deal Value</span><span class="deal-metric-val">$69B</span></div>
+        <div class="deal-metric-row"><span class="deal-metric-lbl">EV/EBITDA</span><span class="deal-metric-val">26x</span></div>
+        <div class="deal-metric-row"><span class="deal-metric-val" style="color:var(--muted)">Gaming SOTP: 18x today</span></div>
+      </div>
+      <div class="deal-divider"></div>
+      <div class="deal-insight">Microsoft paid 26x EV/EBITDA for Activision — a strategic premium above the market multiple of 18x for gaming. The rationale: content lock-in for Game Pass and the ability to run gaming infrastructure on Azure. <strong>Synergy-adjusted EV/EBITDA</strong> was closer to 20x after cloud savings.</div>
+    </div>
+
+    <div class="deal-card">
+      <div class="deal-type type-fundraise">Fundraise</div>
+      <div class="deal-co">NVIDIA Private Rounds (Pre-2022)</div>
+      <div class="deal-sector">Semiconductors — Series B to IPO Journey</div>
+      <div class="deal-metrics">
+        <div class="deal-metric-row"><span class="deal-metric-lbl">1999 IPO valuation</span><span class="deal-metric-val">$600M</span></div>
+        <div class="deal-metric-row"><span class="deal-metric-lbl">Today market cap</span><span class="deal-metric-val">$3.3T</span></div>
+        <div class="deal-metric-row"><span class="deal-metric-val" style="color:var(--green)">5,500x value creation</span></div>
+      </div>
+      <div class="deal-divider"></div>
+      <div class="deal-insight">NVIDIA's IPO in 1999 valued it at $600M as a gaming GPU company. The platform shift to CUDA (parallel computing) in 2006, and then AI in 2016, created 5,500x value. <strong>Platform bets require DCF terminal values that look extreme at inception</strong> — which is exactly why NVIDIA's DCF has the widest range in our universe.</div>
+    </div>
+
+    <div class="deal-card">
+      <div class="deal-type type-pe">NBFC Stake</div>
+      <div class="deal-co">Bajaj Finance — Growth Story</div>
+      <div class="deal-sector">NBFC — Public Market Compounder</div>
+      <div class="deal-metrics">
+        <div class="deal-metric-row"><span class="deal-metric-lbl">2013 market cap</span><span class="deal-metric-val">₹4,000 Cr</span></div>
+        <div class="deal-metric-row"><span class="deal-metric-lbl">2024 market cap</span><span class="deal-metric-val">₹4.5L Cr</span></div>
+        <div class="deal-metric-row"><span class="deal-metric-val" style="color:var(--green)">100x in 10 years</span></div>
+      </div>
+      <div class="deal-divider"></div>
+      <div class="deal-insight">Bajaj Finance compounded at 58% CAGR for 10 years — driven by consistent 22-24% RoE, technology-first credit underwriting, and EMI Finance category creation. The lesson: <strong>P/B expansion</strong> (from 3x to 7x) contributes as much as earnings growth. High RoE businesses deserve P/B expansion.</div>
+    </div>
+
+  </div>
+
+  <div class="cta-strip">
+    <div class="cta-strip-text">
+      <h3>Build your own deal model</h3>
+      <p>Use SOTP to value a conglomerate by its parts. Use EV Bridge to go from deal EV to implied share price. Use Football Field to present the full range — just like a real pitch book.</p>
+    </div>
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/" class="cta-strip-btn">Open Calculator Suite →</a>
+  </div>
+
+  <div class="section-title">M&A Valuation Concepts — How Deals Get Priced</div>
+  <div class="concept-grid">
+    <div class="concept-card">
+      <div class="concept-icon">🏷️</div>
+      <div class="concept-title">Control Premium</div>
+      <div class="concept-body">Acquirers typically pay <strong>20-40% above market price</strong> for control. This premium reflects synergies, strategic value, and the right to make operating decisions. In the EV Bridge, you'd add the control premium to the SOTP-derived equity value before calculating the offer price per share.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon">⚖️</div>
+      <div class="concept-title">Synergy-Adjusted EBITDA</div>
+      <div class="concept-body">When applying Comps multiples to an acquisition, use <strong>synergy-adjusted EBITDA</strong>, not standalone EBITDA. Cost synergies (overlapping functions) and revenue synergies (cross-sell) are added to the target's EBITDA. The multiple is then applied to this higher base.</div>
+      <div class="formula">Synergy EV = (EBITDA + Synergies) × Multiple</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon">📊</div>
+      <div class="concept-title">LBO Entry Multiple</div>
+      <div class="concept-body">Private equity buys at <strong>6-12x EV/EBITDA</strong> for most leveraged buyouts. The return comes from: EBITDA growth, multiple expansion at exit, and leverage paydown. A company bought at 8x can be sold at 10x after EBITDA doubles — generating 5x+ equity return even with no multiple expansion.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon">🎯</div>
+      <div class="concept-title">Football Field in M&A</div>
+      <div class="concept-body">In a real deal, the Football Field shows the <strong>acquirer's offer vs the target's stand-alone value</strong>. DCF gives intrinsic value. Comps gives peer market value. Precedent transactions give what similar deals paid. The football field sets the negotiation corridor — board approval requires the offer to be in the upper range.</div>
+    </div>
+  </div>
+
+  <div class="coming-soon">
+    <h3>🔒 Live Deal Analysis — Coming with Pro</h3>
+    <p>Real-time M&A and IPO deal analysis with implied multiples, SOTP breakdowns, and Football Field charts for every major Indian and global deal. Available in the Pro plan.</p>
+  </div>
+
+</div>
 </body>
 </html>
