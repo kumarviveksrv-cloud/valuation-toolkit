@@ -1,114 +1,285 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Valuation Vault — ValuationDesk</title>
-<link rel="stylesheet" href="/valuation-toolkit/assets/vd.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+.top-nav{border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;height:56px;gap:28px}
+.logo{font-size:17px;font-weight:700}.logo strong{font-weight:900}
+.nav-links{display:flex;gap:20px;flex:1}.nav-links a{font-size:13px;color:var(--muted);font-weight:500}.nav-links a:hover{color:var(--text)}.nav-links a.active{color:var(--text);font-weight:700}
+.nav-cta{display:flex;gap:8px;align-items:center;margin-left:auto}
+.pro-btn{font-size:12px;font-weight:700;padding:6px 14px;background:var(--text);color:#fff;border-radius:6px}
+.page-header{max-width:1200px;margin:0 auto;padding:48px 24px 32px;border-bottom:1px solid var(--border);display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.page-header-left .page-tag{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px}
+.page-header-left .page-headline{font-size:36px;font-weight:900;letter-spacing:-.5px;margin-bottom:6px}
+.page-header-left .page-sub{font-size:14px;color:var(--muted)}
+.header-actions{display:flex;gap:8px}
+.btn-export{padding:9px 16px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text);font-family:var(--font)}.btn-export:hover{border-color:var(--text)}
+.btn-clear{padding:9px 16px;border:1.5px solid #fecaca;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;background:#fef2f2;color:var(--red);font-family:var(--font)}
+.content{max-width:1200px;margin:0 auto;padding:40px 24px 80px}
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:80px 24px}
+.empty-icon{font-size:48px;margin-bottom:16px}
+.empty-title{font-size:20px;font-weight:800;margin-bottom:8px}
+.empty-sub{font-size:14px;color:var(--muted);max-width:420px;margin:0 auto 24px;line-height:1.65}
+.empty-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;background:var(--text);color:#fff;border-radius:8px;font-size:14px;font-weight:700}
+/* VAULT TABLE */
+.vault-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:28px}
+.vault-stat{border:1px solid var(--border);border-radius:8px;padding:13px}
+.vault-stat-lbl{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.vault-stat-val{font-size:22px;font-weight:800;font-family:var(--mono)}
+.vault-table-wrap{overflow-x:auto}
+.vault-table{width:100%;border-collapse:collapse}
+.vault-table th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);padding:10px 14px;text-align:left;background:var(--card);border:1px solid var(--border)}
+.vault-table th:not(:first-child){text-align:right}
+.vault-table td{padding:12px 14px;border:1px solid var(--border);font-size:14px}
+.vault-table td:not(:first-child){text-align:right;font-family:var(--mono);font-weight:600}
+.vault-table tr:hover{background:var(--card)}
+.method-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700}
+.method-dcf{background:#dbeafe;color:#1e40af}
+.method-wacc{background:#f0fdf4;color:#166534}
+.method-comps{background:#fef3c7;color:#92400e}
+.method-nav{background:#fdf4ff;color:#7c3aed}
+.method-sotp{background:#fff1f2;color:#be123c}
+.method-ff{background:#f0f9ff;color:#0369a1}
+.method-bridge{background:#fafaf9;color:#44403c}
+.upside{color:var(--green)}.downside{color:var(--red)}
+.del-btn{padding:4px 10px;border:1px solid #fecaca;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;background:#fef2f2;color:var(--red);font-family:var(--font)}
+.vault-footer{margin-top:16px;font-size:13px;color:var(--muted)}
+/* CALCULATOR LINKS */
+.calc-links{margin-top:40px}
+.calc-links-title{font-size:14px;font-weight:700;margin-bottom:14px}
+.calc-links-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.calc-link-tile{border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center;transition:border-color .15s}
+.calc-link-tile:hover{border-color:var(--text)}
+.calc-link-icon{font-size:20px;margin-bottom:6px}
+.calc-link-name{font-size:12px;font-weight:700}
+.calc-link-badge{font-size:10px;font-weight:600;color:var(--muted)}
+@media(max-width:768px){.vault-summary{grid-template-columns:1fr 1fr}.calc-links-grid{grid-template-columns:1fr 1fr}.nav-links{display:none}.page-headline{font-size:26px}.page-header{flex-direction:column;align-items:flex-start}}
+</style>
 </head>
 <body>
-<nav class="nav">
-  <a href="/valuation-toolkit/" class="nav-logo">Valuation<strong>Desk</strong></a>
-  <ul class="nav-links">
-    <li><a href="/valuation-toolkit/domains/valuation-advisory/">Valuation Advisory</a></li>
-    <li><a href="/valuation-toolkit/vault/" class="active">My Vault</a></li>
-    <li><a href="/valuation-toolkit/deal-room/">Deal Room</a></li>
-    <li><a href="/valuation-toolkit/daily-brief/">Daily Brief</a></li>
-  </ul>
-  <div class="nav-right">
-    <a href="/valuation-toolkit/#pricing" class="nav-cta">Get Pro — ₹799/mo</a>
+<nav class="top-nav">
+  <div class="nav-inner">
+    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/" class="logo">Valuation<strong>Desk</strong></a>
+    <div class="nav-links">
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/">Valuation Advisory</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/" class="active">My Vault</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/deal-room/">Deal Room</a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/daily-brief/">Daily Brief</a>
+    </div>
+    <div class="nav-cta">
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/#pricing" class="pro-btn">Get Pro — ₹799/mo</a>
+    </div>
   </div>
 </nav>
-<div class="page-no-domain">
-  <section class="section">
-    <div class="container">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem;">
-        <div>
-          <div class="eyebrow">Your personal model library</div>
-          <h1 class="h1">Valuation Vault</h1>
-          <p class="lead" style="margin-top:0.5rem;">Every model you save lives here. Export any of them to Excel anytime.</p>
-        </div>
-        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:flex-start;">
-          <button onclick="exportAllToExcel()" class="btn btn-outline btn-sm">⬇ Export all to Excel</button>
-          <button onclick="clearVault()" class="btn btn-outline btn-sm" style="color:var(--red);border-color:var(--red);">Clear vault</button>
-        </div>
-      </div>
 
-      <!-- STATS -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:2rem;" id="vault-stats">
-        <div class="card-metric"><div class="eyebrow" style="margin-bottom:0.3rem;">Total Saved</div><div style="font-size:2rem;font-weight:800;" id="vs-total">0</div></div>
-        <div class="card-metric"><div class="eyebrow" style="margin-bottom:0.3rem;">DCF Models</div><div style="font-size:2rem;font-weight:800;" id="vs-dcf">0</div></div>
-        <div class="card-metric"><div class="eyebrow" style="margin-bottom:0.3rem;">Comps</div><div style="font-size:2rem;font-weight:800;" id="vs-comps">0</div></div>
-        <div class="card-metric"><div class="eyebrow" style="margin-bottom:0.3rem;">Other Models</div><div style="font-size:2rem;font-weight:800;" id="vs-other">0</div></div>
-      </div>
-
-      <!-- VAULT ITEMS -->
-      <div id="vault-list"></div>
-
-      <!-- EMPTY STATE -->
-      <div id="vault-empty" style="display:none;text-align:center;padding:4rem 2rem;background:var(--gray-50);border:1px dashed var(--gray-200);border-radius:var(--r-lg);">
-        <div style="font-size:2.5rem;margin-bottom:1rem;">🗄</div>
-        <h3 class="h3" style="margin-bottom:0.5rem;">Your Vault is empty</h3>
-        <p class="lead" style="margin-bottom:1.5rem;">Run any calculator and click "Save to Vault" — your models will appear here.</p>
-        <a href="/valuation-toolkit/domains/valuation-advisory/calculators/" class="btn btn-black">Open Calculators →</a>
-      </div>
-    </div>
-  </section>
+<div class="page-header">
+  <div class="page-header-left">
+    <div class="page-tag">My Vault</div>
+    <div class="page-headline">Saved Valuations</div>
+    <div class="page-sub">Your saved models from all 7 calculators. Export to Excel anytime.</div>
+  </div>
+  <div class="header-actions">
+    <button class="btn-export" onclick="exportExcel()">⬇ Export to Excel</button>
+    <button class="btn-clear" onclick="clearVault()">🗑 Clear Vault</button>
+  </div>
 </div>
-<footer class="footer">
-  <div class="footer-logo">Valuation<strong>Desk</strong></div>
-  <div class="footer-note">© 2025 ValuationDesk</div>
-</footer>
-<div id="toast-container"></div>
-<script src="/valuation-toolkit/assets/vd.js"></script>
+
+<div class="content">
+  <div id="vaultContent"></div>
+
+  <div class="calc-links">
+    <div class="calc-links-title">Add more valuations — open a calculator</div>
+    <div class="calc-links-grid">
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/dcf.html" class="calc-link-tile">
+        <div class="calc-link-icon">📈</div>
+        <div class="calc-link-name">DCF</div>
+        <div class="calc-link-badge">Free</div>
+      </a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/wacc.html" class="calc-link-tile">
+        <div class="calc-link-icon">⚙️</div>
+        <div class="calc-link-name">WACC Builder</div>
+        <div class="calc-link-badge">Pro</div>
+      </a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/comps.html" class="calc-link-tile">
+        <div class="calc-link-icon">📊</div>
+        <div class="calc-link-name">Trading Comps</div>
+        <div class="calc-link-badge">Pro</div>
+      </a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/ev-bridge.html" class="calc-link-tile">
+        <div class="calc-link-icon">🌉</div>
+        <div class="calc-link-name">EV Bridge</div>
+        <div class="calc-link-badge">Pro</div>
+      </a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/sotp.html" class="calc-link-tile">
+        <div class="calc-link-icon">🧩</div>
+        <div class="calc-link-name">SOTP</div>
+        <div class="calc-link-badge">Pro</div>
+      </a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/football-field.html" class="calc-link-tile">
+        <div class="calc-link-icon">🏈</div>
+        <div class="calc-link-name">Football Field</div>
+        <div class="calc-link-badge">Pro</div>
+      </a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/nav.html" class="calc-link-tile">
+        <div class="calc-link-icon">🏦</div>
+        <div class="calc-link-name">NAV</div>
+        <div class="calc-link-badge">Pro</div>
+      </a>
+      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/" class="calc-link-tile">
+        <div class="calc-link-icon">🧮</div>
+        <div class="calc-link-name">All Calculators</div>
+        <div class="calc-link-badge">Hub</div>
+      </a>
+    </div>
+  </div>
+</div>
+
 <script>
-function renderVault() {
-  const all = VD.vault.getAll();
-  const list = document.getElementById('vault-list');
-  const empty = document.getElementById('vault-empty');
-  if (all.length === 0) { list.innerHTML=''; empty.style.display='block'; }
-  else {
-    empty.style.display='none';
-    list.innerHTML = all.map(item => `
-      <div class="vault-item">
-        <div style="display:flex;align-items:center;gap:0.75rem;flex:1;">
-          <div style="width:32px;height:32px;background:var(--gray-100);border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;color:var(--gray-500);flex-shrink:0;">${item.type.slice(0,3).toUpperCase()}</div>
-          <div>
-            <div style="font-size:0.88rem;font-weight:600;">${item.type}${item.company ? ' — ' + item.company : ''}</div>
-            <div style="font-size:0.75rem;color:var(--gray-400);">${item.domain} · Saved ${item.savedAt}</div>
-          </div>
-        </div>
-        <div style="display:flex;align-items:center;gap:1rem;">
-          <div style="font-size:1rem;font-weight:700;">${item.value || '—'}</div>
-          <button onclick="VD.vault.delete(${item.id}); renderVault();" style="font-size:0.72rem;color:var(--gray-400);background:none;border:none;cursor:pointer;padding:0.25rem;">✕</button>
-        </div>
-      </div>`).join('');
-  }
-  document.getElementById('vs-total').textContent = all.length;
-  document.getElementById('vs-dcf').textContent = all.filter(i=>i.type==='DCF').length;
-  document.getElementById('vs-comps').textContent = all.filter(i=>i.type==='Comps').length;
-  document.getElementById('vs-other').textContent = all.filter(i=>!['DCF','Comps'].includes(i.type)).length;
+function loadVault() {
+  return JSON.parse(localStorage.getItem('vd_vault') || '[]');
 }
 
-function exportAllToExcel() {
-  const all = VD.vault.getAll();
-  if (!all.length) { toast('Vault is empty', 'error'); return; }
-  const wb = XLSX.utils.book_new();
-  const rows = [['Type','Company','Value','Domain','Saved On'], ...all.map(i=>[i.type,i.company||'—',i.value||'—',i.domain,i.savedAt])];
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(rows), 'Valuation Vault');
-  XLSX.writeFile(wb, 'ValuationDesk_Vault.xlsx');
-  toast('Exported to Excel!', 'success');
+function saveVault(data) {
+  localStorage.setItem('vd_vault', JSON.stringify(data));
+}
+
+function methodBadge(type) {
+  const map = { DCF:'method-dcf', WACC:'method-wacc', Comps:'method-comps', NAV:'method-nav', SOTP:'method-sotp', 'Football Field':'method-ff', 'EV Bridge':'method-bridge' };
+  return `<span class="method-badge ${map[type] || 'method-dcf'}">${type}</span>`;
+}
+
+function formatVal(v) {
+  if (v === undefined || v === null || v === '') return '—';
+  return v;
+}
+
+function pctClass(cur, target) {
+  if (!cur || !target) return '';
+  const t = parseFloat(target), c = parseFloat(cur);
+  if (isNaN(t) || isNaN(c)) return '';
+  return t > c ? 'upside' : t < c ? 'downside' : '';
+}
+
+function calcUpside(cur, target) {
+  const t = parseFloat(target), c = parseFloat(cur);
+  if (isNaN(t) || isNaN(c) || c === 0) return '—';
+  const pct = ((t - c) / c * 100).toFixed(1);
+  return `${pct > 0 ? '+' : ''}${pct}%`;
+}
+
+function render() {
+  const vault = loadVault();
+  const el = document.getElementById('vaultContent');
+
+  if (vault.length === 0) {
+    el.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">🗄️</div>
+        <div class="empty-title">Your Vault is empty</div>
+        <div class="empty-sub">Run any calculator and hit "Save to Vault" to store your valuation here. All 7 calculators support vault saving.</div>
+        <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/dcf.html" class="empty-btn">Run your first DCF →</a>
+      </div>`;
+    return;
+  }
+
+  const methods = [...new Set(vault.map(v => v.type))];
+  const upsides = vault.filter(v => {
+    const t = parseFloat(v.intrinsic || v.wacc || v.nav || 0);
+    const c = parseFloat(v.current || 0);
+    return t > c;
+  }).length;
+
+  el.innerHTML = `
+    <div class="vault-summary">
+      <div class="vault-stat"><div class="vault-stat-lbl">Saved Models</div><div class="vault-stat-val">${vault.length}</div></div>
+      <div class="vault-stat"><div class="vault-stat-lbl">Companies</div><div class="vault-stat-val">${[...new Set(vault.map(v => v.company))].length}</div></div>
+      <div class="vault-stat"><div class="vault-stat-lbl">Methods Used</div><div class="vault-stat-val">${methods.length}</div></div>
+      <div class="vault-stat"><div class="vault-stat-lbl">Showing Upside</div><div class="vault-stat-val" style="color:var(--green)">${upsides} / ${vault.length}</div></div>
+    </div>
+    <div class="vault-table-wrap">
+      <table class="vault-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th style="text-align:left">Company</th>
+            <th style="text-align:left">Method</th>
+            <th>Implied Value</th>
+            <th>Current Price</th>
+            <th>Upside / Downside</th>
+            <th>Date Saved</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="vaultRows"></tbody>
+      </table>
+    </div>
+    <div class="vault-footer">Saved in browser localStorage. Clear browser data will remove all entries. Export to Excel to keep a permanent copy.</div>`;
+
+  const tbody = document.getElementById('vaultRows');
+  vault.forEach((item, i) => {
+    const impliedVal = item.intrinsic || item.wacc || item.nav || item.implied || '—';
+    const curPrice = item.current || '—';
+    const upside = calcUpside(curPrice, impliedVal);
+    const uCls = parseFloat(impliedVal) > parseFloat(curPrice) ? 'upside' : 'downside';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="color:var(--muted);font-family:var(--mono);font-size:12px">${i+1}</td>
+      <td><div style="font-weight:700">${item.company || '—'}</div><div style="font-size:11px;color:var(--muted);font-family:var(--mono)">${item.ticker || ''}</div></td>
+      <td>${methodBadge(item.type || 'DCF')}</td>
+      <td>${impliedVal !== '—' ? impliedVal : '—'}</td>
+      <td>${curPrice}</td>
+      <td class="${uCls}" style="font-weight:700">${upside}</td>
+      <td style="font-size:12px;color:var(--muted)">${item.date || '—'}</td>
+      <td><button class="del-btn" onclick="deleteEntry(${i})">Delete</button></td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function deleteEntry(idx) {
+  const vault = loadVault();
+  vault.splice(idx, 1);
+  saveVault(vault);
+  render();
 }
 
 function clearVault() {
-  if (confirm('Clear all saved models? This cannot be undone.')) {
-    localStorage.removeItem('vd_vault_v2');
-    renderVault();
-    toast('Vault cleared', 'info');
-  }
+  if (!confirm('Clear all saved valuations from Vault? This cannot be undone.')) return;
+  localStorage.removeItem('vd_vault');
+  render();
 }
 
-document.addEventListener('DOMContentLoaded', renderVault);
+function exportExcel() {
+  const vault = loadVault();
+  if (vault.length === 0) { alert('Vault is empty — nothing to export.'); return; }
+  const ws_data = [
+    ['Company', 'Ticker', 'Method', 'Implied Value', 'Current Price', 'Upside/Downside', 'Date Saved'],
+    ...vault.map(v => {
+      const iv = v.intrinsic || v.wacc || v.nav || v.implied || '';
+      const cur = v.current || '';
+      const upside = iv && cur ? (((parseFloat(iv) - parseFloat(cur)) / parseFloat(cur)) * 100).toFixed(1) + '%' : '';
+      return [v.company, v.ticker || '', v.type, iv, cur, upside, v.date || ''];
+    })
+  ];
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.aoa_to_sheet(ws_data);
+  ws['!cols'] = [{ wch: 24 }, { wch: 12 }, { wch: 16 }, { wch: 16 }, { wch: 16 }, { wch: 16 }, { wch: 14 }];
+  XLSX.utils.book_append_sheet(wb, ws, 'My Vault');
+  XLSX.writeFile(wb, `ValuationDesk_Vault_${new Date().toISOString().split('T')[0]}.xlsx`);
+}
+
+render();
 </script>
 </body>
 </html>
