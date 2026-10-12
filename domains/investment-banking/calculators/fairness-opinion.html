@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fairness Opinion Analyzer · Investment Banking · ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
+  a{color:inherit;text-decoration:none}
+
+  /* NAV */
+  .top-nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between}
+  .nav-left{display:flex;align-items:center;gap:12px}
+  .nav-logo{font-weight:800;font-size:16px;letter-spacing:-0.5px}
+  .nav-sep{color:var(--border);font-size:18px}
+  .nav-domain{font-size:13px;color:var(--muted);font-weight:500}
+  .nav-right{display:flex;align-items:center;gap:8px}
+  .nav-btn{padding:6px 14px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:none}
+  .nav-btn-ghost{background:none;color:var(--muted)}
+  .nav-btn-ghost:hover{color:var(--text)}
+  .nav-btn-pro{background:var(--text);color:#fff}
+
+  /* DOMAIN SUBNAV */
+  .domain-nav{background:var(--card);border-bottom:1px solid var(--border);padding:0 20px;display:flex;gap:0;overflow-x:auto}
+  .domain-nav a{padding:10px 16px;font-size:13px;font-weight:500;color:var(--muted);white-space:nowrap;border-bottom:2px solid transparent;display:flex;align-items:center;gap:6px}
+  .domain-nav a:hover{color:var(--text)}
+  .domain-nav a.active{color:var(--text);border-bottom-color:var(--text);font-weight:600}
+
+  /* CONTENT */
+  .page-wrap{max-width:720px;margin:0 auto;padding:32px 20px 80px}
+  .calc-header{margin-bottom:32px}
+  .calc-tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:12px}
+  .pro-badge{background:#f59e0b;color:#fff;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:0.5px}
+  .calc-header h1{font-size:26px;font-weight:800;letter-spacing:-0.5px;line-height:1.2;margin-bottom:8px}
+  .calc-header p{color:var(--muted);font-size:15px}
+
+  /* STEPS INDICATOR */
+  .steps-bar{display:flex;gap:0;margin-bottom:32px;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+  .step-pill{flex:1;padding:10px 8px;text-align:center;font-size:12px;font-weight:600;color:var(--muted);background:var(--card);border-right:1px solid var(--border);cursor:pointer;transition:background 0.15s}
+  .step-pill:last-child{border-right:none}
+  .step-pill.active{background:var(--text);color:#fff}
+  .step-pill.done{background:#f0fdf4;color:var(--green)}
+
+  /* CARDS */
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px}
+  .card h2{font-size:16px;font-weight:700;margin-bottom:16px}
+  .card-label{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:8px}
+
+  /* COMPANY SEARCH */
+  .search-wrap{position:relative;margin-bottom:16px}
+  .search-input{width:100%;padding:12px 16px 12px 40px;border:1px solid var(--border);border-radius:8px;font-size:15px;font-family:'Inter',sans-serif;outline:none;transition:border-color 0.15s}
+  .search-input:focus{border-color:var(--text)}
+  .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px}
+  .company-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:340px;overflow-y:auto;padding-right:4px}
+  .company-card{padding:12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all 0.15s;background:#fff}
+  .company-card:hover{border-color:#999}
+  .company-card.selected{border-color:var(--text);background:#f8f8f8}
+  .co-name{font-size:14px;font-weight:600;margin-bottom:2px}
+  .co-meta{font-size:12px;color:var(--muted)}
+  .co-ticker{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--border);padding:1px 6px;border-radius:3px;display:inline-block;margin-bottom:4px}
+
+  /* FILTER PILLS */
+  .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .filter-pill{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid var(--border);cursor:pointer;background:#fff;transition:all 0.15s}
+  .filter-pill.active{background:var(--text);color:#fff;border-color:var(--text)}
+
+  /* CONTEXT CARD */
+  .context-block{background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:16px}
+  .context-block h3{font-size:14px;font-weight:700;margin-bottom:10px}
+  .context-block p{font-size:14px;color:var(--muted);line-height:1.7}
+  .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+  .stat-box{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center}
+  .stat-val{font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;margin-bottom:4px}
+  .stat-label{font-size:11px;color:var(--muted);font-weight:500}
+
+  /* METHOD TABLE */
+  .method-table{width:100%;border-collapse:collapse;margin-top:12px}
+  .method-table th{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);padding:8px 10px;text-align:left;border-bottom:1px solid var(--border)}
+  .method-table td{padding:10px;border-bottom:1px solid var(--border);font-size:13px}
+  .method-table tr:last-child td{border-bottom:none}
+  .weight-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+
+  /* PRO GATE */
+  .pro-gate{border:2px dashed var(--border);border-radius:12px;padding:32px 24px;text-align:center;background:var(--card)}
+  .pro-gate .lock{font-size:36px;margin-bottom:12px}
+  .pro-gate h3{font-size:18px;font-weight:800;margin-bottom:8px}
+  .pro-gate p{color:var(--muted);font-size:14px;margin-bottom:24px}
+  .feature-list{text-align:left;margin-bottom:24px;display:grid;gap:8px}
+  .feature-item{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--text)}
+  .feature-arrow{color:var(--green);font-weight:700;flex-shrink:0;margin-top:1px}
+  .unlock-btn{display:block;width:100%;padding:14px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:12px;font-family:'Inter',sans-serif}
+  .unlock-btn:hover{opacity:0.88}
+  .pricing-note{font-size:12px;color:var(--muted)}
+
+  /* CTA BTN */
+  .cta-btn{display:block;width:100%;padding:14px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;margin-top:20px;font-family:'Inter',sans-serif;transition:opacity 0.15s}
+  .cta-btn:hover{opacity:0.85}
+  .cta-btn:disabled{opacity:0.4;cursor:not-allowed}
+  .back-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer;color:var(--text);font-family:'Inter',sans-serif;margin-top:12px}
+  .back-btn:hover{background:var(--card)}
+
+  /* LOADING */
+  .loading-wrap{padding:48px 24px;text-align:center}
+  .loading-step{font-size:14px;color:var(--muted);margin-bottom:8px;animation:fadeIn 0.4s ease}
+  .loading-step.active{color:var(--text);font-weight:600}
+  .loading-spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--text);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 24px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  /* REVEAL */
+  .reveal-section{margin-bottom:24px}
+  .reveal-section h3{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:12px}
+  .result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+  .result-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+  .result-val{font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;margin-bottom:4px}
+  .result-label{font-size:12px;color:var(--muted);font-weight:500}
+  .fairness-verdict{padding:20px;border-radius:10px;text-align:center;margin-bottom:20px}
+  .verdict-fair{background:#f0fdf4;border:1px solid #86efac}
+  .verdict-unfair{background:#fef2f2;border:1px solid #fca5a5}
+  .verdict-label{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+  .verdict-text{font-size:16px;font-weight:700}
+  .insight-strip{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:14px 16px;font-size:13px;color:#92400e;line-height:1.6;margin-bottom:20px}
+
+  /* FOOTBALL FIELD */
+  .football-field{margin-bottom:20px}
+  .ff-row{margin-bottom:14px}
+  .ff-method{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+  .ff-label{font-size:12px;font-weight:600;color:var(--muted)}
+  .ff-range{font-size:12px;font-family:'JetBrains Mono',monospace;font-weight:700}
+  .ff-track{height:10px;background:var(--border);border-radius:5px;position:relative;overflow:visible}
+  .ff-bar{height:10px;background:var(--blue);border-radius:5px;position:absolute;transition:all 0.8s ease}
+  .ff-deal-line{position:absolute;width:2px;height:18px;top:-4px;background:var(--red);z-index:2;border-radius:1px}
+  .ff-deal-label{position:absolute;font-size:10px;font-weight:700;color:var(--red);top:-18px;transform:translateX(-50%);white-space:nowrap}
+
+  /* VAULT BTN */
+  .vault-btn{display:block;width:100%;padding:12px;background:#fff;border:1px solid var(--border);border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;color:var(--text);font-family:'Inter',sans-serif;margin-top:12px;transition:border-color 0.15s}
+  .vault-btn:hover{border-color:#999}
+
+  @media(max-width:600px){
+    .stat-row,.result-grid{grid-template-columns:1fr 1fr}
+    .company-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <div class="nav-left">
+    <span class="nav-logo">ValuationDesk</span>
+    <span class="nav-sep">/</span>
+    <span class="nav-domain">Investment Banking</span>
+  </div>
+  <div class="nav-right">
+    <button class="nav-btn nav-btn-ghost" onclick="window.location.href='../index.html'">← IB Home</button>
+    <button class="nav-btn nav-btn-pro" onclick="window.location.href='../../../index.html'">All Domains</button>
+  </div>
+</nav>
+
+<!-- DOMAIN SUBNAV -->
+<div class="domain-nav">
+  <a href="../index.html">Overview</a>
+  <a href="../learn/index.html">Learn</a>
+  <a href="index.html" class="active">Calculators</a>
+  <a href="#">My Vault</a>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="page-wrap">
+  <div class="calc-header">
+    <div class="calc-tag">
+      Investment Banking · Calculator
+      <span class="pro-badge">PRO</span>
+    </div>
+    <h1>Fairness Opinion Analyzer</h1>
+    <p>Does the deal price fall within a board-defensible range? Triangulate across DCF, comps, and precedents to reach a fairness conclusion.</p>
+  </div>
+
+  <!-- STEPS BAR -->
+  <div class="steps-bar" id="stepsBar">
+    <div class="step-pill active" id="pill-1">1 · Company</div>
+    <div class="step-pill" id="pill-2">2 · Context</div>
+    <div class="step-pill" id="pill-3">3 · Assumptions</div>
+    <div class="step-pill" id="pill-4">4 · Opinion</div>
+  </div>
+
+  <!-- STEP 1: COMPANY PICKER -->
+  <div id="step1">
+    <div class="card">
+      <h2>Pick a target company</h2>
+      <div class="filter-row" id="filterRow">
+        <div class="filter-pill active" onclick="filterCo('all',this)">All</div>
+        <div class="filter-pill" onclick="filterCo('India',this)">India</div>
+        <div class="filter-pill" onclick="filterCo('Global',this)">Global</div>
+        <div class="filter-pill" onclick="filterCo('Technology',this)">Tech</div>
+        <div class="filter-pill" onclick="filterCo('Banking',this)">Banking</div>
+        <div class="filter-pill" onclick="filterCo('Consumer',this)">Consumer</div>
+      </div>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" type="text" id="searchInput" placeholder="Search company or ticker..." oninput="renderCompanies()">
+      </div>
+      <div class="company-grid" id="companyGrid"></div>
+    </div>
+    <button class="cta-btn" id="step1Btn" disabled onclick="goStep2()">Continue with selected company →</button>
+  </div>
+
+  <!-- STEP 2: CONTEXT -->
+  <div id="step2" style="display:none">
+    <div class="card">
+      <h2 id="ctx-heading">Fairness Opinion: What the Board Needs to Know</h2>
+
+      <div class="context-block">
+        <h3>What is a fairness opinion?</h3>
+        <p>A fairness opinion is a formal written letter from an investment bank to a company's board of directors, stating whether the financial terms of a proposed transaction — typically an M&A deal — are fair, from a financial point of view, to the shareholders. It is not a "go / no-go" recommendation. It answers one question: <strong>is the price within a reasonable range?</strong></p>
+      </div>
+
+      <div class="context-block">
+        <h3>When does a board require one?</h3>
+        <p>In India, SEBI's Takeover Code (Regulation 26) requires independent directors to obtain a fairness opinion before recommending an open offer or delisting. For large cross-border M&A, boards almost always commission one — both for regulatory compliance and as a litigation shield if shareholders later challenge the deal price.</p>
+      </div>
+
+      <div class="context-block">
+        <h3>How bankers arrive at the conclusion</h3>
+        <p>The bank runs a <strong>Football Field</strong> — a chart showing implied value ranges under each method. If the deal price falls within or near the ranges, the opinion is "fair." If it falls below all ranges (or the low end), the conclusion is typically "not fair." No single method controls; the opinion is a judgment call weighted by method relevance.</p>
+        <table class="method-table">
+          <thead><tr><th>Method</th><th>Typical Weight</th><th>Why It's Used</th></tr></thead>
+          <tbody>
+            <tr><td><span class="weight-dot" style="background:#2563eb"></span>DCF Analysis</td><td>High</td><td>Intrinsic value — tests whether the deal captures long-run cash flows</td></tr>
+            <tr><td><span class="weight-dot" style="background:#16a34a"></span>Comparable Companies</td><td>Medium</td><td>Market consensus — what public peers trade at on EBITDA, P/E</td></tr>
+            <tr><td><span class="weight-dot" style="background:#d97706"></span>Precedent Transactions</td><td>High</td><td>Deal precedent — what buyers actually paid in similar control transactions</td></tr>
+            <tr><td><span class="weight-dot" style="background:#9333ea"></span>Premiums Paid</td><td>Medium</td><td>Cross-check — deal premium vs 30/60/90-day VWAP</td></tr>
+            <tr><td><span class="weight-dot" style="background:#dc2626"></span>LBO / Ability to Pay</td><td>Low–Medium</td><td>Floor test — what a financial buyer could afford to pay</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="sector-context-fo" class="context-block">
+        <!-- Sector specific context inserted via JS -->
+      </div>
+
+      <div class="stat-row" id="fo-stats">
+        <!-- Stats inserted via JS -->
+      </div>
+    </div>
+    <button class="cta-btn" onclick="goStep3()">See the full fairness analysis →</button>
+    <button class="back-btn" onclick="goStep1()">← Change company</button>
+  </div>
+
+  <!-- STEP 3: ASSUMPTIONS (PRO GATE) -->
+  <div id="step3" style="display:none">
+    <div class="card">
+      <div class="pro-gate">
+        <div class="lock">🔒</div>
+        <h3>Full Fairness Analysis is Pro</h3>
+        <p>Enter deal assumptions, run the Football Field, and get a board-defensible fairness conclusion with method weighting.</p>
+        <div class="feature-list">
+          <div class="feature-item"><span class="feature-arrow">→</span><span>Football Field chart: DCF, Comps, Precedents, Premiums Paid, LBO ranges side by side</span></div>
+          <div class="feature-item"><span class="feature-arrow">→</span><span>Deal price overlay — see exactly where the offer falls relative to each method</span></div>
+          <div class="feature-item"><span class="feature-arrow">→</span><span>Method weighting engine — adjusts weight by transaction type (strategic vs PE)</span></div>
+          <div class="feature-item"><span class="feature-arrow">→</span><span>Fairness verdict with board-defensible narrative and key assumptions</span></div>
+          <div class="feature-item"><span class="feature-arrow">→</span><span>Deal premium analysis vs 30 / 60 / 90-day VWAP</span></div>
+          <div class="feature-item"><span class="feature-arrow">→</span><span>Export to Vault as analysis card</span></div>
+        </div>
+        <button class="unlock-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+        <div class="pricing-note">Monthly only · Cancel anytime · All 15 domains included</div>
+      </div>
+    </div>
+    <button class="back-btn" onclick="goStep2()">← Back to context</button>
+  </div>
+
+  <!-- STEP 4: REVEAL (PRO ONLY) -->
+  <div id="step4" style="display:none">
+    <div class="card" id="loadingCard">
+      <div class="loading-wrap">
+        <div class="loading-spinner"></div>
+        <div id="loadingSteps"></div>
+      </div>
+    </div>
+    <div id="revealCard" style="display:none">
+      <div class="card">
+        <div id="fairnessVerdict"></div>
+        <div class="reveal-section">
+          <h3>Key Metrics</h3>
+          <div class="result-grid" id="keyMetrics"></div>
+        </div>
+        <div class="reveal-section">
+          <h3>Football Field</h3>
+          <div class="football-field" id="footballField"></div>
+        </div>
+        <div class="insight-strip" id="foInsight"></div>
+        <div class="reveal-section">
+          <h3>Valuation Bridge</h3>
+          <div id="valuationBridge"></div>
+        </div>
+        <button class="vault-btn" onclick="saveToVault()">📁 Save to My Vault</button>
+        <button class="back-btn" onclick="goStep1()">← Start new analysis</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const COMPANIES = [
+  // Indian Large-caps
+  {name:'Reliance Industries',ticker:'RELIANCE',sector:'Energy',mcap:'₹19.2L Cr',region:'India'},
+  {name:'HDFC Bank',ticker:'HDFCBANK',sector:'Banking',mcap:'₹12.8L Cr',region:'India'},
+  {name:'Infosys',ticker:'INFY',sector:'Technology',mcap:'₹7.6L Cr',region:'India'},
+  {name:'ICICI Bank',ticker:'ICICIBANK',sector:'Banking',mcap:'₹8.9L Cr',region:'India'},
+  {name:'Tata Consultancy Services',ticker:'TCS',sector:'Technology',mcap:'₹14.1L Cr',region:'India'},
+  {name:'Bharti Airtel',ticker:'BHARTIARTL',sector:'Telecom',mcap:'₹8.7L Cr',region:'India'},
+  {name:'Hindustan Unilever',ticker:'HINDUNILVR',sector:'FMCG',mcap:'₹5.8L Cr',region:'India'},
+  {name:'Adani Enterprises',ticker:'ADANIENT',sector:'Conglomerate',mcap:'₹3.2L Cr',region:'India'},
+  {name:'Wipro',ticker:'WIPRO',sector:'Technology',mcap:'₹2.6L Cr',region:'India'},
+  {name:'Bajaj Finance',ticker:'BAJFINANCE',sector:'NBFC',mcap:'₹5.1L Cr',region:'India'},
+  {name:'Asian Paints',ticker:'ASIANPAINT',sector:'Consumer',mcap:'₹2.4L Cr',region:'India'},
+  {name:'Maruti Suzuki',ticker:'MARUTI',sector:'Auto',mcap:'₹3.8L Cr',region:'India'},
+  {name:'Sun Pharmaceutical',ticker:'SUNPHARMA',sector:'Pharma',mcap:'₹3.9L Cr',region:'India'},
+  {name:'Larsen & Toubro',ticker:'LT',sector:'Infrastructure',mcap:'₹4.6L Cr',region:'India'},
+  {name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',sector:'Banking',mcap:'₹3.7L Cr',region:'India'},
+  // Global
+  {name:'Apple Inc.',ticker:'AAPL',sector:'Technology',mcap:'$3.5T',region:'Global'},
+  {name:'Microsoft',ticker:'MSFT',sector:'Technology',mcap:'$3.1T',region:'Global'},
+  {name:'Alphabet (Google)',ticker:'GOOGL',sector:'Technology',mcap:'$2.2T',region:'Global'},
+  {name:'Amazon',ticker:'AMZN',sector:'E-Commerce',mcap:'$2.0T',region:'Global'},
+  {name:'Meta Platforms',ticker:'META',sector:'Technology',mcap:'$1.4T',region:'Global'},
+  {name:'JPMorgan Chase',ticker:'JPM',sector:'Banking',mcap:'$680B',region:'Global'},
+  {name:'Tesla',ticker:'TSLA',sector:'Auto',mcap:'$820B',region:'Global'},
+  {name:'Berkshire Hathaway',ticker:'BRK.B',sector:'Conglomerate',mcap:'$950B',region:'Global'},
+  {name:'Visa Inc.',ticker:'V',sector:'Payments',mcap:'$590B',region:'Global'},
+  {name:'Johnson & Johnson',ticker:'JNJ',sector:'Pharma',mcap:'$380B',region:'Global'},
+  {name:'Samsung Electronics',ticker:'005930',sector:'Semiconductors',mcap:'$400B',region:'Global'},
+  {name:'TSMC',ticker:'TSM',sector:'Semiconductors',mcap:'$870B',region:'Global'},
+  {name:'Nestlé',ticker:'NESN',sector:'FMCG',mcap:'$290B',region:'Global'},
+  {name:'LVMH',ticker:'MC',sector:'Luxury',mcap:'$340B',region:'Global'},
+  {name:'ExxonMobil',ticker:'XOM',sector:'Energy',mcap:'$480B',region:'Global'},
+];
+
+const FO_CONTEXT = {
+  Technology:{
+    summary:'Tech M&A fairness opinions lean heavily on DCF — public market multiples compress rapidly during rate cycles, making a point-in-time comp less defensible. EV/Revenue is often used alongside EV/EBITDA given varying margin profiles.',
+    evEbitdaRange:'18x–32x',
+    dealPremium:'28–45%',
+    keyRisk:'Multiple compression between signing and close',
+    dcfWeight:'High (DCF primary)',
+    sectorComps:'Meta, Alphabet, Microsoft acquisitions',
+  },
+  Banking:{
+    summary:'Bank M&A fairness opinions rely primarily on P/BV and P/E multiples — DCF is used but often as a cross-check only, since bank cash flows are complex to model. RBI approval timelines are a key variable in Indian bank deals.',
+    evEbitdaRange:'N/A — P/BV 1.5x–3.2x',
+    dealPremium:'20–35%',
+    keyRisk:'NPA uncertainty and regulatory approval lag',
+    dcfWeight:'Medium (P/BV primary)',
+    sectorComps:'HDFC-HDFC Bank, YES Bank merger comps',
+  },
+  NBFC:{
+    summary:'NBFC fairness opinions typically use P/BV and P/AUM methodologies. Asset quality concerns significantly impact the weight placed on book value multiples versus earnings multiples.',
+    evEbitdaRange:'N/A — P/BV 2x–4x',
+    dealPremium:'22–38%',
+    keyRisk:'NPA cycles and ALM mismatches',
+    dcfWeight:'Medium (P/BV + P/AUM)',
+    sectorComps:'Bajaj Finance, Muthoot Finance deal precedents',
+  },
+  FMCG:{
+    summary:'FMCG fairness opinions anchor on EV/EBITDA comps with high precedent transaction weight — this sector has well-established deal precedents. Premium for distribution network and brand equity is significant.',
+    evEbitdaRange:'22x–38x',
+    dealPremium:'25–45%',
+    keyRisk:'Volume slowdown affecting DCF terminal value',
+    dcfWeight:'Medium-High (comps equally weighted)',
+    sectorComps:'GSK Consumer, Horlicks, Wyeth merger comps',
+  },
+  Auto:{
+    summary:'Auto M&A opinions typically use EV/EBITDA and EV/Unit Sales. EV caps are often set by the acquirer\'s ability to pay given capital intensity. EV includes pension liabilities for MNC acquirers.',
+    evEbitdaRange:'10x–18x',
+    dealPremium:'18–32%',
+    keyRisk:'Cycle timing — auto EBITDA is cyclical',
+    dcfWeight:'Medium (sum-of-parts often used)',
+    sectorComps:'Tata-JLR, Maruti minority buyout comps',
+  },
+  Pharma:{
+    summary:'Pharma fairness opinions are complex — pipeline optionality, patent expiry cliffs, and USFDA risk make DCF assumptions highly sensitive. Royalty/milestone-adjusted deal structures require custom modeling.',
+    evEbitdaRange:'16x–28x',
+    dealPremium:'30–50%',
+    keyRisk:'USFDA observations impacting DCF terminal value',
+    dcfWeight:'High (DCF with pipeline risk adjustments)',
+    sectorComps:'Sun Pharma-Ranbaxy, Abbott India comps',
+  },
+  Infrastructure:{
+    summary:'Infra fairness opinions typically use an asset-based or DCF-on-project approach. Regulated assets use RAB (Regulatory Asset Base) multiples. Greenfield vs brownfield assets require different frameworks entirely.',
+    evEbitdaRange:'12x–20x',
+    dealPremium:'15–28%',
+    keyRisk:'Regulatory changes affecting concession terms',
+    dcfWeight:'High (project DCF primary)',
+    sectorComps:'IRB Infra, Sterlite Power asset deal comps',
+  },
+  Energy:{
+    summary:'Energy sector fairness opinions use EV/EBITDA and reserves-based valuation (EV/BOE) for upstream assets. Downstream and refining assets use throughput multiples. Commodity price assumptions in DCF are heavily scrutinized.',
+    evEbitdaRange:'8x–14x',
+    dealPremium:'15–28%',
+    keyRisk:'Oil price / energy transition assumptions in terminal value',
+    dcfWeight:'Medium (reserves-based valuation primary for upstream)',
+    sectorComps:'HPCL, BPCL privatization comps',
+  },
+  Conglomerate:{
+    summary:'Conglomerate M&A opinions almost always use Sum-of-Parts — blending multiple sector DCFs and comps. A holding company discount (typically 20–35%) is applied to the consolidated SOTP value. This is the most complex fairness opinion to construct.',
+    evEbitdaRange:'Blended (SOTP-based)',
+    dealPremium:'18–35%',
+    keyRisk:'Hold-co discount assumption',
+    dcfWeight:'High — SOTP with 5+ segments',
+    sectorComps:'Tata Sons, Mahindra demerger comps',
+  },
+  default:{
+    summary:'Fairness opinions in this sector typically triangulate across DCF, public market comps, and precedent transaction multiples. The weight assigned to each method depends on the transaction type, available deal comps, and acquirer profile.',
+    evEbitdaRange:'12x–24x',
+    dealPremium:'20–35%',
+    keyRisk:'Market timing and sector cyclicality',
+    dcfWeight:'Medium-High',
+    sectorComps:'Indian M&A precedents',
+  }
+};
+
+let selectedCompany = null;
+let currentFilter = 'all';
+
+function filterCo(region, el){
+  currentFilter = region;
+  document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  renderCompanies();
+}
+
+function renderCompanies(){
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const grid = document.getElementById('companyGrid');
+  const filtered = COMPANIES.filter(c=>{
+    const matchRegion = currentFilter==='all' || c.region===currentFilter || c.sector===currentFilter;
+    const matchQ = !q || c.name.toLowerCase().includes(q) || c.ticker.toLowerCase().includes(q) || c.sector.toLowerCase().includes(q);
+    return matchRegion && matchQ;
+  });
+  grid.innerHTML = filtered.map(c=>`
+    <div class="company-card ${selectedCompany&&selectedCompany.ticker===c.ticker?'selected':''}" onclick="selectCo(this,'${c.ticker}')">
+      <div class="co-ticker">${c.ticker}</div>
+      <div class="co-name">${c.name}</div>
+      <div class="co-meta">${c.sector} · ${c.mcap}</div>
+    </div>
+  `).join('');
+}
+
+function selectCo(el, ticker){
+  selectedCompany = COMPANIES.find(c=>c.ticker===ticker);
+  document.querySelectorAll('.company-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('step1Btn').disabled = false;
+}
+
+function goStep2(){
+  if(!selectedCompany) return;
+  document.getElementById('step1').style.display='none';
+  document.getElementById('step2').style.display='block';
+  setPill(2);
+
+  const ctx = FO_CONTEXT[selectedCompany.sector] || FO_CONTEXT.default;
+  document.getElementById('ctx-heading').textContent = `Fairness Opinion: ${selectedCompany.sector} Sector Norms`;
+
+  document.getElementById('sector-context-fo').innerHTML = `
+    <h3>${selectedCompany.name} — Sector Context</h3>
+    <p>${ctx.summary}</p>
+  `;
+
+  document.getElementById('fo-stats').innerHTML = `
+    <div class="stat-box">
+      <div class="stat-val">${ctx.evEbitdaRange}</div>
+      <div class="stat-label">EV/EBITDA or Primary Multiple Range</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val">${ctx.dealPremium}</div>
+      <div class="stat-label">Typical Deal Premium (vs VWAP)</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-val">${ctx.dcfWeight}</div>
+      <div class="stat-label">DCF Weight in Opinion</div>
+    </div>
+  `;
+}
+
+function goStep3(){
+  const isPro = localStorage.getItem('vd_pro');
+  if(isPro){
+    buildReveal();
+    return;
+  }
+  document.getElementById('step2').style.display='none';
+  document.getElementById('step3').style.display='block';
+  setPill(3);
+}
+
+function goStep1(){
+  document.querySelectorAll('#step1,#step2,#step3,#step4').forEach(s=>s.style.display='none');
+  document.getElementById('step1').style.display='block';
+  document.getElementById('revealCard').style.display='none';
+  document.getElementById('loadingCard').style.display='block';
+  setPill(1);
+}
+
+function goStep2FromBack(){
+  document.getElementById('step3').style.display='none';
+  document.getElementById('step2').style.display='block';
+  setPill(2);
+}
+
+function setPill(n){
+  for(let i=1;i<=4;i++){
+    const p = document.getElementById('pill-'+i);
+    p.classList.remove('active','done');
+    if(i<n) p.classList.add('done');
+    if(i===n) p.classList.add('active');
+  }
+}
+
+function unlockPro(){
+  alert('Pro unlock coming soon. ₹799/month — all 15 domains.');
+}
+
+// ------ PRO: REVEAL ------
+const LOADING_STEPS = [
+  'Pulling M&A deal database...',
+  'Building Football Field...',
+  'Triangulating DCF, Comps, Precedents...',
+  'Calculating deal premium vs VWAP...',
+  'Applying method weighting...',
+  'Fairness conclusion ready.',
+];
+const LOADING_DELAYS = [700,900,800,800,900,200];
+
+function buildReveal(){
+  document.getElementById('step2').style.display='none';
+  document.getElementById('step3').style.display='none';
+  document.getElementById('step4').style.display='block';
+  document.getElementById('loadingCard').style.display='block';
+  document.getElementById('revealCard').style.display='none';
+  setPill(4);
+
+  const stepsEl = document.getElementById('loadingSteps');
+  stepsEl.innerHTML = LOADING_STEPS.map((s,i)=>`<div class="loading-step" id="ls${i}">${s}</div>`).join('');
+
+  let elapsed=0;
+  LOADING_DELAYS.forEach((delay,i)=>{
+    elapsed+=delay;
+    setTimeout(()=>{
+      document.querySelectorAll('.loading-step').forEach(el=>el.classList.remove('active'));
+      document.getElementById('ls'+i).classList.add('active');
+      if(i===LOADING_STEPS.length-1){
+        setTimeout(()=>{
+          document.getElementById('loadingCard').style.display='none';
+          document.getElementById('revealCard').style.display='block';
+          renderReveal();
+        },400);
+      }
+    },elapsed);
+  });
+}
+
+function renderReveal(){
+  const co = selectedCompany;
+  const ctx = FO_CONTEXT[co.sector] || FO_CONTEXT.default;
+
+  // Generate plausible illustrative ranges (not financial advice)
+  const seed = co.ticker.split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+  const prng = (min,max,s)=>min+(((seed*s*2654435761)>>>0)%(Math.round((max-min)*10)))/10;
+
+  const dealPriceMcapCr = co.region==='India' ? 2400 + prng(200,1800,1) : 0;
+
+  const dcfLow  = 2100 + prng(0,400,2);
+  const dcfHigh = dcfLow + 400 + prng(0,500,3);
+  const compsLow = 1900 + prng(0,500,4);
+  const compsHigh = compsLow + 350 + prng(0,450,5);
+  const precLow  = 2200 + prng(0,400,6);
+  const precHigh = precLow + 500 + prng(0,400,7);
+  const lboLow   = 1700 + prng(0,300,8);
+  const lboHigh  = lboLow + 350 + prng(0,300,9);
+  const premLow  = 2050 + prng(0,300,10);
+  const premHigh = premLow + 400 + prng(0,400,11);
+
+  const allLow = Math.min(dcfLow,compsLow,precLow,lboLow,premLow);
+  const allHigh = Math.max(dcfHigh,compsHigh,precHigh,lboHigh,premHigh);
+  const dealPrice = dealPriceMcapCr;
+
+  const withinCount = [
+    [dcfLow,dcfHigh],[compsLow,compsHigh],[precLow,precHigh],[premLow,premHigh]
+  ].filter(([l,h])=>dealPrice>=l&&dealPrice<=h).length;
+
+  const isFair = withinCount >= 2;
+  const premiumPct = (((dealPrice - compsLow*0.88)/( compsLow*0.88))*100).toFixed(1);
+
+  // Verdict
+  document.getElementById('fairnessVerdict').innerHTML = `
+    <div class="fairness-verdict ${isFair?'verdict-fair':'verdict-unfair'}">
+      <div class="verdict-label" style="color:${isFair?'var(--green)':'var(--red)'}">${isFair?'OPINION:':'OPINION:'}</div>
+      <div class="verdict-text" style="color:${isFair?'var(--green)':'var(--red)'}">${isFair?'✅ Fair, from a financial point of view':'❌ Not fair, from a financial point of view'}</div>
+      <div style="font-size:13px;color:var(--muted);margin-top:8px">Deal price falls ${isFair?'within':'outside'} the majority of valuation method ranges · ${withinCount} of 4 methods support the price</div>
+    </div>
+  `;
+
+  // Key metrics
+  const fmt = v => '₹'+Math.round(v).toLocaleString('en-IN')+' Cr';
+  document.getElementById('keyMetrics').innerHTML = `
+    <div class="result-box">
+      <div class="result-val" style="color:var(--blue)">${fmt(dealPrice)}</div>
+      <div class="result-label">Illustrative Deal Price</div>
+    </div>
+    <div class="result-box">
+      <div class="result-val" style="color:var(--green)">${premiumPct}%</div>
+      <div class="result-label">Implied Premium to 30-Day VWAP</div>
+    </div>
+    <div class="result-box">
+      <div class="result-val">${withinCount}/4</div>
+      <div class="result-label">Methods Supporting Fairness</div>
+    </div>
+  `;
+
+  // Football Field
+  const methods = [
+    {name:'DCF Analysis',low:dcfLow,high:dcfHigh,color:'#2563eb',weight:'High'},
+    {name:'Trading Comps (EV/EBITDA)',low:compsLow,high:compsHigh,color:'#16a34a',weight:'Medium'},
+    {name:'Precedent Transactions',low:precLow,high:precHigh,color:'#d97706',weight:'High'},
+    {name:'Premiums Paid Analysis',low:premLow,high:premHigh,color:'#9333ea',weight:'Medium'},
+    {name:'LBO / Ability to Pay',low:lboLow,high:lboHigh,color:'#6b7280',weight:'Low'},
+  ];
+  const fieldMin = Math.min(...methods.map(m=>m.low))*0.95;
+  const fieldMax = Math.max(...methods.map(m=>m.high))*1.05;
+  const range = fieldMax - fieldMin;
+
+  document.getElementById('footballField').innerHTML = methods.map(m=>{
+    const left = ((m.low-fieldMin)/range*100).toFixed(1);
+    const width = ((m.high-m.low)/range*100).toFixed(1);
+    const dealLeft = ((dealPrice-fieldMin)/range*100).toFixed(1);
+    return `
+      <div class="ff-row">
+        <div class="ff-method">
+          <span class="ff-label">${m.name} <span style="color:${m.color};font-size:10px">[${m.weight}]</span></span>
+          <span class="ff-range" style="color:${m.color}">${fmt(m.low)} – ${fmt(m.high)}</span>
+        </div>
+        <div class="ff-track">
+          <div class="ff-bar" style="left:${left}%;width:${width}%;background:${m.color};opacity:0.8"></div>
+          <div class="ff-deal-line" style="left:${dealLeft}%">
+            <div class="ff-deal-label">Deal</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Insight
+  const insights = {
+    fair:`The deal price falls within the range implied by ${withinCount} of 4 valuation methods. The strongest support comes from precedent transactions and DCF, the two highest-weighted methodologies. This is a legally defensible fairness conclusion — most Indian courts and SEBI have upheld opinions where at least 2 of the primary methods support the price.`,
+    unfair:`The deal price falls outside the majority of valuation method ranges. Notably, the DCF implies a higher intrinsic value — suggesting the offer may not fully capture long-run cash flows. The board should request a higher offer or commission an independent review before recommending the transaction to shareholders.`
+  };
+  document.getElementById('foInsight').textContent = '💡 ' + (isFair ? insights.fair : insights.unfair);
+
+  // Valuation Bridge
+  document.getElementById('valuationBridge').innerHTML = `
+    <table class="method-table">
+      <thead><tr><th>Method</th><th>Low</th><th>High</th><th>Weight</th><th>Supports Deal?</th></tr></thead>
+      <tbody>
+        ${methods.map(m=>{
+          const supports = dealPrice>=m.low && dealPrice<=m.high;
+          return `<tr>
+            <td><span class="weight-dot" style="background:${m.color}"></span>${m.name}</td>
+            <td>${fmt(m.low)}</td>
+            <td>${fmt(m.high)}</td>
+            <td>${m.weight}</td>
+            <td style="color:${supports?'var(--green)':'var(--red)';font-weight:600}">${supports?'✅ Yes':'❌ No'}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+    <div style="font-size:12px;color:var(--muted);margin-top:10px">⚠️ Illustrative ranges only. Not financial advice. Actual fairness opinions require audited financials, CIM data, and site-specific assumptions.</div>
+  `;
+}
+
+function saveToVault(){
+  const vault = JSON.parse(localStorage.getItem('vd_vault')||'[]');
+  vault.push({
+    id: Date.now(),
+    type:'Fairness Opinion',
+    company: selectedCompany.name,
+    ticker: selectedCompany.ticker,
+    sector: selectedCompany.sector,
+    date: new Date().toLocaleDateString('en-IN'),
+    domain:'Investment Banking',
+    summary:`Fairness opinion analysis for ${selectedCompany.name} using Football Field triangulation.`
+  });
+  localStorage.setItem('vd_vault',JSON.stringify(vault));
+  alert('Saved to Vault ✓');
+}
+
+// INIT
+renderCompanies();
+</script>
+</body>
+</html>

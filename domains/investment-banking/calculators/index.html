@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IB Calculators — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+.top-nav{border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;height:56px;gap:28px}
+.logo{font-size:17px;font-weight:700}.logo strong{font-weight:900}
+.nav-links{display:flex;gap:20px;flex:1}.nav-links a{font-size:13px;color:var(--muted);font-weight:500}.nav-links a:hover{color:var(--text)}
+.nav-cta{display:flex;gap:8px;align-items:center;margin-left:auto}
+.vault-btn{font-size:12px;font-weight:600;padding:6px 12px;border:1px solid var(--border);border-radius:6px;color:var(--text)}
+.pro-btn{font-size:12px;font-weight:700;padding:6px 14px;background:var(--text);color:#fff;border-radius:6px}
+.domain-nav{border-bottom:1px solid var(--border);background:var(--bg)}
+.domain-nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex}
+.domain-nav a{font-size:13px;font-weight:500;color:var(--muted);padding:10px 16px;border-bottom:2px solid transparent}
+.domain-nav a:hover,.domain-nav a.active{color:var(--text);border-bottom-color:var(--text)}
+.page-hero{max-width:1200px;margin:0 auto;padding:56px 24px 40px}
+.page-headline{font-size:38px;font-weight:900;letter-spacing:-1px;line-height:1.1;margin-bottom:12px}
+.page-sub{font-size:16px;color:var(--muted);max-width:560px;line-height:1.65}
+.section{max-width:1200px;margin:0 auto;padding:0 24px 72px}
+.free-banner{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:16px 20px;margin-bottom:32px;display:flex;align-items:center;gap:12px}
+.free-banner-icon{font-size:20px}
+.free-banner-text{font-size:13px;color:#15803d;font-weight:500;line-height:1.5}
+.free-banner-text strong{font-weight:700}
+.calc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.calc-card{border:1.5px solid var(--border);border-radius:14px;padding:24px;display:block;transition:border-color .15s,box-shadow .15s;position:relative}
+.calc-card:hover{border-color:#888;box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.calc-card.free-card{border-color:var(--text);border-width:2px}
+.calc-card.pro-card{background:var(--bg)}
+.card-icon{font-size:28px;margin-bottom:12px}
+.card-name{font-size:16px;font-weight:800;margin-bottom:6px}
+.card-badge{display:inline-block;padding:3px 10px;border-radius:12px;font-size:10px;font-weight:700;margin-bottom:10px}
+.badge-free{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
+.badge-pro{background:var(--text);color:#fff}
+.card-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px}
+.card-meta{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.card-arrow{font-size:14px;font-weight:700;color:var(--text)}
+.card-footer{display:flex;align-items:center;justify-content:space-between}
+.card-steps{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.pro-note{font-size:11px;color:var(--muted)}
+.divider{border:none;border-top:1px solid var(--border);margin:40px 0}
+.pro-strip{border:1.5px solid var(--border);border-radius:14px;padding:28px;display:flex;align-items:center;justify-content:space-between;gap:24px;background:var(--card)}
+.pro-strip-text h3{font-size:18px;font-weight:800;margin-bottom:6px}
+.pro-strip-text p{font-size:13px;color:var(--muted);max-width:480px}
+.pro-strip-cta{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;background:var(--text);color:#fff;border-radius:8px;font-size:14px;font-weight:700;white-space:nowrap}
+@media(max-width:900px){.calc-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.calc-grid{grid-template-columns:1fr}.pro-strip{flex-direction:column}.nav-links{display:none}}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="nav-inner">
+    <a href="/valuation-toolkit/" class="logo">Valuation<strong>Desk</strong></a>
+    <div class="nav-links">
+      <a href="/valuation-toolkit/domains/investment-banking/">Investment Banking</a>
+      <a href="/valuation-toolkit/vault/">My Vault</a>
+      <a href="/valuation-toolkit/deal-room/">Deal Room</a>
+      <a href="/valuation-toolkit/daily-brief/">Daily Brief</a>
+    </div>
+    <div class="nav-cta">
+      <a href="/valuation-toolkit/vault/" class="vault-btn">📁 Vault</a>
+      <a href="#" class="pro-btn">Get Pro — ₹799/mo</a>
+    </div>
+  </div>
+</nav>
+
+<div class="domain-nav">
+  <div class="domain-nav-inner">
+    <a href="/valuation-toolkit/domains/investment-banking/">Overview</a>
+    <a href="/valuation-toolkit/domains/investment-banking/learn/">📖 Learn</a>
+    <a href="/valuation-toolkit/domains/investment-banking/calculators/" class="active">🧮 Calculators</a>
+    <a href="/valuation-toolkit/vault/">📁 My Vault</a>
+  </div>
+</div>
+
+<div class="page-hero">
+  <h1 class="page-headline">IB Calculators</h1>
+  <p class="page-sub">Six tools bankers actually run — fee structures, deal multiples, IPO pricing, debt sizing, capital raises, and fairness opinions. Built around 30 real companies.</p>
+</div>
+
+<div class="section">
+
+  <div class="free-banner">
+    <div class="free-banner-icon">🎁</div>
+    <div class="free-banner-text">
+      <strong>IB Fee Calculator is free forever.</strong> Start there — it teaches you the Modified Lehman formula, how bankers charge, and why deal size changes everything. The other five are Pro.
+    </div>
+  </div>
+
+  <div class="calc-grid">
+
+    <a href="/valuation-toolkit/domains/investment-banking/calculators/ib-fees.html" class="calc-card free-card">
+      <div class="card-icon">💸</div>
+      <div class="card-name">IB Fee Calculator</div>
+      <span class="card-badge badge-free">FREE</span>
+      <div class="card-desc">Enter a deal — get the full fee breakdown. Modified Lehman formula, retainer + success fee split, per-bank syndicate share, and how your deal benchmarks against Indian M&amp;A norms.</div>
+      <div class="card-footer">
+        <span class="card-steps">4 steps · fully free</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="/valuation-toolkit/domains/investment-banking/calculators/precedent-transactions.html" class="calc-card pro-card">
+      <div class="card-icon">📋</div>
+      <div class="card-name">Precedent Transactions</div>
+      <span class="card-badge badge-pro">PRO</span>
+      <div class="card-desc">Historical M&amp;A deal multiples by sector. Deal premiums, EV/EBITDA paid, strategic vs PE buyer differences. See what acquirers actually paid — not what the press release said.</div>
+      <div class="card-footer">
+        <span class="card-steps">Steps 1–2 free</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="/valuation-toolkit/domains/investment-banking/calculators/ipo-pricing.html" class="calc-card pro-card">
+      <div class="card-icon">📈</div>
+      <div class="card-name">IPO Pricing &amp; Dilution</div>
+      <span class="card-badge badge-pro">PRO</span>
+      <div class="card-desc">Price band analysis, fresh vs OFS proceeds, promoter stake dilution, underwriting fees, oversubscription scenarios. Model what goes to the company vs. selling shareholders.</div>
+      <div class="card-footer">
+        <span class="card-steps">Steps 1–2 free</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="/valuation-toolkit/domains/investment-banking/calculators/debt-capacity.html" class="calc-card pro-card">
+      <div class="card-icon">🏗️</div>
+      <div class="card-name">Debt Capacity Model</div>
+      <span class="card-badge badge-pro">PRO</span>
+      <div class="card-desc">Maximum leverage analysis. DSCR floors, debt/EBITDA thresholds, annual interest cost, and headroom calculation. The lens bankers use before any debt financing conversation.</div>
+      <div class="card-footer">
+        <span class="card-steps">Steps 1–2 free</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="/valuation-toolkit/domains/investment-banking/calculators/capital-raise.html" class="calc-card pro-card">
+      <div class="card-icon">🏦</div>
+      <div class="card-name">Capital Raise Calculator</div>
+      <span class="card-badge badge-pro">PRO</span>
+      <div class="card-desc">QIP, rights issue, OFS, or FPO. Dilution per shareholder, pricing discount to market, implied market cap post-raise. Every route to raising equity capital, modeled.</div>
+      <div class="card-footer">
+        <span class="card-steps">Steps 1–2 free</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="/valuation-toolkit/domains/investment-banking/calculators/fairness-opinion.html" class="calc-card pro-card">
+      <div class="card-icon">⚖️</div>
+      <div class="card-name">Fairness Opinion Range</div>
+      <span class="card-badge badge-pro">PRO</span>
+      <div class="card-desc">Board-level valuation conclusion. Bridge from Football Field to a Yes/No fairness call. Method weighting, deal premium analysis, and the range a board can defend in court.</div>
+      <div class="card-footer">
+        <span class="card-steps">Steps 1–2 free</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+
+  <hr class="divider">
+
+  <div class="pro-strip">
+    <div class="pro-strip-text">
+      <h3>Unlock all 5 Pro calculators</h3>
+      <p>One plan covers the entire toolkit — Investment Banking, Valuation Advisory, and all 13 other domains as they launch. ₹799/month. No annual plan. Cancel anytime.</p>
+    </div>
+    <a href="#" class="pro-strip-cta">Get Pro — ₹799/mo →</a>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Debt Capacity Model — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+.top-nav{border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;height:56px;gap:28px}
+.logo{font-size:17px;font-weight:700}.logo strong{font-weight:900}
+.nav-links{display:flex;gap:20px;flex:1}.nav-links a{font-size:13px;color:var(--muted);font-weight:500}
+.nav-cta{display:flex;gap:8px;align-items:center;margin-left:auto}
+.vault-btn{font-size:12px;font-weight:600;padding:6px 12px;border:1px solid var(--border);border-radius:6px}
+.pro-btn{font-size:12px;font-weight:700;padding:6px 14px;background:var(--text);color:#fff;border-radius:6px}
+.domain-nav{border-bottom:1px solid var(--border)}
+.domain-nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex}
+.domain-nav a{font-size:13px;font-weight:500;color:var(--muted);padding:10px 16px;border-bottom:2px solid transparent}
+.domain-nav a.active{color:var(--text);border-bottom-color:var(--text)}
+.calc-wrap{max-width:800px;margin:0 auto;padding:48px 24px 80px}
+.calc-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;background:var(--text);color:#fff;margin-bottom:14px}
+.calc-title{font-size:30px;font-weight:900;letter-spacing:-.75px;margin-bottom:8px}
+.calc-sub{font-size:15px;color:var(--muted);line-height:1.6;margin-bottom:36px}
+.stepper{display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:40px}
+.step-item{flex:1;padding:10px 16px;text-align:center;font-size:12px;font-weight:600;color:var(--muted);border-right:1px solid var(--border);background:var(--card)}
+.step-item:last-child{border-right:none}
+.step-item.active{background:var(--text);color:#fff}
+.step-item.done{background:#f0fdf4;color:#16a34a}
+.step-num{display:block;font-size:10px;font-weight:700;opacity:.7;margin-bottom:1px;font-family:var(--mono)}
+.step-panel{display:none}.step-panel.visible{display:block}
+.region-tabs{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:20px;width:fit-content}
+.rtab{padding:7px 18px;font-size:13px;font-weight:600;color:var(--muted);background:var(--card);cursor:pointer;border-right:1px solid var(--border)}
+.rtab:last-child{border-right:none}
+.rtab.active{background:var(--text);color:#fff}
+.company-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.co-card{border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .15s}
+.co-card:hover{border-color:#888}
+.co-card.selected{border-color:var(--text);border-width:2px;background:#fafafa}
+.co-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.co-meta{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.co-sector{font-size:11px;color:var(--muted)}
+.context-card{border:1.5px solid var(--border);border-radius:14px;padding:28px;background:var(--card);margin-bottom:20px}
+.cc-company{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.cc-icon{width:44px;height:44px;border-radius:10px;background:var(--text);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;font-family:var(--mono)}
+.cc-name{font-size:18px;font-weight:800}
+.cc-sub{font-size:13px;color:var(--muted)}
+.cc-body{font-size:14px;line-height:1.7;margin-bottom:20px}
+.leverage-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.ls-item{background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px}
+.ls-label{font-size:11px;color:var(--muted);margin-bottom:4px}
+.ls-val{font-size:15px;font-weight:800;font-family:var(--mono)}
+.pro-gate{border:2px dashed var(--border);border-radius:16px;padding:56px 32px;text-align:center;margin-bottom:20px}
+.gate-icon{font-size:40px;margin-bottom:16px}
+.gate-title{font-size:22px;font-weight:900;margin-bottom:8px}
+.gate-sub{font-size:14px;color:var(--muted);max-width:420px;margin:0 auto 24px;line-height:1.6}
+.gate-features{display:flex;flex-direction:column;gap:8px;margin-bottom:28px;text-align:left;max-width:320px;margin-left:auto;margin-right:auto}
+.gate-feat{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.gate-feat::before{content:'→';font-weight:700;color:var(--text)}
+.gate-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:var(--text);color:#fff;border-radius:8px;font-size:15px;font-weight:800;cursor:pointer;border:none}
+.gate-price{font-size:12px;color:var(--muted);margin-top:12px}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:var(--text);color:#fff;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:none}
+.btn-secondary{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text)}
+.btn-row{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap}
+@media(max-width:640px){.company-grid{grid-template-columns:repeat(2,1fr)}.leverage-stats{grid-template-columns:1fr 1fr}.nav-links{display:none}}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <div class="nav-inner">
+    <a href="/valuation-toolkit/" class="logo">Valuation<strong>Desk</strong></a>
+    <div class="nav-links">
+      <a href="/valuation-toolkit/domains/investment-banking/">Investment Banking</a>
+      <a href="/valuation-toolkit/vault/">My Vault</a>
+    </div>
+    <div class="nav-cta">
+      <a href="/valuation-toolkit/vault/" class="vault-btn">📁 Vault</a>
+      <a href="#" class="pro-btn">Get Pro — ₹799/mo</a>
+    </div>
+  </div>
+</nav>
+<div class="domain-nav">
+  <div class="domain-nav-inner">
+    <a href="/valuation-toolkit/domains/investment-banking/">Overview</a>
+    <a href="/valuation-toolkit/domains/investment-banking/learn/">📖 Learn</a>
+    <a href="/valuation-toolkit/domains/investment-banking/calculators/" class="active">🧮 Calculators</a>
+    <a href="/valuation-toolkit/vault/">📁 My Vault</a>
+  </div>
+</div>
+
+<div class="calc-wrap">
+  <div class="calc-badge">🏗️ Pro Calculator</div>
+  <h1 class="calc-title">Debt Capacity Model</h1>
+  <p class="calc-sub">Maximum leverage analysis. DSCR floors, debt/EBITDA thresholds, annual interest cost, and headroom calculation. The first lens bankers apply before any debt financing conversation.</p>
+
+  <div class="stepper">
+    <div class="step-item active" id="st1"><span class="step-num">01</span>Company</div>
+    <div class="step-item" id="st2"><span class="step-num">02</span>Context</div>
+    <div class="step-item" id="st3"><span class="step-num">03</span>Financials ↗</div>
+    <div class="step-item" id="st4"><span class="step-num">04</span>Output ↗</div>
+  </div>
+
+  <div class="step-panel visible" id="panel1">
+    <div class="region-tabs">
+      <div class="rtab active" onclick="switchRegion('India',this)">🇮🇳 India</div>
+      <div class="rtab" onclick="switchRegion('Global',this)">🌐 Global</div>
+    </div>
+    <div class="company-grid" id="companyGrid"></div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="goStep(2)" id="nextBtn1" disabled>See Leverage Context →</button>
+    </div>
+  </div>
+
+  <div class="step-panel" id="panel2">
+    <div class="context-card" id="contextCard"></div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="goStep(3)">Model Debt Capacity →</button>
+      <button class="btn-secondary" onclick="goStep(1)">← Back</button>
+    </div>
+  </div>
+
+  <div class="step-panel" id="panel3">
+    <div class="pro-gate">
+      <div class="gate-icon">🔒</div>
+      <div class="gate-title">Pro feature</div>
+      <div class="gate-sub">Enter the company's financials — EBITDA, existing debt, interest rate — and model maximum borrowing capacity under bank, bond, and rating agency constraints.</div>
+      <div class="gate-features">
+        <div class="gate-feat">DSCR analysis (floor: 1.2x, comfort: 1.5x, strong: 2.0x)</div>
+        <div class="gate-feat">Debt/EBITDA max leverage by credit profile</div>
+        <div class="gate-feat">Annual interest burden at different debt levels</div>
+        <div class="gate-feat">Headroom calculation vs. current debt load</div>
+        <div class="gate-feat">Rating agency leverage threshold comparison</div>
+      </div>
+      <button class="gate-btn" onclick="window.location.href='#'">Unlock Pro — ₹799/mo →</button>
+      <div class="gate-price">Monthly only · Cancel anytime · All 15 domains included</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goStep(2)">← Back to Context</button>
+    </div>
+  </div>
+
+  <div class="step-panel" id="panel4">
+    <div class="pro-gate">
+      <div class="gate-icon">🔒</div>
+      <div class="gate-title">Pro feature</div>
+      <div class="gate-sub">Step 4 shows the full debt capacity waterfall — how much the company can borrow at each rating level, the cost of each tranche, and what the resulting capital structure looks like.</div>
+      <button class="gate-btn" onclick="window.location.href='#'">Unlock Pro — ₹799/mo →</button>
+      <div class="gate-price">Monthly only · Cancel anytime · All 15 domains included</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const COMPANIES=[{name:'Reliance Industries',ticker:'RELIANCE',sector:'Conglomerate',mcap:'₹17.2L Cr',region:'India'},{name:'HDFC Bank',ticker:'HDFCBANK',sector:'Banking',mcap:'₹11.8L Cr',region:'India'},{name:'TCS',ticker:'TCS',sector:'Technology',mcap:'₹13.5L Cr',region:'India'},{name:'Infosys',ticker:'INFY',sector:'Technology',mcap:'₹6.2L Cr',region:'India'},{name:'ICICI Bank',ticker:'ICICIBANK',sector:'Banking',mcap:'₹8.9L Cr',region:'India'},{name:'Hindustan Unilever',ticker:'HUL',sector:'FMCG',mcap:'₹5.4L Cr',region:'India'},{name:'ITC',ticker:'ITC',sector:'FMCG',mcap:'₹4.8L Cr',region:'India'},{name:'Maruti Suzuki',ticker:'MARUTI',sector:'Auto',mcap:'₹3.8L Cr',region:'India'},{name:'Bajaj Finance',ticker:'BAJFINANCE',sector:'NBFC',mcap:'₹4.3L Cr',region:'India'},{name:'Larsen & Toubro',ticker:'LT',sector:'Infrastructure',mcap:'₹4.9L Cr',region:'India'},{name:'Wipro',ticker:'WIPRO',sector:'Technology',mcap:'₹2.4L Cr',region:'India'},{name:'Asian Paints',ticker:'ASIANPAINT',sector:'Chemicals',mcap:'₹2.2L Cr',region:'India'},{name:'Sun Pharma',ticker:'SUNPHARMA',sector:'Pharma',mcap:'₹3.8L Cr',region:'India'},{name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',sector:'Banking',mcap:'₹3.6L Cr',region:'India'},{name:'Titan Company',ticker:'TITAN',sector:'Consumer',mcap:'₹2.9L Cr',region:'India'},{name:'Apple',ticker:'AAPL',sector:'Technology',mcap:'$3.5T',region:'Global'},{name:'Microsoft',ticker:'MSFT',sector:'Technology',mcap:'$3.1T',region:'Global'},{name:'Alphabet',ticker:'GOOGL',sector:'Technology',mcap:'$2.1T',region:'Global'},{name:'Amazon',ticker:'AMZN',sector:'E-Commerce',mcap:'$1.9T',region:'Global'},{name:'Meta',ticker:'META',sector:'Technology',mcap:'$1.4T',region:'Global'},{name:'Berkshire Hathaway',ticker:'BRK.B',sector:'Conglomerate',mcap:'$900B',region:'Global'},{name:'JPMorgan Chase',ticker:'JPM',sector:'Banking',mcap:'$580B',region:'Global'},{name:'Visa',ticker:'V',sector:'Payments',mcap:'$540B',region:'Global'},{name:'Samsung',ticker:'005930',sector:'Technology',mcap:'$380B',region:'Global'},{name:'Alibaba',ticker:'BABA',sector:'E-Commerce',mcap:'$220B',region:'Global'},{name:'Nestlé',ticker:'NESN',sector:'FMCG',mcap:'$290B',region:'Global'},{name:'Tesla',ticker:'TSLA',sector:'Auto',mcap:'$700B',region:'Global'},{name:'LVMH',ticker:'MC',sector:'Luxury',mcap:'$330B',region:'Global'},{name:'TSMC',ticker:'TSM',sector:'Semiconductors',mcap:'$860B',region:'Global'},{name:'Saudi Aramco',ticker:'ARAMCO',sector:'Energy',mcap:'$1.8T',region:'Global'}];
+
+const DEBT_CONTEXT={
+  'Technology':'Tech companies are typically under-leveraged — lenders are cautious about IP-heavy, capex-light businesses where collateral is limited. Indian IT (TCS, Infosys, Wipro) can support 1.5–2.5x Net Debt/EBITDA due to strong cash generation. Covenant packages for tech deals focus on revenue concentration and customer retention.',
+  'Banking':'Banks use entirely different leverage metrics — Capital Adequacy Ratio (CAR/CRAR) under Basel III, not Debt/EBITDA. HDFC Bank, ICICI Bank must maintain CAR above 11.5% (Tier 1). Debt capacity analysis for banks is really a capital adequacy exercise, not traditional corporate leverage.',
+  'FMCG':'FMCG companies are asset-light cash machines with excellent debt capacity. HUL, ITC typically run net cash positions. A 2.5–3.5x Net Debt/EBITDA leverage would be comfortable for most Indian FMCG companies — lenders love the predictable cash flows and strong brands as implicit collateral.',
+  'Infrastructure':'Infrastructure companies run the highest leverage in the Indian corporate world — 4–6x Net Debt/EBITDA is common for toll roads, ports, and power assets with contracted cash flows. L&T\'s infra subsidiaries often carry project-level debt at 7–8x EBITDA. DSCR floors of 1.2–1.3x are standard covenants.',
+  'Auto':'Auto companies face cyclicality that limits leverage appetite. Indian OEMs typically stay below 2x Net Debt/EBITDA. Lenders require headroom for down-cycle scenarios. Capex intensity (plants, tooling) creates natural collateral but also cash burn during downturns.',
+  'default':'Standard Indian corporate leverage thresholds: Highly leveraged >4x, Moderately leveraged 2–4x, Conservative 1–2x, Net cash <0. Rating agencies (CRISIL, ICRA) typically trigger rating reviews when Net Debt/EBITDA crosses 3.5x for investment-grade companies. DSCR minimum covenant: 1.25x.'
+};
+
+const LEVERAGE_NORMS={
+  'Technology':{max:'2–3x',comfortable:'1–2x',floor:'1.2x DSCR'},
+  'Banking':{max:'CAR>11.5%',comfortable:'T1 Ratio>9%',floor:'Basel III Compliance'},
+  'FMCG':{max:'3–4x',comfortable:'2–3x',floor:'1.3x DSCR'},
+  'Infrastructure':{max:'6–8x',comfortable:'4–6x',floor:'1.2x DSCR'},
+  'Auto':{max:'2–3x',comfortable:'1–2x',floor:'1.25x DSCR'},
+  'default':{max:'3.5–4.5x',comfortable:'2–3x',floor:'1.25x DSCR'}
+};
+
+let sel=null;
+
+function goStep(n){
+  for(let i=1;i<=4;i++){
+    document.getElementById('panel'+i).classList.toggle('visible',i===n);
+    document.getElementById('st'+i).classList.toggle('active',i===n);
+    document.getElementById('st'+i).classList.toggle('done',i<n);
+  }
+  if(n===2&&sel) buildContext();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function buildCompanyGrid(region){
+  document.getElementById('companyGrid').innerHTML=COMPANIES.filter(c=>c.region===region).map(c=>`
+    <div class="co-card ${sel&&sel.name===c.name?'selected':''}" onclick="selectCo(${JSON.stringify(c).replace(/"/g,'&quot;')},this)">
+      <div class="co-name">${c.name}</div><div class="co-meta">${c.ticker} · ${c.mcap}</div><div class="co-sector">${c.sector}</div>
+    </div>`).join('');
+}
+
+function switchRegion(r,el){
+  document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  buildCompanyGrid(r);
+}
+
+function selectCo(co,el){
+  sel=co;
+  document.querySelectorAll('.co-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('nextBtn1').disabled=false;
+}
+
+function buildContext(){
+  const body=DEBT_CONTEXT[sel.sector]||DEBT_CONTEXT['default'];
+  const norms=LEVERAGE_NORMS[sel.sector]||LEVERAGE_NORMS['default'];
+  document.getElementById('contextCard').innerHTML=`
+    <div class="cc-company">
+      <div class="cc-icon">${sel.ticker.slice(0,2)}</div>
+      <div><div class="cc-name">${sel.name}</div><div class="cc-sub">${sel.sector} · ${sel.mcap}</div></div>
+    </div>
+    <div class="cc-body">${body}</div>
+    <div class="leverage-stats">
+      <div class="ls-item"><div class="ls-label">Max Leverage</div><div class="ls-val">${norms.max}</div></div>
+      <div class="ls-item"><div class="ls-label">Comfortable Range</div><div class="ls-val">${norms.comfortable}</div></div>
+      <div class="ls-item"><div class="ls-label">DSCR Floor</div><div class="ls-val">${norms.floor}</div></div>
+    </div>`;
+}
+
+buildCompanyGrid('India');
+</script>
+</body>
+</html>

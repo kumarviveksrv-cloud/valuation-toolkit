@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IB Fee Calculator — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+
+/* NAV */
+.top-nav{border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;height:56px;gap:28px}
+.logo{font-size:17px;font-weight:700}.logo strong{font-weight:900}
+.nav-links{display:flex;gap:20px;flex:1}.nav-links a{font-size:13px;color:var(--muted);font-weight:500}.nav-links a:hover{color:var(--text)}
+.nav-cta{display:flex;gap:8px;align-items:center;margin-left:auto}
+.vault-btn{font-size:12px;font-weight:600;padding:6px 12px;border:1px solid var(--border);border-radius:6px;color:var(--text)}
+.pro-btn{font-size:12px;font-weight:700;padding:6px 14px;background:var(--text);color:#fff;border-radius:6px}
+.domain-nav{border-bottom:1px solid var(--border);background:var(--bg)}
+.domain-nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex}
+.domain-nav a{font-size:13px;font-weight:500;color:var(--muted);padding:10px 16px;border-bottom:2px solid transparent}
+.domain-nav a:hover,.domain-nav a.active{color:var(--text);border-bottom-color:var(--text)}
+
+/* CALC LAYOUT */
+.calc-wrap{max-width:800px;margin:0 auto;padding:48px 24px 80px}
+.calc-header{margin-bottom:36px}
+.calc-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;margin-bottom:14px}
+.calc-title{font-size:30px;font-weight:900;letter-spacing:-.75px;margin-bottom:8px}
+.calc-sub{font-size:15px;color:var(--muted);line-height:1.6}
+
+/* STEPPER */
+.stepper{display:flex;align-items:center;gap:0;margin-bottom:40px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.step-item{flex:1;padding:10px 16px;text-align:center;font-size:12px;font-weight:600;color:var(--muted);border-right:1px solid var(--border);background:var(--card);transition:all .2s;cursor:default}
+.step-item:last-child{border-right:none}
+.step-item.active{background:var(--text);color:#fff}
+.step-item.done{background:#f0fdf4;color:#16a34a}
+.step-num{display:block;font-size:10px;font-weight:700;opacity:.7;margin-bottom:1px;font-family:var(--mono)}
+
+/* CARDS */
+.step-panel{display:none}
+.step-panel.visible{display:block}
+
+/* STEP 1 — COMPANY PICKER */
+.region-tabs{display:flex;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:20px;width:fit-content}
+.rtab{padding:7px 18px;font-size:13px;font-weight:600;color:var(--muted);background:var(--card);cursor:pointer;border-right:1px solid var(--border);transition:all .15s}
+.rtab:last-child{border-right:none}
+.rtab.active{background:var(--text);color:#fff}
+.company-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.co-card{border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .15s}
+.co-card:hover{border-color:#888}
+.co-card.selected{border-color:var(--text);border-width:2px;background:#fafafa}
+.co-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.co-meta{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.co-sector{font-size:11px;color:var(--muted)}
+
+/* STEP 2 — CONTEXT */
+.context-card{border:1.5px solid var(--border);border-radius:14px;padding:28px;margin-bottom:20px;background:var(--card)}
+.context-company{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.context-co-icon{width:44px;height:44px;border-radius:10px;background:var(--text);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;font-family:var(--mono)}
+.context-co-name{font-size:18px;font-weight:800}
+.context-co-sub{font-size:13px;color:var(--muted)}
+.context-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px}
+.context-body{font-size:14px;color:var(--text);line-height:1.7;margin-bottom:20px}
+.fee-norms{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.norm-item{background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px}
+.norm-label{font-size:11px;color:var(--muted);margin-bottom:4px}
+.norm-value{font-size:14px;font-weight:800;font-family:var(--mono)}
+
+/* STEP 3 — INPUTS */
+.input-section{margin-bottom:24px}
+.input-label{font-size:13px;font-weight:700;margin-bottom:6px;display:block}
+.input-hint{font-size:11px;color:var(--muted);margin-bottom:8px}
+.input-field{width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:var(--font);color:var(--text);background:var(--bg);transition:border-color .15s;outline:none}
+.input-field:focus{border-color:var(--text)}
+.input-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.input-prefix{position:relative}
+.input-prefix input{padding-left:36px}
+.input-prefix span{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--muted);font-weight:600}
+select.input-field{cursor:pointer}
+.radio-group{display:flex;gap:8px;flex-wrap:wrap}
+.radio-btn{padding:7px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;background:var(--bg)}
+.radio-btn.selected{background:var(--text);color:#fff;border-color:var(--text)}
+.retainer-block{border:1px solid var(--border);border-radius:10px;padding:16px;background:var(--card);margin-top:8px}
+.retainer-block.hidden{display:none}
+
+/* STEP 4 — LOADING + REVEAL */
+.loading-wrap{padding:48px 24px;text-align:center}
+.loading-icon{font-size:36px;margin-bottom:20px;animation:spin 2s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-step{font-size:15px;font-weight:600;color:var(--text);margin-bottom:8px;min-height:24px}
+.loading-bar{width:100%;max-width:320px;height:3px;background:var(--border);border-radius:2px;margin:16px auto 0;overflow:hidden}
+.loading-fill{height:100%;background:var(--text);border-radius:2px;transition:width .4s ease;width:0%}
+.loading-steps-list{margin-top:24px;text-align:left;max-width:320px;margin-left:auto;margin-right:auto}
+.ls-item{font-size:12px;color:var(--muted);padding:4px 0;display:flex;align-items:center;gap:8px;font-family:var(--mono)}
+.ls-item.done-item{color:var(--green)}
+.ls-item.done-item::before{content:'✓'}
+.ls-item.pending-item::before{content:'○';color:var(--border)}
+.ls-item.active-item::before{content:'●';color:var(--text)}
+
+.reveal-wrap{animation:fadeUp .4s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.result-header{display:flex;align-items:center;gap:16px;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.result-co{font-size:13px;color:var(--muted)}
+.result-co strong{color:var(--text);font-weight:700}
+.result-badge{padding:4px 12px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;border-radius:12px;font-size:11px;font-weight:700}
+
+.fee-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.fee-box{border:1.5px solid var(--border);border-radius:12px;padding:20px}
+.fee-box.highlight{border-color:var(--text);background:#fafafa}
+.fee-box-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.fee-box-value{font-size:24px;font-weight:900;font-family:var(--mono);letter-spacing:-.5px}
+.fee-box-sub{font-size:12px;color:var(--muted);margin-top:4px}
+
+.lehman-table{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:24px}
+.lt-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;border-bottom:1px solid var(--border)}
+.lt-row:last-child{border-bottom:none}
+.lt-row.header{background:var(--card)}
+.lt-cell{padding:10px 14px;font-size:12px;font-family:var(--mono)}
+.lt-row.header .lt-cell{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
+.lt-cell.active-tier{font-weight:700;color:var(--text)}
+.lt-cell.inactive-tier{color:#ccc}
+
+.insight-strip{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin-bottom:24px}
+.insight-label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.insight-text{font-size:14px;color:var(--text);line-height:1.6}
+.insight-text strong{font-weight:700}
+
+.benchmark-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.benchmark-label{font-size:13px;font-weight:600;min-width:180px}
+.benchmark-bar-wrap{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.benchmark-bar-fill{height:100%;border-radius:3px;background:var(--text);transition:width .6s ease}
+.benchmark-val{font-size:12px;font-family:var(--mono);font-weight:700;min-width:50px;text-align:right}
+
+.syndicate-box{border:1px solid var(--border);border-radius:10px;padding:16px;background:var(--card);margin-bottom:24px}
+.syndicate-title{font-size:13px;font-weight:700;margin-bottom:10px}
+.syndicate-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.syndicate-row:last-child{border-bottom:none}
+.syndicate-bank{color:var(--muted)}
+.syndicate-fee{font-family:var(--mono);font-weight:700}
+
+/* BUTTONS */
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:var(--text);color:#fff;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:opacity .15s}
+.btn-primary:hover{opacity:.85}
+.btn-secondary{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text);transition:border-color .15s}
+.btn-secondary:hover{border-color:var(--text)}
+.btn-row{display:flex;gap:12px;align-items:center;margin-top:28px;flex-wrap:wrap}
+.save-btn{font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;padding:10px;border:none;background:none;transition:color .15s}
+.save-btn:hover{color:var(--text)}
+
+.vault-toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;z-index:999}
+.vault-toast.show{opacity:1;transform:translateY(0)}
+
+@media(max-width:640px){.company-grid{grid-template-columns:repeat(2,1fr)}.fee-norms{grid-template-columns:1fr 1fr}.fee-summary{grid-template-columns:1fr 1fr}.lt-row{grid-template-columns:1fr 1fr}.lt-row .lt-cell:nth-child(3),.lt-row .lt-cell:nth-child(4){display:none}.input-row{grid-template-columns:1fr}.nav-links{display:none}}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="nav-inner">
+    <a href="/valuation-toolkit/" class="logo">Valuation<strong>Desk</strong></a>
+    <div class="nav-links">
+      <a href="/valuation-toolkit/domains/investment-banking/">Investment Banking</a>
+      <a href="/valuation-toolkit/vault/">My Vault</a>
+      <a href="/valuation-toolkit/deal-room/">Deal Room</a>
+    </div>
+    <div class="nav-cta">
+      <a href="/valuation-toolkit/vault/" class="vault-btn">📁 Vault</a>
+      <a href="#" class="pro-btn">Get Pro — ₹799/mo</a>
+    </div>
+  </div>
+</nav>
+
+<div class="domain-nav">
+  <div class="domain-nav-inner">
+    <a href="/valuation-toolkit/domains/investment-banking/">Overview</a>
+    <a href="/valuation-toolkit/domains/investment-banking/learn/">📖 Learn</a>
+    <a href="/valuation-toolkit/domains/investment-banking/calculators/" class="active">🧮 Calculators</a>
+    <a href="/valuation-toolkit/vault/">📁 My Vault</a>
+  </div>
+</div>
+
+<div class="calc-wrap">
+
+  <div class="calc-header">
+    <div class="calc-badge">💸 Free Calculator</div>
+    <h1 class="calc-title">IB Fee Calculator</h1>
+    <p class="calc-sub">How do investment bankers actually charge? Enter a deal — see the Modified Lehman formula break it down tier by tier. Retainer, success fee, syndicate split.</p>
+  </div>
+
+  <div class="stepper">
+    <div class="step-item active" id="st1"><span class="step-num">01</span>Company</div>
+    <div class="step-item" id="st2"><span class="step-num">02</span>Context</div>
+    <div class="step-item" id="st3"><span class="step-num">03</span>Deal Details</div>
+    <div class="step-item" id="st4"><span class="step-num">04</span>Fee Reveal</div>
+  </div>
+
+  <!-- STEP 1: COMPANY PICKER -->
+  <div class="step-panel visible" id="panel1">
+    <div class="region-tabs">
+      <div class="rtab active" onclick="switchRegion('India',this)">🇮🇳 India</div>
+      <div class="rtab" onclick="switchRegion('Global',this)">🌐 Global</div>
+    </div>
+    <div class="company-grid" id="companyGrid"></div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="goStep(2)" id="nextBtn1" disabled>Continue →</button>
+      <span style="font-size:13px;color:var(--muted)">Pick a company to model the deal around</span>
+    </div>
+  </div>
+
+  <!-- STEP 2: CONTEXT -->
+  <div class="step-panel" id="panel2">
+    <div class="context-card" id="contextCard"></div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="goStep(3)">Set Up the Deal →</button>
+      <button class="btn-secondary" onclick="goStep(1)">← Back</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: DEAL INPUTS -->
+  <div class="step-panel" id="panel3">
+
+    <div class="input-section">
+      <label class="input-label">Deal type</label>
+      <div class="input-hint">Different deal types use different fee structures.</div>
+      <div class="radio-group" id="dealTypeGroup">
+        <div class="radio-btn selected" data-val="ma_sellside" onclick="selectRadio(this,'dealTypeGroup')">M&amp;A — Sell-side</div>
+        <div class="radio-btn" data-val="ma_buyside" onclick="selectRadio(this,'dealTypeGroup')">M&amp;A — Buy-side</div>
+        <div class="radio-btn" data-val="ipo" onclick="selectRadio(this,'dealTypeGroup')">IPO Advisory</div>
+        <div class="radio-btn" data-val="restructuring" onclick="selectRadio(this,'dealTypeGroup')">Restructuring</div>
+        <div class="radio-btn" data-val="debt" onclick="selectRadio(this,'dealTypeGroup')">Debt Advisory</div>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <div class="input-section">
+        <label class="input-label">Deal size (₹ Crore)</label>
+        <div class="input-hint">Total transaction enterprise value.</div>
+        <div class="input-prefix">
+          <span>₹</span>
+          <input type="number" class="input-field" id="dealSize" placeholder="e.g. 2500" value="2500" min="1">
+        </div>
+      </div>
+      <div class="input-section">
+        <label class="input-label">Fee structure</label>
+        <div class="input-hint">How the success fee is calculated.</div>
+        <select class="input-field" id="feeStructure" onchange="updateFeeHint()">
+          <option value="lehman">Modified Lehman (standard)</option>
+          <option value="flat_1">Flat 1% of deal</option>
+          <option value="flat_075">Flat 0.75% of deal</option>
+          <option value="flat_05">Flat 0.5% of deal</option>
+          <option value="custom">Custom %</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="input-section" id="customPctSection" style="display:none">
+      <label class="input-label">Custom fee %</label>
+      <div class="input-prefix">
+        <input type="number" class="input-field" id="customPct" placeholder="e.g. 1.25" step="0.05" value="1.00">
+        <span style="left:auto;right:12px">%</span>
+      </div>
+    </div>
+
+    <div class="input-section">
+      <label class="input-label">Retainer</label>
+      <div class="radio-group" id="retainerGroup">
+        <div class="radio-btn selected" data-val="yes" onclick="selectRadio(this,'retainerGroup');toggleRetainer()">Yes — with retainer</div>
+        <div class="radio-btn" data-val="no" onclick="selectRadio(this,'retainerGroup');toggleRetainer()">No retainer</div>
+      </div>
+      <div class="retainer-block" id="retainerBlock">
+        <div class="input-row">
+          <div>
+            <label class="input-label" style="font-size:12px;margin-bottom:4px">Monthly retainer (₹ Lakh)</label>
+            <div class="input-prefix">
+              <span>₹</span>
+              <input type="number" class="input-field" id="retainerMonthly" placeholder="e.g. 25" value="25">
+            </div>
+          </div>
+          <div>
+            <label class="input-label" style="font-size:12px;margin-bottom:4px">Duration (months)</label>
+            <input type="number" class="input-field" id="retainerMonths" placeholder="e.g. 6" value="6" min="1" max="36">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-section">
+      <label class="input-label">Syndicate banks</label>
+      <div class="input-hint">How many investment banks are sharing this mandate?</div>
+      <div class="radio-group" id="syndicateGroup">
+        <div class="radio-btn selected" data-val="1" onclick="selectRadio(this,'syndicateGroup')">1 — Sole mandated</div>
+        <div class="radio-btn" data-val="2" onclick="selectRadio(this,'syndicateGroup')">2 banks</div>
+        <div class="radio-btn" data-val="3" onclick="selectRadio(this,'syndicateGroup')">3 banks</div>
+        <div class="radio-btn" data-val="4" onclick="selectRadio(this,'syndicateGroup')">4 banks</div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-primary" onclick="runCalculation()">Calculate Fee →</button>
+      <button class="btn-secondary" onclick="goStep(2)">← Back</button>
+    </div>
+
+  </div>
+
+  <!-- STEP 4: LOADING + REVEAL -->
+  <div class="step-panel" id="panel4">
+
+    <div id="loadingWrap" class="loading-wrap">
+      <div class="loading-icon">⚙️</div>
+      <div class="loading-step" id="loadingStep">Initializing...</div>
+      <div class="loading-bar"><div class="loading-fill" id="loadingFill"></div></div>
+      <div class="loading-steps-list" id="loadingList"></div>
+    </div>
+
+    <div id="revealWrap" class="reveal-wrap" style="display:none">
+
+      <div class="result-header">
+        <div>
+          <div class="result-co">Modeling <strong id="revCoName">—</strong></div>
+          <div style="font-size:13px;color:var(--muted)" id="revDealLabel">—</div>
+        </div>
+        <span class="result-badge">Fee Model ✓</span>
+      </div>
+
+      <!-- FEE SUMMARY BOXES -->
+      <div class="fee-summary">
+        <div class="fee-box" id="boxRetainer">
+          <div class="fee-box-label">Retainer Total</div>
+          <div class="fee-box-value" id="valRetainer">—</div>
+          <div class="fee-box-sub" id="subRetainer">—</div>
+        </div>
+        <div class="fee-box" id="boxSuccess">
+          <div class="fee-box-label">Success Fee</div>
+          <div class="fee-box-value" id="valSuccess">—</div>
+          <div class="fee-box-sub" id="subSuccess">—</div>
+        </div>
+        <div class="fee-box highlight">
+          <div class="fee-box-label">Total Fee</div>
+          <div class="fee-box-value" id="valTotal">—</div>
+          <div class="fee-box-sub" id="subTotal">—</div>
+        </div>
+      </div>
+
+      <!-- MODIFIED LEHMAN BREAKDOWN -->
+      <div style="font-size:13px;font-weight:700;margin-bottom:10px">Modified Lehman Tier Breakdown</div>
+      <div class="lehman-table" id="lehmanTable"></div>
+
+      <!-- KEY INSIGHT -->
+      <div class="insight-strip">
+        <div class="insight-label">💡 Why This Matters</div>
+        <div class="insight-text" id="insightText">—</div>
+      </div>
+
+      <!-- SYNDICATE SPLIT -->
+      <div class="syndicate-box" id="syndicateBox">
+        <div class="syndicate-title">Syndicate Split</div>
+        <div id="syndicateRows"></div>
+      </div>
+
+      <!-- BENCHMARK -->
+      <div style="font-size:13px;font-weight:700;margin-bottom:14px">Benchmark vs Indian M&A Norms</div>
+      <div id="benchmarkRows"></div>
+
+      <div class="btn-row">
+        <button class="btn-primary" onclick="saveToVault()">📁 Save to Vault</button>
+        <button class="btn-secondary" onclick="resetCalc()">Run Another Deal</button>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<div class="vault-toast" id="vaultToast">✓ Saved to Vault</div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────────────────
+const COMPANIES = [
+  {name:'Reliance Industries',ticker:'RELIANCE',sector:'Conglomerate',mcap:'₹17.2L Cr',region:'India'},
+  {name:'HDFC Bank',ticker:'HDFCBANK',sector:'Banking',mcap:'₹11.8L Cr',region:'India'},
+  {name:'TCS',ticker:'TCS',sector:'Technology',mcap:'₹13.5L Cr',region:'India'},
+  {name:'Infosys',ticker:'INFY',sector:'Technology',mcap:'₹6.2L Cr',region:'India'},
+  {name:'ICICI Bank',ticker:'ICICIBANK',sector:'Banking',mcap:'₹8.9L Cr',region:'India'},
+  {name:'Hindustan Unilever',ticker:'HUL',sector:'FMCG',mcap:'₹5.4L Cr',region:'India'},
+  {name:'ITC',ticker:'ITC',sector:'FMCG',mcap:'₹4.8L Cr',region:'India'},
+  {name:'Maruti Suzuki',ticker:'MARUTI',sector:'Auto',mcap:'₹3.8L Cr',region:'India'},
+  {name:'Bajaj Finance',ticker:'BAJFINANCE',sector:'NBFC',mcap:'₹4.3L Cr',region:'India'},
+  {name:'Larsen & Toubro',ticker:'LT',sector:'Infrastructure',mcap:'₹4.9L Cr',region:'India'},
+  {name:'Wipro',ticker:'WIPRO',sector:'Technology',mcap:'₹2.4L Cr',region:'India'},
+  {name:'Asian Paints',ticker:'ASIANPAINT',sector:'Chemicals',mcap:'₹2.2L Cr',region:'India'},
+  {name:'Sun Pharma',ticker:'SUNPHARMA',sector:'Pharma',mcap:'₹3.8L Cr',region:'India'},
+  {name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',sector:'Banking',mcap:'₹3.6L Cr',region:'India'},
+  {name:'Titan Company',ticker:'TITAN',sector:'Consumer',mcap:'₹2.9L Cr',region:'India'},
+  {name:'Apple',ticker:'AAPL',sector:'Technology',mcap:'$3.5T',region:'Global'},
+  {name:'Microsoft',ticker:'MSFT',sector:'Technology',mcap:'$3.1T',region:'Global'},
+  {name:'Alphabet',ticker:'GOOGL',sector:'Technology',mcap:'$2.1T',region:'Global'},
+  {name:'Amazon',ticker:'AMZN',sector:'E-Commerce',mcap:'$1.9T',region:'Global'},
+  {name:'Meta',ticker:'META',sector:'Technology',mcap:'$1.4T',region:'Global'},
+  {name:'Berkshire Hathaway',ticker:'BRK.B',sector:'Conglomerate',mcap:'$900B',region:'Global'},
+  {name:'JPMorgan Chase',ticker:'JPM',sector:'Banking',mcap:'$580B',region:'Global'},
+  {name:'Visa',ticker:'V',sector:'Payments',mcap:'$540B',region:'Global'},
+  {name:'Samsung',ticker:'005930',sector:'Technology',mcap:'$380B',region:'Global'},
+  {name:'Alibaba',ticker:'BABA',sector:'E-Commerce',mcap:'$220B',region:'Global'},
+  {name:'Nestlé',ticker:'NESN',sector:'FMCG',mcap:'$290B',region:'Global'},
+  {name:'Tesla',ticker:'TSLA',sector:'Auto',mcap:'$700B',region:'Global'},
+  {name:'LVMH',ticker:'MC',sector:'Luxury',mcap:'$330B',region:'Global'},
+  {name:'TSMC',ticker:'TSM',sector:'Semiconductors',mcap:'$860B',region:'Global'},
+  {name:'Saudi Aramco',ticker:'ARAMCO',sector:'Energy',mcap:'$1.8T',region:'Global'},
+];
+
+const SECTOR_CONTEXT = {
+  'Technology': {
+    norm:'1–2%',
+    typical:'₹8–25Cr on ₹1,000Cr deal',
+    timeline:'3–9 months',
+    body:`Tech acquisitions command premium fees due to deal complexity — earn-outs, IP valuation, talent retention structures, and fast-moving competitive dynamics. Bankers price in the speed requirement. Buy-side mandates for tech targets often close in under 6 months, so retainers are shorter but higher per-month.`
+  },
+  'Banking': {
+    norm:'1–1.75%',
+    typical:'₹10–20Cr on ₹1,000Cr deal',
+    timeline:'9–18 months',
+    body:`Banking sector deals are the most complex to structure — regulatory approvals from RBI, CCI, and sometimes SEBI add 9–12 months to deal timelines. Fee structures tend to be on the higher end because bankers absorb execution risk on uncertain close timelines. Retainers are typically longer and larger.`
+  },
+  'NBFC': {
+    norm:'0.75–1.5%',
+    typical:'₹8–15Cr on ₹1,000Cr deal',
+    timeline:'6–12 months',
+    body:`NBFC mergers face RBI approval timelines and book quality scrutiny that extends engagements. Fees are moderate — often negotiated down given repeat mandates among financial sector players. Asset quality diligence drives complexity more than deal structure.`
+  },
+  'FMCG': {
+    norm:'1–1.5%',
+    typical:'₹10–18Cr on ₹1,000Cr deal',
+    timeline:'4–10 months',
+    body:`Consumer sector M&A is highly coveted — strong brands, predictable cash flows, and premium valuations make EBITDA multiple negotiations crucial. Fees run 1–1.5% for deals above ₹500Cr. Bankers often earn higher fees because competitive bid processes require intense process management.`
+  },
+  'Auto': {
+    norm:'0.75–1.25%',
+    typical:'₹7–13Cr on ₹1,000Cr deal',
+    timeline:'4–8 months',
+    body:`Auto deals involve complex supply chain valuations, manufacturing capex assessments, and often PE buyers looking for operational leverage. Fee structures trend lower because asset bases are straightforward relative to tech or financials. Retainers are standard given longer due diligence on plant & equipment.`
+  },
+  'Pharma': {
+    norm:'1–2%',
+    typical:'₹10–22Cr on ₹1,000Cr deal',
+    timeline:'6–14 months',
+    body:`Pharma M&A is among the highest-fee segments — IP valuation, drug pipeline assessment, regulatory filing reviews (USFDA, CDSCO), and often cross-border complexity justify premium mandates. Bankers with pharma sector expertise command significantly higher fees than generalists.`
+  },
+  'Infrastructure': {
+    norm:'0.5–1%',
+    typical:'₹5–10Cr on ₹1,000Cr deal',
+    timeline:'6–18 months',
+    body:`Infrastructure deals are often regulated, involve government approvals, and feature long timelines. Bankers typically earn 0.5–1% because deal sizes are large (driving absolute fees) but regulatory and political risk limits fee flexibility. Retainers are crucial in this sector due to uncertain close timing.`
+  },
+  'Conglomerate': {
+    norm:'Negotiated',
+    typical:'Case-by-case on mega deals',
+    timeline:'6–24 months',
+    body:`Conglomerate M&A is massive in scale and involves multiple asset classes simultaneously. The Modified Lehman kicks in hard — per-deal fees are individually negotiated. For the largest Indian conglomerate deals (₹10,000Cr+), success fees of 0.2–0.5% on the top slabs are common, but retainers can be ₹50–100L/month.`
+  },
+  'Energy': {
+    norm:'0.5–1%',
+    typical:'₹5–10Cr on ₹1,000Cr deal',
+    timeline:'6–15 months',
+    body:`Energy sector M&A involves commodity price sensitivity, reserve valuation, and geopolitical risk. Fees are typically 0.5–1% for large deals. The Modified Lehman is standard. Saudi Aramco-scale transactions are entirely bespoke — fees on mega-deals often involve equity stakes or success bonuses.`
+  },
+  'Luxury': {
+    norm:'1–1.5%',
+    typical:'₹12–18Cr on ₹1,000Cr deal',
+    timeline:'4–10 months',
+    body:`Global luxury M&A deals are competitive and fast-moving — LVMH, Kering, Richemont compete aggressively. Investment banks command 1–1.5% given brand valuation complexity, intangible-heavy deal structures, and the speed at which these processes run.`
+  },
+  'Semiconductors': {
+    norm:'1–2%',
+    typical:'₹10–22Cr on ₹1,000Cr deal',
+    timeline:'12–24 months',
+    body:`Semiconductor deals often face severe geopolitical and antitrust scrutiny — TSMC, ARM, and others have had deals blocked or delayed by regulators globally. Fees are 1–2% but heavily contingent on deal close. Bankers price execution risk into fee structures, often adding completion bonuses.`
+  },
+  'Payments': {
+    norm:'1–1.5%',
+    typical:'₹12–16Cr on ₹1,000Cr deal',
+    timeline:'4–8 months',
+    body:`Payment sector deals are high-growth and competitive. Tech-like valuations (EV/Revenue multiples) drive negotiations. Bankers earn 1–1.5% — processes are fast-moving and competitive, with multiple bidders common. Regulatory clearance from payment regulators adds moderate complexity.`
+  },
+  'E-Commerce': {
+    norm:'1–1.5%',
+    typical:'₹10–16Cr on ₹1,000Cr deal',
+    timeline:'4–10 months',
+    body:`E-commerce deals are complex due to marketplace vs. direct commerce models, GMV vs. revenue valuation debates, and regulatory scrutiny on foreign ownership. Bankers price risk of extended regulatory review into fees — 1–1.5% is standard.`
+  },
+  'Consumer': {
+    norm:'1–1.5%',
+    typical:'₹10–16Cr on ₹1,000Cr deal',
+    timeline:'4–8 months',
+    body:`Consumer sector deals — jewellery, luxury goods, lifestyle brands — command premium fees when brand value drives the deal. Strategic acquirers pay premium multiples, so the negotiation is intense. Bankers typically run tight competitive processes to maximize value.`
+  },
+  'Chemicals': {
+    norm:'0.75–1.25%',
+    typical:'₹8–14Cr on ₹1,000Cr deal',
+    timeline:'4–9 months',
+    body:`Specialty chemicals M&A involves complex plant valuation, product portfolio assessment, and environmental liability diligence. Fees are moderate but bankers with sector expertise earn a premium. Consolidation among Indian paint and specialty chemical companies has made this a busy sector.`
+  },
+  'default': {
+    norm:'1–1.5%',
+    typical:'₹10–16Cr on ₹1,000Cr deal',
+    timeline:'4–12 months',
+    body:`Standard investment banking mandates for M&A advisory typically run 1–1.5% for mid-market deals. The Modified Lehman formula is the Indian market standard for success fee calculation. Retainers of ₹15–40L/month for 4–9 months are typical across most sectors.`
+  }
+};
+
+// ── STATE ────────────────────────────────────────────────────────────────────
+let selectedCompany = null;
+let currentRegion = 'India';
+let lastResult = null;
+
+// ── STEP MANAGEMENT ──────────────────────────────────────────────────────────
+function goStep(n) {
+  for(let i=1;i<=4;i++){
+    document.getElementById('panel'+i).classList.toggle('visible',i===n);
+    const st = document.getElementById('st'+i);
+    st.classList.toggle('active',i===n);
+    st.classList.toggle('done',i<n);
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ── COMPANY GRID ─────────────────────────────────────────────────────────────
+function buildCompanyGrid(region) {
+  const grid = document.getElementById('companyGrid');
+  const cos = COMPANIES.filter(c=>c.region===region);
+  grid.innerHTML = cos.map(c=>`
+    <div class="co-card ${selectedCompany&&selectedCompany.name===c.name?'selected':''}" onclick="selectCompany(${JSON.stringify(c).replace(/"/g,'&quot;')},this)">
+      <div class="co-name">${c.name}</div>
+      <div class="co-meta">${c.ticker} · ${c.mcap}</div>
+      <div class="co-sector">${c.sector}</div>
+    </div>`).join('');
+}
+
+function switchRegion(region, el) {
+  currentRegion = region;
+  document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  buildCompanyGrid(region);
+}
+
+function selectCompany(co, el) {
+  selectedCompany = co;
+  document.querySelectorAll('.co-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('nextBtn1').disabled = false;
+}
+
+buildCompanyGrid('India');
+
+// ── CONTEXT CARD ─────────────────────────────────────────────────────────────
+function buildContextCard() {
+  const co = selectedCompany;
+  const ctx = SECTOR_CONTEXT[co.sector] || SECTOR_CONTEXT['default'];
+  document.getElementById('contextCard').innerHTML = `
+    <div class="context-company">
+      <div class="context-co-icon">${co.ticker.slice(0,2)}</div>
+      <div>
+        <div class="context-co-name">${co.name}</div>
+        <div class="context-co-sub">${co.sector} · ${co.mcap}</div>
+      </div>
+    </div>
+    <div class="context-title">Fee Norms — ${co.sector} Sector</div>
+    <div class="context-body">${ctx.body}</div>
+    <div class="fee-norms">
+      <div class="norm-item">
+        <div class="norm-label">Typical Fee Range</div>
+        <div class="norm-value">${ctx.norm}</div>
+      </div>
+      <div class="norm-item">
+        <div class="norm-label">Example (₹1,000Cr deal)</div>
+        <div class="norm-value" style="font-size:12px">${ctx.typical}</div>
+      </div>
+      <div class="norm-item">
+        <div class="norm-label">Typical Timeline</div>
+        <div class="norm-value">${ctx.timeline}</div>
+      </div>
+    </div>`;
+}
+
+// ── STEP 2 OVERRIDE ───────────────────────────────────────────────────────────
+const origGoStep = goStep;
+function goStep(n) {
+  if(n===2 && selectedCompany) buildContextCard();
+  origGoStep(n);
+}
+
+// ── RADIO HELPER ─────────────────────────────────────────────────────────────
+function selectRadio(el, groupId) {
+  document.querySelectorAll('#'+groupId+' .radio-btn').forEach(b=>b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function toggleRetainer() {
+  const val = document.querySelector('#retainerGroup .radio-btn.selected')?.dataset.val;
+  document.getElementById('retainerBlock').classList.toggle('hidden', val==='no');
+}
+
+function updateFeeHint() {
+  const val = document.getElementById('feeStructure').value;
+  document.getElementById('customPctSection').style.display = val==='custom'?'block':'none';
+}
+
+// ── MODIFIED LEHMAN ───────────────────────────────────────────────────────────
+function calcModifiedLehman(sizeCr) {
+  const tiers = [
+    {from:0,to:100,rate:0.02,label:'₹0–100Cr'},
+    {from:100,to:500,rate:0.01,label:'₹100–500Cr'},
+    {from:500,to:1000,rate:0.005,label:'₹500–1,000Cr'},
+    {from:1000,to:Infinity,rate:0.0025,label:'Above ₹1,000Cr'},
+  ];
+  let total=0;
+  const breakdown=[];
+  for(const t of tiers){
+    if(sizeCr<=t.from) break;
+    const slice=Math.min(sizeCr,t.to)-t.from;
+    const fee=slice*t.rate;
+    total+=fee;
+    breakdown.push({label:t.label,slice,rate:(t.rate*100).toFixed(2)+'%',fee,active:sizeCr>t.from});
+  }
+  return{total,breakdown};
+}
+
+// ── MAIN CALCULATION ──────────────────────────────────────────────────────────
+function runCalculation() {
+  const dealSize = parseFloat(document.getElementById('dealSize').value)||2500;
+  const feeStr = document.getElementById('feeStructure').value;
+  const hasRetainer = document.querySelector('#retainerGroup .radio-btn.selected')?.dataset.val==='yes';
+  const retainerMonthly = parseFloat(document.getElementById('retainerMonthly').value)||25;
+  const retainerMonths = parseInt(document.getElementById('retainerMonths').value)||6;
+  const syndicateCount = parseInt(document.querySelector('#syndicateGroup .radio-btn.selected')?.dataset.val||'1');
+  const dealType = document.querySelector('#dealTypeGroup .radio-btn.selected')?.dataset.val||'ma_sellside';
+  const customPct = parseFloat(document.getElementById('customPct').value)||1.0;
+
+  let successFee = 0;
+  let successFeeNote = '';
+  let lehmanData = null;
+
+  if(feeStr==='lehman') {
+    lehmanData = calcModifiedLehman(dealSize);
+    successFee = lehmanData.total;
+    successFeeNote = 'Modified Lehman';
+  } else if(feeStr==='flat_1') {
+    successFee = dealSize*0.01;
+    successFeeNote = '1.0% flat';
+  } else if(feeStr==='flat_075') {
+    successFee = dealSize*0.0075;
+    successFeeNote = '0.75% flat';
+  } else if(feeStr==='flat_05') {
+    successFee = dealSize*0.005;
+    successFeeNote = '0.5% flat';
+  } else {
+    successFee = dealSize*(customPct/100);
+    successFeeNote = customPct.toFixed(2)+'% flat';
+  }
+
+  const retainerTotal = hasRetainer ? (retainerMonthly * retainerMonths / 100) : 0; // convert lakh to Cr
+  const totalFee = successFee + retainerTotal;
+  const feePercent = (totalFee / dealSize * 100).toFixed(3);
+  const perBank = totalFee / syndicateCount;
+
+  lastResult = {
+    company: selectedCompany,
+    dealSize, successFee, retainerTotal, totalFee, feePercent,
+    perBank, syndicateCount, dealType, lehmanData, hasRetainer,
+    retainerMonthly, retainerMonths, successFeeNote
+  };
+
+  goStep(4);
+  runLoadingSequence();
+}
+
+// ── LOADING SEQUENCE ──────────────────────────────────────────────────────────
+const LOADING_STEPS = [
+  'Pulling deal comps...',
+  'Applying Modified Lehman formula...',
+  'Benchmarking against Indian M&A...',
+  'Calculating retainer / success split...',
+  'Cross-checking street consensus...',
+  'Fee model ready.'
+];
+const LOADING_DELAYS = [600,800,900,700,1000,200];
+
+function runLoadingSequence() {
+  document.getElementById('loadingWrap').style.display='block';
+  document.getElementById('revealWrap').style.display='none';
+  const listEl = document.getElementById('loadingList');
+  listEl.innerHTML = LOADING_STEPS.map((s,i)=>`<div class="ls-item pending-item" id="ls${i}">${s}</div>`).join('');
+
+  let current=0;
+  let elapsed=0;
+  const total=LOADING_DELAYS.reduce((a,b)=>a+b,0);
+
+  function runStep(i) {
+    if(i>=LOADING_STEPS.length){
+      setTimeout(()=>{
+        document.getElementById('loadingWrap').style.display='none';
+        document.getElementById('revealWrap').style.display='block';
+        buildReveal();
+      },300);
+      return;
+    }
+    document.getElementById('loadingStep').textContent=LOADING_STEPS[i];
+    document.querySelectorAll('.ls-item').forEach((el,idx)=>{
+      el.className='ls-item '+(idx<i?'done-item':idx===i?'active-item':'pending-item');
+    });
+    elapsed+=LOADING_DELAYS[i];
+    document.getElementById('loadingFill').style.width=(elapsed/total*100)+'%';
+    setTimeout(()=>runStep(i+1),LOADING_DELAYS[i]);
+  }
+  runStep(0);
+}
+
+// ── REVEAL ────────────────────────────────────────────────────────────────────
+function fmt(crore) {
+  if(crore>=100) return '₹'+crore.toFixed(1)+' Cr';
+  return '₹'+(crore*100).toFixed(1)+' L';
+}
+
+function buildReveal() {
+  const r = lastResult;
+  const co = r.company;
+  const ctx = SECTOR_CONTEXT[co.sector]||SECTOR_CONTEXT['default'];
+  const dealTypes = {ma_sellside:'M&A Sell-side',ma_buyside:'M&A Buy-side',ipo:'IPO Advisory',restructuring:'Restructuring',debt:'Debt Advisory'};
+
+  document.getElementById('revCoName').textContent = co.name;
+  document.getElementById('revDealLabel').textContent = `${dealTypes[r.dealType]} · ₹${r.dealSize.toLocaleString('en-IN')} Cr deal`;
+
+  // Fee boxes
+  document.getElementById('valRetainer').textContent = r.hasRetainer ? fmt(r.retainerTotal) : '₹0';
+  document.getElementById('subRetainer').textContent = r.hasRetainer ? `${r.retainerMonths} mo × ₹${r.retainerMonthly}L/mo` : 'No retainer';
+  document.getElementById('valSuccess').textContent = fmt(r.successFee);
+  document.getElementById('subSuccess').textContent = r.successFeeNote;
+  document.getElementById('valTotal').textContent = fmt(r.totalFee);
+  document.getElementById('subTotal').textContent = r.feePercent+'% of deal';
+
+  // Lehman table
+  if(r.lehmanData) {
+    document.getElementById('lehmanTable').innerHTML = `
+      <div class="lt-row header">
+        <div class="lt-cell">Tier</div>
+        <div class="lt-cell">Rate</div>
+        <div class="lt-cell">Slice (Cr)</div>
+        <div class="lt-cell">Fee Earned (Cr)</div>
+      </div>` +
+      r.lehmanData.breakdown.map(b=>`
+      <div class="lt-row">
+        <div class="lt-cell ${b.active?'active-tier':'inactive-tier'}">${b.label}</div>
+        <div class="lt-cell ${b.active?'active-tier':'inactive-tier'}">${b.rate}</div>
+        <div class="lt-cell ${b.active?'active-tier':'inactive-tier'}">${b.active?b.slice.toLocaleString('en-IN'):'—'}</div>
+        <div class="lt-cell ${b.active?'active-tier':'inactive-tier'}">${b.active?b.fee.toFixed(2):'—'}</div>
+      </div>`).join('');
+  } else {
+    document.getElementById('lehmanTable').innerHTML = `
+      <div class="lt-row header"><div class="lt-cell">Structure</div><div class="lt-cell">Rate</div><div class="lt-cell">Deal Size</div><div class="lt-cell">Fee (Cr)</div></div>
+      <div class="lt-row"><div class="lt-cell active-tier">Flat fee</div><div class="lt-cell active-tier">${r.successFeeNote}</div><div class="lt-cell active-tier">₹${r.dealSize.toLocaleString('en-IN')} Cr</div><div class="lt-cell active-tier">${r.successFee.toFixed(2)}</div></div>`;
+  }
+
+  // Insight
+  const impliedPct = (r.successFee/r.dealSize*100).toFixed(3);
+  document.getElementById('insightText').innerHTML =
+    `On a ₹${r.dealSize.toLocaleString('en-IN')} Cr deal, the Modified Lehman yields a <strong>${impliedPct}% effective rate</strong> — lower than the headline 2% because larger deal slabs attract lower rates. The sector norm for ${co.sector} is <strong>${ctx.norm}</strong>. Your total all-in fee including retainer works out to <strong>${r.feePercent}% of the deal</strong>. ${parseFloat(r.feePercent)<parseFloat(ctx.norm.split('–')[0])?'This is below the sector floor — possible for repeat mandates or large deal sizes.':'This sits within the normal range for this sector.'}`;
+
+  // Syndicate
+  const roleNames = ['Sole Bank / Book-runner','Co-Manager','Co-Manager #2','Co-Manager #3'];
+  const splits = [0.55,0.25,0.12,0.08];
+  let synRows = '';
+  for(let i=0;i<r.syndicateCount;i++){
+    const share = r.syndicateCount===1 ? r.totalFee : r.totalFee * splits[i];
+    synRows += `<div class="syndicate-row">
+      <span class="syndicate-bank">${roleNames[i]||'Bank '+(i+1)}</span>
+      <span class="syndicate-fee">${fmt(share)}</span>
+    </div>`;
+  }
+  document.getElementById('syndicateRows').innerHTML = synRows;
+
+  // Benchmark
+  const benchmarks = [
+    {label:'Your deal effective rate',val:parseFloat(r.feePercent),color:'var(--text)'},
+    {label:`${co.sector} sector norm (mid)`,val:parseFloat(ctx.norm.replace(/[^0-9.–-]/g,'').split('–')[0])*1+parseFloat(ctx.norm.replace(/[^0-9.–-]/g,'').split('–')[1]||ctx.norm.replace(/[^0-9.–-]/g,''))*0.5,color:'#16a34a'},
+    {label:'All-India M&A median',val:1.0,color:'#6b7280'},
+  ];
+  const maxVal = Math.max(...benchmarks.map(b=>b.val),2);
+  document.getElementById('benchmarkRows').innerHTML = benchmarks.map(b=>`
+    <div class="benchmark-row">
+      <span class="benchmark-label">${b.label}</span>
+      <div class="benchmark-bar-wrap"><div class="benchmark-bar-fill" style="width:${(b.val/maxVal*100).toFixed(0)}%;background:${b.color}"></div></div>
+      <span class="benchmark-val" style="color:${b.color}">${b.val.toFixed(2)}%</span>
+    </div>`).join('');
+}
+
+// ── VAULT ─────────────────────────────────────────────────────────────────────
+function saveToVault() {
+  if(!lastResult) return;
+  const r = lastResult;
+  try {
+    const vault = JSON.parse(localStorage.getItem('vd_vault')||'[]');
+    vault.unshift({
+      id:'ib-fee-'+Date.now(),
+      type:'IB Fee Calculator',
+      company:r.company.name,
+      sector:r.company.sector,
+      date:new Date().toLocaleDateString('en-IN'),
+      deal:'₹'+r.dealSize.toLocaleString('en-IN')+' Cr deal',
+      result:'Total fee: '+fmt(r.totalFee)+' ('+r.feePercent+'%)',
+      domain:'investment-banking'
+    });
+    localStorage.setItem('vd_vault',JSON.stringify(vault.slice(0,50)));
+    const t=document.getElementById('vaultToast');
+    t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),2500);
+  } catch(e){}
+}
+
+function resetCalc() {
+  selectedCompany=null;
+  lastResult=null;
+  document.querySelectorAll('.co-card').forEach(c=>c.classList.remove('selected'));
+  document.getElementById('nextBtn1').disabled=true;
+  switchRegion('India',document.querySelector('.rtab'));
+  goStep(1);
+}
+</script>
+</body>
+</html>

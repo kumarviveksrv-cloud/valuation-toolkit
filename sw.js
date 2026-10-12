@@ -24,6 +24,15 @@ const STATIC_ASSETS = [
   BASE + '/vault/index.html',
   BASE + '/daily-brief/index.html',
   BASE + '/deal-room/index.html',
+  BASE + '/domains/investment-banking/index.html',
+  BASE + '/domains/investment-banking/calculators/index.html',
+  BASE + '/domains/investment-banking/calculators/ib-fees.html',
+  BASE + '/domains/investment-banking/calculators/precedent-transactions.html',
+  BASE + '/domains/investment-banking/calculators/ipo-pricing.html',
+  BASE + '/domains/investment-banking/calculators/debt-capacity.html',
+  BASE + '/domains/investment-banking/calculators/capital-raise.html',
+  BASE + '/domains/investment-banking/calculators/fairness-opinion.html',
+  BASE + '/domains/investment-banking/learn/index.html',
 ];
 
 // Install — cache all static assets

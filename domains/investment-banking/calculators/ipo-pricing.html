@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IPO Pricing & Dilution — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
+a{text-decoration:none;color:inherit}
+.top-nav{border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;height:56px;gap:28px}
+.logo{font-size:17px;font-weight:700}.logo strong{font-weight:900}
+.nav-links{display:flex;gap:20px;flex:1}.nav-links a{font-size:13px;color:var(--muted);font-weight:500}
+.nav-cta{display:flex;gap:8px;align-items:center;margin-left:auto}
+.vault-btn{font-size:12px;font-weight:600;padding:6px 12px;border:1px solid var(--border);border-radius:6px}
+.pro-btn{font-size:12px;font-weight:700;padding:6px 14px;background:var(--text);color:#fff;border-radius:6px}
+.domain-nav{border-bottom:1px solid var(--border)}
+.domain-nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex}
+.domain-nav a{font-size:13px;font-weight:500;color:var(--muted);padding:10px 16px;border-bottom:2px solid transparent}
+.domain-nav a.active{color:var(--text);border-bottom-color:var(--text)}
+.calc-wrap{max-width:800px;margin:0 auto;padding:48px 24px 80px}
+.calc-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;background:var(--text);color:#fff;margin-bottom:14px}
+.calc-title{font-size:30px;font-weight:900;letter-spacing:-.75px;margin-bottom:8px}
+.calc-sub{font-size:15px;color:var(--muted);line-height:1.6;margin-bottom:36px}
+.stepper{display:flex;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:40px}
+.step-item{flex:1;padding:10px 16px;text-align:center;font-size:12px;font-weight:600;color:var(--muted);border-right:1px solid var(--border);background:var(--card)}
+.step-item:last-child{border-right:none}
+.step-item.active{background:var(--text);color:#fff}
+.step-item.done{background:#f0fdf4;color:#16a34a}
+.step-num{display:block;font-size:10px;font-weight:700;opacity:.7;margin-bottom:1px;font-family:var(--mono)}
+.step-panel{display:none}.step-panel.visible{display:block}
+.region-tabs{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:20px;width:fit-content}
+.rtab{padding:7px 18px;font-size:13px;font-weight:600;color:var(--muted);background:var(--card);cursor:pointer;border-right:1px solid var(--border)}
+.rtab:last-child{border-right:none}
+.rtab.active{background:var(--text);color:#fff}
+.company-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.co-card{border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .15s}
+.co-card:hover{border-color:#888}
+.co-card.selected{border-color:var(--text);border-width:2px;background:#fafafa}
+.co-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.co-meta{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.co-sector{font-size:11px;color:var(--muted)}
+.context-card{border:1.5px solid var(--border);border-radius:14px;padding:28px;background:var(--card);margin-bottom:20px}
+.context-company{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)}
+.ctx-icon{width:44px;height:44px;border-radius:10px;background:var(--text);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;font-family:var(--mono)}
+.ctx-name{font-size:18px;font-weight:800}
+.ctx-sub{font-size:13px;color:var(--muted)}
+.ctx-body{font-size:14px;line-height:1.7;margin-bottom:20px}
+.ipo-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.is-item{background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px}
+.is-label{font-size:11px;color:var(--muted);margin-bottom:4px}
+.is-val{font-size:15px;font-weight:800;font-family:var(--mono)}
+.pro-gate{border:2px dashed var(--border);border-radius:16px;padding:56px 32px;text-align:center;margin-bottom:20px}
+.gate-icon{font-size:40px;margin-bottom:16px}
+.gate-title{font-size:22px;font-weight:900;margin-bottom:8px}
+.gate-sub{font-size:14px;color:var(--muted);max-width:420px;margin:0 auto 24px;line-height:1.6}
+.gate-features{display:flex;flex-direction:column;gap:8px;margin-bottom:28px;text-align:left;max-width:320px;margin-left:auto;margin-right:auto}
+.gate-feat{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px}
+.gate-feat::before{content:'→';font-weight:700;color:var(--text)}
+.gate-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:var(--text);color:#fff;border-radius:8px;font-size:15px;font-weight:800;cursor:pointer;border:none}
+.gate-price{font-size:12px;color:var(--muted);margin-top:12px}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:var(--text);color:#fff;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:none}
+.btn-secondary{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text)}
+.btn-row{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap}
+@media(max-width:640px){.company-grid{grid-template-columns:repeat(2,1fr)}.ipo-stats{grid-template-columns:1fr 1fr}.nav-links{display:none}}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <div class="nav-inner">
+    <a href="/valuation-toolkit/" class="logo">Valuation<strong>Desk</strong></a>
+    <div class="nav-links">
+      <a href="/valuation-toolkit/domains/investment-banking/">Investment Banking</a>
+      <a href="/valuation-toolkit/vault/">My Vault</a>
+    </div>
+    <div class="nav-cta">
+      <a href="/valuation-toolkit/vault/" class="vault-btn">📁 Vault</a>
+      <a href="#" class="pro-btn">Get Pro — ₹799/mo</a>
+    </div>
+  </div>
+</nav>
+<div class="domain-nav">
+  <div class="domain-nav-inner">
+    <a href="/valuation-toolkit/domains/investment-banking/">Overview</a>
+    <a href="/valuation-toolkit/domains/investment-banking/learn/">📖 Learn</a>
+    <a href="/valuation-toolkit/domains/investment-banking/calculators/" class="active">🧮 Calculators</a>
+    <a href="/valuation-toolkit/vault/">📁 My Vault</a>
+  </div>
+</div>
+
+<div class="calc-wrap">
+  <div class="calc-badge">📈 Pro Calculator</div>
+  <h1 class="calc-title">IPO Pricing &amp; Dilution</h1>
+  <p class="calc-sub">Price band analysis, fresh vs OFS proceeds, promoter stake dilution, underwriting fees, and oversubscription scenarios. Model exactly what goes to the company vs. selling shareholders.</p>
+
+  <div class="stepper">
+    <div class="step-item active" id="st1"><span class="step-num">01</span>Company</div>
+    <div class="step-item" id="st2"><span class="step-num">02</span>Context</div>
+    <div class="step-item" id="st3"><span class="step-num">03</span>Pricing ↗</div>
+    <div class="step-item" id="st4"><span class="step-num">04</span>Output ↗</div>
+  </div>
+
+  <div class="step-panel visible" id="panel1">
+    <div class="region-tabs">
+      <div class="rtab active" onclick="switchRegion('India',this)">🇮🇳 India</div>
+      <div class="rtab" onclick="switchRegion('Global',this)">🌐 Global</div>
+    </div>
+    <div class="company-grid" id="companyGrid"></div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="goStep(2)" id="nextBtn1" disabled>See IPO Context →</button>
+    </div>
+  </div>
+
+  <div class="step-panel" id="panel2">
+    <div class="context-card" id="contextCard"></div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="goStep(3)">Model the IPO →</button>
+      <button class="btn-secondary" onclick="goStep(1)">← Back</button>
+    </div>
+  </div>
+
+  <div class="step-panel" id="panel3">
+    <div class="pro-gate">
+      <div class="gate-icon">🔒</div>
+      <div class="gate-title">Pro feature</div>
+      <div class="gate-sub">Model the full IPO — set the price band, define fresh vs OFS split, calculate promoter dilution, underwriting fees, and run oversubscription scenarios.</div>
+      <div class="gate-features">
+        <div class="gate-feat">Price band floor / cap / final price modelling</div>
+        <div class="gate-feat">Fresh issue vs OFS split and proceeds calculator</div>
+        <div class="gate-feat">Post-IPO promoter stake and dilution analysis</div>
+        <div class="gate-feat">Underwriting fee and BRLM cost breakdown</div>
+        <div class="gate-feat">3x / 5x / 10x oversubscription scenario table</div>
+      </div>
+      <button class="gate-btn" onclick="window.location.href='#'">Unlock Pro — ₹799/mo →</button>
+      <div class="gate-price">Monthly only · Cancel anytime · All 15 domains included</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goStep(2)">← Back to Context</button>
+    </div>
+  </div>
+
+  <div class="step-panel" id="panel4">
+    <div class="pro-gate">
+      <div class="gate-icon">🔒</div>
+      <div class="gate-title">Pro feature</div>
+      <div class="gate-sub">Step 4 unlocks the IPO pricing output — implied market cap at each price point, grey market premium analysis, listing day return scenarios, and a SEBI-ready summary.</div>
+      <button class="gate-btn" onclick="window.location.href='#'">Unlock Pro — ₹799/mo →</button>
+      <div class="gate-price">Monthly only · Cancel anytime · All 15 domains included</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const COMPANIES=[{name:'Reliance Industries',ticker:'RELIANCE',sector:'Conglomerate',mcap:'₹17.2L Cr',region:'India'},{name:'HDFC Bank',ticker:'HDFCBANK',sector:'Banking',mcap:'₹11.8L Cr',region:'India'},{name:'TCS',ticker:'TCS',sector:'Technology',mcap:'₹13.5L Cr',region:'India'},{name:'Infosys',ticker:'INFY',sector:'Technology',mcap:'₹6.2L Cr',region:'India'},{name:'ICICI Bank',ticker:'ICICIBANK',sector:'Banking',mcap:'₹8.9L Cr',region:'India'},{name:'Hindustan Unilever',ticker:'HUL',sector:'FMCG',mcap:'₹5.4L Cr',region:'India'},{name:'ITC',ticker:'ITC',sector:'FMCG',mcap:'₹4.8L Cr',region:'India'},{name:'Maruti Suzuki',ticker:'MARUTI',sector:'Auto',mcap:'₹3.8L Cr',region:'India'},{name:'Bajaj Finance',ticker:'BAJFINANCE',sector:'NBFC',mcap:'₹4.3L Cr',region:'India'},{name:'Larsen & Toubro',ticker:'LT',sector:'Infrastructure',mcap:'₹4.9L Cr',region:'India'},{name:'Wipro',ticker:'WIPRO',sector:'Technology',mcap:'₹2.4L Cr',region:'India'},{name:'Asian Paints',ticker:'ASIANPAINT',sector:'Chemicals',mcap:'₹2.2L Cr',region:'India'},{name:'Sun Pharma',ticker:'SUNPHARMA',sector:'Pharma',mcap:'₹3.8L Cr',region:'India'},{name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',sector:'Banking',mcap:'₹3.6L Cr',region:'India'},{name:'Titan Company',ticker:'TITAN',sector:'Consumer',mcap:'₹2.9L Cr',region:'India'},{name:'Apple',ticker:'AAPL',sector:'Technology',mcap:'$3.5T',region:'Global'},{name:'Microsoft',ticker:'MSFT',sector:'Technology',mcap:'$3.1T',region:'Global'},{name:'Alphabet',ticker:'GOOGL',sector:'Technology',mcap:'$2.1T',region:'Global'},{name:'Amazon',ticker:'AMZN',sector:'E-Commerce',mcap:'$1.9T',region:'Global'},{name:'Meta',ticker:'META',sector:'Technology',mcap:'$1.4T',region:'Global'},{name:'Berkshire Hathaway',ticker:'BRK.B',sector:'Conglomerate',mcap:'$900B',region:'Global'},{name:'JPMorgan Chase',ticker:'JPM',sector:'Banking',mcap:'$580B',region:'Global'},{name:'Visa',ticker:'V',sector:'Payments',mcap:'$540B',region:'Global'},{name:'Samsung',ticker:'005930',sector:'Technology',mcap:'$380B',region:'Global'},{name:'Alibaba',ticker:'BABA',sector:'E-Commerce',mcap:'$220B',region:'Global'},{name:'Nestlé',ticker:'NESN',sector:'FMCG',mcap:'$290B',region:'Global'},{name:'Tesla',ticker:'TSLA',sector:'Auto',mcap:'$700B',region:'Global'},{name:'LVMH',ticker:'MC',sector:'Luxury',mcap:'$330B',region:'Global'},{name:'TSMC',ticker:'TSM',sector:'Semiconductors',mcap:'$860B',region:'Global'},{name:'Saudi Aramco',ticker:'ARAMCO',sector:'Energy',mcap:'$1.8T',region:'Global'}];
+
+const IPO_CONTEXT={
+  'Technology':'Indian tech IPOs (Nykaa, Zomato, Paytm) commanded massive pre-IPO valuations but saw varied listing performance. Pricing at 25–40x EV/Revenue for high-growth tech is common. The challenge: setting a price band that enables oversubscription without leaving money on the table. QIBS drive the book — institutional allocation is 75% by SEBI mandate.',
+  'Banking':'Banking IPOs require RBI approval and are complex to price — P/BV is the key metric. Indian bank IPOs (Bandhan, IDFC First) typically price at 2–4x P/BV. Fresh issue proceeds fund capital adequacy ratios; OFS allows promoters/PE investors to exit. Underwriting fees are typically 1.5–2.5% of issue size.',
+  'FMCG':'FMCG IPOs are rare because most large FMCG companies are already listed. When they happen (like Nuvoco), they price at 20–30x EV/EBITDA. Investor demand is consistently strong for FMCG names given perceived business quality and cash flow predictability.',
+  'Auto':'Auto IPOs face scrutiny on EV transition exposure. Pricing is typically 15–20x P/E or 8–12x EV/EBITDA for traditional auto. Companies with EV product roadmaps command premium pricing. Underwriting for auto IPOs: 1.5–2% of issue size.',
+  'default':'Indian IPOs follow SEBI\'s book building process — 75% QIB, 15% NII, 10% retail. Price band is set 3–5 weeks before listing. Fresh issue proceeds go to the company; OFS proceeds go to selling shareholders. BRLM (Book Running Lead Manager) fees are typically 1.5–3% of gross issue size.'
+};
+
+let sel=null;
+
+function goStep(n){
+  for(let i=1;i<=4;i++){
+    document.getElementById('panel'+i).classList.toggle('visible',i===n);
+    document.getElementById('st'+i).classList.toggle('active',i===n);
+    document.getElementById('st'+i).classList.toggle('done',i<n);
+  }
+  if(n===2&&sel) buildContext();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function buildCompanyGrid(region){
+  document.getElementById('companyGrid').innerHTML=COMPANIES.filter(c=>c.region===region).map(c=>`
+    <div class="co-card ${sel&&sel.name===c.name?'selected':''}" onclick="selectCo(${JSON.stringify(c).replace(/"/g,'&quot;')},this)">
+      <div class="co-name">${c.name}</div><div class="co-meta">${c.ticker} · ${c.mcap}</div><div class="co-sector">${c.sector}</div>
+    </div>`).join('');
+}
+
+function switchRegion(r,el){
+  document.querySelectorAll('.rtab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  buildCompanyGrid(r);
+}
+
+function selectCo(co,el){
+  sel=co;
+  document.querySelectorAll('.co-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('nextBtn1').disabled=false;
+}
+
+function buildContext(){
+  const body=IPO_CONTEXT[sel.sector]||IPO_CONTEXT['default'];
+  document.getElementById('contextCard').innerHTML=`
+    <div class="context-company">
+      <div class="ctx-icon">${sel.ticker.slice(0,2)}</div>
+      <div><div class="ctx-name">${sel.name}</div><div class="ctx-sub">${sel.sector} · ${sel.mcap}</div></div>
+    </div>
+    <div class="ctx-body">${body}</div>
+    <div class="ipo-stats">
+      <div class="is-item"><div class="is-label">SEBI Allocation</div><div class="is-val">75/15/10</div></div>
+      <div class="is-item"><div class="is-label">Underwriting Fee</div><div class="is-val">1.5–3%</div></div>
+      <div class="is-item"><div class="is-label">Typical Book Build</div><div class="is-val">3–7 days</div></div>
+    </div>`;
+}
+
+buildCompanyGrid('India');
+</script>
+</body>
+</html>

@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learn Investment Banking · ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.7}
+  a{color:inherit;text-decoration:none}
+
+  /* NAV */
+  .top-nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between}
+  .nav-left{display:flex;align-items:center;gap:12px}
+  .nav-logo{font-weight:800;font-size:16px;letter-spacing:-0.5px}
+  .nav-sep{color:var(--border);font-size:18px}
+  .nav-domain{font-size:13px;color:var(--muted);font-weight:500}
+  .nav-right{display:flex;align-items:center;gap:8px}
+  .nav-btn{padding:6px 14px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:none}
+  .nav-btn-ghost{background:none;color:var(--muted)}
+  .nav-btn-ghost:hover{color:var(--text)}
+  .nav-btn-pro{background:var(--text);color:#fff}
+
+  /* SUBNAV */
+  .domain-nav{background:var(--card);border-bottom:1px solid var(--border);padding:0 20px;display:flex;gap:0;overflow-x:auto}
+  .domain-nav a{padding:10px 16px;font-size:13px;font-weight:500;color:var(--muted);white-space:nowrap;border-bottom:2px solid transparent}
+  .domain-nav a:hover{color:var(--text)}
+  .domain-nav a.active{color:var(--text);border-bottom-color:var(--text);font-weight:600}
+
+  /* PAGE */
+  .page-wrap{max-width:780px;margin:0 auto;padding:40px 20px 100px}
+  .page-header{margin-bottom:40px}
+  .page-tag{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:10px}
+  .page-header h1{font-size:30px;font-weight:800;letter-spacing:-0.8px;margin-bottom:10px}
+  .page-header p{color:var(--muted);font-size:16px;max-width:560px}
+
+  /* MODULE TABS */
+  .module-tabs{display:flex;gap:0;margin-bottom:32px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  .module-tab{flex:1;padding:12px 8px;text-align:center;font-size:12px;font-weight:600;color:var(--muted);background:var(--card);border-right:1px solid var(--border);cursor:pointer;transition:all 0.15s;line-height:1.3}
+  .module-tab:last-child{border-right:none}
+  .module-tab.active{background:var(--text);color:#fff}
+  .module-tab:hover:not(.active){background:var(--border)}
+  .module-num{display:block;font-size:10px;margin-bottom:3px;opacity:0.7}
+
+  /* MODULE CONTENT */
+  .module{display:none}
+  .module.active{display:block}
+
+  /* ARTICLE */
+  .article h2{font-size:22px;font-weight:800;letter-spacing:-0.4px;margin-bottom:8px}
+  .article .subtitle{color:var(--muted);font-size:15px;margin-bottom:28px}
+  .article h3{font-size:16px;font-weight:700;margin:28px 0 10px;padding-top:4px}
+  .article h3:first-of-type{margin-top:0}
+  .article p{color:#2a2a2a;margin-bottom:14px;font-size:15px}
+  .article strong{color:var(--text);font-weight:700}
+
+  /* CALLOUT BOXES */
+  .callout{border-radius:10px;padding:18px 20px;margin:20px 0;font-size:14px;line-height:1.7}
+  .callout-blue{background:#eff6ff;border:1px solid #bfdbfe}
+  .callout-green{background:#f0fdf4;border:1px solid #86efac}
+  .callout-amber{background:#fffbeb;border:1px solid #fde68a}
+  .callout-gray{background:var(--card);border:1px solid var(--border)}
+  .callout-title{font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+  .callout-blue .callout-title{color:#1d4ed8}
+  .callout-green .callout-title{color:var(--green)}
+  .callout-amber .callout-title{color:var(--amber)}
+
+  /* TABLES */
+  .data-table{width:100%;border-collapse:collapse;margin:16px 0 24px;font-size:14px}
+  .data-table th{text-align:left;padding:10px 12px;background:var(--card);border:1px solid var(--border);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)}
+  .data-table td{padding:10px 12px;border:1px solid var(--border);vertical-align:top}
+  .data-table tr:hover td{background:var(--card)}
+  .mono{font-family:'JetBrains Mono',monospace;font-size:13px}
+
+  /* TIMELINE */
+  .timeline{margin:20px 0 28px}
+  .tl-item{display:flex;gap:16px;margin-bottom:0}
+  .tl-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:32px}
+  .tl-dot{width:14px;height:14px;border-radius:50%;background:var(--text);border:3px solid #fff;box-shadow:0 0 0 2px var(--text);flex-shrink:0;margin-top:4px}
+  .tl-line{width:2px;background:var(--border);flex:1;margin:4px 0}
+  .tl-item:last-child .tl-line{display:none}
+  .tl-right{padding-bottom:20px}
+  .tl-step{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:4px}
+  .tl-title{font-size:15px;font-weight:700;margin-bottom:4px}
+  .tl-desc{font-size:14px;color:var(--muted)}
+
+  /* COMP TABLE */
+  .comp-tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700}
+  .tag-bb{background:#eff6ff;color:#1d4ed8}
+  .tag-boutique{background:#f0fdf4;color:var(--green)}
+  .tag-middle{background:#fffbeb;color:var(--amber)}
+
+  /* COMP LADDER */
+  .ladder{margin:20px 0 24px}
+  .ladder-row{display:flex;align-items:stretch;gap:0;margin-bottom:8px}
+  .ladder-label{width:100px;font-size:13px;font-weight:700;padding:10px 12px 10px 0;text-align:right;color:var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:flex-end}
+  .ladder-bar-wrap{flex:1}
+  .ladder-bar{height:36px;border-radius:6px;display:flex;align-items:center;padding:0 12px;font-size:13px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden}
+  .ladder-detail{font-size:12px;color:var(--muted);margin-top:4px;padding-left:12px}
+
+  /* QUIZ CARDS */
+  .quiz-section{margin-top:32px;border-top:1px solid var(--border);padding-top:28px}
+  .quiz-section h3{font-size:16px;font-weight:700;margin-bottom:16px}
+  .quiz-q{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:12px}
+  .quiz-q-text{font-size:14px;font-weight:600;margin-bottom:12px}
+  .quiz-opts{display:grid;gap:6px}
+  .quiz-opt{padding:9px 14px;border:1px solid var(--border);border-radius:7px;font-size:13px;cursor:pointer;background:#fff;text-align:left;font-family:'Inter',sans-serif;transition:all 0.15s}
+  .quiz-opt:hover{border-color:#999}
+  .quiz-opt.correct{background:#f0fdf4;border-color:var(--green);color:var(--green);font-weight:600}
+  .quiz-opt.wrong{background:#fef2f2;border-color:var(--red);color:var(--red)}
+  .quiz-explanation{margin-top:10px;font-size:13px;color:var(--muted);display:none;background:var(--card);padding:10px 12px;border-radius:7px;line-height:1.6}
+
+  /* NAV BUTTONS */
+  .module-nav{display:flex;gap:12px;margin-top:32px;padding-top:24px;border-top:1px solid var(--border)}
+  .mnav-btn{padding:11px 20px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;border:1px solid var(--border);background:#fff;color:var(--text)}
+  .mnav-btn-primary{background:var(--text);color:#fff;border-color:var(--text)}
+  .mnav-btn:hover{opacity:0.85}
+
+  @media(max-width:600px){
+    .module-tabs{flex-wrap:wrap}
+    .module-tab{flex:none;width:50%}
+    .module-tab:nth-child(2){border-right:none}
+    .module-tab:nth-child(3){border-top:1px solid var(--border);border-right:1px solid var(--border)}
+    .module-tab:nth-child(4){border-top:1px solid var(--border)}
+  }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="nav-left">
+    <span class="nav-logo">ValuationDesk</span>
+    <span class="nav-sep">/</span>
+    <span class="nav-domain">Investment Banking</span>
+  </div>
+  <div class="nav-right">
+    <button class="nav-btn nav-btn-ghost" onclick="window.location.href='../index.html'">← IB Home</button>
+    <button class="nav-btn nav-btn-pro" onclick="window.location.href='../../../index.html'">All Domains</button>
+  </div>
+</nav>
+
+<div class="domain-nav">
+  <a href="../index.html">Overview</a>
+  <a href="../learn/index.html" class="active">Learn</a>
+  <a href="../calculators/index.html">Calculators</a>
+  <a href="#">My Vault</a>
+</div>
+
+<div class="page-wrap">
+  <div class="page-header">
+    <div class="page-tag">Investment Banking · 4 Modules · ~45 min read</div>
+    <h1>How Investment Banking Works</h1>
+    <p>From origination to close — what IBs actually do, how deals get structured, how to read a pitch book, and what the money looks like.</p>
+  </div>
+
+  <!-- MODULE TABS -->
+  <div class="module-tabs">
+    <div class="module-tab active" onclick="setModule(1,this)"><span class="module-num">MODULE 1</span>What IBs Actually Do</div>
+    <div class="module-tab" onclick="setModule(2,this)"><span class="module-num">MODULE 2</span>The Deal Lifecycle</div>
+    <div class="module-tab" onclick="setModule(3,this)"><span class="module-num">MODULE 3</span>Reading a Pitch Book</div>
+    <div class="module-tab" onclick="setModule(4,this)"><span class="module-num">MODULE 4</span>IB Economics</div>
+  </div>
+
+  <!-- MODULE 1: WHAT IBs ACTUALLY DO -->
+  <div class="module active" id="module-1">
+    <div class="article">
+      <h2>What Investment Bankers Actually Do</h2>
+      <p class="subtitle">Coverage groups, product groups, bulge brackets vs boutiques, and the origination machine.</p>
+
+      <h3>The short answer nobody gives you</h3>
+      <p>Investment bankers do two things: they <strong>originate deals</strong> (find them and pitch for the mandate) and they <strong>execute deals</strong> (structure, market, and close them). Everything else — the models, the pitch books, the due diligence — is in service of one of those two activities.</p>
+      <p>The reason this matters: senior bankers (MDs and VPs) spend 80% of their time originating. Junior bankers (Analysts and Associates) spend 80% of their time executing. When you're evaluating a bank's franchise, you're evaluating its origination machine. When you're evaluating a junior role, you're evaluating its execution training.</p>
+
+      <h3>Coverage vs product groups</h3>
+      <p>Every large investment bank is organized along two axes:</p>
+
+      <table class="data-table">
+        <thead><tr><th>Group Type</th><th>What They Do</th><th>Indian Examples</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Coverage Groups</strong><br><span style="color:var(--muted);font-size:12px">e.g. TMT, Healthcare, Industrials</span></td>
+            <td>Own the client relationships by sector. A TMT banker covers every tech company in their territory. They bring in all deals from those clients.</td>
+            <td>Kotak's TMT Coverage, Axis Capital's Industrials desk</td>
+          </tr>
+          <tr>
+            <td><strong>Product Groups</strong><br><span style="color:var(--muted);font-size:12px">e.g. M&amp;A, ECM, DCM, Leveraged Finance</span></td>
+            <td>Own the product expertise. When a coverage banker brings in a deal, the relevant product group executes it. M&amp;A bankers run every M&amp;A deal regardless of sector.</td>
+            <td>Goldman Sachs India M&amp;A, JM Financial ECM</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>In practice, the coverage banker pitches and wins. The product banker structures and executes. Fees are split between groups. This creates both collaboration and politics — a coverage MD hates losing fee credit to a product group, and vice versa.</p>
+
+      <div class="callout callout-blue">
+        <div class="callout-title">India-Specific Structure</div>
+        In India, most domestic IBs (Kotak, Axis, JM Financial, IIFL, ICICI Securities) don't have the full product-coverage split of global bulge brackets. A single team often covers both the relationship and the product execution. This means Indian IB analysts get broader experience earlier, but less deep expertise in any one area.
+      </div>
+
+      <h3>Bulge brackets vs boutiques vs Indian mid-market</h3>
+
+      <table class="data-table">
+        <thead><tr><th>Tier</th><th>Who</th><th>Strengths</th><th>India Presence</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="comp-tag tag-bb">Bulge Bracket</span></td>
+            <td>Goldman, Morgan Stanley, JP Morgan, Citi, BofA, Barclays, Deutsche</td>
+            <td>Cross-border M&amp;A, global ECM, marquee mandates, global distribution</td>
+            <td>India offices primarily for cross-border deals, large ECM; limited domestic M&amp;A</td>
+          </tr>
+          <tr>
+            <td><span class="comp-tag tag-boutique">Elite Boutique</span></td>
+            <td>Lazard, Evercore, Moelis, Rothschild, Houlihan Lokey, Avendus</td>
+            <td>Senior attention, independent advice (no conflicts from lending), M&amp;A focus</td>
+            <td>Avendus is India's most active boutique (PE, tech M&amp;A). Rothschild active on restructuring.</td>
+          </tr>
+          <tr>
+            <td><span class="comp-tag tag-middle">Indian Domestic</span></td>
+            <td>Kotak, Axis Capital, JM Financial, IIFL, ICICI Securities, Edelweiss</td>
+            <td>India mid-market dominance, domestic ECM, deep sector coverage, regulatory expertise</td>
+            <td>Run most domestic IPOs, QIPs, and mid-market M&amp;A. The real IB market in India by volume.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>The origination machine</h3>
+      <p>People underestimate how much of IB is a sales job. At the MD level, origination is everything. A typical IB MD spends their day:</p>
+      <ul style="margin:0 0 14px 20px;color:#2a2a2a;font-size:15px">
+        <li style="margin-bottom:6px"><strong>Client entertainment and relationship maintenance</strong> — dinners, board meetings, industry conferences. An MD who isn't out of the office is falling behind.</li>
+        <li style="margin-bottom:6px"><strong>Pitching</strong> — preparing and delivering pitch books to prospective clients to win mandates. A top IB MD pitches 3-5 times a week.</li>
+        <li style="margin-bottom:6px"><strong>Mandate negotiations</strong> — once a client wants to do a deal, negotiating the mandate letter, fee structure, and exclusivity terms.</li>
+        <li style="margin-bottom:6px"><strong>Internal coordination</strong> — weekly pipeline reviews, allocating analyst capacity, managing fee credit splits with other groups.</li>
+      </ul>
+
+      <div class="callout callout-amber">
+        <div class="callout-title">The Uncomfortable Truth About IB</div>
+        Investment banking is not primarily about financial modeling. It is primarily about trust and access. The models are a hygiene check — clients expect them to be right, but they don't win deals. Relationships and track record win deals. This is why senior IB professionals are almost universally excellent at relationship management and frequently less strong at technical finance than the buyside analysts they work with.
+      </div>
+
+      <div class="quiz-section">
+        <h3>Check your understanding</h3>
+        <div class="quiz-q">
+          <div class="quiz-q-text">1. An M&amp;A banker at Goldman Sachs India is part of a "product group." A technology company approaching Goldman for M&amp;A advice would primarily work with which group?</div>
+          <div class="quiz-opts">
+            <button class="quiz-opt" onclick="answer(this,'wrong')">A) The M&amp;A group only</button>
+            <button class="quiz-opt" onclick="answer(this,'correct')">B) The TMT coverage group initially, who brings in the M&amp;A group to execute</button>
+            <button class="quiz-opt" onclick="answer(this,'wrong')">C) Whichever group has the most available analysts</button>
+          </div>
+          <div class="quiz-explanation">Coverage groups own client relationships by sector (TMT = Technology, Media, Telecom). The TMT coverage banker wins the mandate; the M&amp;A product group executes the deal. Fees are shared.</div>
+        </div>
+        <div class="quiz-q">
+          <div class="quiz-q-text">2. Why would a company prefer an elite boutique like Avendus over a bulge bracket for an M&amp;A advisory mandate?</div>
+          <div class="quiz-opts">
+            <button class="quiz-opt" onclick="answer(this,'wrong')">A) Boutiques charge lower fees</button>
+            <button class="quiz-opt" onclick="answer(this,'correct')">B) No conflicts from a large lending or trading book — purely advisory, senior banker attention</button>
+            <button class="quiz-opt" onclick="answer(this,'wrong')">C) Boutiques have larger global distribution networks</button>
+          </div>
+          <div class="quiz-explanation">Elite boutiques are "conflict-free" — they don't lend money to corporates or run trading operations, so their advice is purely advisory. They also give smaller companies more senior attention than a bulge bracket where the same company might get a junior team. Global distribution is bulge bracket's advantage, not boutiques'.</div>
+        </div>
+      </div>
+    </div>
+    <div class="module-nav">
+      <button class="mnav-btn mnav-btn-primary" onclick="setModule(2,null)">Module 2: The Deal Lifecycle →</button>
+    </div>
+  </div>
+
+  <!-- MODULE 2: DEAL LIFECYCLE -->
+  <div class="module" id="module-2">
+    <div class="article">
+      <h2>The Deal Lifecycle: Origination to Close</h2>
+      <p class="subtitle">NDA → teaser → IM → management presentation → bids → exclusivity → SPA → closing.</p>
+
+      <h3>The anatomy of a sell-side M&A process</h3>
+      <p>When a company hires a bank to sell itself (called a "sell-side mandate"), the bank runs a structured auction process. Here's exactly what happens at each stage — and what the bank is actually doing behind the scenes.</p>
+
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot" style="background:#0a0a0a"></div><div class="tl-line"></div></div>
+          <div class="tl-right">
+            <div class="tl-step">Week 1–4</div>
+            <div class="tl-title">Preparation: CIM, Financial Model, Management Presentation</div>
+            <div class="tl-desc">The bank prepares the Confidential Information Memorandum (the "book"), builds or audits the financial model, and prepares the management presentation. The CIM is the central marketing document — it must make the company look attractive without misrepresenting anything (legal liability risk). The bank typically spends 3-4 weeks here before approaching any buyers.</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot" style="background:#0a0a0a"></div><div class="tl-line"></div></div>
+          <div class="tl-right">
+            <div class="tl-step">Week 4–5</div>
+            <div class="tl-title">Teaser Distribution + NDA Execution</div>
+            <div class="tl-desc">A 1-2 page anonymous teaser (no company name, just "Indian technology company with ₹X00 Cr revenue...") is sent to a long list of 30-100 potential buyers. Interested parties sign a Non-Disclosure Agreement and receive the full CIM. The list is carefully curated — including a strategic competitor can leak information and destroy value.</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot" style="background:#0a0a0a"></div><div class="tl-line"></div></div>
+          <div class="tl-right">
+            <div class="tl-step">Week 5–8</div>
+            <div class="tl-title">First Round Bids (Non-Binding Indications of Interest)</div>
+            <div class="tl-desc">Interested buyers submit a non-binding IOI (Indication of Interest) with a price range and key assumptions. The bank and company select a "short list" of the most credible buyers — typically 4-8 — to advance to the second round. Price alone doesn't decide this — strategic logic, financing certainty, and management compatibility all factor in.</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot" style="background:#0a0a0a"></div><div class="tl-line"></div></div>
+          <div class="tl-right">
+            <div class="tl-step">Week 8–12</div>
+            <div class="tl-title">Management Presentations + Site Visits</div>
+            <div class="tl-desc">Shortlisted bidders meet the company's management team — typically a 2-3 hour presentation followed by Q&amp;A. This is not just a formality. Buyers assess whether they trust management and whether the story holds up under questioning. Deals have fallen apart at this stage because the CEO couldn't defend revenue assumptions. After this, buyers get access to the virtual data room (VDR).</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot" style="background:#0a0a0a"></div><div class="tl-line"></div></div>
+          <div class="tl-right">
+            <div class="tl-step">Week 12–16</div>
+            <div class="tl-title">Due Diligence + Final Bids (Binding)</div>
+            <div class="tl-desc">Bidders conduct legal, financial, commercial, and technical due diligence. They engage their own advisors. The bank manages Q&amp;A with all bidders through the VDR (so no buyer gets an unfair information advantage). Final bids are binding — a complete price, financing commitment, and a marked-up draft of the Share Purchase Agreement (SPA).</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot" style="background:#0a0a0a"></div><div class="tl-line"></div></div>
+          <div class="tl-right">
+            <div class="tl-step">Week 16–18</div>
+            <div class="tl-title">Exclusivity, Negotiation, SPA Signing</div>
+            <div class="tl-desc">The winning bidder enters exclusivity — typically 30-60 days — during which the company cannot negotiate with other parties. The bank advises on deal terms: price adjustments, earn-outs, representations and warranties, indemnification caps. The SPA is signed when all terms are agreed.</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-left"><div class="tl-dot" style="background:#2563eb"></div></div>
+          <div class="tl-right">
+            <div class="tl-step">Week 18–26+</div>
+            <div class="tl-title">Regulatory Approvals + Closing</div>
+            <div class="tl-desc">In India, most deals above a threshold require CCI (Competition Commission of India) clearance. Cross-border deals may also need FIPB/RBI approval for foreign investment. Large deals can take 3-6 additional months. <strong>The bank's success fee is paid only at closing</strong> — this is why bankers track every regulatory submission obsessively.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-green">
+        <div class="callout-title">Why Deals Fall Apart</div>
+        Most deals that fail do so at one of three points: (1) Management presentations — buyers lose conviction in the management team or the story, (2) Due diligence — skeletons emerge (undisclosed liabilities, tax issues, customer concentration), or (3) Between signing and close — market conditions change and the buyer tries to renegotiate. A good banker anticipates and manages all three risks.
+      </div>
+
+      <h3>Buy-side vs sell-side mandates</h3>
+      <p>Everything above is a sell-side process (helping a company sell itself). The buy-side is different: a company hires a bank to find and negotiate an acquisition target. The bank is paid to evaluate targets, run the due diligence, and negotiate the deal. Buy-side fees are typically lower than sell-side (because the seller's bank controls the process), but they can generate significant follow-on work in financing the acquisition.</p>
+
+      <div class="quiz-section">
+        <h3>Check your understanding</h3>
+        <div class="quiz-q">
+          <div class="quiz-q-text">3. A company is running a sell-side process. It receives 6 IOIs in the first round and advances 3 to management presentations. One of the 3 submits the highest binding bid. Why might the company NOT choose the highest bidder?</div>
+          <div class="quiz-opts">
+            <button class="quiz-opt" onclick="answer(this,'wrong')">A) Higher bids always suggest the buyer is overvaluing the asset and will face problems post-close</button>
+            <button class="quiz-opt" onclick="answer(this,'correct')">B) Financing certainty, management compatibility, and deal conditions (earn-outs, indemnification caps) matter as much as headline price</button>
+            <button class="quiz-opt" onclick="answer(this,'wrong')">C) Indian regulations require the median bid to be selected</button>
+          </div>
+          <div class="quiz-explanation">A higher headline price can be offset by uncertain financing, aggressive representations, low indemnification caps, or an earn-out structure that delays value realization. Sellers often prefer a slightly lower but cleaner offer with certainty of close.</div>
+        </div>
+      </div>
+    </div>
+    <div class="module-nav">
+      <button class="mnav-btn" onclick="setModule(1,null)">← Module 1</button>
+      <button class="mnav-btn mnav-btn-primary" onclick="setModule(3,null)">Module 3: Reading a Pitch Book →</button>
+    </div>
+  </div>
+
+  <!-- MODULE 3: PITCH BOOK -->
+  <div class="module" id="module-3">
+    <div class="article">
+      <h2>How to Read a Pitch Book / CIM</h2>
+      <p class="subtitle">The anatomy, what bankers include vs hide, and how to read between the lines.</p>
+
+      <h3>What is a pitch book?</h3>
+      <p>A pitch book is a PowerPoint presentation (typically 40-120 slides) that an investment bank uses to pitch for a mandate or to present analysis to a client's board. It is <strong>not</strong> research. It is <strong>not</strong> objective analysis. It is a sales document designed to win business or advance a transaction.</p>
+      <p>Understanding this changes how you read one. Every number, every chart, every case study is chosen to support a narrative. Your job when reading a pitch book is to identify what that narrative is — and what it's leaving out.</p>
+
+      <h3>The anatomy of a typical M&amp;A pitch book</h3>
+      <table class="data-table">
+        <thead><tr><th>Section</th><th>What's In It</th><th>What to Look For</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Executive Summary</strong><br><span class="mono">Slides 1-5</span></td>
+            <td>The hook. Why this deal, why now, why this bank.</td>
+            <td>The narrative thesis. If this section isn't compelling, the rest won't be either.</td>
+          </tr>
+          <tr>
+            <td><strong>Market Overview</strong><br><span class="mono">Slides 6-15</span></td>
+            <td>Industry size, growth, tailwinds. Often uses market research (IDC, Gartner, KPMG reports).</td>
+            <td>Check which market definition inflates the TAM. "₹5 lakh crore addressable market" is often misleading.</td>
+          </tr>
+          <tr>
+            <td><strong>Company Overview</strong><br><span class="mono">Slides 16-25</span></td>
+            <td>Revenue trends, EBITDA, customer highlights, competitive positioning.</td>
+            <td>EBITDA adjustments ("Adjusted EBITDA" vs reported). Revenue concentration. One-off items removed from adjusted numbers.</td>
+          </tr>
+          <tr>
+            <td><strong>Valuation Analysis</strong><br><span class="mono">Slides 26-40</span></td>
+            <td>Trading comps, precedent transactions, DCF, Football Field summary.</td>
+            <td>Comp selection. Why did they pick these 6 companies and not others? Chosen comps often trade at higher multiples than the target's actual peer group.</td>
+          </tr>
+          <tr>
+            <td><strong>Transaction Considerations</strong><br><span class="mono">Slides 41-55</span></td>
+            <td>Deal structure options, timeline, pro forma impact, financing.</td>
+            <td>Dilution analysis. EPS accretion/dilution — often shown at optimistic synergy assumptions.</td>
+          </tr>
+          <tr>
+            <td><strong>Credentials / Tombstones</strong><br><span class="mono">Last 10-20 slides</span></td>
+            <td>Past deals the bank has done. Specifically chosen to match this client's situation.</td>
+            <td>Were those deals successful for the client? Tombstones show completed deals — not outcomes.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>What bankers hide (and how to find it)</h3>
+      <p><strong>Cherry-picked comps.</strong> The valuation is only as good as the comparable companies selected. Bankers choose comps that support the valuation argument they're trying to make. On a sell-side pitch, comps will be selected to show high multiples. On a buy-side fairness opinion arguing the target is cheap, comps will show lower multiples. Always ask: who is missing from this list?</p>
+      <p><strong>Adjusted EBITDA creep.</strong> Most pitch books use "Adjusted EBITDA" which adds back items management considers "one-time." Stock-based compensation, restructuring charges, and "acquisition-related costs" are perennially recurring items that companies prefer to exclude. The gap between reported and adjusted EBITDA is a quality signal. Gaps above 20% deserve scrutiny.</p>
+      <p><strong>Optimistic DCF assumptions.</strong> The terminal growth rate and WACC in a DCF are the two assumptions that drive most of the value. A 1% increase in terminal growth or a 0.5% decrease in WACC can change the valuation by 20-30%. Bankers adjust these to arrive at a predetermined range. Check sensitivity tables — if the "bull case" is what ends up in the football field, you're looking at a pitch, not analysis.</p>
+      <p><strong>What the deal does to the board's options.</strong> An investment bank running a sell-side process has an incentive to close the deal — they get paid at close. They have less incentive to recommend walking away. When a bank tells a board "this is the best price you'll get," consider that the banker's fee depends on whether the board agrees.</p>
+
+      <div class="callout callout-amber">
+        <div class="callout-title">The CIM is Different from a Pitch Book</div>
+        The Confidential Information Memorandum (CIM) is the marketing document given to buyers in an M&amp;A auction. It's not a pitch for a mandate — it's a full description of the business. A CIM typically has: company overview, industry background, financial performance (3 years historical + 3 years projected), management team, operations, technology/IP, and a summary of key risks. CIMs are subject to legal liability for material misstatements, which makes them somewhat more factual than pitch books — but the projections are still management's optimistic forecast.
+      </div>
+
+      <div class="quiz-section">
+        <h3>Check your understanding</h3>
+        <div class="quiz-q">
+          <div class="quiz-q-text">4. A pitch book valuation section shows a Football Field with the following ranges: DCF ₹8,000-11,000 Cr, Trading Comps ₹7,500-10,000 Cr, Precedent Transactions ₹9,000-13,000 Cr. The bank's recommended bid range is "₹10,500-12,000 Cr." What is the most important thing to verify?</div>
+          <div class="quiz-opts">
+            <button class="quiz-opt" onclick="answer(this,'wrong')">A) Whether the DCF uses a 10-year or 5-year projection period</button>
+            <button class="quiz-opt" onclick="answer(this,'correct')">B) The comp selection — which companies were used, and why; whether the precedent transactions are genuinely comparable</button>
+            <button class="quiz-opt" onclick="answer(this,'wrong')">C) Whether the Football Field uses a bar chart or a range chart format</button>
+          </div>
+          <div class="quiz-explanation">The recommended range sits at the high end of DCF and comps, anchored by the precedent transactions range. The key question is: are those precedents actually comparable? If they're from different geographies, different deal sizes, or during a period of elevated multiples, the ₹13,000 Cr ceiling is misleading. The comp selection is always the first thing to audit.</div>
+        </div>
+      </div>
+    </div>
+    <div class="module-nav">
+      <button class="mnav-btn" onclick="setModule(2,null)">← Module 2</button>
+      <button class="mnav-btn mnav-btn-primary" onclick="setModule(4,null)">Module 4: IB Economics →</button>
+    </div>
+  </div>
+
+  <!-- MODULE 4: IB ECONOMICS -->
+  <div class="module" id="module-4">
+    <div class="article">
+      <h2>IB Economics: Fees, Teams &amp; Careers</h2>
+      <p class="subtitle">The Analyst→Associate→VP→MD ladder, how deal revenue flows, and what bankers actually make.</p>
+
+      <h3>The fee machine</h3>
+      <p>An investment bank earns fees from three major product lines: M&amp;A advisory, equity capital markets (ECM: IPOs, QIPs, rights issues), and debt capital markets (DCM: bonds, loans). The fee structure varies by product:</p>
+      <table class="data-table">
+        <thead><tr><th>Product</th><th>Typical Fee (India)</th><th>Deal Size Example</th><th>Bank Revenue</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>M&amp;A Advisory (sell-side)</td>
+            <td>0.5–2.0% of deal value</td>
+            <td>₹2,000 Cr deal</td>
+            <td>₹10–40 Cr</td>
+          </tr>
+          <tr>
+            <td>M&amp;A Advisory (buy-side)</td>
+            <td>0.3–1.0% of deal value</td>
+            <td>₹2,000 Cr deal</td>
+            <td>₹6–20 Cr</td>
+          </tr>
+          <tr>
+            <td>IPO Underwriting</td>
+            <td>1.5–3.5% of issue size</td>
+            <td>₹1,000 Cr IPO</td>
+            <td>₹15–35 Cr</td>
+          </tr>
+          <tr>
+            <td>QIP / Rights Issue</td>
+            <td>0.75–2.0% of issue size</td>
+            <td>₹500 Cr QIP</td>
+            <td>₹4–10 Cr</td>
+          </tr>
+          <tr>
+            <td>Debt Capital Markets</td>
+            <td>0.1–0.5% of issue size</td>
+            <td>₹500 Cr bond</td>
+            <td>₹0.5–2.5 Cr</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>A large Indian IB like Kotak Investment Banking or Axis Capital might generate ₹500-800 Cr in annual fee revenue across all products. The top 3-4 domestic banks (Kotak, JM, Axis, ICICI Sec) split the lion's share of Indian deal flow.</p>
+
+      <h3>The career ladder</h3>
+      <div class="ladder">
+        <div class="ladder-row">
+          <div class="ladder-label">Analyst</div>
+          <div class="ladder-bar-wrap">
+            <div class="ladder-bar" style="background:#0a0a0a;width:90%">₹10–18L base + bonus (Indian IB) · ₹18–28L total comp</div>
+            <div class="ladder-detail">2-3 years · 80% of time building models and pitch decks · primary output: the first draft of everything</div>
+          </div>
+        </div>
+        <div class="ladder-row">
+          <div class="ladder-label">Associate</div>
+          <div class="ladder-bar-wrap">
+            <div class="ladder-bar" style="background:#1d4ed8;width:88%">₹20–35L base + bonus · ₹35–55L total comp</div>
+            <div class="ladder-detail">2-3 years · manages analysts, quality checks models, owns the execution workflow · owns project management</div>
+          </div>
+        </div>
+        <div class="ladder-row">
+          <div class="ladder-label">VP</div>
+          <div class="ladder-bar-wrap">
+            <div class="ladder-bar" style="background:#1d6a4b;width:76%">₹40–70L base + bonus · ₹70–120L total comp</div>
+            <div class="ladder-detail">3-4 years · owns client interactions day-to-day, leads execution, begins originating · key person in deals</div>
+          </div>
+        </div>
+        <div class="ladder-row">
+          <div class="ladder-label">Director / SVP</div>
+          <div class="ladder-bar-wrap">
+            <div class="ladder-bar" style="background:#92400e;width:62%">₹80–120L base + bonus · ₹120–200L total comp</div>
+            <div class="ladder-detail">3-5 years · senior client relationships, owns origination in sub-sectors, mentors VPs</div>
+          </div>
+        </div>
+        <div class="ladder-row">
+          <div class="ladder-label">MD</div>
+          <div class="ladder-bar-wrap">
+            <div class="ladder-bar" style="background:#7c3aed;width:50%">₹150L+ base · ₹3–8Cr total with bonus (top performers ₹10Cr+)</div>
+            <div class="ladder-detail">Entirely origination-focused · compensated almost purely on deals won and closed · tenure measured in client relationships</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout callout-blue">
+        <div class="callout-title">Global Bulge Bracket Compensation (Reference)</div>
+        At Goldman Sachs New York, first-year Analysts receive ~$120,000 base + $30-50K bonus (total ~$150-175K). Associates (post-MBA) start at ~$175,000 base + $75-100K bonus. VPs earn $250-350K total. MDs range from $1M to $5M+. In India, the compensation is roughly 1/5th of this, adjusted for local purchasing power parity — which means compensation in India is actually quite competitive in absolute lifestyle terms.
+      </div>
+
+      <h3>Exit opportunities</h3>
+      <p>Investment banking is famously one of the best feeders into buyside finance — primarily because IB analysts develop strong financial modeling skills and deal sourcing exposure.</p>
+      <table class="data-table">
+        <thead><tr><th>Exit Path</th><th>Timeline</th><th>Why IB Helps</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><strong>Private Equity</strong></td>
+            <td>After 2-3 years as Analyst</td>
+            <td>LBO modeling, deal sourcing, due diligence skills map directly. Top IBs (Goldman, Morgan Stanley, Kotak IB) send the most Analysts to PE</td>
+          </tr>
+          <tr>
+            <td><strong>Venture Capital</strong></td>
+            <td>After 2-4 years</td>
+            <td>Deal flow sourcing, VC portfolio valuation, cap table modeling — IB provides strong foundation</td>
+          </tr>
+          <tr>
+            <td><strong>Hedge Fund / Long-Only</strong></td>
+            <td>After 2-3 years</td>
+            <td>Financial modeling depth, comfort with public company valuation, IPO access</td>
+          </tr>
+          <tr>
+            <td><strong>Corporate Development / Strategy</strong></td>
+            <td>After 3-5 years</td>
+            <td>M&amp;A execution experience maps directly to corp dev roles at large Indian conglomerates</td>
+          </tr>
+          <tr>
+            <td><strong>Stay in IB → MD track</strong></td>
+            <td>8-12 years total</td>
+            <td>Uncommon (majority of Analysts leave) but most financially rewarding if successful</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>The real unit economics of IB</h3>
+      <p>A single Indian mid-market deal — say, a ₹1,500 Cr acquisition — might generate ₹15-25 Cr in fees for the sell-side bank. The deal uses 2 Analysts, 1 Associate, and 1 VP for 4-6 months. Total cost of that team: roughly ₹2-3 Cr in fully-loaded compensation for the period. The economics are extraordinarily favorable — which is why IB compensation relative to other industries is high: the product is essentially human capital + relationships, with very low marginal cost per deal.</p>
+      <p>This also explains why the business is structurally unstable during market downturns: when deal volumes collapse (as they did in 2022-23 globally, and periodically in India), there is no product to manufacture. Revenue goes to zero, but compensation costs remain. Banks respond with layoffs — which is why IB headcount is cyclical.</p>
+
+      <div class="callout callout-gray">
+        <div class="callout-title">The Key Insight About IB Compensation</div>
+        Total compensation in IB is heavily back-weighted to bonus, which is discretionary. The base salary is the floor — the bonus is where the real money is. A bad deal environment year (2022-23 globally) saw IB bonuses cut 40-70% even for strong performers. The flip side: in a banner year (2020-21), bonuses at top banks were the highest in a decade. Understanding this variability is essential before choosing IB as a career.
+      </div>
+
+      <div class="quiz-section">
+        <h3>Check your understanding</h3>
+        <div class="quiz-q">
+          <div class="quiz-q-text">5. An IB Analyst spends 80 hours building a detailed LBO model for a pitch. The pitch is unsuccessful and the bank doesn't win the mandate. What was the cost to the bank?</div>
+          <div class="quiz-opts">
+            <button class="quiz-opt" onclick="answer(this,'correct')">A) Very low — analyst compensation is salaried, the pitch is a marginal cost, and learnings compound for future pitches</button>
+            <button class="quiz-opt" onclick="answer(this,'wrong')">B) High — the opportunity cost of 80 hours is a significant revenue loss</button>
+            <button class="quiz-opt" onclick="answer(this,'wrong')">C) Incalculable — each failed pitch permanently damages the bank's reputation</button>
+          </div>
+          <div class="quiz-explanation">This is why the pitch-to-win ratio matters so much in IB. The marginal cost of a pitch is low (analyst time is already paid). The real cost of pitching is selecting which pitches to do — senior banker time is the scarce resource, and the highest cost. An MD who pitches 50 times and wins 5 mandates (10% hit rate) generates far more value than one who pitches 20 times conservatively. Pitching aggressively is correct economics for the bank.</div>
+        </div>
+        <div class="quiz-q">
+          <div class="quiz-q-text">6. Why do most IB Analysts leave banking after 2-3 years, even though the MD role pays ₹3-8Cr+?</div>
+          <div class="quiz-opts">
+            <button class="quiz-opt" onclick="answer(this,'wrong')">A) Indian banks force Analysts to leave after 2 years</button>
+            <button class="quiz-opt" onclick="answer(this,'correct')">B) The path to MD takes 10-12 years, requires becoming an excellent salesperson, and PE/VC offers buyside economics earlier</button>
+            <button class="quiz-opt" onclick="answer(this,'wrong')">C) MD compensation is not actually higher than the Analyst level in real terms</button>
+          </div>
+          <div class="quiz-explanation">The MD ladder requires becoming a skilled relationship-builder and salesperson — which is not the job most Analysts signed up for. PE and VC offer a different skill set (investing vs. advising) and equity upside (carry) that can exceed MD comp over a career. Most Analysts who leave do so because they want to be on the buy side, not because they dislike the pay.</div>
+        </div>
+      </div>
+    </div>
+    <div class="module-nav">
+      <button class="mnav-btn" onclick="setModule(3,null)">← Module 3</button>
+      <button class="mnav-btn mnav-btn-primary" onclick="window.location.href='../calculators/index.html'">Try the Calculators →</button>
+    </div>
+  </div>
+
+</div><!-- end page-wrap -->
+
+<script>
+let activeModule = 1;
+function setModule(n, el){
+  document.querySelectorAll('.module').forEach(m=>m.classList.remove('active'));
+  document.getElementById('module-'+n).classList.add('active');
+  document.querySelectorAll('.module-tab').forEach(t=>t.classList.remove('active'));
+  const tabs = document.querySelectorAll('.module-tab');
+  tabs[n-1].classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  activeModule = n;
+}
+
+function answer(el, result){
+  const opts = el.closest('.quiz-opts').querySelectorAll('.quiz-opt');
+  opts.forEach(o=>o.disabled=true);
+  el.classList.add(result);
+  el.closest('.quiz-q').querySelector('.quiz-explanation').style.display='block';
+}
+</script>
+</body>
+</html>
