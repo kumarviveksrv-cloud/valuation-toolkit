@@ -1,19 +1,29 @@
-// ValuationDesk Service Worker v1.0
+// ValuationDesk Service Worker v2.0
 // Configured for GitHub Pages subfolder: /valuation-toolkit/
 
 const BASE = '/valuation-toolkit';
-const CACHE_NAME = 'valuationdesk-v1';
+const CACHE_NAME = 'valuationdesk-v2';
 
 const STATIC_ASSETS = [
   BASE + '/',
   BASE + '/index.html',
-  BASE + '/calculators/index.html',
-  BASE + '/simulate/index.html',
-  BASE + '/learn/index.html',
-  BASE + '/data/sectors.json',
   BASE + '/manifest.json',
-  BASE + '/assets/vd-system.css',
-  BASE + '/assets/vd-shared.js',
+  BASE + '/icons/icon-192.png',
+  BASE + '/icons/icon-512.png',
+  BASE + '/simulate/index.html',
+  BASE + '/domains/valuation-advisory/index.html',
+  BASE + '/domains/valuation-advisory/calculators/index.html',
+  BASE + '/domains/valuation-advisory/calculators/dcf.html',
+  BASE + '/domains/valuation-advisory/calculators/wacc.html',
+  BASE + '/domains/valuation-advisory/calculators/comps.html',
+  BASE + '/domains/valuation-advisory/calculators/ev-bridge.html',
+  BASE + '/domains/valuation-advisory/calculators/sotp.html',
+  BASE + '/domains/valuation-advisory/calculators/football-field.html',
+  BASE + '/domains/valuation-advisory/calculators/nav.html',
+  BASE + '/domains/valuation-advisory/learn/index.html',
+  BASE + '/vault/index.html',
+  BASE + '/daily-brief/index.html',
+  BASE + '/deal-room/index.html',
 ];
 
 // Install — cache all static assets
@@ -37,28 +47,10 @@ self.addEventListener('activate', event => {
   );
 });
 
-// Fetch — network-first for data, cache-first for static
+// Fetch — cache-first for all static assets
 self.addEventListener('fetch', event => {
-  // Only handle same-origin or our base path
   if (!event.request.url.includes(self.location.origin)) return;
 
-  const url = new URL(event.request.url);
-
-  // Network-first for data files
-  if (url.pathname.startsWith(BASE + '/data/')) {
-    event.respondWith(
-      fetch(event.request)
-        .then(res => {
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-          return res;
-        })
-        .catch(() => caches.match(event.request))
-    );
-    return;
-  }
-
-  // Cache-first for everything else
   event.respondWith(
     caches.match(event.request)
       .then(cached => {
@@ -81,7 +73,7 @@ self.addEventListener('push', event => {
   event.waitUntil(
     self.registration.showNotification(data.title || 'ValuationDesk', {
       body: data.body || 'New content available',
-      icon: BASE + '/assets/icons/icon-192.png',
+      icon: BASE + '/icons/icon-192.png',
       data: { url: data.url || BASE + '/' }
     })
   );
