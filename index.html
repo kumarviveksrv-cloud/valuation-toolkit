@@ -3,292 +3,467 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ValuationDesk — Learn to Value Any Company</title>
-<meta name="description" content="7 professional valuation calculators. 30 companies pre-loaded with real data. DCF, WACC, Comps, EV Bridge, SOTP, Football Field, NAV. Built for financial education.">
+<title>ValuationDesk — 15 Domains of Professional Finance</title>
+<meta name="description" content="Master investment banking, private equity, M&A, VC, credit analysis, and 10 more finance domains. Professional calculators with 30 real companies pre-loaded.">
 <meta name="theme-color" content="#0a0a0a">
-<link rel="manifest" href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/manifest.json">
+<link rel="manifest" href="/valuation-toolkit/manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+:root{
+  --bg:#fff;
+  --text:#0a0a0a;
+  --muted:#6b7280;
+  --border:#e5e5e5;
+  --card:#f9fafb;
+  --green:#16a34a;
+  --red:#dc2626;
+  --amber:#d97706;
+  --font:'Inter',sans-serif;
+  --mono:'JetBrains Mono',monospace
+}
 body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
 a{text-decoration:none;color:inherit}
-/* NAV */
+
+/* ── NAV ── */
 .top-nav{border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:100}
 .nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex;align-items:center;height:56px;gap:28px}
-.logo{font-size:17px;font-weight:700}.logo strong{font-weight:900}
-.nav-links{display:flex;gap:20px;flex:1}.nav-links a{font-size:13px;color:var(--muted);font-weight:500}.nav-links a:hover{color:var(--text)}
+.logo{font-size:17px;font-weight:700;flex-shrink:0}
+.logo strong{font-weight:900}
+.nav-links{display:flex;gap:20px;flex:1}
+.nav-links a{font-size:13px;color:var(--muted);font-weight:500;white-space:nowrap}
+.nav-links a:hover{color:var(--text)}
 .nav-cta{display:flex;gap:8px;align-items:center;margin-left:auto}
-.vault-btn{font-size:12px;font-weight:600;padding:6px 12px;border:1px solid var(--border);border-radius:6px;color:var(--text)}
-.pro-btn{font-size:12px;font-weight:700;padding:6px 14px;background:var(--text);color:#fff;border-radius:6px}
-/* HERO */
-.hero{max-width:1200px;margin:0 auto;padding:96px 24px 80px;text-align:center}
-.hero-tag{display:inline-block;padding:4px 14px;border:1px solid var(--border);border-radius:20px;font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:24px}
-.hero h1{font-size:62px;font-weight:900;letter-spacing:-2px;line-height:1.05;margin-bottom:20px;max-width:820px;margin-left:auto;margin-right:auto}
-.hero p{font-size:18px;color:var(--muted);max-width:560px;margin:0 auto 36px;line-height:1.65}
-.hero-ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:var(--text);color:#fff;border-radius:8px;font-size:14px;font-weight:700}
-.btn-secondary{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border:1.5px solid var(--border);color:var(--text);border-radius:8px;font-size:14px;font-weight:600}.btn-secondary:hover{border-color:var(--text)}
-/* STATS */
-.stats-bar{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--card)}
+.vault-btn{font-size:12px;font-weight:600;padding:6px 12px;border:1px solid var(--border);border-radius:6px;color:var(--text);white-space:nowrap}
+.vault-btn:hover{border-color:#999}
+.pro-btn{font-size:12px;font-weight:700;padding:6px 14px;background:var(--text);color:#fff;border-radius:6px;white-space:nowrap}
+
+/* ── HERO ── */
+.hero{max-width:1200px;margin:0 auto;padding:88px 24px 64px;text-align:center}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:5px 14px;border:1px solid var(--border);border-radius:20px;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:28px;font-family:var(--mono)}
+.hero-badge span{width:6px;height:6px;border-radius:50%;background:var(--green);display:inline-block}
+.hero h1{font-size:66px;font-weight:900;letter-spacing:-2.5px;line-height:1.02;margin-bottom:20px}
+.hero h1 em{font-style:normal;color:var(--muted)}
+.hero-sub{font-size:17px;color:var(--muted);max-width:500px;margin:0 auto 0;line-height:1.7}
+
+/* ── STATS STRIP ── */
+.stats-strip{border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--card)}
 .stats-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex}
-.stat-item{flex:1;padding:20px 24px;border-right:1px solid var(--border);text-align:center}
-.stat-item:last-child{border-right:none}
-.stat-num{font-size:28px;font-weight:900;font-family:var(--mono);margin-bottom:4px}
-.stat-lbl{font-size:12px;color:var(--muted)}
-/* CALCULATORS */
-.section{max-width:1200px;margin:0 auto;padding:72px 24px}
-.section-hd{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:32px;flex-wrap:wrap;gap:12px}
-.section-title{font-size:28px;font-weight:800}
-.section-sub{font-size:14px;color:var(--muted);margin-top:6px;max-width:480px;line-height:1.6}
-.section-link{font-size:14px;font-weight:600;color:var(--text);border-bottom:1px solid var(--text);white-space:nowrap}
-.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:12px}
-.calc-tile{border:1.5px solid var(--border);border-radius:12px;padding:18px;transition:border-color .15s;display:block}
-.calc-tile:hover{border-color:#999}
-.calc-tile.flagship{border-color:var(--text);border-width:2px}
-.tile-icon{font-size:24px;margin-bottom:10px}
-.tile-name{font-size:14px;font-weight:800;margin-bottom:4px}
-.badge-free{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;margin-bottom:8px}
-.badge-pro{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;background:var(--text);color:#fff;margin-bottom:8px}
-.tile-desc{font-size:12px;color:var(--muted);line-height:1.5}
-/* HOW IT WORKS */
-.hiw-section{background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.hiw-inner{max-width:1200px;margin:0 auto;padding:72px 24px}
-.hiw-title{font-size:28px;font-weight:800;text-align:center;margin-bottom:8px}
-.hiw-sub{font-size:15px;color:var(--muted);text-align:center;margin-bottom:48px}
-.hiw-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:40px}
-.hiw-step{text-align:center}
-.hiw-num{width:40px;height:40px;border-radius:50%;background:var(--text);color:#fff;font-size:14px;font-weight:800;font-family:var(--mono);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
-.hiw-step-title{font-size:17px;font-weight:800;margin-bottom:8px}
-.hiw-step-desc{font-size:14px;color:var(--muted);line-height:1.7}
-/* PRICING */
-.pricing-section{max-width:900px;margin:0 auto;padding:72px 24px}
-.pricing-title{font-size:28px;font-weight:800;text-align:center;margin-bottom:8px}
-.pricing-sub{font-size:15px;color:var(--muted);text-align:center;margin-bottom:48px}
-.pricing-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.pricing-card{border:1.5px solid var(--border);border-radius:14px;padding:32px}
-.pricing-card.featured{border-color:var(--text);border-width:2px}
-.plan-name{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px}
-.plan-price{font-size:44px;font-weight:900;font-family:var(--mono);line-height:1;margin-bottom:4px}
-.plan-cadence{font-size:13px;color:var(--muted);margin-bottom:24px}
-.plan-features{list-style:none;margin-bottom:28px;display:flex;flex-direction:column;gap:10px}
-.plan-features li{font-size:14px;display:flex;align-items:flex-start;gap:8px;line-height:1.5}
-.plan-features li::before{content:'✓';font-weight:700;color:var(--green);flex-shrink:0;margin-top:1px}
-.plan-btn{display:block;width:100%;padding:12px;text-align:center;border-radius:8px;font-size:14px;font-weight:700;font-family:var(--font);cursor:pointer;transition:opacity .15s}
-.plan-btn:hover{opacity:.88}
-.plan-btn-free{background:var(--card);color:var(--text);border:1.5px solid var(--border)}
-.plan-btn-pro{background:var(--text);color:#fff;border:none}
-/* BOTTOM CTA */
-.cta-strip{background:var(--text);color:#fff;padding:72px 24px;text-align:center}
-.cta-inner{max-width:560px;margin:0 auto}
-.cta-h{font-size:32px;font-weight:900;letter-spacing:-.5px;margin-bottom:12px}
-.cta-p{font-size:15px;opacity:.65;margin-bottom:28px;line-height:1.65}
-.cta-btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;background:#fff;color:var(--text);border-radius:8px;font-size:14px;font-weight:800}
-/* FOOTER */
-.footer{border-top:1px solid var(--border);padding:28px 24px;text-align:center}
-.footer-logo{font-size:15px;font-weight:700;margin-bottom:6px}.footer-logo strong{font-weight:900}
-.footer-note{font-size:12px;color:var(--muted)}
-@media(max-width:768px){
-  .hero h1{font-size:36px}.hero{padding:64px 24px 56px}
-  .calc-grid{grid-template-columns:1fr 1fr}
-  .pricing-grid{grid-template-columns:1fr}
-  .hiw-steps{grid-template-columns:1fr;gap:32px}
-  .stats-inner{flex-wrap:wrap}
-  .stat-item{min-width:50%;border-right:none;border-bottom:1px solid var(--border)}
-  .stat-item:nth-child(odd){border-right:1px solid var(--border)}
-  .stat-item:last-child,.stat-item:nth-last-child(2):nth-child(odd){border-bottom:none}
+.stat{flex:1;padding:18px 20px;border-right:1px solid var(--border);text-align:center}
+.stat:last-child{border-right:none}
+.stat-num{font-size:26px;font-weight:900;font-family:var(--mono);margin-bottom:3px}
+.stat-lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+
+/* ── SELECTOR AREA ── */
+.selector-wrap{max-width:1200px;margin:0 auto;padding:64px 24px 140px}
+
+.phase-block{margin-bottom:60px}
+.phase-header{display:flex;align-items:center;gap:12px;margin-bottom:22px;padding-bottom:14px;border-bottom:1.5px solid var(--border)}
+.phase-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;font-family:var(--mono);padding:4px 9px;border-radius:5px;flex-shrink:0}
+.phase-1 .phase-label{background:#dcfce7;color:#15803d}
+.phase-2 .phase-label{background:#fef9c3;color:#a16207}
+.phase-3 .phase-label{background:#fee2e2;color:#b91c1c}
+.phase-desc{font-size:13px;color:var(--muted)}
+.phase-count{margin-left:auto;font-size:11px;color:var(--muted);font-family:var(--mono);flex-shrink:0}
+
+.domain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+
+/* ── DOMAIN CARD ── */
+.domain-card{
+  border:1.5px solid var(--border);
+  border-radius:14px;
+  padding:22px 20px 18px;
+  cursor:pointer;
+  transition:border-color .15s, box-shadow .15s;
+  background:var(--bg);
+  user-select:none;
+  position:relative;
 }
-@media(max-width:480px){
+.domain-card:hover{border-color:#aaa;box-shadow:0 2px 14px rgba(0,0,0,.07)}
+.domain-card.selected{
+  border-color:var(--text);
+  border-width:2px;
+  box-shadow:0 4px 24px rgba(0,0,0,.11)
+}
+.domain-card.coming-soon{opacity:.6}
+.domain-card.coming-soon:hover{opacity:.8;border-color:#ccc}
+
+.card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.domain-icon{
+  width:40px;height:40px;border-radius:10px;
+  background:var(--card);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0
+}
+.card-right{display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+.status-badge{
+  font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.4px;padding:3px 7px;border-radius:4px;
+  font-family:var(--mono)
+}
+.status-badge.live{background:#dcfce7;color:#15803d}
+.status-badge.soon{background:var(--card);color:var(--muted);border:1px solid var(--border)}
+.selected-check{
+  width:18px;height:18px;border-radius:50%;background:var(--text);
+  display:none;align-items:center;justify-content:center;flex-shrink:0
+}
+.selected-check svg{width:10px;height:10px;stroke:#fff;stroke-width:2.5;fill:none}
+.domain-card.selected .selected-check{display:flex}
+
+.domain-name{font-size:15px;font-weight:800;margin-bottom:5px;letter-spacing:-.25px}
+.domain-tagline{font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:15px;min-height:36px}
+.domain-meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.meta-pill{
+  font-size:10px;font-family:var(--mono);color:var(--muted);
+  background:var(--card);padding:2px 8px;border-radius:4px;border:1px solid var(--border)
+}
+
+/* ── STICKY CTA BAR ── */
+.cta-bar{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--bg);border-top:1px solid var(--border);
+  z-index:200;padding:12px 24px
+}
+.cta-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.selected-info{display:flex;flex-direction:column;gap:2px}
+.selected-label{font-size:12px;color:var(--muted)}
+.selected-label strong{color:var(--text);font-weight:700}
+.selected-detail{font-size:11px;color:var(--muted);font-family:var(--mono)}
+.cta-btn{
+  padding:12px 22px;background:#ccc;color:#fff;border:none;
+  border-radius:8px;font-size:13px;font-weight:700;
+  cursor:not-allowed;white-space:nowrap;font-family:var(--font);
+  transition:background .2s;flex-shrink:0
+}
+.cta-btn.ready{background:var(--text);cursor:pointer}
+.cta-btn.go{background:var(--green);cursor:pointer}
+
+/* ── TOAST ── */
+.toast{
+  position:fixed;bottom:76px;left:50%;
+  transform:translateX(-50%) translateY(6px);
+  background:var(--text);color:#fff;
+  padding:10px 18px;border-radius:8px;
+  font-size:13px;font-weight:500;
+  opacity:0;transition:opacity .2s, transform .2s;
+  pointer-events:none;white-space:nowrap;z-index:300
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── FOOTER ── */
+.footer{border-top:1px solid var(--border);padding:28px 24px;text-align:center}
+.footer p{font-size:12px;color:var(--muted)}
+.footer a{color:var(--text);font-weight:600}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){.domain-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){
+  .hero h1{font-size:40px;letter-spacing:-1.5px}
+  .hero{padding:60px 20px 40px}
+  .domain-grid{grid-template-columns:1fr}
+  .stats-inner{flex-wrap:wrap}
+  .stat{min-width:50%;border-bottom:1px solid var(--border)}
   .nav-links{display:none}
-  .hero h1{font-size:28px}
-  .calc-grid{grid-template-columns:1fr}
+  .cta-inner{flex-direction:column;align-items:flex-start;gap:10px}
+  .phase-desc{display:none}
+  .hero-sub{font-size:15px}
 }
 </style>
 </head>
 <body>
 
+<!-- NAV -->
 <nav class="top-nav">
   <div class="nav-inner">
-    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/" class="logo">Valuation<strong>Desk</strong></a>
+    <a href="/valuation-toolkit/" class="logo">Valuation<strong>Desk</strong></a>
     <div class="nav-links">
-      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/">Valuation Advisory</a>
-      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/">My Vault</a>
-      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/deal-room/">Deal Room</a>
-      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/daily-brief/">Daily Brief</a>
+      <a href="/valuation-toolkit/domains/valuation-advisory/">Valuation Advisory</a>
+      <a href="/valuation-toolkit/daily-brief/">Daily Brief</a>
+      <a href="/valuation-toolkit/deal-room/">Deal Room</a>
     </div>
     <div class="nav-cta">
-      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/vault/" class="vault-btn">🗄 My Vault</a>
-      <a href="#pricing" class="pro-btn">Get Pro — ₹799/mo</a>
+      <a href="/valuation-toolkit/vault/" class="vault-btn">📁 Vault</a>
+      <a href="#" class="pro-btn">Get Pro — ₹799/mo</a>
     </div>
   </div>
 </nav>
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-tag">Financial Education Platform</div>
-  <h1>Learn to value any company. The way bankers actually do it.</h1>
-  <p>7 professional calculators. 30 companies pre-loaded with real data. India and global markets. From DCF to Football Field — the complete valuation toolkit.</p>
-  <div class="hero-ctas">
-    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/dcf.html" class="btn-primary">Try DCF — it's free →</a>
-    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/" class="btn-secondary">See all 7 calculators</a>
-  </div>
+  <div class="hero-badge"><span></span>1 of 15 domains live now</div>
+  <h1>Finance's missing<br><em>hands-on toolkit.</em></h1>
+  <p class="hero-sub">Pick a domain. Master its calculators. Move to the next. Every module uses real Indian and global companies — not textbook examples.</p>
 </div>
 
-<!-- STATS BAR -->
-<div class="stats-bar">
+<!-- STATS STRIP -->
+<div class="stats-strip">
   <div class="stats-inner">
-    <div class="stat-item"><div class="stat-num">7</div><div class="stat-lbl">Valuation calculators</div></div>
-    <div class="stat-item"><div class="stat-num">30</div><div class="stat-lbl">Companies pre-loaded</div></div>
-    <div class="stat-item"><div class="stat-num">15</div><div class="stat-lbl">India large-caps</div></div>
-    <div class="stat-item"><div class="stat-num">15</div><div class="stat-lbl">Global companies</div></div>
-    <div class="stat-item"><div class="stat-num">Free</div><div class="stat-lbl">DCF — no sign-up</div></div>
+    <div class="stat"><div class="stat-num">15</div><div class="stat-lbl">Finance Domains</div></div>
+    <div class="stat"><div class="stat-num">91+</div><div class="stat-lbl">Calculators</div></div>
+    <div class="stat"><div class="stat-num">59+</div><div class="stat-lbl">Learning Modules</div></div>
+    <div class="stat"><div class="stat-num">30</div><div class="stat-lbl">Companies Pre-loaded</div></div>
   </div>
 </div>
 
-<!-- CALCULATORS -->
-<div class="section">
-  <div class="section-hd">
-    <div>
-      <div class="section-title">7 Professional Calculators</div>
-      <div class="section-sub">Each calculator has 30 companies pre-loaded. Pick a company, study the context, set assumptions, get your output.</div>
+<!-- DOMAIN GRID -->
+<div class="selector-wrap">
+
+  <div class="phase-block phase-1">
+    <div class="phase-header">
+      <span class="phase-label">Phase 1 · Can build now</span>
+      <span class="phase-desc">Core domains — full calculator + learning suite</span>
+      <span class="phase-count">1 / 6 live</span>
     </div>
-    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/" class="section-link">Full suite with workflow guide →</a>
+    <div class="domain-grid" id="grid-1"></div>
   </div>
-  <div class="calc-grid">
-    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/dcf.html" class="calc-tile flagship">
-      <div class="tile-icon">📈</div>
-      <div class="tile-name">DCF Calculator</div>
-      <span class="badge-free">Free</span>
-      <div class="tile-desc">Value a company on future cash flows, discounted to today. The foundational IB method.</div>
-    </a>
-    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/wacc.html" class="calc-tile">
-      <div class="tile-icon">⚙️</div>
-      <div class="tile-name">WACC Builder</div>
-      <span class="badge-pro">Pro</span>
-      <div class="tile-desc">Build your discount rate from CAPM and capital structure. Build WACC before you build DCF.</div>
-    </a>
-    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/comps.html" class="calc-tile">
-      <div class="tile-icon">📊</div>
-      <div class="tile-name">Trading Comps</div>
-      <span class="badge-pro">Pro</span>
-      <div class="tile-desc">Apply peer trading multiples — EV/EBITDA, P/E, EV/Revenue — to arrive at an implied value.</div>
-    </a>
-    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/ev-bridge.html" class="calc-tile">
-      <div class="tile-icon">🌉</div>
-      <div class="tile-name">EV Bridge</div>
-      <span class="badge-pro">Pro</span>
-      <div class="tile-desc">Bridge from Enterprise Value to share price. The step most students get wrong.</div>
-    </a>
+
+  <div class="phase-block phase-2">
+    <div class="phase-header">
+      <span class="phase-label">Phase 2 · Medium complexity</span>
+      <span class="phase-desc">Require data integration and sector-specific models</span>
+      <span class="phase-count">0 / 6 live</span>
+    </div>
+    <div class="domain-grid" id="grid-2"></div>
   </div>
-  <div class="calc-grid">
-    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/sotp.html" class="calc-tile">
-      <div class="tile-icon">🧩</div>
-      <div class="tile-name">SOTP</div>
-      <span class="badge-pro">Pro</span>
-      <div class="tile-desc">Value each business segment separately, on its own peer multiple, then sum them up.</div>
-    </a>
-    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/football-field.html" class="calc-tile">
-      <div class="tile-icon">🏈</div>
-      <div class="tile-name">Football Field</div>
-      <span class="badge-pro">Pro</span>
-      <div class="tile-desc">Aggregate all valuation methods into one visual chart. Slide 3 of every IB pitch book.</div>
-    </a>
-    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/nav.html" class="calc-tile">
-      <div class="tile-icon">🏦</div>
-      <div class="tile-name">NAV</div>
-      <span class="badge-pro">Pro</span>
-      <div class="tile-desc">Restate the balance sheet at fair value. The gap to market price is the franchise value.</div>
-    </a>
-    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/" class="calc-tile" style="display:flex;align-items:center;justify-content:center;background:var(--card);border-style:dashed">
-      <div style="text-align:center">
-        <div style="font-size:22px;margin-bottom:6px">→</div>
-        <div style="font-size:12px;font-weight:700">See all 7</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:2px">with workflow guide</div>
-      </div>
-    </a>
+
+  <div class="phase-block phase-3">
+    <div class="phase-header">
+      <span class="phase-label">Phase 3 · Data-heavy</span>
+      <span class="phase-desc">Real-time data infrastructure required</span>
+      <span class="phase-count">0 / 3 live</span>
+    </div>
+    <div class="domain-grid" id="grid-3"></div>
   </div>
+
 </div>
 
-<!-- HOW IT WORKS -->
-<div class="hiw-section">
-  <div class="hiw-inner">
-    <div class="hiw-title">How every calculator works</div>
-    <div class="hiw-sub">The same 4-step experience across all 7 methods.</div>
-    <div class="hiw-steps">
-      <div class="hiw-step">
-        <div class="hiw-num">1</div>
-        <div class="hiw-step-title">Pick a company</div>
-        <div class="hiw-step-desc">Choose from 30 companies — Reliance, TCS, HDFC Bank, Apple, NVIDIA, Tesla and more. Real financial data from public filings, pre-loaded and ready.</div>
-      </div>
-      <div class="hiw-step">
-        <div class="hiw-num">2</div>
-        <div class="hiw-step-title">Study the context</div>
-        <div class="hiw-step-desc">Before you set an assumption, understand the business. Why does this company have this beta? Who are the real comparable peers? What does the capital structure reveal?</div>
-      </div>
-      <div class="hiw-step">
-        <div class="hiw-num">3</div>
-        <div class="hiw-step-title">Set assumptions and run</div>
-        <div class="hiw-step-desc">Inputs pre-filled from public filings. Override anything you disagree with. Hit run — a 5-second calculation sequence, then a full results reveal with sensitivity analysis.</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- PRICING -->
-<div class="pricing-section" id="pricing">
-  <div class="pricing-title">Simple pricing</div>
-  <div class="pricing-sub">Start free. Upgrade when you're ready for the full suite.</div>
-  <div class="pricing-grid">
-    <div class="pricing-card">
-      <div class="plan-name">Free</div>
-      <div class="plan-price">₹0</div>
-      <div class="plan-cadence">no credit card required</div>
-      <ul class="plan-features">
-        <li>DCF Calculator — fully unlocked</li>
-        <li>30 companies with real financial data</li>
-        <li>Company context, analyst view, bull/bear case</li>
-        <li>5-year FCF projections and sensitivity table</li>
-        <li>Chapter 1 — Language of Valuation</li>
-        <li>Save to Vault (1 model)</li>
-      </ul>
-      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/dcf.html" class="plan-btn plan-btn-free">Try DCF Calculator →</a>
-    </div>
-    <div class="pricing-card featured">
-      <div class="plan-name">Pro</div>
-      <div class="plan-price">₹799</div>
-      <div class="plan-cadence">per month · cancel anytime</div>
-      <ul class="plan-features">
-        <li>Everything in Free</li>
-        <li>WACC Builder</li>
-        <li>Trading Comps</li>
-        <li>EV Bridge</li>
-        <li>SOTP Valuation</li>
-        <li>Football Field Chart</li>
-        <li>NAV Calculator</li>
-        <li>All 5 learning chapters</li>
-        <li>Unlimited Vault saves</li>
-      </ul>
-      <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/" class="plan-btn plan-btn-pro">Get Pro →</a>
-    </div>
-  </div>
-</div>
-
-<!-- BOTTOM CTA -->
-<div class="cta-strip">
+<!-- STICKY CTA BAR -->
+<div class="cta-bar">
   <div class="cta-inner">
-    <div class="cta-h">Start with DCF. It's free.</div>
-    <div class="cta-p">No sign-up required. Pick a company, work through the 4 steps, understand what drives the valuation number. Takes 10 minutes. Teaches you more than a semester of theory.</div>
-    <a href="https://kumarviveksrv-cloud.github.io/valuation-toolkit/domains/valuation-advisory/calculators/dcf.html" class="cta-btn">Open DCF Calculator →</a>
+    <div class="selected-info">
+      <div class="selected-label" id="sel-label">Selected: <strong>none yet</strong></div>
+      <div class="selected-detail" id="sel-detail">Pick a domain above to get started</div>
+    </div>
+    <button class="cta-btn" id="cta-btn" onclick="handleCTA()">Lock my selection and start building ↗</button>
   </div>
 </div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
 
 <!-- FOOTER -->
 <footer class="footer">
-  <div class="footer-logo">Valuation<strong>Desk</strong></div>
-  <div class="footer-note" style="margin-top:6px">Financial models are educational tools, not investment advice. © 2025 ValuationDesk</div>
+  <p>ValuationDesk · Built for finance learners who mean business · <a href="/valuation-toolkit/vault/">My Vault</a></p>
 </footer>
 
+<script>
+const DOMAINS = [
+  // Phase 1
+  {
+    id:'investment-banking', phase:1,
+    name:'Investment Banking', icon:'🏦',
+    tagline:'Pitch books, precedent transactions, fairness opinions, and deal structuring.',
+    calcs:6, modules:4, live:false, url:null
+  },
+  {
+    id:'valuation-advisory', phase:1,
+    name:'Valuation Advisory', icon:'📊',
+    tagline:'DCF, WACC, Comps, EV Bridge, SOTP, Football Field, NAV. The full valuation stack.',
+    calcs:7, modules:5, live:true, url:'/valuation-toolkit/domains/valuation-advisory/'
+  },
+  {
+    id:'corporate-finance', phase:1,
+    name:'Corporate Finance', icon:'🏢',
+    tagline:'Capital allocation, dividend policy, working capital, and financial restructuring.',
+    calcs:8, modules:4, live:false, url:null
+  },
+  {
+    id:'private-equity', phase:1,
+    name:'Private Equity', icon:'🎯',
+    tagline:'LBO modeling, IRR analysis, fund economics, and portfolio construction.',
+    calcs:6, modules:5, live:false, url:null
+  },
+  {
+    id:'venture-capital', phase:1,
+    name:'Venture Capital', icon:'🚀',
+    tagline:'Pre/post-money, cap table waterfall, VC returns, and term sheet economics.',
+    calcs:7, modules:4, live:false, url:null
+  },
+  {
+    id:'mergers-acquisitions', phase:1,
+    name:'M&A', icon:'🤝',
+    tagline:'Accretion/dilution, synergy modeling, purchase price allocation, deal structures.',
+    calcs:5, modules:4, live:false, url:null
+  },
+  // Phase 2
+  {
+    id:'equity-research', phase:2,
+    name:'Equity Research', icon:'🔍',
+    tagline:'Sector deep-dives, earnings models, target price derivation, and analyst notes.',
+    calcs:6, modules:5, live:false, url:null
+  },
+  {
+    id:'credit-analysis', phase:2,
+    name:'Credit Analysis', icon:'📉',
+    tagline:'Credit scoring, debt capacity, covenant analysis, and rating agency models.',
+    calcs:7, modules:4, live:false, url:null
+  },
+  {
+    id:'transaction-advisory', phase:2,
+    name:'Transaction Advisory', icon:'⚖️',
+    tagline:'Buy-side diligence, sell-side preparation, and SPA negotiation frameworks.',
+    calcs:5, modules:3, live:false, url:null
+  },
+  {
+    id:'financial-due-diligence', phase:2,
+    name:'Financial Due Diligence', icon:'🧾',
+    tagline:'Quality of earnings, normalized EBITDA, working capital peg, and red flags.',
+    calcs:5, modules:3, live:false, url:null
+  },
+  {
+    id:'asset-management', phase:2,
+    name:'Asset Management', icon:'📈',
+    tagline:'Portfolio attribution, risk-adjusted returns, benchmark analysis, factor exposure.',
+    calcs:6, modules:4, live:false, url:null
+  },
+  {
+    id:'investment-management', phase:2,
+    name:'Investment Management', icon:'💼',
+    tagline:'SAA/TAA, rebalancing models, client mandate analysis, performance reporting.',
+    calcs:5, modules:3, live:false, url:null
+  },
+  // Phase 3
+  {
+    id:'capital-markets', phase:3,
+    name:'Capital Markets', icon:'📡',
+    tagline:'IPO pricing, book building, secondary issuances, and market microstructure.',
+    calcs:6, modules:4, live:false, url:null
+  },
+  {
+    id:'hedge-funds', phase:3,
+    name:'Hedge Funds', icon:'🛡️',
+    tagline:'Long/short equity, event-driven strategies, risk arbitrage, and alpha generation.',
+    calcs:7, modules:4, live:false, url:null
+  },
+  {
+    id:'structured-finance', phase:3,
+    name:'Structured Finance', icon:'🧩',
+    tagline:'ABS/MBS modeling, CDO waterfalls, securitization, and tranche analysis.',
+    calcs:5, modules:3, live:false, url:null
+  }
+];
+
+let selected = null;
+
+function buildCard(d) {
+  const div = document.createElement('div');
+  div.className = 'domain-card' + (d.live ? ' live' : ' coming-soon');
+  div.id = 'card-' + d.id;
+  div.setAttribute('role', 'button');
+  div.setAttribute('tabindex', '0');
+  div.onclick = () => toggleSelect(d);
+  div.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') toggleSelect(d); };
+  div.innerHTML =
+    '<div class="card-top">' +
+      '<div class="domain-icon">' + d.icon + '</div>' +
+      '<div class="card-right">' +
+        '<span class="status-badge ' + (d.live ? 'live' : 'soon') + '">' + (d.live ? '● Live' : 'Coming soon') + '</span>' +
+        '<div class="selected-check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="domain-name">' + d.name + '</div>' +
+    '<div class="domain-tagline">' + d.tagline + '</div>' +
+    '<div class="domain-meta">' +
+      '<span class="meta-pill">' + d.calcs + ' calc</span>' +
+      '<span class="meta-pill">' + d.modules + ' modules</span>' +
+    '</div>';
+  return div;
+}
+
+function render() {
+  const g = { 1: document.getElementById('grid-1'), 2: document.getElementById('grid-2'), 3: document.getElementById('grid-3') };
+  DOMAINS.forEach(d => g[d.phase].appendChild(buildCard(d)));
+}
+
+function toggleSelect(d) {
+  const prev = selected;
+
+  // Deselect old
+  if (prev) document.getElementById('card-' + prev.id).classList.remove('selected');
+
+  // Toggle off if same
+  if (prev && prev.id === d.id) {
+    selected = null;
+    updateCTA(null);
+    return;
+  }
+
+  selected = d;
+  document.getElementById('card-' + d.id).classList.add('selected');
+  updateCTA(d);
+}
+
+function updateCTA(d) {
+  const btn = document.getElementById('cta-btn');
+  const lbl = document.getElementById('sel-label');
+  const det = document.getElementById('sel-detail');
+
+  if (!d) {
+    lbl.innerHTML = 'Selected: <strong>none yet</strong>';
+    det.textContent = 'Pick a domain above to get started';
+    btn.textContent = 'Lock my selection and start building ↗';
+    btn.className = 'cta-btn';
+    return;
+  }
+
+  lbl.innerHTML = 'Selected: <strong>' + d.name + '</strong>';
+  det.textContent = d.calcs + ' calculators · ' + d.modules + ' modules';
+
+  if (d.live) {
+    btn.textContent = 'Enter ' + d.name + ' →';
+    btn.className = 'cta-btn go';
+  } else {
+    btn.textContent = 'Notify me when ' + d.name + ' launches ↗';
+    btn.className = 'cta-btn ready';
+  }
+}
+
+function handleCTA() {
+  if (!selected) return;
+
+  if (selected.live && selected.url) {
+    window.location.href = selected.url;
+    return;
+  }
+
+  // Store interest in localStorage
+  try {
+    const key = 'vd_domain_interest';
+    const list = JSON.parse(localStorage.getItem(key) || '[]');
+    if (!list.includes(selected.id)) {
+      list.push(selected.id);
+      localStorage.setItem(key, JSON.stringify(list));
+    }
+  } catch(e) {}
+
+  toast('Got it. ' + selected.name + ' is on the build list.');
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3200);
+}
+
+// PWA service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/valuation-toolkit/sw.js').catch(() => {});
+}
+
+render();
+</script>
 </body>
 </html>
