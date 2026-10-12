@@ -1,39 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CSV Simulator — ValuationDesk</title>
-  <meta name="theme-color" content="#0a0a0f">
-  <link rel="manifest" href="/valuation-toolkit/manifest.json">
-  <link rel="stylesheet" href="/valuation-toolkit/assets/vd-system.css">
-  <!-- PapaParse for CSV -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
-  <!-- SheetJS for Excel download -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CSV Simulator — ValuationDesk</title>
+<link rel="manifest" href="/valuation-toolkit/manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- PapaParse for CSV -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<!-- SheetJS for Excel download -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+/* === DESIGN SYSTEM — SELF-CONTAINED, ZERO EXTERNAL CSS === */
+:root {
+  --bg: #fff;
+  --text: #0a0a0a;
+  --muted: #6b7280;
+  --border: #e5e5e5;
+  --card: #f9fafb;
+  --green: #16a34a;
+  --red: #dc2626;
+  --font: 'Inter', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  /* Legacy aliases — so inline styles from original HTML render correctly */
+  --ink: #0a0a0a;
+  --gold: #16a34a;
+  --gold-dim: #f0fdf4;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-display: 'Inter', sans-serif;
+  --transition: all 0.15s;
+  --black: #0a0a0a;
+  --white: #ffffff;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+/* === TOP NAV === */
+.top-nav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--bg); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2rem; height: 56px;
+}
+.top-nav-logo { font-family: var(--font); font-size: 1rem; font-weight: 800; color: var(--text); text-decoration: none; letter-spacing: -0.02em; }
+.top-nav-logo strong { font-weight: 900; }
+.top-nav-links { display: flex; align-items: center; gap: 0.25rem; list-style: none; }
+.top-nav-links a { font-size: 0.82rem; font-weight: 500; color: var(--muted); text-decoration: none; padding: 0.4rem 0.75rem; border-radius: 6px; transition: all 0.15s; }
+.top-nav-links a:hover { color: var(--text); background: var(--card); }
+.top-nav-links a.active { color: var(--text); font-weight: 600; background: var(--card); }
+.top-nav-right { display: flex; align-items: center; gap: 0.75rem; }
+.top-nav-vault-btn { font-size: 0.78rem; font-weight: 600; color: var(--text); text-decoration: none; padding: 0.4rem 0.75rem; border: 1px solid var(--border); border-radius: 6px; transition: all 0.15s; }
+.top-nav-vault-btn:hover { background: var(--card); }
+.top-nav-pro-btn { font-size: 0.78rem; font-weight: 700; color: #fff; background: var(--text); text-decoration: none; padding: 0.4rem 1rem; border-radius: 6px; transition: all 0.15s; }
+.top-nav-pro-btn:hover { opacity: 0.85; }
+
+/* === VD-* COMPONENTS (previously from vd-system.css) === */
+.vd-page { min-height: 100vh; }
+.vd-section { padding: 3rem 2rem; }
+.vd-container { max-width: 1100px; margin: 0 auto; }
+.vd-eyebrow { font-family: var(--mono); font-size: 0.68rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); }
+.vd-h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; color: var(--text); margin-bottom: 0.5rem; }
+.vd-lead { font-size: 0.95rem; color: var(--muted); line-height: 1.7; }
+
+/* SELECT */
+.vd-select {
+  font-family: var(--mono); font-size: 0.72rem; color: var(--text);
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 4px; padding: 0.4rem 0.6rem;
+  outline: none; cursor: pointer; transition: var(--transition);
+}
+.vd-select:focus { border-color: var(--text); }
+
+/* BUTTONS */
+.vd-btn {
+  display: inline-flex; align-items: center;
+  font-family: var(--mono); font-size: 0.72rem; font-weight: 600;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  text-decoration: none; padding: 0.55rem 1.1rem;
+  border-radius: 4px; border: none; cursor: pointer;
+  transition: var(--transition);
+}
+.vd-btn-gold { color: #fff; background: var(--green); }
+.vd-btn-gold:hover { opacity: 0.85; }
+.vd-btn-outline { color: var(--text); background: transparent; border: 1px solid var(--border); }
+.vd-btn-outline:hover { border-color: var(--text); }
+.vd-btn-dark { color: #fff; background: var(--text); }
+.vd-btn-dark:hover { opacity: 0.85; }
+
+/* CARD */
+.vd-card { background: var(--card); border: 1px solid var(--border); border-radius: 6px; padding: 1rem 1.25rem; }
+
+/* MONO LABEL */
+.vd-mono-label { font-family: var(--mono); font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+
+/* TABLE */
+.vd-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.vd-table th { text-align: left; font-family: var(--mono); font-size: 0.65rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); }
+.vd-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--border); color: var(--text); }
+.vd-table tr:last-child td { border-bottom: none; }
+
+/* FOOTER */
+.vd-footer { border-top: 1px solid var(--border); padding: 2rem; display: flex; align-items: center; justify-content: space-between; }
+.vd-footer-logo { font-size: 0.9rem; font-weight: 800; color: var(--text); letter-spacing: -0.02em; }
+.vd-footer-logo strong { font-weight: 900; }
+.vd-footer-note { font-size: 0.75rem; color: var(--muted); }
+
+/* TOAST */
+#vd-toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: 0.5rem; pointer-events: none; }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .top-nav-links { display: none; }
+  .top-nav { padding: 0 1rem; }
+  .vd-section { padding: 2rem 1rem; }
+}
+</style>
 </head>
 <body>
 
-<nav class="vd-nav">
-  <a href="/valuation-toolkit/" class="vd-logo">Valuation<strong>Desk</strong></a>
-  <ul class="vd-nav-links">
-    <li><a href="/valuation-toolkit/learn/"><span class="nav-icon">📖</span> Learn</a></li>
-    <li><a href="/valuation-toolkit/calculators/"><span class="nav-icon">🧮</span> Calculators</a></li>
-    <li><a href="/valuation-toolkit/simulate/"><span class="nav-icon">📊</span> Simulate</a></li>
-    <li><a href="/valuation-toolkit/#pricing"><span class="nav-icon">💼</span> Get Toolkit</a></li>
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <a href="/valuation-toolkit/" class="top-nav-logo">Valuation<strong>Desk</strong></a>
+  <ul class="top-nav-links">
+    <li><a href="/valuation-toolkit/domains/valuation-advisory/">Valuation Advisory</a></li>
+    <li><a href="/valuation-toolkit/vault/">My Vault</a></li>
+    <li><a href="/valuation-toolkit/deal-room/">Deal Room</a></li>
+    <li><a href="/valuation-toolkit/daily-brief/">Daily Brief</a></li>
+    <li><a href="/valuation-toolkit/simulate/" class="active">&#128202; Simulate</a></li>
   </ul>
-  <div class="vd-nav-right">
-    <button id="pwa-install-btn" onclick="triggerPWAInstall()">⬇ Install App</button>
-    <a href="/valuation-toolkit/#pricing" class="vd-btn-nav">Buy Toolkit ₹3,999</a>
-    <button class="vd-hamburger" id="vd-hamburger"><span></span><span></span><span></span></button>
+  <div class="top-nav-right">
+    <a href="/valuation-toolkit/vault/" class="top-nav-vault-btn">🗄 My Vault</a>
+    <a href="/valuation-toolkit/#pricing" class="top-nav-pro-btn">Get Pro — &#8377;799/mo</a>
   </div>
 </nav>
-<div class="vd-mobile-menu" id="vd-mobile-menu">
-  <a href="/valuation-toolkit/learn/">📖 Learn</a>
-  <a href="/valuation-toolkit/calculators/">🧮 Calculators</a>
-  <a href="/valuation-toolkit/simulate/" class="active">📊 Simulate</a>
-  <a href="/valuation-toolkit/#pricing">💼 Get Toolkit</a>
-</div>
 
 <div class="vd-page">
   <section class="vd-section">
@@ -41,7 +144,7 @@
 
       <div class="vd-eyebrow">CSV Simulator</div>
       <h1 class="vd-h1" style="margin-bottom:1rem;">Your Real Data. Live Analysis.</h1>
-      <p class="vd-lead" style="margin-bottom:2.5rem;">Upload your company's P&L or financial data as a CSV. The platform auto-maps columns, calculates key metrics, benchmarks against 12 Indian sectors, and generates a downloadable Excel summary — with all formulas intact.</p>
+      <p class="vd-lead" style="margin-bottom:2.5rem;">Upload your company's P&amp;L or financial data as a CSV. The platform auto-maps columns, calculates key metrics, benchmarks against 12 Indian sectors, and generates a downloadable Excel summary — with all formulas intact.</p>
 
       <!-- STEP 1: Upload -->
       <div style="margin-bottom:2rem;">
@@ -55,11 +158,11 @@
           <input type="file" id="csv-file" accept=".csv" style="display:none;" onchange="handleFile(this.files[0])">
           <div style="font-size:2.5rem;margin-bottom:.75rem;">📂</div>
           <div style="font-family:var(--font-display);font-size:1.2rem;font-weight:700;margin-bottom:.5rem;">Drop your CSV here, or click to upload</div>
-          <div style="font-family:var(--font-mono);font-size:.68rem;color:var(--muted);">Accepts .csv files · Your data never leaves your browser · Fully private</div>
+          <div style="font-family:var(--font-mono);font-size:.68rem;color:var(--muted);">Accepts .csv files &middot; Your data never leaves your browser &middot; Fully private</div>
         </div>
 
         <!-- CSV Format Guide -->
-        <div style="margin-top:1rem;background:#faf8f3;border:1px solid var(--border);padding:1.25rem;">
+        <div style="margin-top:1rem;background:#faf9f7;border:1px solid var(--border);padding:1.25rem;">
           <div style="font-family:var(--font-mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:.75rem;">Expected CSV Format (any of these column names work)</div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:.5rem;">
             <div style="font-family:var(--font-mono);font-size:.68rem;color:var(--muted);">Revenue / Net Sales / Turnover</div>
@@ -69,10 +172,10 @@
             <div style="font-family:var(--font-mono);font-size:.68rem;color:var(--muted);">Total Debt / Borrowings</div>
             <div style="font-family:var(--font-mono);font-size:.68rem;color:var(--muted);">CAPEX / Capital Expenditure</div>
             <div style="font-family:var(--font-mono);font-size:.68rem;color:var(--muted);">Year / FY / Period</div>
-            <div style="font-family:var(--font-mono);font-size:.68rem;color:var(--muted);">D&A / Depreciation</div>
+            <div style="font-family:var(--font-mono);font-size:.68rem;color:var(--muted);">D&amp;A / Depreciation</div>
           </div>
           <div style="margin-top:.75rem;">
-            <button onclick="downloadSampleCSV()" style="font-family:var(--font-mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);background:none;border:1px solid var(--border);padding:.4rem .9rem;cursor:pointer;transition:var(--transition);" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor=''">⬇ Download Sample CSV</button>
+            <button onclick="downloadSampleCSV()" style="font-family:var(--font-mono);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);background:none;border:1px solid var(--border);padding:.4rem .9rem;cursor:pointer;transition:var(--transition);" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor=''">&#8595; Download Sample CSV</button>
           </div>
         </div>
       </div>
@@ -91,12 +194,12 @@
             <div style="display:flex;align-items:center;gap:.5rem;">
               <span style="font-size:.78rem;color:var(--muted);">Currency:</span>
               <select id="currency-select" class="vd-select">
-                <option value="cr">₹ Crore</option>
-                <option value="lakh">₹ Lakh</option>
-                <option value="mn">₹ Million</option>
+                <option value="cr">&#8377; Crore</option>
+                <option value="lakh">&#8377; Lakh</option>
+                <option value="mn">&#8377; Million</option>
               </select>
             </div>
-            <button onclick="runAnalysis()" class="vd-btn vd-btn-gold" style="font-size:.72rem;padding:.7rem 1.5rem;">Run Analysis →</button>
+            <button onclick="runAnalysis()" class="vd-btn vd-btn-gold" style="font-size:.72rem;padding:.7rem 1.5rem;">Run Analysis &rarr;</button>
           </div>
         </div>
       </div>
@@ -110,7 +213,7 @@
 
         <!-- Trend Chart -->
         <div style="background:white;border:1px solid var(--border);padding:1.5rem;margin-bottom:1.5rem;">
-          <div class="vd-mono-label" style="margin-bottom:1rem;">Revenue & EBITDA Trend</div>
+          <div class="vd-mono-label" style="margin-bottom:1rem;">Revenue &amp; EBITDA Trend</div>
           <div style="position:relative;height:200px;" id="trend-chart-wrap">
             <canvas id="trend-chart"></canvas>
           </div>
@@ -131,9 +234,9 @@
 
         <!-- Download -->
         <div style="display:flex;gap:1rem;flex-wrap:wrap;padding-top:1rem;border-top:1px solid var(--border);">
-          <button onclick="downloadAnalysisExcel()" class="vd-btn vd-btn-gold">⬇ Download Analysis as Excel</button>
-          <button onclick="resetSimulator()" class="vd-btn vd-btn-outline">↺ Upload New File</button>
-          <a href="/valuation-toolkit/#pricing" class="vd-btn vd-btn-dark" style="font-size:.68rem;">Get Full DCF Model →</a>
+          <button onclick="downloadAnalysisExcel()" class="vd-btn vd-btn-gold">&#8595; Download Analysis as Excel</button>
+          <button onclick="resetSimulator()" class="vd-btn vd-btn-outline">&#8635; Upload New File</button>
+          <a href="/valuation-toolkit/domains/valuation-advisory/calculators/dcf.html" class="vd-btn vd-btn-dark" style="font-size:.68rem;">Get Full DCF Model &rarr;</a>
         </div>
       </div>
 
@@ -143,26 +246,45 @@
 
 <footer class="vd-footer">
   <div class="vd-footer-logo">Valuation<strong>Desk</strong></div>
-  <div class="vd-footer-note">Your data never leaves your browser. No server. No tracking. © 2025 ValuationDesk</div>
+  <div class="vd-footer-note">Your data never leaves your browser. No server. No tracking. &copy; 2025 ValuationDesk</div>
 </footer>
 <div id="vd-toast-container"></div>
-<script src="/valuation-toolkit/assets/vd-shared.js"></script>
+
 <script>
-let parsedData = [], detectedColumns = [], sectorData = null, mappedData = {};
+// === SECTORS DATA — EMBEDDED INLINE (previously loaded from data/sectors.json) ===
+const SECTORS_JSON = {"_meta":{"version":"1.0","sources":["BSE/NSE filings","Screener.in","Ace Equity","Bloomberg (public)","SEBI disclosures"],"note":"Benchmarks represent median values for Indian-listed peers. Updated periodically.","currency":"INR","last_updated":"2025"},"sectors":[{"id":"it_services","name":"IT Services & Software","peers":["TCS","Infosys","Wipro","HCL Tech","Tech Mahindra","Mphasis","Persistent","Coforge"],"dcf":{"revenue_growth_y1_3":12.5,"revenue_growth_y4_5":9.0,"ebitda_margin":24.5,"capex_pct_revenue":2.5,"wc_pct_revenue":4.0,"da_pct_revenue":3.5,"tax_rate":25.0,"terminal_growth":4.5,"beta":0.85,"wacc_typical":13.2},"comps":{"ev_ebitda_median":22.4,"ev_ebitda_range":[16.0,32.0],"pe_median":28.5,"pe_range":[20.0,42.0],"ev_revenue_median":4.8,"pb_median":6.2,"fcf_yield_median":3.8,"roe_median":26.0,"roce_median":32.0},"lbo":{"typical_entry_multiple":18.0,"leverage_ratio":2.5,"debt_paydown_yr5":65.0,"exit_multiple_range":[16.0,22.0],"irr_target":22.0}},{"id":"fmcg","name":"FMCG & Consumer Goods","peers":["HUL","ITC","Nestle India","Dabur","Marico","Godrej Consumer","Britannia","Colgate"],"dcf":{"revenue_growth_y1_3":10.0,"revenue_growth_y4_5":8.0,"ebitda_margin":21.0,"capex_pct_revenue":4.0,"wc_pct_revenue":-2.0,"da_pct_revenue":3.0,"tax_rate":25.0,"terminal_growth":5.0,"beta":0.70,"wacc_typical":11.8},"comps":{"ev_ebitda_median":42.0,"ev_ebitda_range":[28.0,65.0],"pe_median":55.0,"pe_range":[38.0,85.0],"ev_revenue_median":8.2,"pb_median":15.0,"fcf_yield_median":2.1,"roe_median":38.0,"roce_median":45.0},"lbo":{"typical_entry_multiple":35.0,"leverage_ratio":1.5,"debt_paydown_yr5":80.0,"exit_multiple_range":[30.0,42.0],"irr_target":18.0}},{"id":"pharma","name":"Pharmaceuticals","peers":["Sun Pharma","Dr Reddy","Cipla","Lupin","Aurobindo","Torrent Pharma","Alkem","Abbott India"],"dcf":{"revenue_growth_y1_3":11.5,"revenue_growth_y4_5":9.0,"ebitda_margin":22.0,"capex_pct_revenue":6.5,"wc_pct_revenue":8.0,"da_pct_revenue":5.0,"tax_rate":25.0,"terminal_growth":4.0,"beta":0.75,"wacc_typical":12.0},"comps":{"ev_ebitda_median":24.0,"ev_ebitda_range":[15.0,38.0],"pe_median":32.0,"pe_range":[22.0,52.0],"ev_revenue_median":4.5,"pb_median":5.0,"fcf_yield_median":2.8,"roe_median":18.0,"roce_median":22.0},"lbo":{"typical_entry_multiple":20.0,"leverage_ratio":2.0,"debt_paydown_yr5":60.0,"exit_multiple_range":[18.0,26.0],"irr_target":20.0}},{"id":"banking","name":"Banking & Financial Services","peers":["HDFC Bank","ICICI Bank","Kotak Bank","Axis Bank","SBI","IndusInd","Federal Bank","Bandhan Bank"],"dcf":{"revenue_growth_y1_3":16.0,"revenue_growth_y4_5":12.0,"ebitda_margin":38.0,"capex_pct_revenue":2.0,"wc_pct_revenue":0.0,"da_pct_revenue":1.5,"tax_rate":25.0,"terminal_growth":5.0,"beta":1.10,"wacc_typical":14.5},"comps":{"ev_ebitda_median":14.0,"ev_ebitda_range":[8.0,24.0],"pe_median":18.0,"pe_range":[10.0,32.0],"ev_revenue_median":5.5,"pb_median":2.8,"fcf_yield_median":4.2,"roe_median":16.0,"roce_median":14.0},"lbo":{"typical_entry_multiple":12.0,"leverage_ratio":1.2,"debt_paydown_yr5":50.0,"exit_multiple_range":[10.0,16.0],"irr_target":18.0}},{"id":"auto","name":"Automobiles & Auto Ancillary","peers":["Maruti","M&M","Tata Motors","Bajaj Auto","Hero MotoCorp","TVS Motor","Eicher","Bosch India"],"dcf":{"revenue_growth_y1_3":13.0,"revenue_growth_y4_5":9.5,"ebitda_margin":13.5,"capex_pct_revenue":5.5,"wc_pct_revenue":2.0,"da_pct_revenue":4.5,"tax_rate":25.0,"terminal_growth":3.5,"beta":1.15,"wacc_typical":13.8},"comps":{"ev_ebitda_median":18.0,"ev_ebitda_range":[10.0,28.0],"pe_median":24.0,"pe_range":[14.0,40.0],"ev_revenue_median":2.2,"pb_median":3.5,"fcf_yield_median":3.0,"roe_median":16.0,"roce_median":18.0},"lbo":{"typical_entry_multiple":14.0,"leverage_ratio":2.5,"debt_paydown_yr5":60.0,"exit_multiple_range":[12.0,18.0],"irr_target":20.0}},{"id":"real_estate","name":"Real Estate & REITs","peers":["DLF","Godrej Properties","Prestige","Sobha","Brigade","Macrotech","Embassy REIT","Mindspace REIT"],"dcf":{"revenue_growth_y1_3":18.0,"revenue_growth_y4_5":12.0,"ebitda_margin":28.0,"capex_pct_revenue":35.0,"wc_pct_revenue":15.0,"da_pct_revenue":2.0,"tax_rate":25.0,"terminal_growth":4.0,"beta":1.30,"wacc_typical":15.0},"comps":{"ev_ebitda_median":28.0,"ev_ebitda_range":[15.0,48.0],"pe_median":45.0,"pe_range":[22.0,80.0],"ev_revenue_median":7.5,"pb_median":4.2,"fcf_yield_median":1.8,"roe_median":12.0,"roce_median":10.0},"lbo":{"typical_entry_multiple":22.0,"leverage_ratio":3.5,"debt_paydown_yr5":45.0,"exit_multiple_range":[18.0,28.0],"irr_target":22.0}},{"id":"energy","name":"Energy & Power","peers":["Reliance","ONGC","NTPC","Power Grid","Adani Power","Tata Power","CESC","Torrent Power"],"dcf":{"revenue_growth_y1_3":9.0,"revenue_growth_y4_5":7.0,"ebitda_margin":32.0,"capex_pct_revenue":12.0,"wc_pct_revenue":3.0,"da_pct_revenue":8.0,"tax_rate":25.0,"terminal_growth":3.0,"beta":0.90,"wacc_typical":12.5},"comps":{"ev_ebitda_median":12.0,"ev_ebitda_range":[7.0,20.0],"pe_median":16.0,"pe_range":[8.0,28.0],"ev_revenue_median":3.5,"pb_median":2.0,"fcf_yield_median":5.0,"roe_median":14.0,"roce_median":12.0},"lbo":{"typical_entry_multiple":10.0,"leverage_ratio":4.0,"debt_paydown_yr5":40.0,"exit_multiple_range":[8.0,14.0],"irr_target":16.0}},{"id":"telecom","name":"Telecom","peers":["Bharti Airtel","Vodafone Idea","Indus Towers","BSNL"],"dcf":{"revenue_growth_y1_3":11.0,"revenue_growth_y4_5":8.0,"ebitda_margin":42.0,"capex_pct_revenue":18.0,"wc_pct_revenue":-5.0,"da_pct_revenue":18.0,"tax_rate":25.0,"terminal_growth":3.5,"beta":0.95,"wacc_typical":12.8},"comps":{"ev_ebitda_median":8.5,"ev_ebitda_range":[5.0,14.0],"pe_median":28.0,"pe_range":[15.0,50.0],"ev_revenue_median":3.8,"pb_median":3.5,"fcf_yield_median":3.2,"roe_median":10.0,"roce_median":8.0},"lbo":{"typical_entry_multiple":7.0,"leverage_ratio":3.0,"debt_paydown_yr5":35.0,"exit_multiple_range":[6.0,10.0],"irr_target":16.0}},{"id":"startup_saas","name":"Indian SaaS / B2B Tech (Startup)","peers":["Freshworks","Zoho (private)","Razorpay (private)","Chargebee","Postman","BrowserStack"],"dcf":{"revenue_growth_y1_3":45.0,"revenue_growth_y4_5":28.0,"ebitda_margin":-15.0,"capex_pct_revenue":3.0,"wc_pct_revenue":-8.0,"da_pct_revenue":4.0,"tax_rate":25.0,"terminal_growth":5.0,"beta":1.50,"wacc_typical":18.0},"comps":{"ev_ebitda_median":0,"ev_revenue_median":12.0,"arr_multiple_median":10.0,"fcf_yield_median":-8.0,"roe_median":-12.0,"roce_median":-10.0}},{"id":"ecommerce","name":"E-commerce & Marketplace","peers":["Nykaa","Zomato","PolicyBazaar","CarTrade","Mamaearth"],"dcf":{"revenue_growth_y1_3":30.0,"revenue_growth_y4_5":20.0,"ebitda_margin":5.0,"capex_pct_revenue":4.0,"wc_pct_revenue":-6.0,"da_pct_revenue":3.5,"tax_rate":25.0,"terminal_growth":5.0,"beta":1.40,"wacc_typical":16.0},"comps":{"ev_ebitda_median":80.0,"ev_ebitda_range":[30.0,150.0],"pe_median":120.0,"pe_range":[40.0,250.0],"ev_revenue_median":6.0,"pb_median":8.0,"fcf_yield_median":0.5,"roe_median":5.0,"roce_median":4.0},"lbo":{"typical_entry_multiple":50.0,"leverage_ratio":1.0,"debt_paydown_yr5":70.0,"exit_multiple_range":[40.0,70.0],"irr_target":20.0}},{"id":"cement","name":"Cement & Building Materials","peers":["UltraTech","Shree Cement","Ambuja","ACC","Dalmia Bharat","JK Cement","Ramco"],"dcf":{"revenue_growth_y1_3":11.0,"revenue_growth_y4_5":8.0,"ebitda_margin":18.0,"capex_pct_revenue":9.0,"wc_pct_revenue":2.0,"da_pct_revenue":7.0,"tax_rate":25.0,"terminal_growth":3.5,"beta":0.95,"wacc_typical":12.5},"comps":{"ev_ebitda_median":16.0,"ev_ebitda_range":[10.0,24.0],"pe_median":30.0,"pe_range":[18.0,48.0],"ev_revenue_median":2.8,"pb_median":4.0,"fcf_yield_median":2.5,"roe_median":14.0,"roce_median":16.0},"lbo":{"typical_entry_multiple":13.0,"leverage_ratio":2.5,"debt_paydown_yr5":55.0,"exit_multiple_range":[11.0,17.0],"irr_target":18.0}},{"id":"healthcare","name":"Healthcare Services & Hospitals","peers":["Apollo Hospitals","Fortis","Max Healthcare","Narayana Health","Dr Lal PathLabs","Metropolis"],"dcf":{"revenue_growth_y1_3":16.0,"revenue_growth_y4_5":12.0,"ebitda_margin":19.0,"capex_pct_revenue":8.0,"wc_pct_revenue":3.0,"da_pct_revenue":5.5,"tax_rate":25.0,"terminal_growth":5.0,"beta":0.80,"wacc_typical":12.2},"comps":{"ev_ebitda_median":38.0,"ev_ebitda_range":[22.0,55.0],"pe_median":65.0,"pe_range":[40.0,100.0],"ev_revenue_median":7.0,"pb_median":9.0,"fcf_yield_median":1.8,"roe_median":16.0,"roce_median":14.0},"lbo":{"typical_entry_multiple":28.0,"leverage_ratio":2.0,"debt_paydown_yr5":60.0,"exit_multiple_range":[24.0,35.0],"irr_target":20.0}}]};
 
-// Load sector data
-VD.loadData('/valuation-toolkit/data/sectors.json').then(d => {
-  sectorData = d;
-  if (d) {
-    const sel = document.getElementById('sector-select');
-    d.sectors.forEach(s => {
-      const opt = document.createElement('option');
-      opt.value = s.id; opt.textContent = s.name;
-      sel.appendChild(opt);
-    });
+// === VD TOAST — INLINE (previously from vd-shared.js) ===
+const VD = {
+  toast: function(msg, type) {
+    const container = document.getElementById('vd-toast-container');
+    const t = document.createElement('div');
+    t.style.cssText = `
+      background:${type==='error'?'#dc2626':type==='success'?'#16a34a':'#0a0a0a'};
+      color:#fff;padding:.7rem 1rem;border-radius:6px;
+      font-family:var(--mono);font-size:.72rem;font-weight:500;
+      box-shadow:0 4px 12px rgba(0,0,0,.15);
+      transition:opacity 0.3s;pointer-events:auto;
+    `;
+    t.textContent = msg;
+    container.appendChild(t);
+    setTimeout(() => { t.style.opacity='0'; setTimeout(()=>t.remove(), 300); }, 2800);
   }
-});
+};
 
+// === SECTOR DROPDOWN — POPULATED FROM EMBEDDED DATA ===
+let parsedData = [], detectedColumns = [], sectorData = SECTORS_JSON, mappedData = {};
+
+(function initSectorDropdown() {
+  const sel = document.getElementById('sector-select');
+  SECTORS_JSON.sectors.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s.id; opt.textContent = s.name;
+    sel.appendChild(opt);
+  });
+})();
+
+// === FILE HANDLING ===
 function handleDrop(e) {
   e.preventDefault();
   document.getElementById('dropzone').style.borderColor = '';
@@ -188,6 +310,7 @@ function handleFile(file) {
   });
 }
 
+// === FIELD MAPPING ===
 const FIELD_MAP = {
   revenue:   ['revenue','net sales','turnover','sales','total revenue','net revenue'],
   ebitda:    ['ebitda','operating profit','operating income','ebit'],
@@ -215,8 +338,8 @@ function buildMapper() {
     const row = document.createElement('div');
     row.style.cssText = 'display:flex;align-items:center;gap:.5rem;';
     row.innerHTML = `
-      <div style="font-family:var(--font-mono);font-size:.7rem;color:var(--ink);flex:1;background:#faf8f3;padding:.4rem .6rem;border:1px solid var(--border);">${col}</div>
-      <div style="font-family:var(--font-mono);font-size:.6rem;color:var(--muted);">→</div>
+      <div style="font-family:var(--font-mono);font-size:.7rem;color:var(--ink);flex:1;background:#faf9f7;padding:.4rem .6rem;border:1px solid var(--border);">${col}</div>
+      <div style="font-family:var(--font-mono);font-size:.6rem;color:var(--muted);">&rarr;</div>
       <select class="vd-select" style="flex:1;" data-col="${col}">
         <option value="">-- Ignore --</option>
         ${Object.keys(FIELD_MAP).map(f => `<option value="${f}" ${f===detected?'selected':''}>${f.charAt(0).toUpperCase()+f.slice(1)}</option>`).join('')}
@@ -227,6 +350,7 @@ function buildMapper() {
   document.getElementById('mapper-section').style.display = 'block';
 }
 
+// === RUN ANALYSIS ===
 function runAnalysis() {
   // Build mapping
   mappedData = {};
@@ -258,9 +382,9 @@ function runAnalysis() {
     ? (revenue.slice(-1)[0]/revenue.slice(-2)[0]-1)*100 : null;
 
   const kpis = [
-    { label:'Latest Revenue', val:'₹'+latestRev.toLocaleString('en-IN')+' Cr', sub:'Most recent period' },
+    { label:'Latest Revenue', val:'&#8377;'+latestRev.toLocaleString('en-IN')+' Cr', sub:'Most recent period' },
     { label:'EBITDA Margin', val:ebitdaMargin.toFixed(1)+'%', sub:'Latest period', color: ebitdaMargin>20?'var(--green)':ebitdaMargin>10?'var(--ink)':'var(--red)' },
-    { label:'YoY Revenue Growth', val: revGrowth!==null?revGrowth.toFixed(1)+'%':'—', sub:'Last 2 periods', color: revGrowth>0?'var(--green)':'var(--red)' },
+    { label:'YoY Revenue Growth', val: revGrowth!==null?revGrowth.toFixed(1)+'%':'&#8212;', sub:'Last 2 periods', color: revGrowth>0?'var(--green)':'var(--red)' },
     { label:'Rows in Dataset', val: parsedData.length, sub:'Periods uploaded' },
   ];
 
@@ -272,7 +396,7 @@ function runAnalysis() {
     </div>
   `).join('');
 
-  // Simple bar chart via inline SVG
+  // Bar chart via inline SVG
   const chartRevs = revenue.filter(Boolean);
   const chartYrs  = years.slice(0, chartRevs.length);
   const maxR = Math.max(...chartRevs);
@@ -284,8 +408,8 @@ function runAnalysis() {
     const x = padL + i * ((svgW-padL-20)/chartRevs.length) + 5;
     const h = (v/maxR)*(svgH-padB-10);
     const y = svgH-padB-h;
-    svgBars += `<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="rgba(201,168,76,0.7)" rx="2"/>
-    <text x="${x+barW/2}" y="${svgH-5}" text-anchor="middle" font-size="9" font-family="monospace" fill="#6b6760">${chartYrs[i]}</text>`;
+    svgBars += `<rect x="${x}" y="${y}" width="${barW}" height="${h}" fill="rgba(22,163,74,0.7)" rx="2"/>
+    <text x="${x+barW/2}" y="${svgH-5}" text-anchor="middle" font-size="9" font-family="monospace" fill="#6b7280">${chartYrs[i]}</text>`;
   });
 
   document.getElementById('trend-chart-wrap').innerHTML = `
@@ -293,7 +417,7 @@ function runAnalysis() {
       <line x1="${padL}" y1="0" x2="${padL}" y2="${svgH-padB}" stroke="rgba(0,0,0,.1)" stroke-width="1"/>
       <line x1="${padL}" y1="${svgH-padB}" x2="${svgW}" y2="${svgH-padB}" stroke="rgba(0,0,0,.1)" stroke-width="1"/>
       ${svgBars}
-      <text x="10" y="12" font-size="8" font-family="monospace" fill="#c9a84c" transform="rotate(-90,10,60)" text-anchor="middle">Revenue (Cr)</text>
+      <text x="10" y="12" font-size="8" font-family="monospace" fill="#16a34a" transform="rotate(-90,10,60)" text-anchor="middle">Revenue (Cr)</text>
     </svg>`;
 
   // Sector benchmarking
@@ -302,10 +426,10 @@ function runAnalysis() {
   if (sector) {
     const rows = [
       ['Metric', 'Your Company', 'Sector Median', 'Status'],
-      ['EBITDA Margin', ebitdaMargin.toFixed(1)+'%', sector.dcf.ebitda_margin+'%', ebitdaMargin >= sector.dcf.ebitda_margin ? '✅ Above' : '⚠️ Below'],
-      ['Revenue Growth', revGrowth!==null?revGrowth.toFixed(1)+'%':'—', sector.dcf.revenue_growth_y1_3+'%', revGrowth!==null&&revGrowth>=sector.dcf.revenue_growth_y1_3?'✅ Above':'⚠️ Below'],
-      ['EV/EBITDA (typical)', '—', sector.comps.ev_ebitda_median+'x', 'Benchmark'],
-      ['P/E (typical)', '—', sector.comps.pe_median+'x', 'Benchmark'],
+      ['EBITDA Margin', ebitdaMargin.toFixed(1)+'%', sector.dcf.ebitda_margin+'%', ebitdaMargin >= sector.dcf.ebitda_margin ? '&#10003; Above' : '&#9888; Below'],
+      ['Revenue Growth', revGrowth!==null?revGrowth.toFixed(1)+'%':'&#8212;', sector.dcf.revenue_growth_y1_3+'%', revGrowth!==null&&revGrowth>=sector.dcf.revenue_growth_y1_3?'&#10003; Above':'&#9888; Below'],
+      ['EV/EBITDA (typical)', '&#8212;', sector.comps.ev_ebitda_median+'x', 'Benchmark'],
+      ['P/E (typical)', '&#8212;', sector.comps.pe_median+'x', 'Benchmark'],
     ];
     document.getElementById('benchmark-table').innerHTML = `<table class="vd-table"><thead><tr>${rows[0].map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.slice(1).map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
 
@@ -326,7 +450,7 @@ function runAnalysis() {
     const ev=Math.round(pv+pvTv);
 
     document.getElementById('quick-dcf').innerHTML=[
-      {label:'Est. Enterprise Value',val:'₹'+ev.toLocaleString('en-IN')+' Cr'},
+      {label:'Est. Enterprise Value',val:'&#8377;'+ev.toLocaleString('en-IN')+' Cr'},
       {label:'WACC Used',val:wacc+'%'},
       {label:'Terminal Growth',val:g+'%'},
       {label:'Based on Sector',val:sector.name},
@@ -339,6 +463,7 @@ function runAnalysis() {
   VD.toast('Analysis complete!', 'success');
 }
 
+// === EXCEL DOWNLOAD ===
 function downloadAnalysisExcel() {
   if (!window._analysisData) return;
   const d = window._analysisData;
@@ -357,7 +482,7 @@ function downloadAnalysisExcel() {
     ['EBITDA Margin (%)', d.ebitdaMargin?.toFixed(1)],
     ['YoY Revenue Growth (%)', d.revGrowth?.toFixed(1) || '—'],
     [],
-    ['Note: For full DCF, Comps, LBO and VC analysis, download the Full Toolkit at ValuationDesk'],
+    ['Note: For full DCF, Comps, LBO and VC analysis, open the calculator suite at ValuationDesk'],
   ];
 
   const ws = XLSX.utils.aoa_to_sheet(summaryRows);
@@ -367,6 +492,7 @@ function downloadAnalysisExcel() {
   VD.toast('Excel downloaded with formulas!', 'success');
 }
 
+// === SAMPLE CSV DOWNLOAD ===
 function downloadSampleCSV() {
   const csv = `Year,Revenue,EBITDA,PAT,Total Assets,Total Debt,CAPEX
 FY2021,320,58,28,450,120,22
@@ -382,6 +508,7 @@ FY2025,645,142,78,850,65,48`;
   VD.toast('Sample CSV downloaded!', 'success');
 }
 
+// === RESET ===
 function resetSimulator() {
   parsedData=[]; detectedColumns=[]; mappedData={};
   document.getElementById('dropzone').style.borderColor='';

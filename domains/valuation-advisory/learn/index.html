@@ -1,56 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Learn Valuation Advisory — ValuationDesk</title>
-<link rel="stylesheet" href="/valuation-toolkit/assets/vd.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Learn Valuation — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
+/* === DESIGN SYSTEM — SELF-CONTAINED, ZERO EXTERNAL CSS === */
+:root {
+  --bg: #fff;
+  --text: #0a0a0a;
+  --muted: #6b7280;
+  --border: #e5e5e5;
+  --card: #f9fafb;
+  --green: #16a34a;
+  --red: #dc2626;
+  --font: 'Inter', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+  /* Legacy aliases — keep inline styles working */
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --black: #0a0a0a;
+  --white: #ffffff;
+  --r-sm: 4px;
+  --r: 8px;
+  --r-lg: 12px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+
+/* === TOP NAV === */
+.top-nav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--bg); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2rem; height: 56px;
+}
+.top-nav-logo { font-family: var(--font); font-size: 1rem; font-weight: 800; color: var(--text); text-decoration: none; letter-spacing: -0.02em; }
+.top-nav-logo strong { font-weight: 900; }
+.top-nav-links { display: flex; align-items: center; gap: 0.25rem; list-style: none; }
+.top-nav-links a { font-size: 0.82rem; font-weight: 500; color: var(--muted); text-decoration: none; padding: 0.4rem 0.75rem; border-radius: 6px; transition: all 0.15s; }
+.top-nav-links a:hover { color: var(--text); background: var(--card); }
+.top-nav-right { display: flex; align-items: center; gap: 0.75rem; }
+.top-nav-vault-btn { font-size: 0.78rem; font-weight: 600; color: var(--text); text-decoration: none; padding: 0.4rem 0.75rem; border: 1px solid var(--border); border-radius: 6px; transition: all 0.15s; }
+.top-nav-vault-btn:hover { background: var(--card); }
+.top-nav-pro-btn { font-size: 0.78rem; font-weight: 700; color: #fff; background: var(--text); text-decoration: none; padding: 0.4rem 1rem; border-radius: 6px; transition: all 0.15s; }
+.top-nav-pro-btn:hover { opacity: 0.85; }
+
+/* === DOMAIN NAV === */
+.domain-nav { background: var(--bg); border-bottom: 1px solid var(--border); padding: 0 2rem; }
+.domain-nav-inner { display: flex; overflow-x: auto; scrollbar-width: none; }
+.domain-nav-inner::-webkit-scrollbar { display: none; }
+.domain-nav-inner a { display: inline-block; font-size: 0.8rem; font-weight: 500; color: var(--muted); text-decoration: none; padding: 0.65rem 1rem; border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap; }
+.domain-nav-inner a:hover { color: var(--text); }
+.domain-nav-inner a.active { color: var(--text); font-weight: 600; border-bottom-color: var(--text); }
+
+/* === PAGE LAYOUT === */
+.page { min-height: 100vh; }
+.section { padding: 3rem 2rem; }
+.container { max-width: 1100px; margin: 0 auto; }
+
+/* === TYPOGRAPHY === */
+.h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; color: var(--text); }
+.eyebrow { font-family: var(--mono); font-size: 0.65rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+
+/* === TAGS === */
+.tag { display: inline-flex; align-items: center; font-family: var(--mono); font-size: 0.6rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.2rem 0.5rem; border-radius: 3px; }
+.tag-green { background: #dcfce7; color: var(--green); }
+.tag-black { background: var(--text); color: #fff; }
+
+/* === BUTTONS === */
+.btn { display: inline-flex; align-items: center; font-family: var(--font); font-size: 0.82rem; font-weight: 600; text-decoration: none; padding: 0.55rem 1.1rem; border-radius: 6px; border: none; cursor: pointer; transition: all 0.15s; }
+.btn-outline { color: #fff; border: 1px solid rgba(255,255,255,0.25); background: transparent; }
+.btn-outline:hover { background: rgba(255,255,255,0.1); }
+.btn-black { color: #fff; background: var(--text); }
+.btn-black:hover { opacity: 0.85; }
+
+/* === CHAPTER CONTENT === */
 .chapter-content { max-width: 680px; }
-.chapter-content h3 { font-size:1.1rem; font-weight:700; margin:2rem 0 0.5rem; }
-.chapter-content p { font-size:0.9rem; line-height:1.8; color:var(--gray-500); margin-bottom:1rem; }
-.chapter-content ul { padding-left:1.25rem; margin-bottom:1rem; }
-.chapter-content li { font-size:0.88rem; line-height:1.7; color:var(--gray-500); margin-bottom:0.3rem; }
-.chapter-content strong { color:var(--black); font-weight:600; }
-.formula-box { background:var(--gray-50); border:1px solid var(--gray-200); border-left:3px solid var(--black); border-radius:var(--r-sm); padding:1rem 1.25rem; margin:1.25rem 0; font-family:var(--mono); font-size:0.82rem; color:var(--black); line-height:1.8; }
-.insight-box { background:var(--gray-50); border:1px solid var(--gray-200); border-radius:var(--r); padding:1rem 1.25rem; margin:1.25rem 0; }
-.insight-box .eyebrow { margin-bottom:0.4rem; }
-.insight-box p { margin:0; font-size:0.82rem; }
-.try-it { background:var(--black); color:var(--white); border-radius:var(--r-lg); padding:1.5rem; margin:2rem 0; }
-.chapter-nav { display:flex; justify-content:space-between; padding-top:1.5rem; border-top:1px solid var(--gray-200); margin-top:2rem; }
+.chapter-content h3 { font-size: 1.1rem; font-weight: 700; margin: 2rem 0 0.5rem; }
+.chapter-content p { font-size: 0.9rem; line-height: 1.8; color: var(--gray-500); margin-bottom: 1rem; }
+.chapter-content ul { padding-left: 1.25rem; margin-bottom: 1rem; }
+.chapter-content li { font-size: 0.88rem; line-height: 1.7; color: var(--gray-500); margin-bottom: 0.3rem; }
+.chapter-content strong { color: var(--black); font-weight: 600; }
+
+/* === FORMULA BOX === */
+.formula-box {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-left: 3px solid var(--black);
+  border-radius: var(--r-sm);
+  padding: 1rem 1.25rem;
+  margin: 1.25rem 0;
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--black);
+  line-height: 1.8;
+  overflow-x: auto;
+}
+
+/* === INSIGHT BOX === */
+.insight-box { background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: var(--r); padding: 1rem 1.25rem; margin: 1.25rem 0; }
+.insight-box .eyebrow { margin-bottom: 0.4rem; }
+.insight-box p { margin: 0; font-size: 0.82rem; color: var(--gray-500); }
+
+/* === TRY IT === */
+.try-it { background: var(--black); color: var(--white); border-radius: var(--r-lg); padding: 1.5rem; margin: 2rem 0; }
+
+/* === CHAPTER NAV === */
+.chapter-nav { display: flex; justify-content: space-between; padding-top: 1.5rem; border-top: 1px solid var(--gray-200); margin-top: 2rem; }
+
+/* === FOOTER === */
+.footer { border-top: 1px solid var(--border); padding: 2rem; display: flex; align-items: center; justify-content: space-between; }
+.footer-logo { font-size: 0.9rem; font-weight: 800; color: var(--text); letter-spacing: -0.02em; }
+.footer-logo strong { font-weight: 900; }
+.footer-note { font-size: 0.75rem; color: var(--muted); }
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .top-nav-links { display: none; }
+  .top-nav { padding: 0 1rem; }
+  .domain-nav { padding: 0 1rem; }
+  .section { padding: 2rem 1rem; }
+  .layout-grid { grid-template-columns: 1fr !important; }
+  .sidebar-col { position: static !important; top: auto !important; }
+}
 </style>
 </head>
 <body>
-<nav class="nav">
-  <a href="/valuation-toolkit/" class="nav-logo">Valuation<strong>Desk</strong></a>
-  <ul class="nav-links">
-    <li><a href="/valuation-toolkit/domains/valuation-advisory/" class="active">Valuation Advisory</a></li>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <a href="/valuation-toolkit/" class="top-nav-logo">Valuation<strong>Desk</strong></a>
+  <ul class="top-nav-links">
+    <li><a href="/valuation-toolkit/domains/valuation-advisory/">Valuation Advisory</a></li>
     <li><a href="/valuation-toolkit/vault/">My Vault</a></li>
     <li><a href="/valuation-toolkit/deal-room/">Deal Room</a></li>
     <li><a href="/valuation-toolkit/daily-brief/">Daily Brief</a></li>
   </ul>
-  <div class="nav-right">
-    <a href="/valuation-toolkit/#pricing" class="nav-cta">Get Pro — ₹799/mo</a>
+  <div class="top-nav-right">
+    <a href="/valuation-toolkit/vault/" class="top-nav-vault-btn">🗄 My Vault</a>
+    <a href="/valuation-toolkit/#pricing" class="top-nav-pro-btn">Get Pro — ₹799/mo</a>
   </div>
 </nav>
-<div class="domain-bar">
-  <a href="/valuation-toolkit/domains/valuation-advisory/" class="domain-link">Overview</a>
-  <a href="/valuation-toolkit/domains/valuation-advisory/learn/" class="domain-link active">📖 Learn</a>
-  <a href="/valuation-toolkit/domains/valuation-advisory/calculators/" class="domain-link">🧮 Calculators</a>
-  <a href="/valuation-toolkit/vault/" class="domain-link">🗄 My Vault</a>
+
+<!-- DOMAIN NAV -->
+<div class="domain-nav">
+  <div class="domain-nav-inner">
+    <a href="/valuation-toolkit/domains/valuation-advisory/">Overview</a>
+    <a href="/valuation-toolkit/domains/valuation-advisory/learn/" class="active">📖 Learn</a>
+    <a href="/valuation-toolkit/domains/valuation-advisory/calculators/">🧮 Calculators</a>
+    <a href="/valuation-toolkit/vault/">🗄 My Vault</a>
+  </div>
 </div>
+
 <div class="page">
   <section class="section">
     <div class="container">
-      <div style="display:grid;grid-template-columns:220px 1fr;gap:3rem;align-items:flex-start;">
+      <div class="layout-grid" style="display:grid;grid-template-columns:220px 1fr;gap:3rem;align-items:flex-start;">
 
         <!-- SIDEBAR -->
-        <div style="position:sticky;top:120px;">
+        <div class="sidebar-col" style="position:sticky;top:108px;">
           <div class="eyebrow" style="margin-bottom:0.75rem;">Chapters</div>
           <div style="display:flex;flex-direction:column;gap:0.25rem;">
             <a href="#ch1" style="font-size:0.82rem;font-weight:600;color:var(--black);text-decoration:none;padding:0.5rem 0.75rem;border-radius:var(--r-sm);background:var(--gray-100);">01 — Language of Valuation</a>
             <a href="#ch2" style="font-size:0.82rem;color:var(--gray-400);text-decoration:none;padding:0.5rem 0.75rem;border-radius:var(--r-sm);display:flex;justify-content:space-between;"><span>02 — DCF Deep Dive</span><span class="tag tag-black" style="font-size:0.55rem;">Pro</span></a>
             <a href="#ch3" style="font-size:0.82rem;color:var(--gray-400);text-decoration:none;padding:0.5rem 0.75rem;border-radius:var(--r-sm);display:flex;justify-content:space-between;"><span>03 — Comps Analysis</span><span class="tag tag-black" style="font-size:0.55rem;">Pro</span></a>
-            <a href="#ch4" style="font-size:0.82rem;color:var(--gray-400);text-decoration:none;padding:0.5rem 0.75rem;border-radius:var(--r-sm);display:flex;justify-content:space-between;"><span>04 — SOTP & Complex</span><span class="tag tag-black" style="font-size:0.55rem;">Pro</span></a>
+            <a href="#ch4" style="font-size:0.82rem;color:var(--gray-400);text-decoration:none;padding:0.5rem 0.75rem;border-radius:var(--r-sm);display:flex;justify-content:space-between;"><span>04 — SOTP &amp; Complex</span><span class="tag tag-black" style="font-size:0.55rem;">Pro</span></a>
             <a href="#ch5" style="font-size:0.82rem;color:var(--gray-400);text-decoration:none;padding:0.5rem 0.75rem;border-radius:var(--r-sm);display:flex;justify-content:space-between;"><span>05 — Live Case Study</span><span class="tag tag-black" style="font-size:0.55rem;">Pro</span></a>
           </div>
           <div style="margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid var(--gray-200);">
@@ -59,7 +182,7 @@
           </div>
         </div>
 
-        <!-- CHAPTER 1 FULL CONTENT -->
+        <!-- CHAPTER 1 FULL CONTENT — PRESERVED EXACTLY -->
         <div class="chapter-content" id="ch1">
           <div style="margin-bottom:1.5rem;">
             <span class="tag tag-green" style="margin-bottom:0.75rem;display:inline-block;">Chapter 01 — Free</span>
@@ -72,26 +195,26 @@
           <h3>Enterprise Value vs Equity Value — The Most Important Distinction in Finance</h3>
           <p>This is where most people get confused, and where most valuation errors are born.</p>
           <p><strong>Enterprise Value (EV)</strong> is the total value of the business — what it would cost to buy the entire company outright, including paying off all its debt and taking its cash. Think of it as the "price tag" of the operating business.</p>
-          <p><strong>Equity Value</strong> is what's left for shareholders after all the creditors have been paid. It's the market capitalisation of the company — share price × shares outstanding.</p>
+          <p><strong>Equity Value</strong> is what's left for shareholders after all the creditors have been paid. It's the market capitalisation of the company — share price &times; shares outstanding.</p>
 
           <div class="formula-box">
             Enterprise Value = Equity Value + Net Debt + Minority Interests + Preferred Stock<br>
-            Net Debt = Total Debt − Cash & Equivalents<br>
-            Equity Value = Enterprise Value − Net Debt − Minorities − Preferred
+            Net Debt = Total Debt &minus; Cash &amp; Equivalents<br>
+            Equity Value = Enterprise Value &minus; Net Debt &minus; Minorities &minus; Preferred
           </div>
 
           <div class="insight-box">
             <div class="eyebrow">Why this matters</div>
-            <p>If Company A has a market cap of ₹1,000 Cr but ₹500 Cr of debt and zero cash, its EV is ₹1,500 Cr. Company B has the same market cap but is debt-free with ₹200 Cr of cash — its EV is ₹800 Cr. They "cost" very different amounts to acquire, even though their market caps are identical.</p>
+            <p>If Company A has a market cap of &#8377;1,000 Cr but &#8377;500 Cr of debt and zero cash, its EV is &#8377;1,500 Cr. Company B has the same market cap but is debt-free with &#8377;200 Cr of cash — its EV is &#8377;800 Cr. They "cost" very different amounts to acquire, even though their market caps are identical.</p>
           </div>
 
-          <h3>Why EV/EBITDA ≠ P/E — And When to Use Each</h3>
+          <h3>Why EV/EBITDA &ne; P/E — And When to Use Each</h3>
           <p>The single most common question in an IB interview. The answer is about <strong>capital structure neutrality</strong>.</p>
           <p>EBITDA is before interest — so it doesn't matter how the company is financed. EV/EBITDA is capital structure neutral, which means you can compare a heavily leveraged company with a debt-free one on the same basis. This makes it ideal for:</p>
           <ul>
-            <li>M&A analysis (you're buying the whole business, not just equity)</li>
+            <li>M&amp;A analysis (you're buying the whole business, not just equity)</li>
             <li>Comparing companies across different geographies with different tax rates</li>
-            <li>Capital-intensive sectors where D&A is a big number</li>
+            <li>Capital-intensive sectors where D&amp;A is a big number</li>
           </ul>
           <p>P/E is an equity multiple — it's after interest and tax, so it's sensitive to capital structure. Use it when:</p>
           <ul>
@@ -101,26 +224,26 @@
           </ul>
 
           <div class="formula-box">
-            EV / EBITDA = Enterprise Value ÷ EBITDA (capital structure neutral)<br>
-            P / E = Market Cap ÷ Net Income = Share Price ÷ EPS (equity metric)<br>
-            EV / Revenue = Enterprise Value ÷ Revenue (used for early-stage or high-growth)
+            EV / EBITDA = Enterprise Value &divide; EBITDA (capital structure neutral)<br>
+            P / E = Market Cap &divide; Net Income = Share Price &divide; EPS (equity metric)<br>
+            EV / Revenue = Enterprise Value &divide; Revenue (used for early-stage or high-growth)
           </div>
 
           <h3>The Bridge — Walking from EV to Equity Value</h3>
           <p>In practice, every valuation ends with a "bridge" — taking the Enterprise Value you've calculated and walking it down to an Equity Value and then a per-share price. Here's what that looks like:</p>
 
           <div class="formula-box">
-            Enterprise Value (from DCF or Comps)   ₹1,500 Cr<br>
-            Less: Total Debt                        (₹300 Cr)<br>
-            Less: Finance Lease Liabilities         (₹50 Cr)<br>
-            Less: Minority Interests                (₹0 Cr)<br>
-            Add:  Cash & Equivalents                ₹180 Cr<br>
-            Add:  Associates / Investments           ₹0 Cr<br>
-            ─────────────────────────────────────────────────<br>
-            Equity Value                            ₹1,330 Cr<br>
-            ÷ Shares Outstanding                    15 Cr<br>
-            ─────────────────────────────────────────────────<br>
-            Value Per Share                         ₹88.67
+            Enterprise Value (from DCF or Comps)   &#8377;1,500 Cr<br>
+            Less: Total Debt                        (&#8377;300 Cr)<br>
+            Less: Finance Lease Liabilities         (&#8377;50 Cr)<br>
+            Less: Minority Interests                (&#8377;0 Cr)<br>
+            Add:  Cash &amp; Equivalents                &#8377;180 Cr<br>
+            Add:  Associates / Investments           &#8377;0 Cr<br>
+            &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;<br>
+            Equity Value                            &#8377;1,330 Cr<br>
+            &divide; Shares Outstanding                    15 Cr<br>
+            &#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;&#9472;<br>
+            Value Per Share                         &#8377;88.67
           </div>
 
           <h3>Operating vs Non-Operating Assets</h3>
@@ -130,9 +253,9 @@
           <h3>The Three Questions Every Valuation Answers</h3>
           <p>Before you open a model, ask yourself which of these you're answering:</p>
           <ul>
-            <li><strong>What is the intrinsic value?</strong> → DCF (discounted cash flow)</li>
-            <li><strong>What are similar companies worth?</strong> → Comps (trading or transaction multiples)</li>
-            <li><strong>What would a buyer pay?</strong> → Transaction comps + control premium</li>
+            <li><strong>What is the intrinsic value?</strong> &rarr; DCF (discounted cash flow)</li>
+            <li><strong>What are similar companies worth?</strong> &rarr; Comps (trading or transaction multiples)</li>
+            <li><strong>What would a buyer pay?</strong> &rarr; Transaction comps + control premium</li>
           </ul>
           <p>A well-constructed valuation uses all three — and the "Football Field" chart (Chapter 4) shows you how to present the range.</p>
 
@@ -141,13 +264,13 @@
             <div style="font-size:0.65rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:0.75rem;">Now try it yourself</div>
             <div style="font-size:1rem;font-weight:700;color:var(--white);margin-bottom:0.4rem;">Build the EV Bridge — live</div>
             <div style="font-size:0.82rem;color:rgba(255,255,255,0.55);margin-bottom:1rem;">Open the EV Bridge calculator. Input a company's debt and cash figures. Watch the bridge walk from EV to Equity Value in real time.</div>
-            <a href="/valuation-toolkit/domains/valuation-advisory/calculators/#ev-bridge" class="btn btn-outline" style="color:var(--white);border-color:rgba(255,255,255,0.2);">Open EV Bridge Calculator →</a>
+            <a href="/valuation-toolkit/domains/valuation-advisory/calculators/ev-bridge.html" class="btn btn-outline" style="color:var(--white);border-color:rgba(255,255,255,0.2);">Open EV Bridge Calculator &rarr;</a>
           </div>
 
           <!-- CHAPTER NAV -->
           <div class="chapter-nav">
             <div></div>
-            <a href="/valuation-toolkit/#pricing" class="btn btn-black">Continue to Chapter 2 — DCF Deep Dive (Pro) →</a>
+            <a href="/valuation-toolkit/#pricing" class="btn btn-black">Continue to Chapter 2 — DCF Deep Dive (Pro) &rarr;</a>
           </div>
         </div>
 
@@ -155,14 +278,14 @@
     </div>
   </section>
 </div>
+
 <footer class="footer">
   <div class="footer-logo">Valuation<strong>Desk</strong></div>
-  <div class="footer-note">© 2025 ValuationDesk</div>
+  <div class="footer-note">&copy; 2025 ValuationDesk</div>
 </footer>
-<div id="toast-container"></div>
-<script src="/valuation-toolkit/assets/vd.js"></script>
+
 <script>
-// Mark chapter 1 as done
+// Mark chapter 1 as complete — preserved from original
 const done = JSON.parse(localStorage.getItem('vd_chapters_done') || '[]');
 if (!done.includes('ch1-va')) { done.push('ch1-va'); localStorage.setItem('vd_chapters_done', JSON.stringify(done)); }
 </script>
