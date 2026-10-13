@@ -1,8 +1,8 @@
-// ValuationDesk Service Worker v13.0
+// ValuationDesk Service Worker v14.0
 // Configured for GitHub Pages subfolder: /valuation-toolkit/
 
 const BASE = '/valuation-toolkit';
-const CACHE_NAME = 'valuationdesk-v13';
+const CACHE_NAME = 'valuationdesk-v14';
 
 const STATIC_ASSETS = [
   BASE + '/',
@@ -131,6 +131,16 @@ const STATIC_ASSETS = [
   BASE + '/domains/capital-markets/calculators/greenshoe.html',
   BASE + '/domains/capital-markets/calculators/credit-spread.html',
   BASE + '/domains/capital-markets/learn/index.html',
+  BASE + '/domains/hedge-funds/index.html',
+  BASE + '/domains/hedge-funds/calculators/index.html',
+  BASE + '/domains/hedge-funds/calculators/long-short-model.html',
+  BASE + '/domains/hedge-funds/calculators/options-payoff.html',
+  BASE + '/domains/hedge-funds/calculators/var-calculator.html',
+  BASE + '/domains/hedge-funds/calculators/strategy-pnl.html',
+  BASE + '/domains/hedge-funds/calculators/drawdown-analysis.html',
+  BASE + '/domains/hedge-funds/calculators/factor-exposure.html',
+  BASE + '/domains/hedge-funds/calculators/leverage-margin.html',
+  BASE + '/domains/hedge-funds/learn/index.html',
 ];
 
 // Install — cache all static assets

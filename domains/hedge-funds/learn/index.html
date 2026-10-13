@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Learn Hedge Funds · ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
+  --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;
+  --accent:#7c3aed;--accent-bg:#f5f3ff;--accent-border:#ddd6fe;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
+
+.nav{display:flex;align-items:center;gap:8px;padding:14px 24px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.nav a{font-size:13px;color:var(--muted);text-decoration:none}.nav a:hover{color:var(--text)}
+.nav-sep{color:var(--border);font-size:13px}
+.nav-cur{font-size:13px;color:var(--text);font-weight:600}
+
+.hero{padding:40px 24px 32px;max-width:800px;margin:0 auto;text-align:center}
+.badge{display:inline-block;background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-border);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.04em;margin-bottom:14px}
+h1{font-size:clamp(24px,5vw,36px);font-weight:900;margin-bottom:10px;line-height:1.2}
+.hero-sub{font-size:16px;color:var(--muted);max-width:540px;margin:0 auto 28px}
+
+.progress-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:8px}
+.prog-item{font-size:12px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s}
+.prog-item:hover{border-color:var(--accent);color:var(--accent)}
+.prog-item.done{background:#ede9fe;border-color:#c4b5fd;color:#7c3aed}
+
+.modules{max-width:800px;margin:0 auto;padding:0 24px 60px}
+
+.module{border:1px solid var(--border);border-radius:14px;margin-bottom:14px;overflow:hidden;transition:box-shadow .2s}
+.module:hover{box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.module.open{box-shadow:0 4px 20px rgba(124,58,237,.08);border-color:var(--accent-border)}
+
+.mod-header{display:flex;align-items:center;gap:14px;padding:18px 20px;cursor:pointer;user-select:none}
+.mod-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;background:var(--accent-bg);color:var(--accent);border:2px solid var(--accent-border)}
+.module.done .mod-num{background:#ede9fe;color:#7c3aed;border-color:#c4b5fd}
+.mod-title-wrap{flex:1}
+.mod-title{font-size:16px;font-weight:700;margin-bottom:2px}
+.mod-meta{font-size:12px;color:var(--muted)}
+.mod-arrow{font-size:18px;color:var(--muted);transition:transform .25s}
+.module.open .mod-arrow{transform:rotate(180deg)}
+.mod-status{font-size:11px;font-weight:700;padding:3px 8px;border-radius:12px}
+.mod-status-new{background:var(--accent-bg);color:var(--accent)}
+.mod-status-done{background:#ede9fe;color:#7c3aed}
+
+.mod-body{display:none;padding:0 20px 24px}
+.module.open .mod-body{display:block}
+
+.intro-box{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:10px;padding:16px;margin-bottom:20px;font-size:14px;line-height:1.7}
+.intro-box strong{color:var(--accent)}
+
+.section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:20px 0 10px}
+
+.flow{display:flex;flex-direction:column;gap:0;margin-bottom:20px}
+.flow-step{display:flex;gap:14px;position:relative}
+.flow-step::before{content:'';position:absolute;left:19px;top:44px;bottom:0;width:2px;background:var(--border)}
+.flow-step:last-child::before{display:none}
+.flow-num{width:38px;height:38px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;position:relative;z-index:1}
+.flow-content{padding-bottom:20px;flex:1}
+.flow-head{font-size:14px;font-weight:700;margin-bottom:4px}
+.flow-body{font-size:13px;color:var(--muted);line-height:1.6}
+.flow-tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;margin-bottom:6px}
+.tag-strat{background:#ede9fe;color:#7c3aed}
+.tag-risk{background:#fee2e2;color:#991b1b}
+.tag-ops{background:#fef9c3;color:#854d0e}
+.tag-fee{background:#dcfce7;color:#166534}
+.tag-reg{background:#dbeafe;color:#1d4ed8}
+.tag-deriv{background:#fce7f3;color:#9d174d}
+
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:20px}
+.concept-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px}
+.concept-icon{font-size:22px;margin-bottom:8px}
+.concept-head{font-size:13px;font-weight:700;margin-bottom:6px}
+.concept-body{font-size:12px;color:var(--muted);line-height:1.6}
+
+.formula{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--card);border:1px solid var(--border);padding:10px 14px;border-radius:8px;margin:10px 0;line-height:1.8}
+
+.data-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px}
+.data-table th{background:var(--card);padding:8px 12px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:2px solid var(--border)}
+.data-table td{padding:9px 12px;border-bottom:1px solid var(--border)}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--card)}
+.mono{font-family:'JetBrains Mono',monospace;font-weight:700}
+.chip{display:inline-flex;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700}
+.chip-g{background:#dcfce7;color:#166534}
+.chip-y{background:#fef9c3;color:#854d0e}
+.chip-r{background:#fee2e2;color:#991b1b}
+.chip-v{background:#ede9fe;color:#7c3aed}
+
+.glossary{display:grid;gap:8px;margin-bottom:20px}
+.gloss-row{display:grid;grid-template-columns:160px 1fr;gap:12px;align-items:start;padding:10px 0;border-bottom:1px solid var(--border)}
+.gloss-row:last-child{border-bottom:none}
+.gloss-term{font-size:13px;font-weight:700;color:var(--accent)}
+.gloss-def{font-size:13px;color:var(--muted);line-height:1.6}
+
+.quiz-block{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px}
+.quiz-q{font-size:14px;font-weight:700;margin-bottom:10px}
+.quiz-opt{display:flex;flex-direction:column;gap:6px}
+.quiz-btn{background:#fff;border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:13px;font-family:inherit;cursor:pointer;text-align:left;transition:all .15s}
+.quiz-btn:hover{border-color:var(--accent);background:var(--accent-bg)}
+.quiz-btn.correct{background:#ede9fe;border-color:#c4b5fd;color:#5b21b6;font-weight:600}
+.quiz-btn.wrong{background:#fee2e2;border-color:#fca5a5;color:#991b1b}
+.quiz-reveal{margin-top:10px;padding:10px 14px;background:var(--accent-bg);border-radius:8px;font-size:13px;color:var(--accent);display:none}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.info-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px}
+.info-card-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px}
+.info-card ul{padding-left:16px;margin:0}
+.info-card li{font-size:13px;color:var(--text);margin-bottom:4px;line-height:1.5}
+
+.payoff-viz{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px}
+.payoff-label{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.06em}
+.payoff-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.payoff-name{font-size:12px;font-weight:600;width:100px;flex-shrink:0}
+.payoff-bar-wrap{flex:1;background:#e5e7eb;border-radius:4px;height:10px;overflow:hidden}
+.payoff-bar{height:10px;border-radius:4px}
+.bar-long{background:#7c3aed}
+.bar-short{background:#dc2626}
+.bar-hedge{background:#16a34a}
+.payoff-val{font-size:12px;font-family:'JetBrains Mono',monospace;font-weight:700;width:60px;text-align:right;flex-shrink:0}
+
+.factor-compare{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:6px;margin-bottom:20px}
+.fc-col{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center}
+.fc-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:6px}
+.fc-icon{font-size:20px;margin-bottom:4px}
+.fc-name{font-size:11px;font-weight:700;color:var(--text);margin-bottom:4px}
+.fc-desc{font-size:10px;color:var(--muted);line-height:1.4}
+
+.risk-matrix{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.risk-cell{border-radius:10px;padding:14px}
+.risk-cell.high{background:#fee2e2;border:1px solid #fca5a5}
+.risk-cell.medium{background:#fef9c3;border:1px solid #fde68a}
+.risk-cell.low{background:#dcfce7;border:1px solid #86efac}
+.risk-cell.info{background:#ede9fe;border:1px solid #c4b5fd}
+.risk-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.risk-cell.high .risk-label{color:#991b1b}
+.risk-cell.medium .risk-label{color:#92400e}
+.risk-cell.low .risk-label{color:#166534}
+.risk-cell.info .risk-label{color:#5b21b6}
+.risk-title{font-size:13px;font-weight:700;margin-bottom:4px}
+.risk-desc{font-size:12px;color:var(--muted);line-height:1.5}
+
+.fee-waterfall{margin-bottom:20px}
+.fw-row{display:flex;align-items:stretch;gap:0;margin-bottom:2px}
+.fw-label{font-size:12px;font-weight:600;width:140px;flex-shrink:0;padding:10px 0;display:flex;align-items:center}
+.fw-bar-wrap{flex:1;display:flex;align-items:center;gap:8px}
+.fw-bar{height:32px;border-radius:4px;display:flex;align-items:center;padding:0 10px;font-size:12px;font-weight:700;color:#fff;min-width:60px}
+.fw-bar.gross{background:#7c3aed}
+.fw-bar.mgmt{background:#dc2626}
+.fw-bar.perf{background:#d97706}
+.fw-bar.net{background:#16a34a}
+.fw-num{font-size:12px;font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--text)}
+
+.cta-box{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:12px;padding:20px;text-align:center;margin-top:12px}
+.cta-title{font-size:15px;font-weight:700;margin-bottom:6px;color:var(--accent)}
+.cta-sub{font-size:13px;color:var(--muted);margin-bottom:14px}
+.cta-btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block;transition:opacity .15s}
+.cta-btn:hover{opacity:.9}
+
+@media(max-width:600px){
+  .nav{padding:10px 16px}
+  .hero{padding:28px 16px 20px}
+  .modules{padding:0 16px 40px}
+  .mod-header{padding:14px 16px;gap:10px}
+  .mod-body{padding:0 16px 20px}
+  .concept-grid{grid-template-columns:1fr}
+  .gloss-row{grid-template-columns:1fr;gap:4px}
+  .two-col{grid-template-columns:1fr}
+  .factor-compare{grid-template-columns:1fr 1fr}
+  .risk-matrix{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/valuation-toolkit/">ValuationDesk</a>
+  <span class="nav-sep">›</span>
+  <a href="/valuation-toolkit/domains/hedge-funds/">Hedge Funds</a>
+  <span class="nav-sep">›</span>
+  <span class="nav-cur">Learn</span>
+</nav>
+
+<div class="hero">
+  <span class="badge">Hedge Funds · Learning Hub</span>
+  <h1>Master Hedge Fund Investing</h1>
+  <p class="hero-sub">Four deep-dive modules covering HF strategies, derivatives, risk management frameworks, and fund structure — the bedrock of alternative investment analysis in India.</p>
+  <div class="progress-row" id="progRow">
+    <span class="prog-item" id="prog1" onclick="openModule('m1')">01 · HF Strategies</span>
+    <span class="prog-item" id="prog2" onclick="openModule('m2')">02 · Options &amp; Derivatives</span>
+    <span class="prog-item" id="prog3" onclick="openModule('m3')">03 · Risk Management</span>
+    <span class="prog-item" id="prog4" onclick="openModule('m4')">04 · Fund Structure &amp; Fees</span>
+  </div>
+</div>
+
+<div class="modules">
+
+<!-- MODULE 1: HF STRATEGIES -->
+<div class="module" id="m1">
+  <div class="mod-header" onclick="toggleModule('m1')">
+    <div class="mod-num">01</div>
+    <div class="mod-title-wrap">
+      <div class="mod-title">Hedge Fund Strategies</div>
+      <div class="mod-meta">Long/Short · Global Macro · Arbitrage · Event Driven · Quant</div>
+    </div>
+    <span class="mod-status mod-status-new">New</span>
+    <span class="mod-arrow">▾</span>
+  </div>
+  <div class="mod-body">
+    <div class="intro-box">India's Category III AIF (Hedge Fund) universe crossed <strong>₹1.8 lakh crore in AUM in 2025</strong>, driven by institutional allocations and growing HNI demand. Unlike mutual funds, HFs use leverage, shorting, and derivatives to pursue absolute returns regardless of market direction. Mastering their strategies is prerequisite for any alternative investment career.</div>
+
+    <div class="section-title">Core Hedge Fund Strategy Families</div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div class="flow-content">
+          <span class="flow-tag tag-strat">Equity Strategy</span>
+          <div class="flow-head">Long/Short Equity (L/S)</div>
+          <div class="flow-body">The most widely used HF strategy globally. A fund buys (goes long) undervalued stocks and simultaneously sells short overvalued ones. Net exposure varies from market-neutral (0%) to directional (60–100% net long). India L/S funds typically run 40–80% net long with 100–150% gross exposure. Profit comes from the spread between winners and losers — stock selection alpha, not market beta. Key metrics: Sharpe ratio, Information Ratio (IR), hit rate on longs vs. shorts.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div class="flow-content">
+          <span class="flow-tag tag-strat">Macro Strategy</span>
+          <div class="flow-head">Global Macro</div>
+          <div class="flow-body">Trades across currencies, rates, commodities, and equities based on macroeconomic views. A fund might short the Indian rupee while longing gold if it expects a current account crisis. Uses futures, swaps, and options for liquid, levered expression. Pure macro funds often run 5–10x leverage. India-specific macro plays include RBI rate policy, monsoon-driven commodity moves, and EM capital flow cycles. Discretionary macro relies on judgment; systematic macro uses quantitative signals.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div class="flow-content">
+          <span class="flow-tag tag-strat">Relative Value</span>
+          <div class="flow-head">Statistical Arbitrage &amp; Pairs Trading</div>
+          <div class="flow-body">Exploits price discrepancies between related securities. Classic pairs: long HDFC Bank, short ICICI Bank when their spread widens beyond historical norms. Stat arb on NSE uses mean-reversion signals across cointegrated pairs, sector ETFs vs. constituents, or futures vs. spot basis. Indian cash-futures arb yields 6–10% annualised before costs but requires high-frequency execution. Convergence trades can fail if fundamentals diverge — "the spread can stay irrational longer than you stay solvent."</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <div class="flow-content">
+          <span class="flow-tag tag-strat">Event Driven</span>
+          <div class="flow-head">Event-Driven &amp; Special Situations</div>
+          <div class="flow-body">Profits from corporate events: mergers, delistings, restructurings, rights issues, open offers. Merger arb buys the target and shorts the acquirer post-announcement, capturing the spread between offer price and market price. India-specific plays include SEBI open offer arb (26% mandatory tender), demerger plays, and NCLT resolution arbitrage in IBC cases. Event-driven returns are asymmetric — high probability of small gain, small probability of large loss on deal break.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">5</div>
+        <div class="flow-content">
+          <span class="flow-tag tag-strat">Quantitative</span>
+          <div class="flow-head">Systematic / Quantitative Strategies</div>
+          <div class="flow-body">Algorithmic execution of signals derived from price, volume, fundamentals, and alternative data. CTA (Commodity Trading Advisors) use trend-following across futures. Factor-based quant funds exploit Fama-French factors: value, momentum, quality, size, growth. India quant universe is growing: NSE tick data, exchange co-location, and F&amp;O liquidity allow institutional quant. Common pitfalls: overfitting to historical data, factor crowding during market stress, regime shifts invalidating models.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Strategy Comparison: Return / Risk Profile</div>
+    <table class="data-table">
+      <thead>
+        <tr><th>Strategy</th><th>Target Return</th><th>Typical Vol</th><th>Market Beta</th><th>Key Risk</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Long/Short Equity</td><td class="mono">12–22%</td><td class="mono">8–16%</td><td class="mono">0.3–0.7</td><td>Stock selection, crowding</td></tr>
+        <tr><td>Global Macro</td><td class="mono">10–25%</td><td class="mono">15–30%</td><td class="mono">-0.2–0.5</td><td>Regime shifts, carry unwind</td></tr>
+        <tr><td>Stat Arb</td><td class="mono">8–14%</td><td class="mono">4–8%</td><td class="mono">0.0–0.1</td><td>Correlation breakdown</td></tr>
+        <tr><td>Event Driven</td><td class="mono">12–18%</td><td class="mono">6–12%</td><td class="mono">0.2–0.5</td><td>Deal break, regulatory block</td></tr>
+        <tr><td>Systematic/CTA</td><td class="mono">8–16%</td><td class="mono">10–20%</td><td class="mono">-0.1–0.2</td><td>Trend reversal, data failure</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-title">Net vs. Gross Exposure</div>
+    <div class="payoff-viz">
+      <div class="payoff-label">Illustrative Portfolio: ₹100 AUM — Gross 140%, Net 60% Long</div>
+      <div class="payoff-row">
+        <div class="payoff-name">Long Book</div>
+        <div class="payoff-bar-wrap"><div class="payoff-bar bar-long" style="width:100%"></div></div>
+        <div class="payoff-val">₹100</div>
+      </div>
+      <div class="payoff-row">
+        <div class="payoff-name">Short Book</div>
+        <div class="payoff-bar-wrap"><div class="payoff-bar bar-short" style="width:29%"></div></div>
+        <div class="payoff-val">₹40</div>
+      </div>
+      <div class="payoff-row">
+        <div class="payoff-name">Net Exposure</div>
+        <div class="payoff-bar-wrap"><div class="payoff-bar bar-hedge" style="width:43%"></div></div>
+        <div class="payoff-val">₹60</div>
+      </div>
+      <div style="font-size:12px;color:var(--muted);margin-top:10px">Gross = Long + Short = ₹140 (captures total risk); Net = Long - Short = ₹60 (directional market exposure). Gross exposure is what prime brokers use to set margin requirements.</div>
+    </div>
+
+    <div class="section-title">Key Terms</div>
+    <div class="glossary">
+      <div class="gloss-row"><div class="gloss-term">Alpha</div><div class="gloss-def">Return in excess of what a benchmark or factor model would predict. Pure alpha is uncorrelated with market moves — the holy grail of HF investing.</div></div>
+      <div class="gloss-row"><div class="gloss-term">Beta</div><div class="gloss-def">Sensitivity to market moves. A fund with beta 0.5 moves half as much as the index. Market-neutral funds target beta near zero.</div></div>
+      <div class="gloss-row"><div class="gloss-term">Gross Exposure</div><div class="gloss-def">Sum of absolute value of longs and shorts. A fund 100% long and 40% short has 140% gross exposure.</div></div>
+      <div class="gloss-row"><div class="gloss-term">Net Exposure</div><div class="gloss-def">Long minus short positions as % of AUM. Measures directional market bet. Net 0% = market neutral.</div></div>
+      <div class="gloss-row"><div class="gloss-term">Short Interest</div><div class="gloss-def">Total shares sold short as % of float. High short interest (above 10%) can create "short squeezes" when stock rallies force short-sellers to cover.</div></div>
+    </div>
+
+    <div class="section-title">Quick Check</div>
+    <div class="quiz-block" id="q1a">
+      <div class="quiz-q">A fund is ₹120 long and ₹50 short on ₹100 AUM. What is the net exposure?</div>
+      <div class="quiz-opt">
+        <button class="quiz-btn" onclick="checkQ('q1a',this,false)">A. 170%</button>
+        <button class="quiz-btn" onclick="checkQ('q1a',this,true)">B. 70%</button>
+        <button class="quiz-btn" onclick="checkQ('q1a',this,false)">C. 50%</button>
+        <button class="quiz-btn" onclick="checkQ('q1a',this,false)">D. 120%</button>
+      </div>
+      <div class="quiz-reveal" id="q1a-rev">Net Exposure = (Long - Short) / AUM = (₹120 - ₹50) / ₹100 = 70%. The 170% answer would be gross exposure = (120 + 50)/100.</div>
+    </div>
+
+    <div class="cta-box">
+      <div class="cta-title">Practice with the Long/Short Model Calculator</div>
+      <div class="cta-sub">Build actual long/short positions on Nifty 50 stocks and see the Sharpe, beta, and gross/net exposure live.</div>
+      <a class="cta-btn" href="/valuation-toolkit/domains/hedge-funds/calculators/long-short-model.html">Open Calculator →</a>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 2: OPTIONS & DERIVATIVES -->
+<div class="module" id="m2">
+  <div class="mod-header" onclick="toggleModule('m2')">
+    <div class="mod-num">02</div>
+    <div class="mod-title-wrap">
+      <div class="mod-title">Options &amp; Derivatives</div>
+      <div class="mod-meta">Greeks · Payoffs · Volatility · Strategies · VaR</div>
+    </div>
+    <span class="mod-status mod-status-new">New</span>
+    <span class="mod-arrow">▾</span>
+  </div>
+  <div class="mod-body">
+    <div class="intro-box">India's NSE is among the world's largest derivatives exchanges by volume. <strong>F&amp;O turnover exceeds ₹500 lakh crore monthly</strong> — dwarfing cash market volumes. Hedge funds use options for directional bets, hedging, and volatility trading. Understanding Greeks is non-negotiable for any HF risk role.</div>
+
+    <div class="section-title">Option Payoff Profiles</div>
+    <div class="two-col">
+      <div class="info-card">
+        <div class="info-card-title">Call Option (Right to Buy)</div>
+        <ul>
+          <li><strong>Long Call:</strong> Pay premium, profit if stock rises above strike. Max loss = premium. Unlimited upside.</li>
+          <li><strong>Short Call:</strong> Receive premium, profit if stock stays below strike. Max profit = premium. Unlimited loss risk.</li>
+          <li>Break-even = Strike + Premium paid</li>
+          <li>Used by HFs to get leveraged upside with defined downside</li>
+        </ul>
+      </div>
+      <div class="info-card">
+        <div class="info-card-title">Put Option (Right to Sell)</div>
+        <ul>
+          <li><strong>Long Put:</strong> Pay premium, profit if stock falls below strike. Max loss = premium. Max gain = Strike - 0.</li>
+          <li><strong>Short Put:</strong> Receive premium, profit if stock stays above strike. Used in cash-secured put strategies.</li>
+          <li>Break-even = Strike - Premium paid</li>
+          <li>Used by HFs to hedge long book or bet on downside</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section-title">The Greeks — Sensitivity Measures</div>
+    <table class="data-table">
+      <thead>
+        <tr><th>Greek</th><th>Measures</th><th>Long Call</th><th>Long Put</th><th>Key Insight</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Delta (Δ)</strong></td><td>Price sensitivity to stock move</td><td class="mono">0 to +1</td><td class="mono">-1 to 0</td><td>ATM options ≈ 0.5 delta</td></tr>
+        <tr><td><strong>Gamma (Γ)</strong></td><td>Rate of delta change</td><td class="mono">+</td><td class="mono">+</td><td>Highest at ATM, near expiry</td></tr>
+        <tr><td><strong>Theta (Θ)</strong></td><td>Time decay per day</td><td class="mono">−</td><td class="mono">−</td><td>Long options lose value daily</td></tr>
+        <tr><td><strong>Vega (V)</strong></td><td>Sensitivity to implied vol</td><td class="mono">+</td><td class="mono">+</td><td>Long options gain on vol spike</td></tr>
+        <tr><td><strong>Rho (ρ)</strong></td><td>Sensitivity to interest rate</td><td class="mono">+</td><td class="mono">−</td><td>Minor for short-dated options</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-title">HF Option Strategies</div>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="concept-icon">📈</div>
+        <div class="concept-head">Covered Call</div>
+        <div class="concept-body">Own stock + sell call. Generates income (premium) from existing long positions. Caps upside. Common in India's yield-enhancing HF mandates on blue-chip holdings.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">🛡️</div>
+        <div class="concept-head">Protective Put</div>
+        <div class="concept-body">Own stock + buy put. Portfolio insurance. Pay theta every month for downside protection. Used by HFs ahead of binary events: elections, earnings, policy decisions.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">↔️</div>
+        <div class="concept-head">Straddle / Strangle</div>
+        <div class="concept-body">Buy call + put at same/different strikes. Profit from big move in either direction. Used around earnings or budget announcements. Long vol strategy — expensive in India's high-IV environment.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">📊</div>
+        <div class="concept-head">Iron Condor</div>
+        <div class="concept-body">Sell OTM call + put, buy further OTM to cap losses. Profits when stock stays range-bound. Popular in high-vol environments — sell inflated premiums, collect theta. Max profit if Nifty stays in range.</div>
+      </div>
+    </div>
+
+    <div class="section-title">Implied vs. Realised Volatility</div>
+    <div class="formula">India VIX = Implied Vol of Nifty 50 index options (market's fear gauge)
+
+Volatility Risk Premium = Implied Vol - Realised Vol
+If IVol > RVol → options are expensive → sell volatility
+If RVol > IVol → market moves exceed expectations → buy volatility
+
+Historical India VIX range: 10–85 (peaked during COVID March 2020)
+Budget/election premium: IVol typically 25-40% above normal 2 weeks before</div>
+
+    <div class="section-title">Value-at-Risk (VaR) Basics</div>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="concept-icon">📉</div>
+        <div class="concept-head">Parametric VaR</div>
+        <div class="concept-body">Assumes normal distribution. VaR (1-day, 99%) = Position × Vol × 2.33 / √252. Fast to compute. Underestimates tail risk — ignores fat tails and skewness in Indian markets.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">🔁</div>
+        <div class="concept-head">Historical VaR</div>
+        <div class="concept-body">Replays actual past returns on today's portfolio. Captures real market events: COVID crash, demonetisation shock. Limited by history — doesn't predict novel stress scenarios.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">🎲</div>
+        <div class="concept-head">Monte Carlo VaR</div>
+        <div class="concept-body">Simulates thousands of random return paths based on input parameters. Most flexible — can model correlations, fat tails, and option non-linearities. Computationally intensive but used by institutional HFs.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">⚠️</div>
+        <div class="concept-head">CVaR / Expected Shortfall</div>
+        <div class="concept-body">Average loss beyond the VaR threshold. If 1% VaR = ₹10L, CVaR asks: "on the days it's worse than ₹10L, what's the average loss?" Better tail risk measure — preferred by SEBI for Category III AIFs.</div>
+      </div>
+    </div>
+
+    <div class="section-title">Quick Check</div>
+    <div class="quiz-block" id="q2a">
+      <div class="quiz-q">You buy an ATM call option when IVol = 30% and Realised Vol has been 18%. This trade is most likely a...</div>
+      <div class="quiz-opt">
+        <button class="quiz-btn" onclick="checkQ('q2a',this,false)">A. Long volatility trade (cheap vol)</button>
+        <button class="quiz-btn" onclick="checkQ('q2a',this,false)">B. Directional long bet only</button>
+        <button class="quiz-btn" onclick="checkQ('q2a',this,true)">C. Short volatility trade (expensive vol) in terms of vol value</button>
+        <button class="quiz-btn" onclick="checkQ('q2a',this,false)">D. Delta-neutral, pure gamma play</button>
+      </div>
+      <div class="quiz-reveal" id="q2a-rev">IVol (30%) significantly exceeds Realised Vol (18%) — the Volatility Risk Premium is +12%. Buying options here means paying expensive implied vol. A vol seller would benefit if realised vol stays below 30%. This is actually a bad time to be long vol on a pure IV basis.</div>
+    </div>
+
+    <div class="cta-box">
+      <div class="cta-title">Build Option Payoffs Live</div>
+      <div class="cta-sub">Model calls, puts, straddles and spreads on Nifty 50 stocks with our options payoff calculator.</div>
+      <a class="cta-btn" href="/valuation-toolkit/domains/hedge-funds/calculators/options-payoff.html">Open Calculator →</a>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 3: RISK MANAGEMENT -->
+<div class="module" id="m3">
+  <div class="mod-header" onclick="toggleModule('m3')">
+    <div class="mod-num">03</div>
+    <div class="mod-title-wrap">
+      <div class="mod-title">Risk Management Frameworks</div>
+      <div class="mod-meta">Drawdown · Leverage · Factor Exposure · Position Sizing · Stress Testing</div>
+    </div>
+    <span class="mod-status mod-status-new">New</span>
+    <span class="mod-arrow">▾</span>
+  </div>
+  <div class="mod-body">
+    <div class="intro-box">Risk management separates institutional hedge funds from retail speculation. <strong>Long-Term Capital Management (LTCM) lost $4.6 billion in 1998 despite Nobel laureates running the models</strong> — because leverage amplified what seemed like rounding errors. In India's HF space, the top risk metrics are: drawdown, leverage, factor concentration, and liquidity-adjusted VaR.</div>
+
+    <div class="section-title">Drawdown Analysis</div>
+    <div class="formula">Max Drawdown = (Peak NAV - Trough NAV) / Peak NAV × 100%
+
+Drawdown Duration = Time from peak to recovery
+Calmar Ratio = Annualised Return / |Max Drawdown|
+A Calmar > 0.5 is considered acceptable; > 1.0 is strong
+
+Example: Fund peak ₹150, trough ₹112 → Drawdown = (150-112)/150 = 25.3%
+If annualised return = 18%, Calmar = 18% / 25.3% = 0.71</div>
+
+    <div class="section-title">Risk Classification Matrix</div>
+    <div class="risk-matrix">
+      <div class="risk-cell high">
+        <div class="risk-label">🔴 Tail Risk</div>
+        <div class="risk-title">Extreme Move Events</div>
+        <div class="risk-desc">3-sigma+ moves, flash crashes, systemic crises. Black Monday 1987 (-22% in a day), COVID Mar 2020 (-13% in single session on NSE). VaR models fail here — CVaR and stress tests are essential.</div>
+      </div>
+      <div class="risk-cell medium">
+        <div class="risk-label">🟡 Factor Risk</div>
+        <div class="risk-title">Systematic Factor Exposure</div>
+        <div class="risk-desc">Unintended bets on value, momentum, or quality factors across positions. During factor crowding, correlated blow-ups across seemingly diversified books. Fama-French decomposition reveals hidden factor tilts.</div>
+      </div>
+      <div class="risk-cell medium">
+        <div class="risk-label">🟡 Liquidity Risk</div>
+        <div class="risk-title">Forced Unwind / Margin Calls</div>
+        <div class="risk-desc">Inability to exit positions at fair value under stress. India small-cap liquidity dries up in crises — 10% of daily volume per day rule to avoid market impact. Margin calls force fire sales, amplifying losses.</div>
+      </div>
+      <div class="risk-cell low">
+        <div class="risk-label">🟢 Operational Risk</div>
+        <div class="risk-title">Process &amp; System Failures</div>
+        <div class="risk-desc">Trade errors, system outages, settlement failures. Knight Capital lost $440M in 45 minutes (2012) due to a software bug. Mitigated by pre-trade checks, kill switches, and dual-approval processes.</div>
+      </div>
+    </div>
+
+    <div class="section-title">Leverage Mechanics</div>
+    <div class="formula">Leveraged Return = L × r_stock − (L−1) × borrow_rate
+Where: L = leverage ratio, r_stock = stock return, borrow_rate = prime broker rate (typically 8–10% in India)
+
+At 4× leverage: L=4, borrow_rate=8.5%, stock_return=15%
+Gross Return = 4 × 15% = 60%
+Funding Cost = (4-1) × 8.5% = 25.5%
+Net Leveraged Return = 60% - 25.5% = 34.5%
+
+At 4× leverage with -10% stock loss:
+Gross Loss = 4 × (-10%) = -40%
+Funding Cost = 25.5%
+Total Net Loss = -40% - 25.5% = -65.5% on AUM</div>
+
+    <div class="section-title">Margin Call Mechanics</div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div class="flow-content">
+          <span class="flow-tag tag-ops">Prime Broker</span>
+          <div class="flow-head">Initial Margin Requirement</div>
+          <div class="flow-body">When taking on leverage, the prime broker requires initial margin — typically 20–25% of position value. A ₹100 position at 4× leverage on ₹25 of own capital: initial margin = 25%.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div class="flow-content">
+          <span class="flow-tag tag-risk">Trigger</span>
+          <div class="flow-head">Maintenance Margin &amp; Margin Call Price</div>
+          <div class="flow-body">If the stock falls and equity drops below the maintenance margin (usually 20%), the broker issues a margin call. Margin Call Price = Loan Amount / (Position × (1 - Maintenance Margin%)). At 4× leverage on ₹100 stock: loan = ₹75, margin call at ₹75 / (1 × 0.80) = ₹93.75 — only a 6.25% drop triggers it.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div class="flow-content">
+          <span class="flow-tag tag-risk">Crisis</span>
+          <div class="flow-head">Forced Liquidation</div>
+          <div class="flow-body">If margin is not met within hours, the broker force-liquidates positions. The fund must add cash or reduce positions under market stress — precisely when prices are most unfavorable. Liquidation cascades can infect other positions in the book as the fund rushes to raise cash.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">Fama-French Factor Decomposition</div>
+    <div class="factor-compare">
+      <div class="fc-col">
+        <div class="fc-label">Factor</div>
+        <div class="fc-icon">📊</div>
+        <div class="fc-name">Market (MKT)</div>
+        <div class="fc-desc">Core market beta exposure. Loading ≈ 1.0 for a fully invested fund</div>
+      </div>
+      <div class="fc-col">
+        <div class="fc-label">HML</div>
+        <div class="fc-icon">💎</div>
+        <div class="fc-name">Value</div>
+        <div class="fc-desc">High book-to-market stocks. Low PE, high dividend yield. PSU banks, steel</div>
+      </div>
+      <div class="fc-col">
+        <div class="fc-label">WML</div>
+        <div class="fc-icon">🚀</div>
+        <div class="fc-name">Momentum</div>
+        <div class="fc-desc">Past 12-month winners. Telecom, pharma in 2024–25 India</div>
+      </div>
+      <div class="fc-col">
+        <div class="fc-label">RMW</div>
+        <div class="fc-icon">🏆</div>
+        <div class="fc-name">Quality</div>
+        <div class="fc-desc">Robust profitability vs. weak. High ROE, low leverage, stable earnings</div>
+      </div>
+      <div class="fc-col">
+        <div class="fc-label">CMA</div>
+        <div class="fc-icon">📈</div>
+        <div class="fc-name">Growth</div>
+        <div class="fc-desc">Conservative vs. aggressive investment. High capex, PE expansion stories</div>
+      </div>
+    </div>
+
+    <div class="section-title">Quick Check</div>
+    <div class="quiz-block" id="q3a">
+      <div class="quiz-q">A fund has ₹100 AUM, borrows ₹300 (4× leverage). Maintenance margin is 20%. Below what stock price (from ₹1000 entry) would a margin call occur?</div>
+      <div class="quiz-opt">
+        <button class="quiz-btn" onclick="checkQ('q3a',this,false)">A. ₹800</button>
+        <button class="quiz-btn" onclick="checkQ('q3a',this,false)">B. ₹900</button>
+        <button class="quiz-btn" onclick="checkQ('q3a',this,true)">C. ₹937.50</button>
+        <button class="quiz-btn" onclick="checkQ('q3a',this,false)">D. ₹750</button>
+      </div>
+      <div class="quiz-reveal" id="q3a-rev">Loan = ₹300. Position = ₹400 (at ₹1000 price). Margin Call Price ratio = Loan / (Position × (1 - MaintMargin)) = 300 / (400 × 0.80) = 0.9375. Stock margin call price = 1000 × 0.9375 = ₹937.50 — only a 6.25% drop triggers it at 4× leverage.</div>
+    </div>
+
+    <div class="cta-box">
+      <div class="cta-title">Model Drawdowns, Leverage &amp; Factor Risk Live</div>
+      <div class="cta-sub">Three risk calculators: Drawdown Analysis, Leverage &amp; Margin, and Factor Exposure — on real Nifty 50 data.</div>
+      <a class="cta-btn" href="/valuation-toolkit/domains/hedge-funds/calculators/">Open Calculators →</a>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 4: FUND STRUCTURE & FEES -->
+<div class="module" id="m4">
+  <div class="mod-header" onclick="toggleModule('m4')">
+    <div class="mod-num">04</div>
+    <div class="mod-title-wrap">
+      <div class="mod-title">Fund Structure &amp; Fees</div>
+      <div class="mod-meta">AIF Cat III · 2&amp;20 · Hurdle Rate · High Water Mark · SEBI Regulations</div>
+    </div>
+    <span class="mod-status mod-status-new">New</span>
+    <span class="mod-arrow">▾</span>
+  </div>
+  <div class="mod-body">
+    <div class="intro-box">India's hedge funds operate as <strong>Category III AIFs under SEBI's AIF Regulations 2012</strong>. Minimum investment is ₹1 crore per investor. The "2 and 20" fee structure (2% management fee, 20% performance fee above a hurdle) creates significant alignment — but also agency problems if not structured correctly.</div>
+
+    <div class="section-title">India Hedge Fund Regulatory Structure</div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div class="flow-content">
+          <span class="flow-tag tag-reg">SEBI AIF</span>
+          <div class="flow-head">Category III AIF Registration</div>
+          <div class="flow-body">All Indian hedge funds must register as Category III AIFs with SEBI. Minimum corpus: ₹20 crore. Minimum investor commitment: ₹1 crore (₹25L for employees/directors). Category III AIFs can take leverage, short sell, and invest in derivatives — unlike Category I/II AIFs which have restrictions.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div class="flow-content">
+          <span class="flow-tag tag-ops">Structure</span>
+          <div class="flow-head">Legal Structure: Trust + Manager</div>
+          <div class="flow-body">Indian AIFs are structured as trusts. The fund has a Trustee (usually a corporate trustee) and an Investment Manager (the fund management company). SEBI requires the Investment Manager to have minimum net worth of ₹5 crore. Key Personnel (fund managers, CRO, compliance) must be disclosed and approved.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div class="flow-content">
+          <span class="flow-tag tag-ops">Leverage</span>
+          <div class="flow-head">Leverage Limits</div>
+          <div class="flow-body">SEBI allows Cat III AIFs to take leverage up to 2× NAV for listed equities via F&amp;O. Overseas borrowing is not permitted. Prime brokers (Indian entities: Kotak Securities, IIFL, HDFC Securities) provide margin funding for equity leverage. Repo/TREPS used for short-term liquidity. Leverage reporting required monthly to SEBI.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <div class="flow-content">
+          <span class="flow-tag tag-fee">Tax</span>
+          <div class="flow-head">Pass-through Tax Treatment</div>
+          <div class="flow-body">Category III AIFs do NOT enjoy pass-through tax treatment — unlike Cat I &amp; II AIFs. The AIF itself is taxed at the fund level at maximum marginal rate (42.7% for trusts). This is a structural disadvantage vs. foreign HFs investing through Mauritius/Singapore treaty routes, though recent amendments partially address this for specific categories.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">The 2 and 20 Fee Structure</div>
+    <div class="fee-waterfall">
+      <div class="fw-row">
+        <div class="fw-label">Gross Return</div>
+        <div class="fw-bar-wrap">
+          <div class="fw-bar gross" style="width:100%">24%</div>
+          <div class="fw-num">₹2,400 on ₹10,000</div>
+        </div>
+      </div>
+      <div class="fw-row">
+        <div class="fw-label">Less: Mgmt Fee</div>
+        <div class="fw-bar-wrap">
+          <div class="fw-bar mgmt" style="width:8%">−2%</div>
+          <div class="fw-num">₹200 (2% of AUM)</div>
+        </div>
+      </div>
+      <div class="fw-row">
+        <div class="fw-label">Less: Perf Fee</div>
+        <div class="fw-bar-wrap">
+          <div class="fw-bar perf" style="width:23%">−20% × (24%−8%)</div>
+          <div class="fw-num">₹320 (20% above 8% hurdle)</div>
+        </div>
+      </div>
+      <div class="fw-row">
+        <div class="fw-label">Net to Investor</div>
+        <div class="fw-bar-wrap">
+          <div class="fw-bar net" style="width:69%">~18.8%</div>
+          <div class="fw-num">₹1,880 net return</div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:20px;line-height:1.6">Performance fee only on returns above the 8% hurdle rate. The performance fee is ₹320 = 20% × (24% - 8%) × ₹10,000 = 20% × ₹1,600 = ₹320. At 8% hurdle, gross must exceed 8% before the manager earns any performance fee.</div>
+
+    <div class="section-title">High Water Mark (HWM)</div>
+    <div class="formula">High Water Mark = Previous highest NAV at which performance fees were charged
+
+Year 1: NAV ₹100 → ₹120. Perf fee charged. HWM = ₹120.
+Year 2: NAV ₹120 → ₹105. Loss year. HWM remains ₹120. No perf fee.
+Year 3: NAV ₹105 → ₹118. Still below HWM. No perf fee.
+Year 4: NAV ₹118 → ₹135. Crosses HWM ₹120 → perf fee on ₹135-₹120 = ₹15 excess.
+
+HWM protects investors: managers must recover losses before earning perf fees again.
+Some funds have "loss carryforward" provisions — perf fees never charged on prior losses.</div>
+
+    <div class="section-title">Key Terms Glossary</div>
+    <div class="glossary">
+      <div class="gloss-row"><div class="gloss-term">Hurdle Rate</div><div class="gloss-def">Minimum return that must be earned before performance fees kick in. Typically 6–10% in India. May be "soft" (fees on all returns once hurdle crossed) or "hard" (fees only on returns above the hurdle).</div></div>
+      <div class="gloss-row"><div class="gloss-term">High Water Mark</div><div class="gloss-def">The highest NAV at which performance fees were previously charged. Prevents managers from earning fees multiple times on the same profit. Investors get loss recovery protection.</div></div>
+      <div class="gloss-row"><div class="gloss-term">Lock-up Period</div><div class="gloss-def">Minimum holding period before investors can redeem. Typically 1–2 years for Indian AIFs. Allows managers to deploy into illiquid positions without forced selling. Followed by quarterly/annual redemption windows.</div></div>
+      <div class="gloss-row"><div class="gloss-term">Clawback</div><div class="gloss-def">Provision requiring fund managers to return performance fees if subsequent losses erode gains. Rare in India's AIF structures but growing in institutional mandates. Aligns long-term incentives.</div></div>
+      <div class="gloss-row"><div class="gloss-term">Carried Interest</div><div class="gloss-def">Performance fee share allocated to the fund manager as a % of profits. "20% carry" means manager keeps 20¢ of every ₹1 profit above hurdle. In India, taxed as business income at fund level.</div></div>
+      <div class="gloss-row"><div class="gloss-term">Side Pocket</div><div class="gloss-def">Segregated account for illiquid or hard-to-value positions. Allows the liquid portfolio to continue operating while distressed assets are wound down separately. SEBI allows side pockets for Cat III AIFs in specific circumstances.</div></div>
+    </div>
+
+    <div class="section-title">Typical India Cat III AIF Term Sheet</div>
+    <table class="data-table">
+      <thead>
+        <tr><th>Parameter</th><th>Typical Range</th><th>Notes</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Minimum Investment</td><td class="mono">₹1 Cr</td><td>SEBI mandated minimum</td></tr>
+        <tr><td>Management Fee</td><td class="mono">1.5–2.5%</td><td>On AUM, charged quarterly</td></tr>
+        <tr><td>Performance Fee</td><td class="mono">15–25%</td><td>Above hurdle; typical is 20%</td></tr>
+        <tr><td>Hurdle Rate</td><td class="mono">6–10%</td><td>Often linked to 91-day T-Bill</td></tr>
+        <tr><td>Lock-up Period</td><td class="mono">1–2 years</td><td>Hard lock with exit load post</td></tr>
+        <tr><td>Redemption Window</td><td class="mono">Quarterly / Annual</td><td>Post lock-up</td></tr>
+        <tr><td>Max Leverage</td><td class="mono">2× NAV</td><td>SEBI Cat III AIF limit</td></tr>
+        <tr><td>Target AUM</td><td class="mono">₹500–₹5,000 Cr</td><td>Varies by strategy capacity</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-title">Quick Check</div>
+    <div class="quiz-block" id="q4a">
+      <div class="quiz-q">A fund charges 2% management fee and 20% performance fee with an 8% hurdle and HWM. NAV goes from ₹100 to ₹130. What is the performance fee per unit?</div>
+      <div class="quiz-opt">
+        <button class="quiz-btn" onclick="checkQ('q4a',this,false)">A. ₹6.00</button>
+        <button class="quiz-btn" onclick="checkQ('q4a',this,true)">B. ₹4.40</button>
+        <button class="quiz-btn" onclick="checkQ('q4a',this,false)">C. ₹5.20</button>
+        <button class="quiz-btn" onclick="checkQ('q4a',this,false)">D. ₹3.00</button>
+      </div>
+      <div class="quiz-reveal" id="q4a-rev">Gross gain = ₹30. Hurdle = 8% of ₹100 = ₹8. Gain above hurdle = ₹30 - ₹8 = ₹22. Performance fee = 20% × ₹22 = ₹4.40 per unit. Net to investor = ₹30 - ₹2 (mgmt fee) - ₹4.40 = ₹23.60, so net return ≈ 23.6% on ₹100 NAV.</div>
+    </div>
+
+    <div class="cta-box">
+      <div class="cta-title">Model Fund P&amp;L with Strategy PnL Calculator</div>
+      <div class="cta-sub">Calculate strategy returns, Sharpe ratio, and PnL attribution across market regimes for any Nifty 50 stock.</div>
+      <a class="cta-btn" href="/valuation-toolkit/domains/hedge-funds/calculators/strategy-pnl.html">Open Calculator →</a>
+    </div>
+  </div>
+</div>
+
+</div><!-- .modules -->
+
+<script>
+var PROGRESS = {};
+
+function toggleModule(id) {
+  var el = document.getElementById(id);
+  var isOpen = el.classList.contains('open');
+  document.querySelectorAll('.module').forEach(function(m) { m.classList.remove('open'); });
+  if (!isOpen) {
+    el.classList.add('open');
+    markProgress(id);
+  }
+}
+
+function openModule(id) {
+  document.querySelectorAll('.module').forEach(function(m) { m.classList.remove('open'); });
+  var el = document.getElementById(id);
+  el.classList.add('open');
+  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  markProgress(id);
+}
+
+function markProgress(id) {
+  var map = { m1: 'prog1', m2: 'prog2', m3: 'prog3', m4: 'prog4' };
+  PROGRESS[id] = true;
+  var pid = map[id];
+  if (pid) {
+    document.getElementById(pid).classList.add('done');
+  }
+  try { localStorage.setItem('hf-learn-progress', JSON.stringify(PROGRESS)); } catch(e) {}
+}
+
+function checkQ(blockId, btn, isCorrect) {
+  var block = document.getElementById(blockId);
+  var btns = block.querySelectorAll('.quiz-btn');
+  btns.forEach(function(b) { b.disabled = true; });
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) {
+    btns.forEach(function(b) {
+      if (b.getAttribute('onclick').indexOf('true') !== -1) { b.classList.add('correct'); }
+    });
+  }
+  var rev = document.getElementById(blockId + '-rev');
+  if (rev) rev.style.display = 'block';
+}
+
+// Restore progress
+(function() {
+  try {
+    var saved = JSON.parse(localStorage.getItem('hf-learn-progress') || '{}');
+    PROGRESS = saved;
+    var map = { m1: 'prog1', m2: 'prog2', m3: 'prog3', m4: 'prog4' };
+    Object.keys(saved).forEach(function(id) {
+      var pid = map[id];
+      if (pid) document.getElementById(pid).classList.add('done');
+    });
+  } catch(e) {}
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Strategy P&L · Hedge Fund Calculators · ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--accent:#7c3aed;--accent-bg:#f5f3ff;--accent-border:#ddd6fe;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px}
+.nav{display:flex;align-items:center;gap:8px;padding:14px 24px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.nav a{font-size:13px;color:var(--muted);text-decoration:none}.nav a:hover{color:var(--text)}
+.nav-sep{color:var(--border);font-size:13px}
+.nav-cur{font-size:13px;font-weight:600}
+.header{padding:28px 24px 0;max-width:860px;margin:0 auto}
+.header-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:20px;padding:3px 12px;font-size:11px;font-weight:700;color:var(--accent);margin-bottom:10px}
+.header h1{font-size:clamp(18px,3.5vw,26px);font-weight:800;margin-bottom:4px}
+.header-sub{font-size:13px;color:var(--muted)}
+.tabs{display:flex;gap:0;padding:20px 24px 0;max-width:860px;margin:0 auto;border-bottom:1px solid var(--border)}
+.tab{padding:10px 16px;font-size:13px;font-weight:600;border:none;background:none;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit;white-space:nowrap}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab.done{color:var(--green)}
+.tab.locked{color:var(--muted);cursor:default}
+.step{display:none;max-width:860px;margin:0 auto;padding:24px}
+.step.active{display:block}
+.search-box{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none;margin-bottom:12px}
+.search-box:focus{border-color:var(--accent)}
+.stock-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.stock-card{border:1.5px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all .15s}
+.stock-card:hover{border-color:var(--accent);background:var(--accent-bg)}
+.stock-card.selected{border-color:var(--accent);background:var(--accent-bg)}
+.sc-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.sc-sector{font-size:11px;color:var(--muted);margin-bottom:6px}
+.sc-row{display:flex;gap:8px}
+.sc-pill{font-size:11px;font-weight:600;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:2px 7px;color:var(--muted)}
+.btn{display:inline-block;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:11px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s}
+.btn:hover{opacity:.88}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn-row{margin-top:20px;display:flex;gap:10px;align-items:center}
+.ctx-hero{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:12px;padding:20px;margin-bottom:16px}
+.ctx-name{font-size:18px;font-weight:800;margin-bottom:4px}
+.ctx-meta{display:flex;gap:10px;flex-wrap:wrap}
+.ctx-chip{font-size:12px;font-weight:600;background:#fff;border:1px solid var(--accent-border);border-radius:8px;padding:3px 10px;color:var(--accent)}
+.ctx-chip.green{background:#f0fdf4;border-color:#bbf7d0;color:var(--green)}
+.ctx-chip.red{background:#fff0f0;border-color:#fecaca;color:var(--red)}
+.teach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:20px}
+.teach-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
+.teach-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+.teach-val{font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;margin-bottom:4px}
+.teach-sub{font-size:12px;color:var(--muted)}
+.explain-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+@media(max-width:600px){.explain-grid{grid-template-columns:1fr}}
+.explain-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px}
+.explain-card h4{font-size:13px;font-weight:700;margin-bottom:8px}
+.explain-card p{font-size:12px;color:var(--muted);line-height:1.6}
+.pro-gate{border:2px dashed var(--border);border-radius:12px;padding:32px;text-align:center;background:var(--card)}
+.pro-lock{font-size:36px;margin-bottom:12px}
+.pro-title{font-size:18px;font-weight:800;margin-bottom:6px}
+.pro-sub{font-size:13px;color:var(--muted);margin-bottom:16px}
+.pro-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px}
+.pro-pill{font-size:12px;font-weight:600;background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);border-radius:20px;padding:4px 12px}
+.btn-pro{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+/* Fee bar */
+.fee-bar{display:flex;height:20px;border-radius:6px;overflow:hidden;margin:10px 0}
+.fee-seg{display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="/valuation-toolkit/">ValuationDesk</a><span class="nav-sep">›</span>
+  <a href="/valuation-toolkit/domains/hedge-funds/">Hedge Funds</a><span class="nav-sep">›</span>
+  <a href="/valuation-toolkit/domains/hedge-funds/calculators/">Calculators</a><span class="nav-sep">›</span>
+  <span class="nav-cur">Strategy P&amp;L</span>
+</nav>
+<div class="header">
+  <div class="header-badge">📊 PRO · Hedge Funds</div>
+  <h1>Strategy P&amp;L Dashboard</h1>
+  <p class="header-sub">Fund performance dashboard: Sharpe, Sortino, alpha, long/short attribution, and 2/20 fee drag on any Nifty 50 anchor stock.</p>
+</div>
+<div class="tabs">
+  <button class="tab active" id="tab1" onclick="goStep(1)">1 · Pick Stock</button>
+  <button class="tab locked" id="tab2" onclick="goStep(2)">2 · Performance Context</button>
+  <button class="tab locked" id="tab3">🔒 3 · Fund Setup</button>
+  <button class="tab locked" id="tab4">🔒 4 · Full Dashboard</button>
+</div>
+
+<!-- STEP 1 -->
+<div class="step active" id="step1">
+  <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Pick your primary long position to anchor the strategy analysis.</p>
+  <input class="search-box" id="searchBox" placeholder="Search stocks, sectors…" oninput="filterStocks()">
+  <div class="stock-grid" id="stockGrid"></div>
+  <div class="btn-row">
+    <button class="btn" id="nextBtn1" onclick="goStep(2)" disabled>Performance Context →</button>
+    <span id="sel1" style="font-size:13px;color:var(--muted)">No stock selected</span>
+  </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="step" id="step2">
+  <div id="ctxBox"></div>
+  <div class="btn-row">
+    <button class="btn" style="background:var(--card);color:var(--text);border:1px solid var(--border)" onclick="goStep(1)">← Back</button>
+    <button class="btn" onclick="goStep(3)">Fund Setup →</button>
+  </div>
+</div>
+
+<!-- STEP 3 PRO GATE -->
+<div class="step" id="step3">
+  <div class="pro-gate">
+    <div class="pro-lock">🔒</div>
+    <div class="pro-title">Fund Setup</div>
+    <div class="pro-sub">Input AUM, strategy returns, benchmark, and fee structure to build the full P&amp;L dashboard.</div>
+    <div class="pro-pills">
+      <span class="pro-pill">AUM &amp; NAV</span>
+      <span class="pro-pill">Monthly Returns Series</span>
+      <span class="pro-pill">Benchmark Selection</span>
+      <span class="pro-pill">Risk-Free Rate</span>
+      <span class="pro-pill">L/S Attribution</span>
+      <span class="pro-pill">Fee Structure (2/20)</span>
+      <span class="pro-pill">HWM Tracking</span>
+      <span class="pro-pill">Hurdle Rate</span>
+    </div>
+    <button class="btn-pro" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+  </div>
+  <div class="btn-row">
+    <button class="btn" style="background:var(--card);color:var(--text);border:1px solid var(--border)" onclick="goStep(2)">← Back</button>
+  </div>
+</div>
+
+<!-- STEP 4 PRO GATE -->
+<div class="step" id="step4">
+  <div class="pro-gate">
+    <div class="pro-lock">🔒</div>
+    <div class="pro-title">Full Performance Dashboard</div>
+    <div class="pro-sub">Complete fund analytics: risk-adjusted returns, attribution, and fee drag quantification.</div>
+    <div class="pro-pills">
+      <span class="pro-pill">Sharpe Ratio</span>
+      <span class="pro-pill">Sortino Ratio</span>
+      <span class="pro-pill">Annualised Alpha</span>
+      <span class="pro-pill">Long Book Attribution</span>
+      <span class="pro-pill">Short Book Attribution</span>
+      <span class="pro-pill">2/20 Fee Drag</span>
+      <span class="pro-pill">Investor Net Return</span>
+      <span class="pro-pill">Rolling Performance Chart</span>
+    </div>
+    <button class="btn-pro" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+  </div>
+</div>
+
+<script>
+var STOCKS=[
+  {id:1,name:'Reliance Industries',sector:'Oil & Gas',price:2840,beta:0.95,vol:18.2,pe:24.8,ret1y:8.2,momentum6m:4.8,shortInt:1.2,ivol:22.4,alpha1y:240,factor:'quality'},
+  {id:2,name:'HDFC Bank',sector:'Banking',price:1720,beta:0.88,vol:16.4,pe:18.2,ret1y:12.4,momentum6m:6.2,shortInt:0.8,ivol:19.8,alpha1y:180,factor:'quality'},
+  {id:3,name:'Infosys',sector:'IT',price:1840,beta:0.82,vol:19.8,pe:22.4,ret1y:18.6,momentum6m:9.4,shortInt:2.4,ivol:24.2,alpha1y:320,factor:'growth'},
+  {id:4,name:'ICICI Bank',sector:'Banking',price:1240,beta:1.12,vol:20.4,pe:17.6,ret1y:24.8,momentum6m:12.4,shortInt:1.8,ivol:22.8,alpha1y:420,factor:'value'},
+  {id:5,name:'TCS',sector:'IT',price:3980,beta:0.72,vol:15.6,pe:26.8,ret1y:6.8,momentum6m:3.2,shortInt:0.6,ivol:17.4,alpha1y:80,factor:'quality'},
+  {id:6,name:'Bharti Airtel',sector:'Telecom',price:1580,beta:0.78,vol:22.4,pe:48.2,ret1y:42.4,momentum6m:22.8,shortInt:3.2,ivol:28.4,alpha1y:680,factor:'momentum'},
+  {id:7,name:'Kotak Mahindra Bank',sector:'Banking',price:1840,beta:0.94,vol:18.8,pe:19.4,ret1y:8.4,momentum6m:4.8,shortInt:1.4,ivol:21.2,alpha1y:120,factor:'quality'},
+  {id:8,name:'L&T',sector:'Capital Goods',price:3640,beta:1.24,vol:24.8,pe:34.2,ret1y:28.4,momentum6m:14.2,shortInt:2.8,ivol:28.8,alpha1y:520,factor:'momentum'},
+  {id:9,name:'Axis Bank',sector:'Banking',price:1180,beta:1.18,vol:22.8,pe:14.8,ret1y:16.4,momentum6m:8.4,shortInt:4.2,ivol:26.4,alpha1y:280,factor:'value'},
+  {id:10,name:'Maruti Suzuki',sector:'Auto',price:12400,beta:0.84,vol:21.2,pe:28.4,ret1y:14.2,momentum6m:7.2,shortInt:1.2,ivol:23.4,alpha1y:200,factor:'quality'},
+  {id:11,name:'Sun Pharmaceutical',sector:'Pharma',price:1720,beta:0.64,vol:17.4,pe:38.4,ret1y:32.4,momentum6m:16.8,shortInt:2.2,ivol:22.8,alpha1y:580,factor:'momentum'},
+  {id:12,name:'HUL',sector:'FMCG',price:2480,beta:0.42,vol:14.2,pe:52.4,ret1y:2.4,momentum6m:1.2,shortInt:0.8,ivol:16.4,alpha1y:-80,factor:'quality'},
+  {id:13,name:'ITC',sector:'FMCG',price:468,beta:0.58,vol:16.8,pe:24.8,ret1y:12.4,momentum6m:6.4,shortInt:1.8,ivol:18.4,alpha1y:180,factor:'value'},
+  {id:14,name:'Asian Paints',sector:'Materials',price:2780,beta:0.48,vol:19.4,pe:58.4,ret1y:-14.2,momentum6m:-8.2,shortInt:5.8,ivol:26.4,alpha1y:-380,factor:'growth'},
+  {id:15,name:'Bajaj Finance',sector:'NBFC',price:7240,beta:1.42,vol:26.4,pe:34.8,ret1y:8.4,momentum6m:4.8,shortInt:6.4,ivol:32.4,alpha1y:120,factor:'growth'},
+  {id:16,name:'Wipro',sector:'IT',price:580,beta:0.88,vol:22.8,pe:20.8,ret1y:6.4,momentum6m:3.2,shortInt:2.4,ivol:26.4,alpha1y:80,factor:'value'},
+  {id:17,name:'NTPC',sector:'Power',price:384,beta:0.74,vol:20.4,pe:18.4,ret1y:32.4,momentum6m:16.8,shortInt:1.4,ivol:22.8,alpha1y:580,factor:'momentum'},
+  {id:18,name:'Power Grid',sector:'Power',price:328,beta:0.68,vol:18.4,pe:20.4,ret1y:28.4,momentum6m:14.2,shortInt:1.2,ivol:20.4,alpha1y:480,factor:'value'},
+  {id:19,name:'Titan',sector:'Consumer',price:3640,beta:0.82,vol:24.8,pe:84.2,ret1y:4.2,momentum6m:2.4,shortInt:3.8,ivol:28.4,alpha1y:-40,factor:'growth'},
+  {id:20,name:'UltraTech Cement',sector:'Materials',price:11240,beta:0.94,vol:22.4,pe:42.4,ret1y:8.4,momentum6m:4.8,shortInt:2.4,ivol:25.4,alpha1y:120,factor:'quality'},
+  {id:21,name:'HCL Technologies',sector:'IT',price:1680,beta:0.78,vol:20.4,pe:24.8,ret1y:22.4,momentum6m:11.4,shortInt:1.8,ivol:22.4,alpha1y:380,factor:'value'},
+  {id:22,name:'M&M',sector:'Auto',price:2940,beta:1.08,vol:26.4,pe:28.4,ret1y:42.8,momentum6m:22.4,shortInt:2.8,ivol:30.4,alpha1y:720,factor:'momentum'},
+  {id:23,name:'JSW Steel',sector:'Materials',price:980,beta:1.48,vol:28.8,pe:22.4,ret1y:4.8,momentum6m:2.4,shortInt:8.2,ivol:36.4,alpha1y:-40,factor:'value'},
+  {id:24,name:'Adani Ports',sector:'Infrastructure',price:1380,beta:1.28,vol:26.4,pe:32.4,ret1y:24.4,momentum6m:12.4,shortInt:4.2,ivol:32.4,alpha1y:420,factor:'momentum'},
+  {id:25,name:'Tata Motors',sector:'Auto',price:980,beta:1.58,vol:32.4,pe:8.4,ret1y:24.4,momentum6m:12.4,shortInt:9.4,ivol:38.4,alpha1y:420,factor:'value'},
+  {id:26,name:'HDFC Life',sector:'Insurance',price:680,beta:0.72,vol:18.4,pe:72.4,ret1y:8.4,momentum6m:4.2,shortInt:2.2,ivol:22.4,alpha1y:120,factor:'growth'},
+  {id:27,name:'SBI',sector:'Banking',price:840,beta:1.32,vol:26.4,pe:10.8,ret1y:28.4,momentum6m:14.2,shortInt:3.8,ivol:30.4,alpha1y:480,factor:'value'},
+  {id:28,name:'Tech Mahindra',sector:'IT',price:1480,beta:0.98,vol:26.4,pe:38.4,ret1y:8.4,momentum6m:4.2,shortInt:4.2,ivol:30.4,alpha1y:120,factor:'growth'},
+  {id:29,name:'Nestle India',sector:'FMCG',price:24800,beta:0.38,vol:16.4,pe:68.4,ret1y:-4.8,momentum6m:-2.4,shortInt:1.2,ivol:18.4,alpha1y:-160,factor:'quality'},
+  {id:30,name:'Cipla',sector:'Pharma',price:1540,beta:0.68,vol:18.8,pe:28.4,ret1y:18.4,momentum6m:9.4,shortInt:2.4,ivol:22.4,alpha1y:320,factor:'momentum'}
+];
+
+var selected=null;
+
+function renderStocks(arr){
+  var g=document.getElementById('stockGrid');
+  g.innerHTML=arr.map(function(s){
+    var isS=selected&&selected.id===s.id;
+    var selCls=isS?' selected':'';
+    return '<div class="stock-card'+selCls+'" onclick="selectStock('+s.id+')">'
+      +'<div class="sc-name">'+s.name+'</div>'
+      +'<div class="sc-sector">'+s.sector+'</div>'
+      +'<div class="sc-row">'
+      +'<span class="sc-pill">₹'+s.price.toLocaleString()+'</span>'
+      +'<span class="sc-pill">'+(s.ret1y>=0?'+':'')+s.ret1y+'% 1Y</span>'
+      +'<span class="sc-pill">β '+s.beta+'</span>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+}
+
+function filterStocks(){
+  var q=document.getElementById('searchBox').value.toLowerCase();
+  var arr=q?STOCKS.filter(function(s){return s.name.toLowerCase().includes(q)||s.sector.toLowerCase().includes(q);}):STOCKS;
+  renderStocks(arr);
+}
+
+function selectStock(id){
+  selected=STOCKS.find(function(s){return s.id===id;});
+  renderStocks(STOCKS.filter(function(s){
+    var q=document.getElementById('searchBox').value.toLowerCase();
+    return !q||s.name.toLowerCase().includes(q)||s.sector.toLowerCase().includes(q);
+  }));
+  document.getElementById('nextBtn1').disabled=false;
+  document.getElementById('sel1').textContent='Selected: '+selected.name;
+}
+
+function goStep(n){
+  [1,2,3,4].forEach(function(i){
+    document.getElementById('step'+i).classList.toggle('active',i===n);
+    var t=document.getElementById('tab'+i);
+    t.classList.remove('active','done','locked');
+    if(i<n) t.classList.add('done');
+    else if(i===n) t.classList.add('active');
+    else t.classList.add('locked');
+  });
+  if(n===2&&selected) buildContext();
+}
+
+function buildContext(){
+  var s=selected;
+  // Performance metrics
+  var riskFree=6.5; // RBI repo rate
+  var excessReturn=s.ret1y-riskFree;
+  var sharpe=+(excessReturn/s.vol).toFixed(2);
+  var niftyRet=14.8; // benchmark
+  var alpha=+(s.ret1y-niftyRet).toFixed(1);
+  // Estimated fee drag: 2% mgmt on AUM + 20% perf on profits above hurdle (hurdle = 8%)
+  var grossRet=s.ret1y;
+  var mgmtFee=2.0;
+  var hurdleRate=8.0;
+  var profitAboveHurdle=Math.max(0,grossRet-hurdleRate);
+  var perfFee=+(profitAboveHurdle*0.20).toFixed(1);
+  var totalFee=+(mgmtFee+perfFee).toFixed(1);
+  var netReturn=+(grossRet-totalFee).toFixed(1);
+  var isPositiveAlpha=alpha>=0;
+  var isGoodSharpe=sharpe>=0.8;
+  var alphaColor=isPositiveAlpha?'var(--green)':'var(--red)';
+  var sharpeColor=isGoodSharpe?'var(--green)':'var(--amber)';
+  // 2/20 bar: mgmt / perf / investor net
+  var total=Math.max(grossRet,0.01);
+  var mgmtPct=Math.round(mgmtFee/total*100);
+  var perfPct=Math.round(perfFee/total*100);
+  var netPct=Math.max(0,100-mgmtPct-perfPct);
+  var feeBarHtml='<div class="fee-bar">'
+    +'<div class="fee-seg" style="width:'+mgmtPct+'%;background:#7c3aed">Mgmt</div>'
+    +'<div class="fee-seg" style="width:'+perfPct+'%;background:#dc2626">Perf</div>'
+    +'<div class="fee-seg" style="width:'+netPct+'%;background:#16a34a">LP Net</div>'
+    +'</div>'
+    +'<div style="font-size:11px;color:var(--muted)">Management fee: '+mgmtFee+'% · Performance fee: '+perfFee+'% · Investor net: '+netReturn+'%</div>';
+
+  var html='<div class="ctx-hero">'
+    +'<div class="ctx-name">'+s.name+' · Fund Strategy View</div>'
+    +'<div class="ctx-meta" style="margin-top:8px">'
+    +'<span class="ctx-chip">₹'+s.price.toLocaleString()+' CMP</span>'
+    +'<span class="ctx-chip '+(s.ret1y>=0?'green':'red')+'">'+(s.ret1y>=0?'+':'')+s.ret1y+'% 1Y Gross</span>'
+    +'<span class="ctx-chip">vs Nifty '+(niftyRet>=0?'+':'')+niftyRet+'%</span>'
+    +'<span class="ctx-chip">Net β '+s.beta+'</span>'
+    +'</div>'
+    +'</div>'
+
+    +'<div class="teach-grid">'
+    +'<div class="teach-card"><div class="teach-label">Sharpe Ratio</div><div class="teach-val" style="color:'+sharpeColor+'">'+sharpe+'x</div><div class="teach-sub">(Return − Rf) / Vol · Rf = '+riskFree+'%</div></div>'
+    +'<div class="teach-card"><div class="teach-label">Alpha vs Nifty</div><div class="teach-val" style="color:'+alphaColor+'">'+(alpha>=0?'+':'')+alpha+'%</div><div class="teach-sub">Stock vs benchmark excess return</div></div>'
+    +'<div class="teach-card"><div class="teach-label">Gross Return</div><div class="teach-val">'+(grossRet>=0?'+':'')+grossRet+'%</div><div class="teach-sub">Before fees</div></div>'
+    +'<div class="teach-card"><div class="teach-label">Investor Net Return</div><div class="teach-val" style="color:'+(netReturn>=0?'var(--green)':'var(--red)')+'">'+(netReturn>=0?'+':'')+netReturn+'%</div><div class="teach-sub">After 2/20 fees</div></div>'
+    +'</div>'
+
+    +'<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px">'
+    +'<div style="font-size:13px;font-weight:700;margin-bottom:10px">2/20 Fee Structure Breakdown</div>'
+    +feeBarHtml
+    +'</div>'
+
+    +'<div class="explain-grid">'
+    +'<div class="explain-card"><h4>📐 Sharpe Ratio</h4><p>Excess return per unit of total risk. Sharpe above 1.0 is good; above 2.0 is exceptional. Problem: penalises upside volatility equally — Sortino is better for HFs with asymmetric returns.</p></div>'
+    +'<div class="explain-card"><h4>📈 Sortino Ratio</h4><p>Like Sharpe but divides excess return by downside deviation only. Better metric for hedge funds as it rewards volatile upsides while punishing downside risk specifically.</p></div>'
+    +'<div class="explain-card"><h4>💰 2/20 Fee Structure</h4><p>2% annual management fee on AUM regardless of performance. 20% performance fee on profits above the hurdle rate (typically 6–8%). High-water mark ensures investors don\'t pay twice for the same gains.</p></div>'
+    +'<div class="explain-card"><h4>🎯 Alpha Attribution</h4><p>Jensen\'s Alpha = Fund Return − (Rf + β × (Market − Rf)). Positive alpha means the manager added value beyond market exposure. Long/short attribution splits this into what the long book vs short book contributed.</p></div>'
+    +'</div>';
+
+  document.getElementById('ctxBox').innerHTML=html;
+}
+
+function unlockPro(){
+  alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');
+}
+
+renderStocks(STOCKS);
+</script>
+</body>
+</html>

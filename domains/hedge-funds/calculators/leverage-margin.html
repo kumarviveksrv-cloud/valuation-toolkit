@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leverage &amp; Margin · Hedge Funds · ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --accent:#7c3aed;--accent-bg:#f5f3ff;--accent-border:#ddd6fe;
+  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;
+  --card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+a{color:inherit;text-decoration:none}
+header{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-weight:800;font-size:18px;letter-spacing:-0.5px}
+.logo span{color:var(--accent)}
+.header-nav{display:flex;gap:24px;font-size:14px;font-weight:500;color:var(--muted)}
+.header-nav a:hover{color:var(--text)}
+.breadcrumb{font-size:13px;color:var(--muted);padding:12px 24px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border)}
+.breadcrumb a:hover{color:var(--text)}
+.breadcrumb span{color:var(--border)}
+.calc-hero{padding:24px 24px 0}
+.calc-hero h1{font-size:22px;font-weight:800;letter-spacing:-0.5px;margin-bottom:4px}
+.calc-hero p{font-size:14px;color:var(--muted)}
+.pro-badge{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;margin-left:8px;letter-spacing:0.5px}
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);padding:0 24px;margin-top:20px;overflow-x:auto}
+.tab{padding:10px 16px;font-size:13px;font-weight:600;color:var(--muted);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s;white-space:nowrap}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab.done{color:var(--green);border-bottom-color:var(--green)}
+.tab.locked{color:var(--muted);cursor:default;opacity:0.6}
+.step{display:none;padding:24px}
+.step.active{display:block}
+.search-box{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:'Inter',sans-serif;margin-bottom:16px;outline:none}
+.search-box:focus{border-color:var(--accent)}
+.stock-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:20px;max-height:420px;overflow-y:auto}
+.stock-card{border:1px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;transition:all .15s}
+.stock-card:hover{border-color:var(--accent);background:var(--accent-bg)}
+.stock-card.selected{border-color:var(--accent);background:var(--accent-bg);box-shadow:0 0 0 2px var(--accent-border)}
+.sc-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.sc-sector{font-size:11px;color:var(--muted);margin-bottom:6px}
+.sc-row{display:flex;gap:4px;flex-wrap:wrap}
+.sc-pill{font-size:10px;font-weight:600;padding:2px 6px;border-radius:4px;background:var(--card);border:1px solid var(--border);color:var(--muted);font-family:'JetBrains Mono',monospace}
+.sel-info{font-size:13px;color:var(--muted);margin-bottom:16px;font-weight:500}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .15s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover:not(:disabled){background:#6d28d9}
+.btn-primary:disabled{opacity:0.4;cursor:not-allowed}
+.btn-outline{background:var(--bg);color:var(--text);border:1px solid var(--border)}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+.ctx-header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.ctx-title{font-size:18px;font-weight:800;letter-spacing:-0.3px}
+.ctx-subtitle{font-size:13px;color:var(--muted);margin-top:2px}
+.lev-badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;white-space:nowrap}
+.lev-badge.safe{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
+.lev-badge.caution{background:#fffbeb;color:#92400e;border:1px solid #fde68a}
+.lev-badge.danger{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+.info-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px}
+.info-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px}
+.ic-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+.ic-value{font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;letter-spacing:-0.5px}
+.ic-value.up{color:var(--green)}
+.ic-value.down{color:var(--red)}
+.ic-value.warn{color:var(--amber)}
+.ic-value.accent{color:var(--accent)}
+.ic-value.neutral{color:var(--blue)}
+.ic-note{font-size:11px;color:var(--muted);margin-top:3px}
+.section-title{font-size:14px;font-weight:700;margin-bottom:14px;color:var(--text)}
+/* Margin cascade visualization */
+.margin-cascade{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:20px}
+.cascade-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.cascade-row:last-child{margin-bottom:0}
+.cascade-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.cascade-dot.current{background:var(--green)}
+.cascade-dot.margin-call{background:var(--amber)}
+.cascade-dot.liquidation{background:var(--red)}
+.cascade-label{font-size:13px;font-weight:600;min-width:130px}
+.cascade-price{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;min-width:80px}
+.cascade-price.current{color:var(--green)}
+.cascade-price.margin-call{color:var(--amber)}
+.cascade-price.liquidation{color:var(--red)}
+.cascade-drop{font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px}
+.cascade-drop.margin-call{background:#fffbeb;color:#92400e}
+.cascade-drop.liquidation{background:#fef2f2;color:#991b1b}
+.cascade-bar-track{flex:1;height:8px;background:#e5e5e5;border-radius:4px;overflow:hidden}
+.cascade-bar-fill{height:8px;border-radius:4px}
+/* Sharpe comparison */
+.sharpe-compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.sharpe-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+.sharpe-card.leveraged{border-color:var(--accent);background:var(--accent-bg)}
+.sharpe-title{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px}
+.sharpe-val{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:800;margin-bottom:4px}
+.sharpe-val.good{color:var(--green)}
+.sharpe-val.ok{color:var(--amber)}
+.sharpe-val.bad{color:var(--red)}
+.sharpe-sub{font-size:12px;color:var(--muted)}
+/* Cost table */
+.cost-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px}
+.cost-table th{text-align:left;padding:8px 12px;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;border-bottom:2px solid var(--border);background:var(--card)}
+.cost-table td{padding:8px 12px;border-bottom:1px solid var(--border)}
+.cost-table tr.total td{font-weight:700;background:var(--card)}
+.mono{font-family:'JetBrains Mono',monospace}
+.color-up{color:var(--green)}
+.color-down{color:var(--red)}
+.color-warn{color:var(--amber)}
+.color-neutral{color:var(--blue)}
+.callout{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:8px;padding:14px 16px;margin-bottom:20px;font-size:13px;line-height:1.6}
+.callout strong{color:var(--accent)}
+.callout-danger{background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:14px 16px;margin-bottom:20px;font-size:13px;line-height:1.6}
+.callout-danger strong{color:var(--red)}
+.pro-gate{border:2px dashed var(--border);border-radius:12px;padding:28px 24px;text-align:center}
+.pro-gate-icon{font-size:32px;margin-bottom:10px}
+.pro-gate-title{font-size:17px;font-weight:800;margin-bottom:6px}
+.pro-gate-sub{font-size:13px;color:var(--muted);margin-bottom:16px;max-width:420px;margin-left:auto;margin-right:auto}
+.pro-pills{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:18px}
+.pro-pill{font-size:12px;font-weight:600;padding:4px 10px;border-radius:99px;background:var(--card);border:1px solid var(--border);color:var(--muted)}
+.btn-pro{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;padding:11px 24px;border-radius:8px;font-size:14px;font-weight:700;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.btn-pro:hover{opacity:0.9}
+footer{border-top:1px solid var(--border);padding:20px 24px;font-size:12px;color:var(--muted);display:flex;justify-content:space-between;align-items:center;margin-top:40px}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="/" class="logo">Valuation<span>Desk</span></a>
+  <nav class="header-nav">
+    <a href="/">Home</a>
+    <a href="/domains/hedge-funds/">Hedge Funds</a>
+    <a href="/domains/hedge-funds/calculators/">Calculators</a>
+  </nav>
+</header>
+
+<div class="breadcrumb">
+  <a href="/">Home</a><span>/</span>
+  <a href="/domains/hedge-funds/">Hedge Funds</a><span>/</span>
+  <a href="/domains/hedge-funds/calculators/">Calculators</a><span>/</span>
+  <span>Leverage &amp; Margin</span>
+</div>
+
+<div class="calc-hero">
+  <h1>Leverage &amp; Margin <span class="pro-badge">✦ PRO</span></h1>
+  <p>Model prime brokerage leverage, margin call triggers, liquidation prices, and Sharpe amplification for a leveraged long position.</p>
+</div>
+
+<div class="tabs">
+  <button class="tab active" id="tab1" onclick="goStep(1)">1 · Pick Stock</button>
+  <button class="tab locked" id="tab2" onclick="goStep(2)">2 · Leverage Context</button>
+  <button class="tab locked" id="tab3">🔒 3 · Margin Model</button>
+  <button class="tab locked" id="tab4">🔒 4 · Liquidation Analysis</button>
+</div>
+
+<!-- Step 1 -->
+<div class="step active" id="step1">
+  <input class="search-box" id="searchBox" placeholder="Search stocks by name or sector…" oninput="filterStocks()">
+  <div class="stock-grid" id="stockGrid"></div>
+  <div class="sel-info" id="sel1">No stock selected</div>
+  <button class="btn btn-primary" id="nextBtn1" disabled onclick="goStep(2)">View Leverage Context →</button>
+</div>
+
+<!-- Step 2 -->
+<div class="step" id="step2">
+  <div id="ctx2"></div>
+  <div style="display:flex;gap:10px;margin-top:8px;flex-wrap:wrap">
+    <button class="btn btn-outline" onclick="goStep(1)">← Back</button>
+    <button class="btn btn-primary" onclick="goStep(3)">Build Margin Model →</button>
+  </div>
+</div>
+
+<!-- Step 3: PRO Gate -->
+<div class="step" id="step3">
+  <div class="pro-gate">
+    <div class="pro-gate-icon">🔒</div>
+    <div class="pro-gate-title">Margin Model Builder — PRO</div>
+    <div class="pro-gate-sub">Configure AUM, leverage ratio, margin rates, prime broker terms, and collateral type for precise margin modelling.</div>
+    <div class="pro-pills">
+      <span class="pro-pill">AUM Input</span>
+      <span class="pro-pill">Leverage Ratio</span>
+      <span class="pro-pill">Margin Rate</span>
+      <span class="pro-pill">Prime Broker Fee</span>
+      <span class="pro-pill">Collateral Type</span>
+      <span class="pro-pill">Repo Rate</span>
+      <span class="pro-pill">Long/Short Netting</span>
+      <span class="pro-pill">Stress Leverage</span>
+    </div>
+    <button class="btn-pro" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+  </div>
+  <div style="margin-top:16px">
+    <button class="btn btn-outline" onclick="goStep(2)">← Back to Context</button>
+  </div>
+</div>
+
+<!-- Step 4: PRO Gate -->
+<div class="step" id="step4">
+  <div class="pro-gate">
+    <div class="pro-gate-icon">🔒</div>
+    <div class="pro-gate-title">Full Liquidation Analysis — PRO</div>
+    <div class="pro-gate-sub">Precise margin call prices, liquidation cascade simulation, optimal deleveraging paths, and stress scenario P&amp;L.</div>
+    <div class="pro-pills">
+      <span class="pro-pill">Initial Margin Required</span>
+      <span class="pro-pill">Maintenance Margin Level</span>
+      <span class="pro-pill">Margin Call Price</span>
+      <span class="pro-pill">Liquidation Price</span>
+      <span class="pro-pill">Max Drawdown Allowed</span>
+      <span class="pro-pill">Sharpe at Leverage</span>
+      <span class="pro-pill">Funding Cost Impact</span>
+      <span class="pro-pill">Risk Capital Used</span>
+    </div>
+    <button class="btn-pro" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+  </div>
+  <div style="margin-top:16px">
+    <button class="btn btn-outline" onclick="goStep(3)">← Back to Model</button>
+  </div>
+</div>
+
+<footer>
+  <span>© 2025 ValuationDesk · For educational purposes only</span>
+  <span><a href="/domains/hedge-funds/">← Back to Hedge Funds</a></span>
+</footer>
+
+<script>
+var STOCKS=[
+  {id:1,name:'Reliance Industries',sector:'Oil & Gas',price:2840,beta:0.95,vol:18.2,pe:24.8,ret1y:8.2,momentum6m:4.8,shortInt:1.2,ivol:22.4,alpha1y:240,factor:'quality'},
+  {id:2,name:'HDFC Bank',sector:'Banking',price:1720,beta:0.88,vol:16.4,pe:18.2,ret1y:12.4,momentum6m:6.2,shortInt:0.8,ivol:19.8,alpha1y:180,factor:'quality'},
+  {id:3,name:'Infosys',sector:'IT',price:1840,beta:0.82,vol:19.8,pe:22.4,ret1y:18.6,momentum6m:9.4,shortInt:2.4,ivol:24.2,alpha1y:320,factor:'growth'},
+  {id:4,name:'ICICI Bank',sector:'Banking',price:1240,beta:1.12,vol:20.4,pe:17.6,ret1y:24.8,momentum6m:12.4,shortInt:1.8,ivol:22.8,alpha1y:420,factor:'value'},
+  {id:5,name:'TCS',sector:'IT',price:3980,beta:0.72,vol:15.6,pe:26.8,ret1y:6.8,momentum6m:3.2,shortInt:0.6,ivol:17.4,alpha1y:80,factor:'quality'},
+  {id:6,name:'Bharti Airtel',sector:'Telecom',price:1580,beta:0.78,vol:22.4,pe:48.2,ret1y:42.4,momentum6m:22.8,shortInt:3.2,ivol:28.4,alpha1y:680,factor:'momentum'},
+  {id:7,name:'Kotak Mahindra Bank',sector:'Banking',price:1840,beta:0.94,vol:18.8,pe:19.4,ret1y:8.4,momentum6m:4.8,shortInt:1.4,ivol:21.2,alpha1y:120,factor:'quality'},
+  {id:8,name:'L&T',sector:'Capital Goods',price:3640,beta:1.24,vol:24.8,pe:34.2,ret1y:28.4,momentum6m:14.2,shortInt:2.8,ivol:28.8,alpha1y:520,factor:'momentum'},
+  {id:9,name:'Axis Bank',sector:'Banking',price:1180,beta:1.18,vol:22.8,pe:14.8,ret1y:16.4,momentum6m:8.4,shortInt:4.2,ivol:26.4,alpha1y:280,factor:'value'},
+  {id:10,name:'Maruti Suzuki',sector:'Auto',price:12400,beta:0.84,vol:21.2,pe:28.4,ret1y:14.2,momentum6m:7.2,shortInt:1.2,ivol:23.4,alpha1y:200,factor:'quality'},
+  {id:11,name:'Sun Pharmaceutical',sector:'Pharma',price:1720,beta:0.64,vol:17.4,pe:38.4,ret1y:32.4,momentum6m:16.8,shortInt:2.2,ivol:22.8,alpha1y:580,factor:'momentum'},
+  {id:12,name:'HUL',sector:'FMCG',price:2480,beta:0.42,vol:14.2,pe:52.4,ret1y:2.4,momentum6m:1.2,shortInt:0.8,ivol:16.4,alpha1y:-80,factor:'quality'},
+  {id:13,name:'ITC',sector:'FMCG',price:468,beta:0.58,vol:16.8,pe:24.8,ret1y:12.4,momentum6m:6.4,shortInt:1.8,ivol:18.4,alpha1y:180,factor:'value'},
+  {id:14,name:'Asian Paints',sector:'Materials',price:2780,beta:0.48,vol:19.4,pe:58.4,ret1y:-14.2,momentum6m:-8.2,shortInt:5.8,ivol:26.4,alpha1y:-380,factor:'growth'},
+  {id:15,name:'Bajaj Finance',sector:'NBFC',price:7240,beta:1.42,vol:26.4,pe:34.8,ret1y:8.4,momentum6m:4.8,shortInt:6.4,ivol:32.4,alpha1y:120,factor:'growth'},
+  {id:16,name:'Wipro',sector:'IT',price:580,beta:0.88,vol:22.8,pe:20.8,ret1y:6.4,momentum6m:3.2,shortInt:2.4,ivol:26.4,alpha1y:80,factor:'value'},
+  {id:17,name:'NTPC',sector:'Power',price:384,beta:0.74,vol:20.4,pe:18.4,ret1y:32.4,momentum6m:16.8,shortInt:1.4,ivol:22.8,alpha1y:580,factor:'momentum'},
+  {id:18,name:'Power Grid',sector:'Power',price:328,beta:0.68,vol:18.4,pe:20.4,ret1y:28.4,momentum6m:14.2,shortInt:1.2,ivol:20.4,alpha1y:480,factor:'value'},
+  {id:19,name:'Titan',sector:'Consumer',price:3640,beta:0.82,vol:24.8,pe:84.2,ret1y:4.2,momentum6m:2.4,shortInt:3.8,ivol:28.4,alpha1y:-40,factor:'growth'},
+  {id:20,name:'UltraTech Cement',sector:'Materials',price:11240,beta:0.94,vol:22.4,pe:42.4,ret1y:8.4,momentum6m:4.8,shortInt:2.4,ivol:25.4,alpha1y:120,factor:'quality'},
+  {id:21,name:'HCL Technologies',sector:'IT',price:1680,beta:0.78,vol:20.4,pe:24.8,ret1y:22.4,momentum6m:11.4,shortInt:1.8,ivol:22.4,alpha1y:380,factor:'value'},
+  {id:22,name:'M&M',sector:'Auto',price:2940,beta:1.08,vol:26.4,pe:28.4,ret1y:42.8,momentum6m:22.4,shortInt:2.8,ivol:30.4,alpha1y:720,factor:'momentum'},
+  {id:23,name:'JSW Steel',sector:'Materials',price:980,beta:1.48,vol:28.8,pe:22.4,ret1y:4.8,momentum6m:2.4,shortInt:8.2,ivol:36.4,alpha1y:-40,factor:'value'},
+  {id:24,name:'Adani Ports',sector:'Infrastructure',price:1380,beta:1.28,vol:26.4,pe:32.4,ret1y:24.4,momentum6m:12.4,shortInt:4.2,ivol:32.4,alpha1y:420,factor:'momentum'},
+  {id:25,name:'Tata Motors',sector:'Auto',price:980,beta:1.58,vol:32.4,pe:8.4,ret1y:24.4,momentum6m:12.4,shortInt:9.4,ivol:38.4,alpha1y:420,factor:'value'},
+  {id:26,name:'HDFC Life',sector:'Insurance',price:680,beta:0.72,vol:18.4,pe:72.4,ret1y:8.4,momentum6m:4.2,shortInt:2.2,ivol:22.4,alpha1y:120,factor:'growth'},
+  {id:27,name:'SBI',sector:'Banking',price:840,beta:1.32,vol:26.4,pe:10.8,ret1y:28.4,momentum6m:14.2,shortInt:3.8,ivol:30.4,alpha1y:480,factor:'value'},
+  {id:28,name:'Tech Mahindra',sector:'IT',price:1480,beta:0.98,vol:26.4,pe:38.4,ret1y:8.4,momentum6m:4.2,shortInt:4.2,ivol:30.4,alpha1y:120,factor:'growth'},
+  {id:29,name:'Nestle India',sector:'FMCG',price:24800,beta:0.38,vol:16.4,pe:68.4,ret1y:-4.8,momentum6m:-2.4,shortInt:1.2,ivol:18.4,alpha1y:-160,factor:'quality'},
+  {id:30,name:'Cipla',sector:'Pharma',price:1540,beta:0.68,vol:18.8,pe:28.4,ret1y:18.4,momentum6m:9.4,shortInt:2.4,ivol:22.4,alpha1y:320,factor:'momentum'}
+];
+
+var selected=null;
+
+function goStep(n){
+  [1,2,3,4].forEach(function(i){
+    document.getElementById('step'+i).classList.toggle('active',i===n);
+    var t=document.getElementById('tab'+i);
+    t.classList.remove('active','done','locked');
+    if(i<n) t.classList.add('done');
+    else if(i===n) t.classList.add('active');
+    else t.classList.add('locked');
+  });
+  if(n===2&&selected) buildContext();
+}
+
+function renderStocks(arr){
+  var g=document.getElementById('stockGrid');
+  g.innerHTML=arr.map(function(s){
+    var isS=selected&&selected.id===s.id;
+    var selCls=isS?' selected':'';
+    return '<div class="stock-card'+selCls+'" onclick="selectStock('+s.id+')">'
+      +'<div class="sc-name">'+s.name+'</div>'
+      +'<div class="sc-sector">'+s.sector+'</div>'
+      +'<div class="sc-row">'
+      +'<span class="sc-pill">β '+s.beta+'</span>'
+      +'<span class="sc-pill">σ '+s.vol+'%</span>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+}
+
+function filterStocks(){
+  var q=document.getElementById('searchBox').value.toLowerCase();
+  var arr=q?STOCKS.filter(function(s){
+    return s.name.toLowerCase().includes(q)||s.sector.toLowerCase().includes(q);
+  }):STOCKS;
+  renderStocks(arr);
+}
+
+function selectStock(id){
+  selected=STOCKS.find(function(s){return s.id===id;});
+  renderStocks(STOCKS.filter(function(s){
+    var q=document.getElementById('searchBox').value.toLowerCase();
+    return !q||s.name.toLowerCase().includes(q)||s.sector.toLowerCase().includes(q);
+  }));
+  document.getElementById('nextBtn1').disabled=false;
+  document.getElementById('sel1').textContent='Selected: '+selected.name;
+}
+
+function buildContext(){
+  var s=selected;
+
+  /* ---- Parameters (4x leverage, SEBI margin rules) ---- */
+  var leverage=4.0;        // 4x illustrative leverage
+  var initMarginPct=0.25;  // 25% initial margin requirement
+  var maintMarginPct=0.20; // 20% maintenance margin
+  var rf=6.5;              // risk-free rate %
+  var borrowRate=8.5;      // prime broker rate %
+  var aumL=10;             // AUM in lakhs (illustrative)
+
+  /* ---- Position sizing ---- */
+  var positionL=+(aumL*leverage).toFixed(1);          // ₹40L position
+  var loanL=+(aumL*(leverage-1)).toFixed(1);          // ₹30L borrowed
+
+  /* ---- Margin call threshold ---- */
+  // Equity/Position < maintMarginPct → call
+  // (Position × price_ratio - Loan) / (Position × price_ratio) = maintMarginPct
+  // price_ratio = Loan / (Position × (1 - maintMarginPct))
+  var mcPriceRatio=loanL/(positionL*(1-maintMarginPct));
+  var marginCallPrice=Math.round(s.price*mcPriceRatio);
+  var marginCallDropPct=+((1-mcPriceRatio)*100).toFixed(1);
+
+  /* ---- Liquidation threshold (equity = 0) ---- */
+  var liqPriceRatio=loanL/positionL;                 // price at which equity = 0
+  var liquidationPrice=Math.round(s.price*liqPriceRatio);
+  var liquidationDropPct=+((1-liqPriceRatio)*100).toFixed(1);
+
+  /* ---- Funding cost ---- */
+  var annualFundingCostPct=+((leverage-1)*borrowRate).toFixed(1);
+  var fundingDragPct=+((leverage-1)*(borrowRate-rf)).toFixed(1);
+
+  /* ---- Return calculations ---- */
+  var leveragedGrossReturn=+(leverage*s.ret1y).toFixed(1);
+  var leveragedNetReturn=+(leveragedGrossReturn-annualFundingCostPct).toFixed(1);
+
+  /* ---- Sharpe calculations ---- */
+  var excessReturn=+(s.ret1y-rf).toFixed(1);
+  var unleveragedSharpe=+(excessReturn/s.vol).toFixed(2);
+  var levExcessReturn=+(leverage*s.ret1y-(leverage-1)*borrowRate-rf).toFixed(1);
+  var levVol=+(leverage*s.vol).toFixed(1);
+  var leveragedSharpe=+(levExcessReturn/levVol).toFixed(2);
+
+  /* ---- Max leverage before wipeout at 1 std dev move ---- */
+  var oneSigmaDrop=s.vol;  // approximate annual 1-sigma move %
+  // Max leverage where 1-sigma drop wipes equity: L × sigmaMove = 1 (100% of equity)
+  var maxLev1Sigma=+(100/s.vol).toFixed(1);
+
+  /* ---- Named booleans ---- */
+  var isHighVol=s.vol>25;
+  var isHighBeta=s.beta>1.2;
+  var isPositiveReturn=s.ret1y>0;
+  var isPositiveLevReturn=leveragedNetReturn>0;
+  var isMarginCallClose=marginCallDropPct<10;
+  var isLiquidationClose=liquidationDropPct<20;
+  var isSharpeImproved=leveragedSharpe>unleveragedSharpe;
+  var isHighMaxLev=maxLev1Sigma>5;
+  var isLowMaxLev=maxLev1Sigma<3;
+
+  /* ---- Sign strings (named) ---- */
+  var ret1ySign=s.ret1y>=0?'+':'';
+  var levGrossSign=leveragedGrossReturn>=0?'+':'';
+  var levNetSign=leveragedNetReturn>=0?'+':'';
+  var unlSharpeSign=unleveragedSharpe>=0?'+':'';
+  var levSharpeSign=leveragedSharpe>=0?'+':'';
+  var excessRetSign=excessReturn>=0?'+':'';
+
+  /* ---- CSS class names (named) ---- */
+  var ret1yClass=isPositiveReturn?'up':'down';
+  var levNetClass=isPositiveLevReturn?'up':'down';
+  var mcDropClass=isMarginCallClose?'warn':'neutral';
+  var liqDropClass='down';
+
+  var unlSharpeClass;
+  if(unleveragedSharpe>=1.0){unlSharpeClass='good';}
+  else if(unleveragedSharpe>=0.5){unlSharpeClass='ok';}
+  else{unlSharpeClass='bad';}
+
+  var levSharpeClass;
+  if(leveragedSharpe>=1.0){levSharpeClass='good';}
+  else if(leveragedSharpe>=0.5){levSharpeClass='ok';}
+  else{levSharpeClass='bad';}
+
+  /* ---- Leverage risk badge ---- */
+  var riskBadgeClass;
+  var riskBadgeText;
+  if(isHighVol||isMarginCallClose){
+    riskBadgeClass='danger';
+    riskBadgeText='High Margin Risk';
+  } else if(isHighBeta){
+    riskBadgeClass='caution';
+    riskBadgeText='Moderate Risk';
+  } else {
+    riskBadgeClass='safe';
+    riskBadgeText='Lower Risk';
+  }
+
+  /* ---- Danger zone insight text (named) ---- */
+  var marginCallText=isMarginCallClose
+    ?'Margin call is within '+marginCallDropPct+'% — a single adverse day could trigger it given '+s.vol+'% annual vol.'
+    :'Margin call requires a '+marginCallDropPct+'% price drop. Annual vol is '+s.vol+'%, so still manageable.';
+
+  var sharpeText=isSharpeImproved
+    ?'Sharpe ratio improves slightly with leverage here because the stock\'s excess return exceeds the funding spread.'
+    :'Leverage erodes the Sharpe ratio — the funding cost drag ('+fundingDragPct+'% p.a.) outpaces the benefit of amplification.';
+
+  var volWarningText=isHighVol
+    ?'High vol stock ('+s.vol+'%): at 4x leverage, realised volatility reaches '+levVol+'% p.a. — extreme for a single position.'
+    :'Moderate vol ('+s.vol+'%) provides reasonable buffer at 4x. 1-sigma leveraged vol: '+levVol+'% p.a.';
+
+  var maxLevText;
+  if(isHighMaxLev){
+    maxLevText='Conservative vol allows up to ~'+maxLev1Sigma+'x before a 1-sigma annual move wipes equity.';
+  } else if(isLowMaxLev){
+    maxLevText='High vol restricts safe leverage — even a 1-sigma move at '+maxLev1Sigma+'x could cause full wipeout.';
+  } else {
+    maxLevText='Theoretical max safe leverage (1-sigma wipeout): ~'+maxLev1Sigma+'x — factor in buffer before using it.';
+  }
+
+  /* ---- Build HTML ---- */
+  var html='<div class="ctx-header">'
+    +'<div>'
+    +'<div class="ctx-title">'+s.name+'</div>'
+    +'<div class="ctx-subtitle">'+s.sector+' · 4x Leverage Illustration (₹'+aumL+'L equity → ₹'+positionL+'L position)</div>'
+    +'</div>'
+    +'<span class="lev-badge '+riskBadgeClass+'">'+riskBadgeText+'</span>'
+    +'</div>'
+
+    +'<div class="info-grid">'
+    +'<div class="info-card">'
+    +'<div class="ic-label">Leverage</div>'
+    +'<div class="ic-value accent">4x</div>'
+    +'<div class="ic-note">₹'+aumL+'L equity → ₹'+positionL+'L</div>'
+    +'</div>'
+    +'<div class="info-card">'
+    +'<div class="ic-label">1Y Unleveraged</div>'
+    +'<div class="ic-value '+ret1yClass+'">'+ret1ySign+s.ret1y+'%</div>'
+    +'<div class="ic-note">Gross (before fees)</div>'
+    +'</div>'
+    +'<div class="info-card">'
+    +'<div class="ic-label">Net at 4x</div>'
+    +'<div class="ic-value '+levNetClass+'">'+levNetSign+leveragedNetReturn+'%</div>'
+    +'<div class="ic-note">After '+annualFundingCostPct+'% funding cost</div>'
+    +'</div>'
+    +'<div class="info-card">'
+    +'<div class="ic-label">Margin Call At</div>'
+    +'<div class="ic-value warn">'+marginCallDropPct+'%</div>'
+    +'<div class="ic-note">Price drop from here</div>'
+    +'</div>'
+    +'</div>'
+
+    +'<div class="section-title">Margin Cascade — Price Levels at 4x Leverage</div>'
+    +'<div class="margin-cascade">'
+
+    +'<div class="cascade-row">'
+    +'<div class="cascade-dot current"></div>'
+    +'<div class="cascade-label">Current Price</div>'
+    +'<div class="cascade-price current">₹'+s.price.toLocaleString()+'</div>'
+    +'<div class="cascade-bar-track"><div class="cascade-bar-fill" style="width:100%;background:#16a34a"></div></div>'
+    +'<div style="width:72px"></div>'
+    +'</div>'
+
+    +'<div class="cascade-row">'
+    +'<div class="cascade-dot margin-call"></div>'
+    +'<div class="cascade-label">Margin Call</div>'
+    +'<div class="cascade-price margin-call">₹'+marginCallPrice.toLocaleString()+'</div>'
+    +'<div class="cascade-bar-track"><div class="cascade-bar-fill" style="width:'+mcPriceRatio.toFixed(3)*100+'%;background:#d97706"></div></div>'
+    +'<div class="cascade-drop margin-call">-'+marginCallDropPct+'%</div>'
+    +'</div>'
+
+    +'<div class="cascade-row">'
+    +'<div class="cascade-dot liquidation"></div>'
+    +'<div class="cascade-label">Full Wipeout</div>'
+    +'<div class="cascade-price liquidation">₹'+liquidationPrice.toLocaleString()+'</div>'
+    +'<div class="cascade-bar-track"><div class="cascade-bar-fill" style="width:'+liqPriceRatio.toFixed(3)*100+'%;background:#dc2626"></div></div>'
+    +'<div class="cascade-drop liquidation">-'+liquidationDropPct+'%</div>'
+    +'</div>'
+
+    +'</div>'
+
+    +'<div class="section-title">Sharpe at 1x vs 4x Leverage</div>'
+    +'<div class="sharpe-compare">'
+    +'<div class="sharpe-card">'
+    +'<div class="sharpe-title">Unleveraged (1x)</div>'
+    +'<div class="sharpe-val '+unlSharpeClass+'">'+unlSharpeSign+unleveragedSharpe+'</div>'
+    +'<div class="sharpe-sub">Excess return: '+excessRetSign+excessReturn+'% / Vol: '+s.vol+'%</div>'
+    +'</div>'
+    +'<div class="sharpe-card leveraged">'
+    +'<div class="sharpe-title">Leveraged (4x)</div>'
+    +'<div class="sharpe-val '+levSharpeClass+'">'+levSharpeSign+leveragedSharpe+'</div>'
+    +'<div class="sharpe-sub">Net return: '+levNetSign+leveragedNetReturn+'% / Vol: '+levVol+'%</div>'
+    +'</div>'
+    +'</div>'
+
+    +'<div class="section-title">Funding Cost Breakdown</div>'
+    +'<table class="cost-table">'
+    +'<thead><tr><th>Component</th><th>Rate</th><th>On Loan (₹'+loanL+'L)</th></tr></thead>'
+    +'<tbody>'
+    +'<tr><td>Prime broker rate</td>'
+    +'<td class="mono">'+borrowRate+'% p.a.</td>'
+    +'<td class="mono color-down">-₹'+((loanL*borrowRate)/100).toFixed(2)+'L/yr</td></tr>'
+    +'<tr><td>Risk-free rate (opportunity cost)</td>'
+    +'<td class="mono">'+rf+'% p.a.</td>'
+    +'<td class="mono color-down">-₹'+((loanL*rf)/100).toFixed(2)+'L/yr</td></tr>'
+    +'<tr><td>Net funding spread drag</td>'
+    +'<td class="mono">'+(borrowRate-rf).toFixed(1)+'% p.a.</td>'
+    +'<td class="mono color-down">-'+fundingDragPct+'% on equity</td></tr>'
+    +'<tr class="total"><td>Total annual funding cost</td>'
+    +'<td class="mono">'+annualFundingCostPct+'% p.a.</td>'
+    +'<td class="mono color-down">-₹'+((loanL*borrowRate)/100).toFixed(2)+'L/yr</td></tr>'
+    +'</tbody></table>'
+
+    +'<div class="callout">'
+    +'<strong>Leverage Insight:</strong> '+sharpeText+' '
+    +volWarningText+' '
+    +maxLevText
+    +'</div>'
+
+    +'<div class="callout-danger">'
+    +'<strong>Margin Risk:</strong> '+marginCallText+' '
+    +'At 4x leverage, the position requires a '+liquidationDropPct+'% price decline to reach full wipeout — equivalent to '+(+(liquidationDropPct/s.vol).toFixed(1))+' annual standard deviations. Prime broker may force partial liquidation before that threshold.'
+    +'</div>';
+
+  document.getElementById('ctx2').innerHTML=html;
+}
+
+function unlockPro(){
+  alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');
+}
+
+renderStocks(STOCKS);
+</script>
+</body>
+</html>

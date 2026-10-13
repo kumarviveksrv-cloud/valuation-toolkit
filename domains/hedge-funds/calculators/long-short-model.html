@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Long/Short Model · Hedge Funds · ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
+  --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;
+  --accent:#7c3aed;--accent-bg:#f5f3ff;--accent-border:#ddd6fe;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.5}
+.nav{display:flex;align-items:center;gap:8px;padding:14px 24px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.nav a{font-size:13px;color:var(--muted);text-decoration:none}.nav a:hover{color:var(--text)}
+.nav-sep{color:var(--border);font-size:13px}
+.nav-cur{font-size:13px;font-weight:600}
+.hero{padding:32px 24px 24px;max-width:860px;margin:0 auto}
+.badge-row{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.04em}
+.badge-domain{background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-border)}
+.badge-free{background:#dcfce7;color:#16a34a;border:1px solid #bbf7d0}
+.badge-num{background:var(--card);color:var(--muted);border:1px solid var(--border)}
+h1{font-size:clamp(22px,4vw,30px);font-weight:800;line-height:1.2;margin-bottom:8px}
+.sub{color:var(--muted);font-size:15px;max-width:580px}
+.tabs{display:flex;border-bottom:2px solid var(--border);margin:0 24px;overflow-x:auto}
+.tab{padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;color:var(--muted);transition:color .15s}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab.done{color:var(--green)}
+.tab.locked{color:var(--border);cursor:default}
+.step{display:none;padding:24px;max-width:860px;margin:0 auto}
+.step.active{display:block}
+
+/* STEP 1 — PICKER */
+.pair-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.picker-label{font-size:13px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.picker-label .side-badge{font-size:11px;padding:2px 8px;border-radius:10px;font-weight:700}
+.long-badge{background:#dcfce7;color:#16a34a}
+.short-badge{background:#fee2e2;color:#dc2626}
+.search-box{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none;margin-bottom:8px}
+.search-box:focus{border-color:var(--accent)}
+.mini-grid{display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto}
+.mini-card{border:1px solid var(--border);border-radius:8px;padding:10px 12px;cursor:pointer;transition:all .15s}
+.mini-card:hover{border-color:var(--accent);background:var(--accent-bg)}
+.mini-card.selected-long{border-color:var(--green);background:#f0fdf4}
+.mini-card.selected-short{border-color:var(--red);background:#fff5f5}
+.mini-name{font-size:13px;font-weight:700}
+.mini-meta{font-size:11px;color:var(--muted);display:flex;gap:10px;margin-top:3px}
+.mini-val{font-family:'JetBrains Mono',monospace;font-weight:600}
+.btn-next{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:11px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:20px;transition:opacity .15s}
+.btn-next:hover{opacity:.88}
+.btn-next:disabled{opacity:.4;cursor:default}
+
+/* STEP 2 — LOADING + CONTEXT */
+.loading-box{text-align:center;padding:40px 20px}
+.loading-title{font-size:18px;font-weight:700;margin-bottom:8px}
+.loading-sub{font-size:14px;color:var(--muted);margin-bottom:28px}
+.progress-outer{width:100%;max-width:420px;margin:0 auto 20px;height:8px;background:var(--border);border-radius:6px;overflow:hidden}
+.progress-bar{height:100%;background:var(--accent);border-radius:6px;width:0;transition:width .4s ease}
+.loading-steps{display:flex;flex-direction:column;gap:8px;max-width:320px;margin:0 auto;text-align:left}
+.loading-step{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.loading-step.done{color:var(--green)}
+.loading-step.active{color:var(--accent);font-weight:600}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--border);flex-shrink:0}
+.loading-step.done .step-dot{background:var(--green)}
+.loading-step.active .step-dot{background:var(--accent)}
+
+/* CONTEXT */
+.ctx-section{margin-bottom:28px}
+.ctx-title{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px}
+.pair-compare{display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;margin-bottom:20px}
+.pair-side{border:1px solid var(--border);border-radius:10px;padding:16px}
+.pair-side.long-side{border-color:#86efac;background:#f0fdf4}
+.pair-side.short-side{border-color:#fca5a5;background:#fff5f5}
+.pair-side-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.long-side .pair-side-label{color:var(--green)}
+.short-side .pair-side-label{color:var(--red)}
+.pair-name{font-size:16px;font-weight:800;margin-bottom:6px}
+.pair-stats{display:flex;flex-direction:column;gap:4px;font-size:13px}
+.pair-stat-row{display:flex;justify-content:space-between}
+.pair-stat-label{color:var(--muted)}
+.pair-stat-val{font-weight:700;font-family:'JetBrains Mono',monospace}
+.vs-circle{width:40px;height:40px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:var(--muted);flex-shrink:0}
+
+/* SPREAD BAR */
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.bar-label{font-size:13px;font-weight:600;min-width:120px}
+.bar-bg{flex:1;height:8px;background:var(--border);border-radius:6px;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px}
+.bar-val{font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;min-width:52px;text-align:right}
+
+/* SCENARIO TABLE */
+.scenario-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px}
+.scenario-table th{background:var(--card);padding:8px 12px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:2px solid var(--border)}
+.scenario-table td{padding:9px 12px;border-bottom:1px solid var(--border)}
+.scenario-table tr:last-child td{border-bottom:none}
+.mono{font-family:'JetBrains Mono',monospace;font-weight:700}
+.pos{color:var(--green)}.neg{color:var(--red)}
+
+/* TEACH CARDS */
+.teach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:20px}
+.teach-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px}
+.teach-icon{font-size:20px;margin-bottom:8px}
+.teach-head{font-size:13px;font-weight:700;margin-bottom:4px}
+.teach-body{font-size:12px;color:var(--muted);line-height:1.55}
+
+/* STAT ROW */
+.stat-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:20px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.stat-val{font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;margin-bottom:4px}
+.stat-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+
+/* STEPS 3+4 (FREE — visible) */
+.inputs-section{margin-bottom:24px}
+.inputs-title{font-size:14px;font-weight:700;margin-bottom:14px}
+.input-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px}
+.input-group{display:flex;flex-direction:column;gap:4px}
+.input-group label{font-size:12px;font-weight:600;color:var(--muted)}
+.input-group input,.input-group select{padding:9px 11px;border:1px solid var(--border);border-radius:7px;font-size:14px;font-family:inherit;outline:none}
+.input-group input:focus,.input-group select:focus{border-color:var(--accent)}
+.btn-calc{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:11px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s}
+.btn-calc:hover{opacity:.88}
+
+/* RESULTS */
+.results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:24px}
+.result-card{border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+.result-val{font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;margin-bottom:4px}
+.result-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.scenario-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px}
+.scenario-col{border:1px solid var(--border);border-radius:10px;padding:16px}
+.scenario-col.good{border-color:#86efac;background:#f0fdf4}
+.scenario-col.bad{border-color:#fca5a5;background:#fff5f5}
+.scenario-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.good .scenario-title{color:var(--green)}
+.bad .scenario-title{color:var(--red)}
+.scenario-stat{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;border-bottom:1px solid var(--border)}
+.scenario-stat:last-child{border-bottom:none}
+
+@media(max-width:640px){
+  .pair-row{grid-template-columns:1fr}
+  .pair-compare{grid-template-columns:1fr;gap:8px}
+  .vs-circle{display:none}
+  .scenario-grid{grid-template-columns:1fr}
+  .nav,.step{padding-left:16px;padding-right:16px}
+  .tabs{margin:0 16px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/valuation-toolkit/">ValuationDesk</a><span class="nav-sep">›</span>
+  <a href="/valuation-toolkit/domains/hedge-funds/">Hedge Funds</a><span class="nav-sep">›</span>
+  <a href="/valuation-toolkit/domains/hedge-funds/calculators/">Calculators</a><span class="nav-sep">›</span>
+  <span class="nav-cur">Long/Short Model</span>
+</nav>
+
+<div class="hero">
+  <div class="badge-row">
+    <span class="badge badge-domain">Hedge Funds</span>
+    <span class="badge badge-free">FREE</span>
+    <span class="badge badge-num">01 of 07</span>
+  </div>
+  <h1>Long/Short Model</h1>
+  <p class="sub">Pick a long and a short stock, set position sizes, and model your pair trade P&L across bull, base, and bear scenarios with beta-adjusted returns.</p>
+</div>
+
+<div class="tabs">
+  <div class="tab active" id="tab1" onclick="goStep(1)">1 · Pick Pair</div>
+  <div class="tab" id="tab2" onclick="goStep(2)">2 · Trade Context</div>
+  <div class="tab" id="tab3" onclick="goStep(3)">3 · Position Size</div>
+  <div class="tab" id="tab4" onclick="goStep(4)">4 · P&L Results</div>
+</div>
+
+<!-- STEP 1 -->
+<div class="step active" id="step1">
+  <div class="pair-row">
+    <div>
+      <div class="picker-label">
+        <span class="side-badge long-badge">LONG</span> Pick your long stock
+      </div>
+      <input class="search-box" type="text" id="searchLong" placeholder="Search name or sector…" oninput="filterGrid('long')">
+      <div class="mini-grid" id="gridLong"></div>
+    </div>
+    <div>
+      <div class="picker-label">
+        <span class="side-badge short-badge">SHORT</span> Pick your short stock
+      </div>
+      <input class="search-box" type="text" id="searchShort" placeholder="Search name or sector…" oninput="filterGrid('short')">
+      <div class="mini-grid" id="gridShort"></div>
+    </div>
+  </div>
+  <div id="pairStatus" style="font-size:13px;color:var(--muted);margin-top:4px">Pick one long and one short stock to continue.</div>
+  <button class="btn-next" id="btnStep2" onclick="goStep(2)" disabled>Build Trade Context →</button>
+</div>
+
+<!-- STEP 2 -->
+<div class="step" id="step2">
+  <div id="loadingBox" class="loading-box">
+    <div class="loading-title">Analysing Your Pair Trade…</div>
+    <div class="loading-sub" id="loadingDesc">Pulling market data and computing spread metrics</div>
+    <div class="progress-outer"><div class="progress-bar" id="progBar"></div></div>
+    <div class="loading-steps" id="loadingSteps">
+      <div class="loading-step active" id="ls1"><span class="step-dot"></span>Fetching long position metrics</div>
+      <div class="loading-step" id="ls2"><span class="step-dot"></span>Fetching short position metrics</div>
+      <div class="loading-step" id="ls3"><span class="step-dot"></span>Computing beta spread</div>
+      <div class="loading-step" id="ls4"><span class="step-dot"></span>Building scenario framework</div>
+      <div class="loading-step" id="ls5"><span class="step-dot"></span>Ready</div>
+    </div>
+  </div>
+  <div id="ctxBox" style="display:none"></div>
+</div>
+
+<!-- STEP 3 -->
+<div class="step" id="step3">
+  <div class="inputs-section">
+    <div class="inputs-title">Position Sizing</div>
+    <div class="input-grid">
+      <div class="input-group">
+        <label>Fund AUM (₹ Cr)</label>
+        <input type="number" id="aum" value="500" min="10">
+      </div>
+      <div class="input-group">
+        <label>Long Position (% of AUM)</label>
+        <input type="number" id="longPct" value="8" min="1" max="30">
+      </div>
+      <div class="input-group">
+        <label>Short Position (% of AUM)</label>
+        <input type="number" id="shortPct" value="6" min="1" max="30">
+      </div>
+      <div class="input-group">
+        <label>Holding Period (months)</label>
+        <input type="number" id="holdMonths" value="6" min="1" max="36">
+      </div>
+      <div class="input-group">
+        <label>Bull Case Long Return (%)</label>
+        <input type="number" id="longBull" value="25" step="0.5">
+      </div>
+      <div class="input-group">
+        <label>Bull Case Short Return (%)</label>
+        <input type="number" id="shortBull" value="-10" step="0.5">
+      </div>
+      <div class="input-group">
+        <label>Bear Case Long Return (%)</label>
+        <input type="number" id="longBear" value="-12" step="0.5">
+      </div>
+      <div class="input-group">
+        <label>Bear Case Short Return (%)</label>
+        <input type="number" id="shortBear" value="15" step="0.5">
+      </div>
+    </div>
+    <button class="btn-calc" onclick="calcResults()">Calculate P&L →</button>
+  </div>
+</div>
+
+<!-- STEP 4 -->
+<div class="step" id="step4">
+  <div id="results"></div>
+</div>
+
+<script>
+var STOCKS=[
+  {id:1,name:'Reliance Industries',sector:'Oil & Gas',price:2840,beta:0.95,vol:18.2,pe:24.8,ret1y:8.2,momentum6m:4.8,shortInt:1.2,ivol:22.4,alpha1y:240,factor:'quality'},
+  {id:2,name:'HDFC Bank',sector:'Banking',price:1720,beta:0.88,vol:16.4,pe:18.2,ret1y:12.4,momentum6m:6.2,shortInt:0.8,ivol:19.8,alpha1y:180,factor:'quality'},
+  {id:3,name:'Infosys',sector:'IT',price:1840,beta:0.82,vol:19.8,pe:22.4,ret1y:18.6,momentum6m:9.4,shortInt:2.4,ivol:24.2,alpha1y:320,factor:'growth'},
+  {id:4,name:'ICICI Bank',sector:'Banking',price:1240,beta:1.12,vol:20.4,pe:17.6,ret1y:24.8,momentum6m:12.4,shortInt:1.8,ivol:22.8,alpha1y:420,factor:'value'},
+  {id:5,name:'TCS',sector:'IT',price:3980,beta:0.72,vol:15.6,pe:26.8,ret1y:6.8,momentum6m:3.2,shortInt:0.6,ivol:17.4,alpha1y:80,factor:'quality'},
+  {id:6,name:'Bharti Airtel',sector:'Telecom',price:1580,beta:0.78,vol:22.4,pe:48.2,ret1y:42.4,momentum6m:22.8,shortInt:3.2,ivol:28.4,alpha1y:680,factor:'momentum'},
+  {id:7,name:'Kotak Mahindra Bank',sector:'Banking',price:1840,beta:0.94,vol:18.8,pe:19.4,ret1y:8.4,momentum6m:4.8,shortInt:1.4,ivol:21.2,alpha1y:120,factor:'quality'},
+  {id:8,name:'L&T',sector:'Capital Goods',price:3640,beta:1.24,vol:24.8,pe:34.2,ret1y:28.4,momentum6m:14.2,shortInt:2.8,ivol:28.8,alpha1y:520,factor:'momentum'},
+  {id:9,name:'Axis Bank',sector:'Banking',price:1180,beta:1.18,vol:22.8,pe:14.8,ret1y:16.4,momentum6m:8.4,shortInt:4.2,ivol:26.4,alpha1y:280,factor:'value'},
+  {id:10,name:'Maruti Suzuki',sector:'Auto',price:12400,beta:0.84,vol:21.2,pe:28.4,ret1y:14.2,momentum6m:7.2,shortInt:1.2,ivol:23.4,alpha1y:200,factor:'quality'},
+  {id:11,name:'Sun Pharmaceutical',sector:'Pharma',price:1720,beta:0.64,vol:17.4,pe:38.4,ret1y:32.4,momentum6m:16.8,shortInt:2.2,ivol:22.8,alpha1y:580,factor:'momentum'},
+  {id:12,name:'HUL',sector:'FMCG',price:2480,beta:0.42,vol:14.2,pe:52.4,ret1y:2.4,momentum6m:1.2,shortInt:0.8,ivol:16.4,alpha1y:-80,factor:'quality'},
+  {id:13,name:'ITC',sector:'FMCG',price:468,beta:0.58,vol:16.8,pe:24.8,ret1y:12.4,momentum6m:6.4,shortInt:1.8,ivol:18.4,alpha1y:180,factor:'value'},
+  {id:14,name:'Asian Paints',sector:'Materials',price:2780,beta:0.48,vol:19.4,pe:58.4,ret1y:-14.2,momentum6m:-8.2,shortInt:5.8,ivol:26.4,alpha1y:-380,factor:'growth'},
+  {id:15,name:'Bajaj Finance',sector:'NBFC',price:7240,beta:1.42,vol:26.4,pe:34.8,ret1y:8.4,momentum6m:4.8,shortInt:6.4,ivol:32.4,alpha1y:120,factor:'growth'},
+  {id:16,name:'Wipro',sector:'IT',price:580,beta:0.88,vol:22.8,pe:20.8,ret1y:6.4,momentum6m:3.2,shortInt:2.4,ivol:26.4,alpha1y:80,factor:'value'},
+  {id:17,name:'NTPC',sector:'Power',price:384,beta:0.74,vol:20.4,pe:18.4,ret1y:32.4,momentum6m:16.8,shortInt:1.4,ivol:22.8,alpha1y:580,factor:'momentum'},
+  {id:18,name:'Power Grid',sector:'Power',price:328,beta:0.68,vol:18.4,pe:20.4,ret1y:28.4,momentum6m:14.2,shortInt:1.2,ivol:20.4,alpha1y:480,factor:'value'},
+  {id:19,name:'Titan',sector:'Consumer',price:3640,beta:0.82,vol:24.8,pe:84.2,ret1y:4.2,momentum6m:2.4,shortInt:3.8,ivol:28.4,alpha1y:-40,factor:'growth'},
+  {id:20,name:'UltraTech Cement',sector:'Materials',price:11240,beta:0.94,vol:22.4,pe:42.4,ret1y:8.4,momentum6m:4.8,shortInt:2.4,ivol:25.4,alpha1y:120,factor:'quality'},
+  {id:21,name:'HCL Technologies',sector:'IT',price:1680,beta:0.78,vol:20.4,pe:24.8,ret1y:22.4,momentum6m:11.4,shortInt:1.8,ivol:22.4,alpha1y:380,factor:'value'},
+  {id:22,name:'M&M',sector:'Auto',price:2940,beta:1.08,vol:26.4,pe:28.4,ret1y:42.8,momentum6m:22.4,shortInt:2.8,ivol:30.4,alpha1y:720,factor:'momentum'},
+  {id:23,name:'JSW Steel',sector:'Materials',price:980,beta:1.48,vol:28.8,pe:22.4,ret1y:4.8,momentum6m:2.4,shortInt:8.2,ivol:36.4,alpha1y:-40,factor:'value'},
+  {id:24,name:'Adani Ports',sector:'Infrastructure',price:1380,beta:1.28,vol:26.4,pe:32.4,ret1y:24.4,momentum6m:12.4,shortInt:4.2,ivol:32.4,alpha1y:420,factor:'momentum'},
+  {id:25,name:'Tata Motors',sector:'Auto',price:980,beta:1.58,vol:32.4,pe:8.4,ret1y:24.4,momentum6m:12.4,shortInt:9.4,ivol:38.4,alpha1y:420,factor:'value'},
+  {id:26,name:'HDFC Life',sector:'Insurance',price:680,beta:0.72,vol:18.4,pe:72.4,ret1y:8.4,momentum6m:4.2,shortInt:2.2,ivol:22.4,alpha1y:120,factor:'growth'},
+  {id:27,name:'SBI',sector:'Banking',price:840,beta:1.32,vol:26.4,pe:10.8,ret1y:28.4,momentum6m:14.2,shortInt:3.8,ivol:30.4,alpha1y:480,factor:'value'},
+  {id:28,name:'Tech Mahindra',sector:'IT',price:1480,beta:0.98,vol:26.4,pe:38.4,ret1y:8.4,momentum6m:4.2,shortInt:4.2,ivol:30.4,alpha1y:120,factor:'growth'},
+  {id:29,name:'Nestle India',sector:'FMCG',price:24800,beta:0.38,vol:16.4,pe:68.4,ret1y:-4.8,momentum6m:-2.4,shortInt:1.2,ivol:18.4,alpha1y:-160,factor:'quality'},
+  {id:30,name:'Cipla',sector:'Pharma',price:1540,beta:0.68,vol:18.8,pe:28.4,ret1y:18.4,momentum6m:9.4,shortInt:2.4,ivol:22.4,alpha1y:320,factor:'momentum'}
+];
+
+var longPick=null,shortPick=null;
+var filteredLong=STOCKS.slice(),filteredShort=STOCKS.slice();
+
+function fmt(n,d){return Number(n).toLocaleString('en-IN',{minimumFractionDigits:d||0,maximumFractionDigits:d||0});}
+
+function renderGrid(side){
+  var list=side==='long'?filteredLong:filteredShort;
+  var h='';
+  list.forEach(function(s){
+    var isSelL=longPick&&longPick.id===s.id;
+    var isSelS=shortPick&&shortPick.id===s.id;
+    var cls='mini-card';
+    if(side==='long'&&isSelL) cls+=' selected-long';
+    if(side==='short'&&isSelS) cls+=' selected-short';
+    var alphaSign=s.alpha1y>=0?'+':'';
+    h+='<div class="'+cls+'" onclick="pick(\''+side+'\','+s.id+')">';
+    h+='<div class="mini-name">'+s.name+'</div>';
+    h+='<div class="mini-meta"><span class="mini-val">₹'+fmt(s.price)+'</span><span>β '+s.beta+'</span><span>α '+alphaSign+s.alpha1y+'bps</span><span>6M: '+(s.momentum6m>=0?'+':'')+s.momentum6m+'%</span></div>';
+    h+='</div>';
+  });
+  document.getElementById('grid'+cap(side)).innerHTML=h;
+}
+
+function cap(s){return s.charAt(0).toUpperCase()+s.slice(1);}
+
+function filterGrid(side){
+  var q=document.getElementById('search'+cap(side)).value.toLowerCase().trim();
+  if(side==='long') filteredLong=q?STOCKS.filter(function(s){return s.name.toLowerCase().includes(q)||s.sector.toLowerCase().includes(q);}):STOCKS.slice();
+  else filteredShort=q?STOCKS.filter(function(s){return s.name.toLowerCase().includes(q)||s.sector.toLowerCase().includes(q);}):STOCKS.slice();
+  renderGrid(side);
+}
+
+function pick(side,id){
+  if(side==='long') longPick=STOCKS.find(function(s){return s.id===id;});
+  else shortPick=STOCKS.find(function(s){return s.id===id;});
+  renderGrid('long');renderGrid('short');
+  updateStatus();
+}
+
+function updateStatus(){
+  var hasBoth=longPick&&shortPick;
+  var isSame=longPick&&shortPick&&longPick.id===shortPick.id;
+  var st=document.getElementById('pairStatus');
+  var btn=document.getElementById('btnStep2');
+  if(isSame){st.textContent='Long and short must be different stocks.';btn.disabled=true;}
+  else if(hasBoth){st.textContent='Pair: LONG '+longPick.name+' / SHORT '+shortPick.name;btn.disabled=false;}
+  else if(longPick){st.textContent='Long: '+longPick.name+'. Now pick your short.';btn.disabled=true;}
+  else if(shortPick){st.textContent='Short: '+shortPick.name+'. Now pick your long.';btn.disabled=true;}
+  else{st.textContent='Pick one long and one short stock to continue.';btn.disabled=true;}
+}
+
+function goStep(n){
+  [1,2,3,4].forEach(function(i){
+    document.getElementById('step'+i).classList.toggle('active',i===n);
+    var t=document.getElementById('tab'+i);
+    t.classList.remove('active','done','locked');
+    if(i<n) t.classList.add('done');
+    else if(i===n) t.classList.add('active');
+    else t.classList.add('locked');
+  });
+  if(n===2) startLoading();
+}
+
+var loadingDone=false;
+function startLoading(){
+  if(loadingDone) return;
+  var box=document.getElementById('loadingBox');
+  var ctx=document.getElementById('ctxBox');
+  box.style.display='block';ctx.style.display='none';
+  var steps=['ls1','ls2','ls3','ls4','ls5'];
+  var labels=['Fetching long position metrics','Fetching short position metrics','Computing beta spread','Building scenario framework','Ready'];
+  var pcts=[0,20,40,65,85,100];
+  var i=0;
+  var bar=document.getElementById('progBar');
+  function next(){
+    if(i>0){
+      var prev=document.getElementById(steps[i-1]);
+      prev.classList.remove('active');prev.classList.add('done');
+    }
+    if(i<steps.length){
+      var cur=document.getElementById(steps[i]);
+      cur.classList.add('active');
+      document.getElementById('loadingDesc').textContent=labels[i];
+      bar.style.width=pcts[i+1]+'%';
+      i++;
+      setTimeout(next,i===5?800:900);
+    } else {
+      bar.style.width='100%';
+      setTimeout(function(){
+        box.style.display='none';
+        buildContext();
+        ctx.style.display='block';
+        loadingDone=true;
+      },400);
+    }
+  }
+  next();
+}
+
+function buildContext(){
+  var L=longPick,S=shortPick;
+  var betaSpread=Math.round((L.beta-S.beta)*100)/100;
+  var isBetaNeutral=Math.abs(betaSpread)<0.15;
+  var isLongHighBeta=L.beta>S.beta;
+  var momentumSpread=L.momentum6m-S.momentum6m;
+  var isMomentumFavourable=momentumSpread>0;
+  var alphaDiff=L.alpha1y-S.alpha1y;
+  var isAlphaFavourable=alphaDiff>0;
+  var isSameSector=L.sector===S.sector;
+
+  /* Net/Gross exposure placeholders */
+  var longPctVal=8,shortPctVal=6;
+  var grossExp=longPctVal+shortPctVal;
+  var netExp=longPctVal-shortPctVal;
+  var betaAdj=Math.round((L.beta*longPctVal-S.beta*shortPctVal)*10)/10;
+
+  /* Base scenario: half of 1Y returns annualised */
+  var longBase=Math.round(L.ret1y*0.5*10)/10;
+  var shortBase=Math.round(-S.ret1y*0.3*10)/10;
+
+  /* Commentary — named booleans first */
+  var betaNote=isBetaNeutral?'Beta-neutral pair — market moves cancel out, leaving pure stock-selection alpha':'Beta spread of '+betaSpread+' means the pair has a '+(isLongHighBeta?'long':'short')+'-biased market exposure';
+  var momentumNote=isMomentumFavourable?'6M momentum favours the long ('+L.momentum6m.toFixed(1)+'% vs '+S.momentum6m.toFixed(1)+'%) — trend is working for you':'Momentum headwind — the short has recently outperformed ('+S.momentum6m.toFixed(1)+'% vs long\'s '+L.momentum6m.toFixed(1)+'%)';
+  var alphaNote=isAlphaFavourable?'Historical alpha supports the trade: long generated '+(L.alpha1y/100).toFixed(2)+'% vs short\'s '+(S.alpha1y/100).toFixed(2)+'%':'Watch the alpha reversal risk — short has historically outperformed on alpha';
+  var sectorNote=isSameSector?'Same-sector pair ('+L.sector+') — market sector risk nets out cleanly':'Cross-sector pair — '+(L.sector)+' vs '+(S.sector)+'. Carry sector factor risk as a residual exposure';
+
+  var h='';
+  h+='<div class="ctx-section"><div class="ctx-title">Pair Overview</div>';
+  h+='<div class="pair-compare">';
+  h+='<div class="pair-side long-side"><div class="pair-side-label">LONG</div><div class="pair-name">'+L.name+'</div>';
+  h+='<div class="pair-stats">';
+  h+='<div class="pair-stat-row"><span class="pair-stat-label">Price</span><span class="pair-stat-val">₹'+fmt(L.price)+'</span></div>';
+  h+='<div class="pair-stat-row"><span class="pair-stat-label">Beta</span><span class="pair-stat-val">'+L.beta+'</span></div>';
+  h+='<div class="pair-stat-row"><span class="pair-stat-label">1Y Return</span><span class="pair-stat-val">+'+(L.ret1y)+'%</span></div>';
+  h+='<div class="pair-stat-row"><span class="pair-stat-label">6M Momentum</span><span class="pair-stat-val">'+(L.momentum6m>=0?'+':'')+L.momentum6m+'%</span></div>';
+  h+='<div class="pair-stat-row"><span class="pair-stat-label">Alpha (1Y)</span><span class="pair-stat-val">'+(L.alpha1y>=0?'+':'')+L.alpha1y+'bps</span></div>';
+  h+='<div class="pair-stat-row"><span class="pair-stat-label">Factor</span><span class="pair-stat-val">'+L.factor+'</span></div>';
+  h+='</div></div>';
+  h+='<div class="vs-circle">VS</div>';
+  h+='<div class="pair-side short-side"><div class="pair-side-label">SHORT</div><div class="pair-name">'+S.name+'</div>';
+  h+='<div class="pair-stats">';
+  h+='<div class="pair-stat-row"><span class="pair-stat-label">Price</span><span class="pair-stat-val">₹'+fmt(S.price)+'</span></div>';
+  h+='<div class="pair-stat-row"><span class="pair-stat-label">Beta</span><span class="pair-stat-val">'+S.beta+'</span></div>';
+  h+='<div class="pair-stat-row"><span class="pair-stat-label">1Y Return</span><span class="pair-stat-val">'+(S.ret1y>=0?'+':'')+S.ret1y+'%</span></div>';
+  h+='<div class="pair-stat-row"><span class="pair-stat-label">6M Momentum</span><span class="pair-stat-val">'+(S.momentum6m>=0?'+':'')+S.momentum6m+'%</span></div>';
+  h+='<div class="pair-stat-row"><span class="pair-stat-label">Alpha (1Y)</span><span class="pair-stat-val">'+(S.alpha1y>=0?'+':'')+S.alpha1y+'bps</span></div>';
+  h+='<div class="pair-stat-row"><span class="pair-stat-label">Factor</span><span class="pair-stat-val">'+S.factor+'</span></div>';
+  h+='</div></div></div></div>';
+
+  h+='<div class="ctx-section"><div class="ctx-title">Pair Spread Metrics</div>';
+  h+='<div class="bar-row"><div class="bar-label">Long Beta</div><div class="bar-bg"><div class="bar-fill" style="width:'+(L.beta/2*100)+'%;background:#16a34a"></div></div><div class="bar-val">'+L.beta+'</div></div>';
+  h+='<div class="bar-row"><div class="bar-label">Short Beta</div><div class="bar-bg"><div class="bar-fill" style="width:'+(S.beta/2*100)+'%;background:#dc2626"></div></div><div class="bar-val">'+S.beta+'</div></div>';
+  h+='<div class="bar-row"><div class="bar-label">Long Ivol</div><div class="bar-bg"><div class="bar-fill" style="width:'+(L.ivol/50*100)+'%;background:#7c3aed"></div></div><div class="bar-val">'+L.ivol+'%</div></div>';
+  h+='<div class="bar-row"><div class="bar-label">Short Ivol</div><div class="bar-bg"><div class="bar-fill" style="width:'+(S.ivol/50*100)+'%;background:#d97706"></div></div><div class="bar-val">'+S.ivol+'%</div></div>';
+  h+='<div class="stat-row">';
+  h+='<div class="stat-card"><div class="stat-val" style="color:'+(betaSpread>=0?'#16a34a':'#dc2626')+'">'+betaSpread+'</div><div class="stat-label">Beta Spread (L–S)</div></div>';
+  h+='<div class="stat-card"><div class="stat-val" style="color:'+(momentumSpread>=0?'#16a34a':'#dc2626')">'+(momentumSpread>=0?'+':'')+momentumSpread.toFixed(1)+'%</div><div class="stat-label">Momentum Spread</div></div>';
+  h+='<div class="stat-card"><div class="stat-val" style="color:'+(alphaDiff>=0?'#16a34a':'#dc2626')">'+(alphaDiff>=0?'+':'')+alphaDiff+'bps</div><div class="stat-label">Alpha Spread</div></div>';
+  h+='</div></div>';
+
+  h+='<div class="ctx-section"><div class="ctx-title">Trade Thesis Check</div>';
+  [{icon:'📊',txt:betaNote},{icon:'📈',txt:momentumNote},{icon:'✨',txt:alphaNote},{icon:'🏭',txt:sectorNote}].forEach(function(item){
+    h+='<div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:1.6"><span>'+item.icon+'</span><span>'+item.txt+'</span></div>';
+  });
+  h+='</div>';
+
+  h+='<div class="ctx-section"><div class="ctx-title">Key Concepts</div>';
+  h+='<div class="teach-grid">';
+  h+='<div class="teach-card"><div class="teach-icon">📐</div><div class="teach-head">Gross Exposure</div><div class="teach-body">Long% + Short% = total risk deployed. Gross = '+grossExp+'% of AUM in this pair trade.</div></div>';
+  h+='<div class="teach-card"><div class="teach-icon">↔️</div><div class="teach-head">Net Exposure</div><div class="teach-body">Long% − Short% = directional market bet. Net = '+netExp+'%. Lower = more market neutral.</div></div>';
+  h+='<div class="teach-card"><div class="teach-icon">β</div><div class="teach-head">Beta-Adjusted Net</div><div class="teach-body">True market sensitivity = Long% × βL − Short% × βS. Pair target: close to zero for market neutrality.</div></div>';
+  h+='<div class="teach-card"><div class="teach-icon">💰</div><div class="teach-head">Short Revenue</div><div class="teach-body">Shorting earns a rebate (~repo rate minus) and the P&L when the stock falls. Short cost ≈ borrow fee (0.5–5% p.a.).</div></div>';
+  h+='</div></div>';
+
+  h+='<button class="btn-next" onclick="goStep(3)">Set Position Size →</button>';
+  document.getElementById('ctxBox').innerHTML=h;
+}
+
+function calcResults(){
+  var L=longPick,S=shortPick;
+  var aum=parseFloat(document.getElementById('aum').value)||500;
+  var lPct=parseFloat(document.getElementById('longPct').value)||8;
+  var sPct=parseFloat(document.getElementById('shortPct').value)||6;
+  var holdM=parseFloat(document.getElementById('holdMonths').value)||6;
+  var lBull=parseFloat(document.getElementById('longBull').value)||25;
+  var sBull=parseFloat(document.getElementById('shortBull').value)||-10;
+  var lBear=parseFloat(document.getElementById('longBear').value)||-12;
+  var sBear=parseFloat(document.getElementById('shortBear').value)||15;
+
+  var lAmt=aum*lPct/100;
+  var sAmt=aum*sPct/100;
+  var grossExp=lPct+sPct;
+  var netExp=lPct-sPct;
+  var betaAdj=Math.round((L.beta*lPct-S.beta*sPct)*10)/10;
+
+  /* Base case: midpoint */
+  var lBase=(lBull+lBear)/2;
+  var sBase=(sBull+sBear)/2;
+
+  /* P&L calculation helper */
+  function pnl(lRet,sRet){
+    var lPnl=lAmt*lRet/100;
+    var sPnl=sAmt*(-sRet/100); /* short gains when stock falls */
+    return {long:Math.round(lPnl*10)/10,short:Math.round(sPnl*10)/10,total:Math.round((lPnl+sPnl)*10)/10};
+  }
+
+  var bullPnl=pnl(lBull,sBull);
+  var basePnl=pnl(lBase,sBase);
+  var bearPnl=pnl(lBear,sBear);
+
+  /* Return on gross */
+  function pct(n){return Math.round(n/aum*1000)/10;}
+
+  /* Sharpe (rough, base case / vol) */
+  var annFactor=12/holdM;
+  var grossVolEst=(L.vol*lPct/100+S.vol*sPct/100)/grossExp;
+  var baseAnnRet=pct(basePnl.total)*annFactor;
+  var sharpe=Math.round(baseAnnRet/grossVolEst*100)/100;
+
+  goStep(4);
+
+  var h='';
+  h+='<div class="ctx-title" style="margin-bottom:16px">L/S PAIR RESULTS — '+L.name.split(' ')[0]+' LONG / '+S.name.split(' ')[0]+' SHORT</div>';
+
+  h+='<div class="results-grid">';
+  h+='<div class="result-card"><div class="result-val" style="color:var(--accent)">₹'+fmt(lAmt)+'Cr</div><div class="result-label">Long Position</div></div>';
+  h+='<div class="result-card"><div class="result-val" style="color:#dc2626">₹'+fmt(sAmt)+'Cr</div><div class="result-label">Short Position</div></div>';
+  h+='<div class="result-card"><div class="result-val">'+grossExp+'%</div><div class="result-label">Gross Exposure</div></div>';
+  h+='<div class="result-card"><div class="result-val">'+netExp+'%</div><div class="result-label">Net Exposure</div></div>';
+  h+='<div class="result-card"><div class="result-val" style="color:'+(betaAdj<2?'#16a34a':'#d97706')+'">'+betaAdj+'%</div><div class="result-label">Beta-Adj Net</div></div>';
+  h+='<div class="result-card"><div class="result-val" style="color:'+(sharpe>1?'#16a34a':sharpe>0?'#d97706':'#dc2626')+'">'+sharpe+'</div><div class="result-label">Est. Sharpe</div></div>';
+  h+='</div>';
+
+  h+='<div class="ctx-title" style="margin:20px 0 12px">Scenario P&L (₹ Cr)</div>';
+  h+='<div class="scenario-grid">';
+
+  h+='<div class="scenario-col good"><div class="scenario-title">📈 Bull Case</div>';
+  h+='<div class="scenario-stat"><span>Long P&L</span><span class="mono pos">+₹'+bullPnl.long+'Cr</span></div>';
+  h+='<div class="scenario-stat"><span>Short P&L</span><span class="mono '+(bullPnl.short>=0?'pos':'neg')+'">'+(bullPnl.short>=0?'+':'')+bullPnl.short+'Cr</span></div>';
+  h+='<div class="scenario-stat" style="font-weight:700"><span>Total P&L</span><span class="mono '+(bullPnl.total>=0?'pos':'neg')+'">'+(bullPnl.total>=0?'+':'')+bullPnl.total+'Cr ('+pct(bullPnl.total)+'%)</span></div>';
+  h+='</div>';
+
+  h+='<div class="scenario-col bad"><div class="scenario-title">📉 Bear Case</div>';
+  h+='<div class="scenario-stat"><span>Long P&L</span><span class="mono neg">'+bearPnl.long+'Cr</span></div>';
+  h+='<div class="scenario-stat"><span>Short P&L</span><span class="mono '+(bearPnl.short>=0?'pos':'neg')+'">'+(bearPnl.short>=0?'+':'')+bearPnl.short+'Cr</span></div>';
+  h+='<div class="scenario-stat" style="font-weight:700"><span>Total P&L</span><span class="mono '+(bearPnl.total>=0?'pos':'neg')+'">'+(bearPnl.total>=0?'+':'')+bearPnl.total+'Cr ('+pct(bearPnl.total)+'%)</span></div>';
+  h+='</div>';
+
+  h+='</div>';
+
+  h+='<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:13px;margin-top:4px">';
+  h+='<strong>Base Case:</strong> Total P&L = <span class="mono '+(basePnl.total>=0?'pos':'neg')+'">'+(basePnl.total>=0?'+':'')+basePnl.total+'Cr ('+pct(basePnl.total)+'% of AUM)</span> over '+holdM+' months. Annualised: ~'+Math.round(pct(basePnl.total)*annFactor*10)/10+'%.';
+  h+='</div>';
+
+  document.getElementById('results').innerHTML=h;
+}
+
+renderGrid('long');renderGrid('short');
+</script>
+</body>
+</html>
