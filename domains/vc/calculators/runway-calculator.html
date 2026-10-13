@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Runway Calculator — VC Calculators — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;}
+.top-nav{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:56px;}
+.top-nav-logo{font-size:1rem;font-weight:800;color:var(--text);text-decoration:none;letter-spacing:-0.02em;}
+.top-nav-logo strong{font-weight:900;}
+.top-nav-right{display:flex;align-items:center;gap:0.75rem;}
+.top-nav-pro-btn{font-size:0.78rem;font-weight:700;color:#fff;background:var(--text);padding:0.4rem 1rem;border-radius:6px;border:none;cursor:pointer;}
+.domain-nav{background:var(--bg);border-bottom:1px solid var(--border);padding:0 2rem;}
+.domain-nav-inner{display:flex;overflow-x:auto;scrollbar-width:none;}
+.domain-nav-inner::-webkit-scrollbar{display:none;}
+.domain-nav-inner a{display:inline-block;font-size:0.8rem;font-weight:500;color:var(--muted);text-decoration:none;padding:0.65rem 1rem;border-bottom:2px solid transparent;white-space:nowrap;}
+.domain-nav-inner a.active{color:var(--text);font-weight:600;border-bottom-color:var(--text);}
+.step-bar{background:var(--card);border-bottom:1px solid var(--border);padding:0 2rem;}
+.step-bar-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;padding:0.9rem 0;}
+.stp{display:flex;align-items:center;gap:0.45rem;font-size:0.75rem;font-weight:600;color:var(--muted);}
+.stp.active{color:var(--text);}
+.stp.done{color:var(--green);}
+.stp-num{width:22px;height:22px;border-radius:50%;border:2px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;flex-shrink:0;}
+.stp.done .stp-num{background:var(--green);border-color:var(--green);color:#fff;}
+.stp.active .stp-num{background:var(--text);border-color:var(--text);color:#fff;}
+.stp-line{flex:1;height:2px;background:var(--border);margin:0 0.5rem;}
+.stp-done-line{background:var(--green);}
+.calc-section{padding:2.5rem 2rem;display:none;}
+.calc-section.active{display:block;}
+.container{max-width:1100px;margin:0 auto;}
+.breadcrumb{display:flex;align-items:center;gap:0.5rem;font-size:0.78rem;color:var(--muted);margin-bottom:1.5rem;}
+.breadcrumb a{color:var(--muted);text-decoration:none;}
+.breadcrumb span{color:var(--border);}
+.sec-eyebrow{font-family:var(--mono);font-size:0.65rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.4rem;}
+.sec-title{font-size:1.4rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:0.4rem;}
+.sec-sub{font-size:0.85rem;color:var(--muted);margin-bottom:1.5rem;}
+.sector-pills{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1rem;}
+.pill{font-size:0.72rem;font-weight:600;padding:0.3rem 0.7rem;border-radius:20px;border:1px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.pill.active{background:var(--text);color:#fff;border-color:var(--text);}
+.search-input{width:100%;max-width:340px;padding:0.55rem 0.9rem;border:1px solid var(--border);border-radius:7px;font-family:var(--font);font-size:0.82rem;outline:none;margin-bottom:1rem;}
+.co-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0.6rem;margin-bottom:1.5rem;}
+.co-card{border:1px solid var(--border);border-radius:8px;padding:0.75rem 0.9rem;cursor:pointer;transition:all 0.15s;}
+.co-card:hover{border-color:#999;}
+.co-card.selected{border-color:var(--text);box-shadow:0 0 0 2px var(--text);}
+.co-ticker{font-family:var(--mono);font-size:0.62rem;font-weight:700;color:var(--muted);margin-bottom:0.2rem;}
+.co-name{font-size:0.82rem;font-weight:700;margin-bottom:0.15rem;}
+.co-sector{font-size:0.7rem;color:var(--muted);}
+.step-btn{padding:0.65rem 1.5rem;background:var(--text);color:#fff;border:none;border-radius:7px;font-family:var(--font);font-size:0.85rem;font-weight:700;cursor:pointer;}
+.step-btn:disabled{opacity:0.35;cursor:not-allowed;}
+.step-btn-outline{background:transparent;color:var(--text);border:1.5px solid var(--border);}
+.step-nav{display:flex;gap:0.75rem;margin-top:1.5rem;}
+.teach-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2rem;margin-bottom:1.5rem;}
+.teach-title{font-size:1rem;font-weight:800;letter-spacing:-0.01em;margin-bottom:0.9rem;}
+/* Runway gauge visual */
+.runway-gauge{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:1.2rem;}
+.gauge-box{border-radius:10px;padding:1rem;text-align:center;}
+.gauge-box.danger{background:#fef2f2;border:1.5px solid #fecaca;}
+.gauge-box.warning{background:#fffbeb;border:1.5px solid #fef3c7;}
+.gauge-box.safe{background:#f0fdf4;border:1.5px solid #bbf7d0;}
+.gauge-months{font-size:1.6rem;font-weight:900;letter-spacing:-0.03em;margin-bottom:0.2rem;}
+.gauge-box.danger .gauge-months{color:var(--red);}
+.gauge-box.warning .gauge-months{color:var(--amber);}
+.gauge-box.safe .gauge-months{color:var(--green);}
+.gauge-label{font-size:0.72rem;font-weight:700;margin-bottom:0.2rem;}
+.gauge-desc{font-size:0.68rem;color:var(--muted);}
+.teach-table{width:100%;border-collapse:collapse;font-size:0.8rem;margin-bottom:1rem;}
+.teach-table th{text-align:left;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);padding:0.5rem 0.75rem;border-bottom:2px solid var(--border);}
+.teach-table td{padding:0.55rem 0.75rem;border-bottom:1px solid var(--border);vertical-align:top;}
+.teach-table tr:last-child td{border-bottom:none;}
+.formula-box{background:#0a0a0a;border-radius:8px;padding:1rem 1.25rem;margin-bottom:1rem;}
+.formula-box pre{font-family:var(--mono);font-size:0.72rem;color:#e5e5e5;white-space:pre-wrap;}
+.formula-box .cm{color:#6b7280;}
+.ctx-box{border:1px solid var(--border);border-radius:8px;padding:1rem 1.25rem;margin-bottom:1rem;}
+.ctx-label{font-family:var(--mono);font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.4rem;}
+.ctx-row{display:flex;align-items:baseline;gap:0.5rem;margin-bottom:0.2rem;}
+.ctx-key{font-size:0.75rem;color:var(--muted);min-width:150px;}
+.ctx-val{font-size:0.8rem;font-weight:600;color:var(--text);}
+.pro-gate{border:2px dashed var(--border);border-radius:12px;padding:3rem 2rem;text-align:center;margin-bottom:1.5rem;}
+.pro-gate-icon{font-size:2rem;margin-bottom:0.75rem;}
+.pro-gate-title{font-size:1.1rem;font-weight:800;letter-spacing:-0.01em;margin-bottom:0.4rem;}
+.pro-gate-sub{font-size:0.82rem;color:var(--muted);margin-bottom:1.25rem;max-width:400px;margin-left:auto;margin-right:auto;}
+.pro-gate-features{display:flex;flex-wrap:wrap;justify-content:center;gap:0.4rem;margin-bottom:1.5rem;}
+.pro-gate-feature{font-size:0.72rem;font-weight:600;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:0.25rem 0.65rem;}
+.pro-btn{padding:0.7rem 1.75rem;background:var(--text);color:#fff;border:none;border-radius:7px;font-family:var(--font);font-size:0.88rem;font-weight:700;cursor:pointer;}
+.pro-tag{display:inline-block;font-family:var(--mono);font-size:0.58rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:3px;background:var(--text);color:#fff;margin-left:0.4rem;vertical-align:middle;}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <a href="../../../index.html" class="top-nav-logo">Valuation<strong>Desk</strong></a>
+  <div class="top-nav-right">
+    <button onclick="unlockPro()" class="top-nav-pro-btn">Unlock Pro</button>
+  </div>
+</nav>
+<nav class="domain-nav">
+  <div class="domain-nav-inner">
+    <a href="../../valuation-advisory/index.html">Valuation</a>
+    <a href="../../investment-banking/index.html">Investment Banking</a>
+    <a href="../../corporate-finance/index.html">Corporate Finance</a>
+    <a href="../../ma/index.html">M&amp;A</a>
+    <a href="../../pe/index.html">Private Equity</a>
+    <a href="../index.html" class="active">Venture Capital</a>
+  </div>
+</nav>
+
+<div class="step-bar">
+  <div class="step-bar-inner">
+    <div class="stp active" id="si1"><div class="stp-num">1</div><span>Pick Startup</span></div>
+    <div class="stp-line" id="sl1"></div>
+    <div class="stp idle" id="si2"><div class="stp-num">2</div><span>Burn &amp; Runway</span></div>
+    <div class="stp-line" id="sl2"></div>
+    <div class="stp idle" id="si3"><div class="stp-num">3</div><span>Scenario Model <span class="pro-tag">Pro</span></span></div>
+    <div class="stp-line" id="sl3"></div>
+    <div class="stp idle" id="si4"><div class="stp-num">4</div><span>Runway Forecast</span></div>
+  </div>
+</div>
+
+<!-- STEP 1 -->
+<section class="calc-section active" id="s1">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../index.html">Venture Capital</a><span>/</span>
+      <a href="index.html">Calculators</a><span>/</span>
+      <span>Runway Calculator</span>
+    </div>
+    <div class="sec-eyebrow">VC Calculator · Pro</div>
+    <div class="sec-title">Runway Calculator</div>
+    <div class="sec-sub">Calculate months of runway and model hiring plans, revenue ramp, and bridge financing scenarios.</div>
+    <div class="sector-pills" id="sectorPills"></div>
+    <input class="search-input" id="searchInput" placeholder="Search startup or ticker..." oninput="filterCos()">
+    <div class="co-grid" id="coGrid"></div>
+    <button class="step-btn" id="s1btn" onclick="showStep(2)" disabled>Next: Burn &amp; Runway →</button>
+  </div>
+</section>
+
+<!-- STEP 2 -->
+<section class="calc-section" id="s2">
+  <div class="container">
+    <div class="teach-card">
+      <div class="teach-title">Understanding Burn Rate and Runway</div>
+
+      <div class="runway-gauge">
+        <div class="gauge-box danger">
+          <div class="gauge-months">&lt;6</div>
+          <div class="gauge-label">🚨 Danger Zone</div>
+          <div class="gauge-desc">Raise now or cut costs immediately. Investors will sense desperation — your leverage is gone.</div>
+        </div>
+        <div class="gauge-box warning">
+          <div class="gauge-months">6–12</div>
+          <div class="gauge-label">⚠️ Watch Closely</div>
+          <div class="gauge-desc">Begin fundraise now (takes 3–6 months). Model bridge options. Identify quick wins on burn.</div>
+        </div>
+        <div class="gauge-box safe">
+          <div class="gauge-months">18+</div>
+          <div class="gauge-label">✅ Healthy</div>
+          <div class="gauge-desc">Enough cushion to be selective in fundraising. Focus on reaching strong milestones first.</div>
+        </div>
+      </div>
+
+      <div class="formula-box">
+        <pre><span class="cm">// Burn rate</span>
+grossBurn   = totalMonthlyExpenses
+netBurn     = grossBurn - monthlyRevenue
+runway      = cashInBank / netBurn    <span class="cm">// months</span>
+
+<span class="cm">// With revenue ramp (CAGR-adjusted)</span>
+<span class="cm">// Iteratively solve: sum of (netBurn_month_i) = cashInBank</span>
+netBurn_m   = grossBurn - (ARR/12) × (1 + monthlyGrowthRate)^m
+
+<span class="cm">// Default scenario</span>
+defaultDate = today + runway months</pre>
+      </div>
+
+      <table class="teach-table">
+        <thead><tr><th>Metric</th><th>Healthy benchmark (seed–Series A)</th><th>Red flag</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Net burn</strong></td><td>₹30–80L/month at seed; ₹1–5 Cr/month at Series A</td><td>Net burn &gt; 3× comparable seed checks</td></tr>
+          <tr><td><strong>Burn multiple</strong></td><td>&lt;1.5 (best-in-class); &lt;2 (acceptable)</td><td>&gt;3 — burning too much to grow</td></tr>
+          <tr><td><strong>Months to next milestone</strong></td><td>Raise before 6 months of runway left</td><td>Starting raise with &lt;3 months — extremely dangerous</td></tr>
+          <tr><td><strong>Revenue offset</strong></td><td>Revenue should cover 30–50%+ of burn by Series A</td><td>Zero revenue 18 months post-seed</td></tr>
+          <tr><td><strong>Burn multiple formula</strong></td><td>Net Burn ÷ Net New ARR (monthly)</td><td>Tracks efficiency of growth spend</td></tr>
+        </tbody>
+      </table>
+
+      <div class="ctx-box" id="ctxBox">
+        <div class="ctx-label" id="ctxLabel">Sector Context</div>
+        <div id="ctxRows"></div>
+      </div>
+    </div>
+    <div class="step-nav">
+      <button class="step-btn step-btn-outline" onclick="showStep(1)">← Back</button>
+      <button class="step-btn" onclick="showStep(3)">Next: Scenario Model →</button>
+    </div>
+  </div>
+</section>
+
+<!-- STEP 3 — PRO GATE -->
+<section class="calc-section" id="s3">
+  <div class="container">
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <div class="pro-gate-title">Runway Scenario Model — Pro Feature</div>
+      <div class="pro-gate-sub">Enter current cash, burn, and revenue — then model 3 scenarios (base / hire aggressively / cut to extend) to see exact default dates and bridge requirements.</div>
+      <div class="pro-gate-features">
+        <span class="pro-gate-feature">3-scenario runway model</span>
+        <span class="pro-gate-feature">Hiring plan impact</span>
+        <span class="pro-gate-feature">Revenue ramp overlay</span>
+        <span class="pro-gate-feature">Bridge financing calculator</span>
+        <span class="pro-gate-feature">Default date forecast</span>
+        <span class="pro-gate-feature">Month-by-month burn chart</span>
+      </div>
+      <button class="pro-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    </div>
+    <div class="step-nav">
+      <button class="step-btn step-btn-outline" onclick="showStep(2)">← Back</button>
+    </div>
+  </div>
+</section>
+
+<!-- STEP 4 — PRO GATE -->
+<section class="calc-section" id="s4">
+  <div class="container">
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <div class="pro-gate-title">Runway Forecast — Pro Feature</div>
+      <div class="pro-gate-sub">Month-by-month cash burn chart across all scenarios, with fundraising milestone markers and bridge financing overlay.</div>
+      <button class="pro-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    </div>
+  </div>
+</section>
+
+<script>
+const COMPANIES=[
+  {name:'Razorpay',ticker:'RZRPAY',sector:'Fintech'},{name:'Groww',ticker:'GROWW',sector:'Fintech'},
+  {name:'PhonePe',ticker:'PHONEPE',sector:'Fintech'},{name:'CRED',ticker:'CRED',sector:'Fintech'},
+  {name:'Slice',ticker:'SLICE',sector:'Fintech'},{name:'Freshworks',ticker:'FRSH',sector:'SaaS'},
+  {name:'Zoho',ticker:'ZOHO',sector:'SaaS'},{name:'Darwinbox',ticker:'DRWNBX',sector:'SaaS'},
+  {name:'Chargebee',ticker:'CHRGBEE',sector:'SaaS'},{name:'BrowserStack',ticker:'BRSRSTK',sector:'SaaS'},
+  {name:'Meesho',ticker:'MEESHO',sector:'E-commerce'},{name:'Nykaa',ticker:'FSN',sector:'E-commerce'},
+  {name:'Mamaearth',ticker:'HMBL',sector:'D2C/Consumer'},{name:'Purplle',ticker:'PURPLLE',sector:'D2C/Consumer'},
+  {name:'boAt',ticker:'BOAT',sector:'D2C/Consumer'},{name:'Swiggy',ticker:'SWIGGY',sector:'Food Tech'},
+  {name:'Zomato',ticker:'ZOMATO',sector:'Food Tech'},{name:'OfBusiness',ticker:'OFBIZ',sector:'B2B Commerce'},
+  {name:'Udaan',ticker:'UDAAN',sector:'B2B Commerce'},{name:'Lenskart',ticker:'LNKRT',sector:'D2C/Consumer'},
+  {name:'Ola',ticker:'OLA',sector:'Mobility'},{name:'Rapido',ticker:'RAPIDO',sector:'Mobility'},
+  {name:"Byju's",ticker:'BYJU',sector:'EdTech'},{name:'Unacademy',ticker:'UNACAD',sector:'EdTech'},
+  {name:'Delhivery',ticker:'DELHIVERY',sector:'Logistics'},{name:'Ecom Express',ticker:'ECOMEX',sector:'Logistics'},
+  {name:'OYO',ticker:'OYO',sector:'Hospitality'},{name:'ideaForge',ticker:'IDEAFRG',sector:'Deep Tech'},
+  {name:'Agnikul Cosmos',ticker:'AGNIKUL',sector:'Deep Tech'},{name:'InMobi',ticker:'INMOBI',sector:'AdTech/Media'}
+];
+const SECTOR_CONTEXT={
+  'Fintech':{typicalBurn:'₹40–80L/mo (seed)',burnMultiple:'1.5–2.5×',runway:'18 months recommended',revenueOffset:'30–50% of burn by Ser A'},
+  'SaaS':{typicalBurn:'₹30–60L/mo (seed)',burnMultiple:'1–2×',runway:'18–24 months recommended',revenueOffset:'40–60% of burn by Ser A'},
+  'E-commerce':{typicalBurn:'₹80L–1.5 Cr/mo (seed)',burnMultiple:'2–4×',runway:'12–18 months recommended',revenueOffset:'GMV ÷ burn is key metric'},
+  'D2C/Consumer':{typicalBurn:'₹50–80L/mo (seed)',burnMultiple:'1.5–3×',runway:'15–18 months recommended',revenueOffset:'Revenue-positive by Series A'},
+  'Food Tech':{typicalBurn:'₹1–3 Cr/mo (seed)',burnMultiple:'3–6×',runway:'12–18 months recommended',revenueOffset:'Unit economics positive by Ser B'},
+  'B2B Commerce':{typicalBurn:'₹40–80L/mo (seed)',burnMultiple:'1.5–3×',runway:'18 months recommended',revenueOffset:'40–60% of burn by Ser A'},
+  'Mobility':{typicalBurn:'₹80L–2 Cr/mo (seed)',burnMultiple:'2–5×',runway:'12–18 months recommended',revenueOffset:'GMV coverage key metric'},
+  'EdTech':{typicalBurn:'₹50L–1 Cr/mo (seed)',burnMultiple:'2–4×',runway:'15–18 months recommended',revenueOffset:'Revenue-positive by Series A'},
+  'Logistics':{typicalBurn:'₹60–100L/mo (seed)',burnMultiple:'1.5–3×',runway:'18 months recommended',revenueOffset:'50%+ of burn covered by Ser A'},
+  'Hospitality':{typicalBurn:'₹40–80L/mo (seed)',burnMultiple:'2–4×',runway:'15–18 months recommended',revenueOffset:'Unit positive by Ser A'},
+  'Deep Tech':{typicalBurn:'₹20–50L/mo (seed)',burnMultiple:'N/A (pre-revenue)',runway:'24+ months recommended',revenueOffset:'Grant + govt funding supplements'},
+  'AdTech/Media':{typicalBurn:'₹40–80L/mo (seed)',burnMultiple:'1.5–2.5×',runway:'18 months recommended',revenueOffset:'Revenue-positive by Ser A'}
+};
+let activeSector='All',selectedCo=null;
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+function getSectors(){return['All',...new Set(COMPANIES.map(c=>c.sector))];}
+function renderSectors(){
+  document.getElementById('sectorPills').innerHTML=getSectors().map(s=>`<button class="pill${s===activeSector?' active':''}" onclick="setSector('${s}')">${s}</button>`).join('');
+}
+function setSector(s){activeSector=s;renderSectors();filterCos();}
+function filterCos(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const f=COMPANIES.filter(c=>(activeSector==='All'||c.sector===activeSector)&&(c.name.toLowerCase().includes(q)||c.ticker.toLowerCase().includes(q)));
+  document.getElementById('coGrid').innerHTML=f.map(c=>`<div class="co-card${selectedCo&&selectedCo.name===c.name?' selected':''}" data-co='${JSON.stringify(c)}'><div class="co-ticker">${c.ticker}</div><div class="co-name">${c.name}</div><div class="co-sector">${c.sector}</div></div>`).join('');
+}
+document.addEventListener('click',function(e){
+  const card=e.target.closest('.co-card[data-co]');
+  if(!card)return;
+  selectCo(JSON.parse(card.dataset.co));
+});
+function selectCo(c){selectedCo=c;document.getElementById('s1btn').disabled=false;filterCos();}
+function renderCtx(){
+  if(!selectedCo)return;
+  const ctx=SECTOR_CONTEXT[selectedCo.sector]||{};
+  document.getElementById('ctxLabel').textContent=`${selectedCo.sector} — Burn &amp; Runway Benchmarks`;
+  document.getElementById('ctxRows').innerHTML=`
+    <div class="ctx-row"><span class="ctx-key">Typical burn (seed)</span><span class="ctx-val">${ctx.typicalBurn||'—'}</span></div>
+    <div class="ctx-row"><span class="ctx-key">Burn multiple range</span><span class="ctx-val">${ctx.burnMultiple||'—'}</span></div>
+    <div class="ctx-row"><span class="ctx-key">Recommended runway</span><span class="ctx-val">${ctx.runway||'—'}</span></div>
+    <div class="ctx-row"><span class="ctx-key">Revenue offset target</span><span class="ctx-val">${ctx.revenueOffset||'—'}</span></div>
+  `;
+}
+function showStep(n){
+  [1,2,3,4].forEach(i=>{
+    document.getElementById('s'+i).classList.toggle('active',i===n);
+    const si=document.getElementById('si'+i);
+    si.className='stp '+(i<n?'done':i===n?'active':'idle');
+    if(i<4){const ln=document.getElementById('sl'+i);if(ln)ln.className='stp-line'+(i<n?' stp-done-line':'');}
+  });
+  if(n===2&&selectedCo)renderCtx();
+}
+renderSectors();filterCos();
+</script>
+</body>
+</html>

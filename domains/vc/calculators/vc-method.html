@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VC Method Valuation — VC Calculators — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;}
+.top-nav{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:56px;}
+.top-nav-logo{font-size:1rem;font-weight:800;color:var(--text);text-decoration:none;letter-spacing:-0.02em;}
+.top-nav-logo strong{font-weight:900;}
+.top-nav-right{display:flex;align-items:center;gap:0.75rem;}
+.top-nav-pro-btn{font-size:0.78rem;font-weight:700;color:#fff;background:var(--text);text-decoration:none;padding:0.4rem 1rem;border-radius:6px;border:none;cursor:pointer;}
+.domain-nav{background:var(--bg);border-bottom:1px solid var(--border);padding:0 2rem;}
+.domain-nav-inner{display:flex;overflow-x:auto;scrollbar-width:none;}
+.domain-nav-inner::-webkit-scrollbar{display:none;}
+.domain-nav-inner a{display:inline-block;font-size:0.8rem;font-weight:500;color:var(--muted);text-decoration:none;padding:0.65rem 1rem;border-bottom:2px solid transparent;white-space:nowrap;}
+.domain-nav-inner a:hover{color:var(--text);}
+.domain-nav-inner a.active{color:var(--text);font-weight:600;border-bottom-color:var(--text);}
+.step-bar{background:var(--card);border-bottom:1px solid var(--border);padding:0 2rem;}
+.step-bar-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;padding:0.9rem 0;gap:0;}
+.stp{display:flex;align-items:center;gap:0.45rem;font-size:0.75rem;font-weight:600;color:var(--muted);}
+.stp.active{color:var(--text);}
+.stp.done{color:var(--green);}
+.stp-num{width:22px;height:22px;border-radius:50%;border:2px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;flex-shrink:0;}
+.stp.done .stp-num{background:var(--green);border-color:var(--green);color:#fff;}
+.stp.active .stp-num{background:var(--text);border-color:var(--text);color:#fff;}
+.stp-line{flex:1;height:2px;background:var(--border);margin:0 0.5rem;}
+.stp-done-line{background:var(--green);}
+.calc-section{padding:2.5rem 2rem;display:none;}
+.calc-section.active{display:block;}
+.container{max-width:1100px;margin:0 auto;}
+.breadcrumb{display:flex;align-items:center;gap:0.5rem;font-size:0.78rem;color:var(--muted);margin-bottom:1.5rem;}
+.breadcrumb a{color:var(--muted);text-decoration:none;}
+.breadcrumb a:hover{color:var(--text);}
+.breadcrumb span{color:var(--border);}
+.sec-eyebrow{font-family:var(--mono);font-size:0.65rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.4rem;}
+.sec-title{font-size:1.4rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:0.4rem;}
+.sec-sub{font-size:0.85rem;color:var(--muted);margin-bottom:1.5rem;}
+.sector-pills{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1rem;}
+.pill{font-size:0.72rem;font-weight:600;padding:0.3rem 0.7rem;border-radius:20px;border:1px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.pill:hover{border-color:#999;color:var(--text);}
+.pill.active{background:var(--text);color:#fff;border-color:var(--text);}
+.search-input{width:100%;max-width:340px;padding:0.55rem 0.9rem;border:1px solid var(--border);border-radius:7px;font-family:var(--font);font-size:0.82rem;outline:none;margin-bottom:1rem;}
+.search-input:focus{border-color:#999;}
+.co-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0.6rem;margin-bottom:1.5rem;}
+.co-card{border:1px solid var(--border);border-radius:8px;padding:0.75rem 0.9rem;cursor:pointer;transition:all 0.15s;}
+.co-card:hover{border-color:#999;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.co-card.selected{border-color:var(--text);background:#fafafa;box-shadow:0 0 0 2px var(--text);}
+.co-ticker{font-family:var(--mono);font-size:0.62rem;font-weight:700;color:var(--muted);margin-bottom:0.2rem;}
+.co-name{font-size:0.82rem;font-weight:700;margin-bottom:0.15rem;}
+.co-sector{font-size:0.7rem;color:var(--muted);}
+.step-btn{display:inline-block;padding:0.65rem 1.5rem;background:var(--text);color:#fff;border:none;border-radius:7px;font-family:var(--font);font-size:0.85rem;font-weight:700;cursor:pointer;}
+.step-btn:disabled{opacity:0.35;cursor:not-allowed;}
+.step-btn-outline{background:transparent;color:var(--text);border:1.5px solid var(--border);}
+.step-btn-outline:hover{border-color:#999;}
+.step-nav{display:flex;gap:0.75rem;margin-top:1.5rem;}
+.teach-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2rem;margin-bottom:1.5rem;}
+.teach-title{font-size:1rem;font-weight:800;letter-spacing:-0.01em;margin-bottom:0.9rem;}
+/* VC Method flow diagram */
+.vc-flow{display:flex;flex-direction:column;gap:0.6rem;margin-bottom:1.2rem;}
+.vc-flow-step{display:flex;align-items:center;gap:0.75rem;background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:0.75rem 1rem;}
+.vc-flow-num{width:28px;height:28px;border-radius:50%;background:var(--text);color:#fff;display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:800;flex-shrink:0;}
+.vc-flow-label{font-size:0.78rem;font-weight:700;color:var(--text);}
+.vc-flow-desc{font-size:0.73rem;color:var(--muted);margin-left:auto;text-align:right;max-width:240px;}
+.vc-flow-arrow{text-align:center;color:var(--muted);font-size:0.9rem;}
+.teach-table{width:100%;border-collapse:collapse;font-size:0.8rem;margin-bottom:1rem;}
+.teach-table th{text-align:left;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);padding:0.5rem 0.75rem;border-bottom:2px solid var(--border);}
+.teach-table td{padding:0.55rem 0.75rem;border-bottom:1px solid var(--border);vertical-align:top;}
+.teach-table tr:last-child td{border-bottom:none;}
+.formula-box{background:#0a0a0a;border-radius:8px;padding:1rem 1.25rem;margin-bottom:1rem;}
+.formula-box pre{font-family:var(--mono);font-size:0.72rem;color:#e5e5e5;white-space:pre-wrap;}
+.formula-box .cm{color:#6b7280;}
+.ctx-box{border:1px solid var(--border);border-radius:8px;padding:1rem 1.25rem;margin-bottom:1rem;}
+.ctx-label{font-family:var(--mono);font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.4rem;}
+.ctx-row{display:flex;align-items:baseline;gap:0.5rem;margin-bottom:0.2rem;}
+.ctx-key{font-size:0.75rem;color:var(--muted);min-width:140px;}
+.ctx-val{font-size:0.8rem;font-weight:600;color:var(--text);}
+.pro-gate{border:2px dashed var(--border);border-radius:12px;padding:3rem 2rem;text-align:center;margin-bottom:1.5rem;}
+.pro-gate-icon{font-size:2rem;margin-bottom:0.75rem;}
+.pro-gate-title{font-size:1.1rem;font-weight:800;letter-spacing:-0.01em;margin-bottom:0.4rem;}
+.pro-gate-sub{font-size:0.82rem;color:var(--muted);margin-bottom:1.25rem;max-width:400px;margin-left:auto;margin-right:auto;}
+.pro-gate-features{display:flex;flex-wrap:wrap;justify-content:center;gap:0.4rem;margin-bottom:1.5rem;}
+.pro-gate-feature{font-size:0.72rem;font-weight:600;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:0.25rem 0.65rem;}
+.pro-btn{display:inline-block;padding:0.7rem 1.75rem;background:var(--text);color:#fff;border:none;border-radius:7px;font-family:var(--font);font-size:0.88rem;font-weight:700;cursor:pointer;}
+.pro-tag{display:inline-block;font-family:var(--mono);font-size:0.58rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:3px;background:var(--text);color:#fff;margin-left:0.4rem;vertical-align:middle;}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <a href="../../../index.html" class="top-nav-logo">Valuation<strong>Desk</strong></a>
+  <div class="top-nav-right">
+    <button onclick="unlockPro()" class="top-nav-pro-btn">Unlock Pro</button>
+  </div>
+</nav>
+<nav class="domain-nav">
+  <div class="domain-nav-inner">
+    <a href="../../valuation-advisory/index.html">Valuation</a>
+    <a href="../../investment-banking/index.html">Investment Banking</a>
+    <a href="../../corporate-finance/index.html">Corporate Finance</a>
+    <a href="../../ma/index.html">M&amp;A</a>
+    <a href="../../pe/index.html">Private Equity</a>
+    <a href="../index.html" class="active">Venture Capital</a>
+  </div>
+</nav>
+
+<div class="step-bar">
+  <div class="step-bar-inner">
+    <div class="stp active" id="si1"><div class="stp-num">1</div><span>Pick Startup</span></div>
+    <div class="stp-line" id="sl1"></div>
+    <div class="stp idle" id="si2"><div class="stp-num">2</div><span>The Method</span></div>
+    <div class="stp-line" id="sl2"></div>
+    <div class="stp idle" id="si3"><div class="stp-num">3</div><span>Exit Inputs <span class="pro-tag">Pro</span></span></div>
+    <div class="stp-line" id="sl3"></div>
+    <div class="stp idle" id="si4"><div class="stp-num">4</div><span>Implied Pre-Money</span></div>
+  </div>
+</div>
+
+<!-- STEP 1 -->
+<section class="calc-section active" id="s1">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../index.html">Venture Capital</a><span>/</span>
+      <a href="index.html">Calculators</a><span>/</span>
+      <span>VC Method Valuation</span>
+    </div>
+    <div class="sec-eyebrow">VC Calculator · Pro</div>
+    <div class="sec-title">VC Method Valuation</div>
+    <div class="sec-sub">Work backwards from your target exit value to compute the implied pre-money and required ownership stake.</div>
+    <div class="sector-pills" id="sectorPills"></div>
+    <input class="search-input" id="searchInput" placeholder="Search startup or ticker..." oninput="filterCos()">
+    <div class="co-grid" id="coGrid"></div>
+    <button class="step-btn" id="s1btn" onclick="showStep(2)" disabled>Next: The Method →</button>
+  </div>
+</section>
+
+<!-- STEP 2 -->
+<section class="calc-section" id="s2">
+  <div class="container">
+    <div class="teach-card">
+      <div class="teach-title">The VC Method: Working Backwards from Exit</div>
+
+      <div class="vc-flow">
+        <div class="vc-flow-step">
+          <div class="vc-flow-num">1</div>
+          <div><div class="vc-flow-label">Estimate Terminal Value at Exit</div><div style="font-size:0.72rem;color:var(--muted);">Revenue multiple × projected revenue at exit year (T)</div></div>
+        </div>
+        <div class="vc-flow-arrow">↓</div>
+        <div class="vc-flow-step">
+          <div class="vc-flow-num">2</div>
+          <div><div class="vc-flow-label">Discount to Today (PV of Exit)</div><div style="font-size:0.72rem;color:var(--muted);">Terminal Value ÷ (1 + target IRR)^years</div></div>
+        </div>
+        <div class="vc-flow-arrow">↓</div>
+        <div class="vc-flow-step">
+          <div class="vc-flow-num">3</div>
+          <div><div class="vc-flow-label">Required Ownership % at Exit</div><div style="font-size:0.72rem;color:var(--muted);">Investment ÷ PV of Exit = minimum ownership needed today</div></div>
+        </div>
+        <div class="vc-flow-arrow">↓</div>
+        <div class="vc-flow-step">
+          <div class="vc-flow-num">4</div>
+          <div><div class="vc-flow-label">Implied Pre-Money Valuation</div><div style="font-size:0.72rem;color:var(--muted);">Investment × (1 − required ownership%) ÷ required ownership%</div></div>
+        </div>
+      </div>
+
+      <div class="formula-box">
+        <pre><span class="cm">// Step 1: Exit value at year T</span>
+exitValue     = revenueAtExit × exitMultiple
+
+<span class="cm">// Step 2: Discount to present</span>
+pvOfExit      = exitValue / (1 + targetIRR)^holdPeriod
+
+<span class="cm">// Step 3: Required ownership at exit</span>
+reqOwnershipT = investment / pvOfExit
+
+<span class="cm">// Step 4: Adjust for dilution in future rounds</span>
+reqOwnership0 = reqOwnershipT / (1 - futureRoundDilution)
+
+<span class="cm">// Step 5: Implied pre-money valuation</span>
+preMoney      = investment × (1 - reqOwnership0) / reqOwnership0</pre>
+      </div>
+
+      <table class="teach-table">
+        <thead><tr><th>Input</th><th>Typical range (India VC)</th><th>Sensitivity</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Target IRR</strong></td><td>30–40% gross (seed); 25–35% (Series A)</td><td>High — drives required ownership</td></tr>
+          <tr><td><strong>Exit multiple (revenue)</strong></td><td>8–15× for SaaS; 4–8× for consumer; 3–5× for logistics</td><td>Very high — biggest lever on exit value</td></tr>
+          <tr><td><strong>Hold period</strong></td><td>7–10 years (India VC avg); 5–7 for growth funds</td><td>Moderate — longer = more discounting</td></tr>
+          <tr><td><strong>Future dilution</strong></td><td>40–60% across Series A, B, C rounds</td><td>High — often under-estimated by founders</td></tr>
+        </tbody>
+      </table>
+
+      <div class="ctx-box" id="ctxBox">
+        <div class="ctx-label" id="ctxLabel">Sector Context</div>
+        <div id="ctxRows"></div>
+      </div>
+    </div>
+    <div class="step-nav">
+      <button class="step-btn step-btn-outline" onclick="showStep(1)">← Back</button>
+      <button class="step-btn" onclick="showStep(3)">Next: Exit Inputs →</button>
+    </div>
+  </div>
+</section>
+
+<!-- STEP 3 — PRO GATE -->
+<section class="calc-section" id="s3">
+  <div class="container">
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <div class="pro-gate-title">VC Method Calculator — Pro Feature</div>
+      <div class="pro-gate-sub">Enter exit revenue, multiple, IRR target, and hold period — the model back-solves to implied pre-money valuation and required seed ownership.</div>
+      <div class="pro-gate-features">
+        <span class="pro-gate-feature">Terminal value at exit</span>
+        <span class="pro-gate-feature">Discount to PV</span>
+        <span class="pro-gate-feature">Required ownership stake</span>
+        <span class="pro-gate-feature">Future dilution adjustment</span>
+        <span class="pro-gate-feature">Sensitivity table (IRR × multiple)</span>
+        <span class="pro-gate-feature">Implied pre-money output</span>
+      </div>
+      <button class="pro-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    </div>
+    <div class="step-nav">
+      <button class="step-btn step-btn-outline" onclick="showStep(2)">← Back</button>
+    </div>
+  </div>
+</section>
+
+<!-- STEP 4 — PRO GATE -->
+<section class="calc-section" id="s4">
+  <div class="container">
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <div class="pro-gate-title">Implied Pre-Money Output — Pro Feature</div>
+      <div class="pro-gate-sub">See implied pre-money valuation, required ownership at entry and exit, and a full IRR vs multiple sensitivity matrix.</div>
+      <button class="pro-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    </div>
+  </div>
+</section>
+
+<script>
+const COMPANIES=[
+  {name:'Razorpay',ticker:'RZRPAY',sector:'Fintech'},
+  {name:'Groww',ticker:'GROWW',sector:'Fintech'},
+  {name:'PhonePe',ticker:'PHONEPE',sector:'Fintech'},
+  {name:'CRED',ticker:'CRED',sector:'Fintech'},
+  {name:'Slice',ticker:'SLICE',sector:'Fintech'},
+  {name:'Freshworks',ticker:'FRSH',sector:'SaaS'},
+  {name:'Zoho',ticker:'ZOHO',sector:'SaaS'},
+  {name:'Darwinbox',ticker:'DRWNBX',sector:'SaaS'},
+  {name:'Chargebee',ticker:'CHRGBEE',sector:'SaaS'},
+  {name:'BrowserStack',ticker:'BRSRSTK',sector:'SaaS'},
+  {name:'Meesho',ticker:'MEESHO',sector:'E-commerce'},
+  {name:'Nykaa',ticker:'FSN',sector:'E-commerce'},
+  {name:'Mamaearth',ticker:'HMBL',sector:'D2C/Consumer'},
+  {name:'Purplle',ticker:'PURPLLE',sector:'D2C/Consumer'},
+  {name:'boAt',ticker:'BOAT',sector:'D2C/Consumer'},
+  {name:'Swiggy',ticker:'SWIGGY',sector:'Food Tech'},
+  {name:'Zomato',ticker:'ZOMATO',sector:'Food Tech'},
+  {name:'OfBusiness',ticker:'OFBIZ',sector:'B2B Commerce'},
+  {name:'Udaan',ticker:'UDAAN',sector:'B2B Commerce'},
+  {name:'Lenskart',ticker:'LNKRT',sector:'D2C/Consumer'},
+  {name:'Ola',ticker:'OLA',sector:'Mobility'},
+  {name:'Rapido',ticker:'RAPIDO',sector:'Mobility'},
+  {name:"Byju's",ticker:'BYJU',sector:'EdTech'},
+  {name:'Unacademy',ticker:'UNACAD',sector:'EdTech'},
+  {name:'Delhivery',ticker:'DELHIVERY',sector:'Logistics'},
+  {name:'Ecom Express',ticker:'ECOMEX',sector:'Logistics'},
+  {name:'OYO',ticker:'OYO',sector:'Hospitality'},
+  {name:'ideaForge',ticker:'IDEAFRG',sector:'Deep Tech'},
+  {name:'Agnikul Cosmos',ticker:'AGNIKUL',sector:'Deep Tech'},
+  {name:'InMobi',ticker:'INMOBI',sector:'AdTech/Media'}
+];
+const SECTOR_CONTEXT={
+  'Fintech':{targetReturn:'10–15× gross',exitMultiple:'8–12× revenue',holdPeriod:'7–9 years',exitRoute:'IPO or bank acquisition'},
+  'SaaS':{targetReturn:'8–12× gross',exitMultiple:'10–15× ARR',holdPeriod:'6–8 years',exitRoute:'Strategic M&A or NASDAQ IPO'},
+  'E-commerce':{targetReturn:'8–12× gross',exitMultiple:'4–8× revenue',holdPeriod:'7–10 years',exitRoute:'IPO (NSE/BSE)'},
+  'D2C/Consumer':{targetReturn:'5–10× gross',exitMultiple:'3–6× revenue',holdPeriod:'5–8 years',exitRoute:'IPO or FMCG acquisition'},
+  'Food Tech':{targetReturn:'7–12× gross',exitMultiple:'4–8× revenue',holdPeriod:'7–10 years',exitRoute:'IPO or global platform M&A'},
+  'B2B Commerce':{targetReturn:'8–12× gross',exitMultiple:'4–7× revenue',holdPeriod:'6–9 years',exitRoute:'Strategic or IPO'},
+  'Mobility':{targetReturn:'6–10× gross',exitMultiple:'3–6× revenue',holdPeriod:'7–10 years',exitRoute:'IPO or OEM acquisition'},
+  'EdTech':{targetReturn:'8–15× gross',exitMultiple:'5–10× revenue',holdPeriod:'6–8 years',exitRoute:'Consolidation or acquisition'},
+  'Logistics':{targetReturn:'5–8× gross',exitMultiple:'3–5× revenue',holdPeriod:'7–10 years',exitRoute:'IPO or platform acquisition'},
+  'Hospitality':{targetReturn:'6–10× gross',exitMultiple:'3–6× revenue',holdPeriod:'7–10 years',exitRoute:'IPO or hotel chain M&A'},
+  'Deep Tech':{targetReturn:'10–20× gross',exitMultiple:'8–15× revenue',holdPeriod:'8–12 years',exitRoute:'Strategic acquisition'},
+  'AdTech/Media':{targetReturn:'6–10× gross',exitMultiple:'4–8× revenue',holdPeriod:'5–8 years',exitRoute:'Media conglomerate M&A'}
+};
+let activeSector='All',selectedCo=null;
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+function getSectors(){const s=new Set(COMPANIES.map(c=>c.sector));return['All',...s];}
+function renderSectors(){
+  document.getElementById('sectorPills').innerHTML=getSectors().map(s=>`<button class="pill${s===activeSector?' active':''}" onclick="setSector('${s}')">${s}</button>`).join('');
+}
+function setSector(s){activeSector=s;renderSectors();filterCos();}
+function filterCos(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const filtered=COMPANIES.filter(c=>(activeSector==='All'||c.sector===activeSector)&&(c.name.toLowerCase().includes(q)||c.ticker.toLowerCase().includes(q)));
+  document.getElementById('coGrid').innerHTML=filtered.map(c=>`<div class="co-card${selectedCo&&selectedCo.name===c.name?' selected':''}" onclick="selectCo(${JSON.stringify(c).replace(/"/g,'&quot;')})"><div class="co-ticker">${c.ticker}</div><div class="co-name">${c.name}</div><div class="co-sector">${c.sector}</div></div>`).join('');
+}
+function selectCo(c){selectedCo=c;document.getElementById('s1btn').disabled=false;filterCos();}
+function renderCtx(){
+  if(!selectedCo)return;
+  const ctx=SECTOR_CONTEXT[selectedCo.sector]||{};
+  document.getElementById('ctxLabel').textContent=`${selectedCo.sector} — Typical VC Method Benchmarks`;
+  document.getElementById('ctxRows').innerHTML=`
+    <div class="ctx-row"><span class="ctx-key">Target return</span><span class="ctx-val">${ctx.targetReturn||'—'}</span></div>
+    <div class="ctx-row"><span class="ctx-key">Exit multiple</span><span class="ctx-val">${ctx.exitMultiple||'—'}</span></div>
+    <div class="ctx-row"><span class="ctx-key">Hold period</span><span class="ctx-val">${ctx.holdPeriod||'—'}</span></div>
+    <div class="ctx-row"><span class="ctx-key">Common exit route</span><span class="ctx-val">${ctx.exitRoute||'—'}</span></div>
+  `;
+}
+function showStep(n){
+  [1,2,3,4].forEach(i=>{
+    document.getElementById('s'+i).classList.toggle('active',i===n);
+    const si=document.getElementById('si'+i);
+    si.className='stp '+(i<n?'done':i===n?'active':'idle');
+    if(i<4){const ln=document.getElementById('sl'+i);if(ln)ln.className='stp-line'+(i<n?' stp-done-line':'');}
+  });
+  if(n===2&&selectedCo)renderCtx();
+}
+renderSectors();filterCos();
+</script>
+</body>
+</html>

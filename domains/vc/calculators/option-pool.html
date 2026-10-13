@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Option Pool Modeller — VC Calculators — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;}
+.top-nav{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:56px;}
+.top-nav-logo{font-size:1rem;font-weight:800;color:var(--text);text-decoration:none;letter-spacing:-0.02em;}
+.top-nav-logo strong{font-weight:900;}
+.top-nav-right{display:flex;align-items:center;gap:0.75rem;}
+.top-nav-pro-btn{font-size:0.78rem;font-weight:700;color:#fff;background:var(--text);padding:0.4rem 1rem;border-radius:6px;border:none;cursor:pointer;}
+.domain-nav{background:var(--bg);border-bottom:1px solid var(--border);padding:0 2rem;}
+.domain-nav-inner{display:flex;overflow-x:auto;scrollbar-width:none;}
+.domain-nav-inner::-webkit-scrollbar{display:none;}
+.domain-nav-inner a{display:inline-block;font-size:0.8rem;font-weight:500;color:var(--muted);text-decoration:none;padding:0.65rem 1rem;border-bottom:2px solid transparent;white-space:nowrap;}
+.domain-nav-inner a.active{color:var(--text);font-weight:600;border-bottom-color:var(--text);}
+.step-bar{background:var(--card);border-bottom:1px solid var(--border);padding:0 2rem;}
+.step-bar-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;padding:0.9rem 0;}
+.stp{display:flex;align-items:center;gap:0.45rem;font-size:0.75rem;font-weight:600;color:var(--muted);}
+.stp.active{color:var(--text);}
+.stp.done{color:var(--green);}
+.stp-num{width:22px;height:22px;border-radius:50%;border:2px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;flex-shrink:0;}
+.stp.done .stp-num{background:var(--green);border-color:var(--green);color:#fff;}
+.stp.active .stp-num{background:var(--text);border-color:var(--text);color:#fff;}
+.stp-line{flex:1;height:2px;background:var(--border);margin:0 0.5rem;}
+.stp-done-line{background:var(--green);}
+.calc-section{padding:2.5rem 2rem;display:none;}
+.calc-section.active{display:block;}
+.container{max-width:1100px;margin:0 auto;}
+.breadcrumb{display:flex;align-items:center;gap:0.5rem;font-size:0.78rem;color:var(--muted);margin-bottom:1.5rem;}
+.breadcrumb a{color:var(--muted);text-decoration:none;}
+.breadcrumb span{color:var(--border);}
+.sec-eyebrow{font-family:var(--mono);font-size:0.65rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.4rem;}
+.sec-title{font-size:1.4rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:0.4rem;}
+.sec-sub{font-size:0.85rem;color:var(--muted);margin-bottom:1.5rem;}
+.sector-pills{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1rem;}
+.pill{font-size:0.72rem;font-weight:600;padding:0.3rem 0.7rem;border-radius:20px;border:1px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.pill.active{background:var(--text);color:#fff;border-color:var(--text);}
+.search-input{width:100%;max-width:340px;padding:0.55rem 0.9rem;border:1px solid var(--border);border-radius:7px;font-family:var(--font);font-size:0.82rem;outline:none;margin-bottom:1rem;}
+.co-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0.6rem;margin-bottom:1.5rem;}
+.co-card{border:1px solid var(--border);border-radius:8px;padding:0.75rem 0.9rem;cursor:pointer;transition:all 0.15s;}
+.co-card:hover{border-color:#999;}
+.co-card.selected{border-color:var(--text);box-shadow:0 0 0 2px var(--text);}
+.co-ticker{font-family:var(--mono);font-size:0.62rem;font-weight:700;color:var(--muted);margin-bottom:0.2rem;}
+.co-name{font-size:0.82rem;font-weight:700;margin-bottom:0.15rem;}
+.co-sector{font-size:0.7rem;color:var(--muted);}
+.step-btn{padding:0.65rem 1.5rem;background:var(--text);color:#fff;border:none;border-radius:7px;font-family:var(--font);font-size:0.85rem;font-weight:700;cursor:pointer;}
+.step-btn:disabled{opacity:0.35;cursor:not-allowed;}
+.step-btn-outline{background:transparent;color:var(--text);border:1.5px solid var(--border);}
+.step-nav{display:flex;gap:0.75rem;margin-top:1.5rem;}
+.teach-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2rem;margin-bottom:1.5rem;}
+.teach-title{font-size:1rem;font-weight:800;letter-spacing:-0.01em;margin-bottom:0.9rem;}
+/* Vesting timeline */
+.vesting-timeline{display:flex;align-items:center;gap:0;margin-bottom:1.2rem;position:relative;}
+.vt-seg{flex:1;text-align:center;padding:0.6rem 0.4rem;font-size:0.68rem;font-weight:600;}
+.vt-seg-cliff{background:#fef3c7;border:1.5px solid #fef3c7;border-radius:6px 0 0 6px;color:var(--amber);}
+.vt-seg-vest{background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:0;color:var(--green);}
+.vt-seg-post{background:#f9fafb;border:1.5px solid var(--border);border-radius:0 6px 6px 0;color:var(--muted);}
+.vt-label{font-size:0.62rem;color:var(--muted);margin-top:0.25rem;}
+/* Shuffle comparison */
+.shuffle-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:1.2rem;}
+.shuffle-box{border:1.5px solid var(--border);border-radius:10px;padding:1rem;}
+.shuffle-box-title{font-size:0.78rem;font-weight:800;margin-bottom:0.4rem;}
+.shuffle-rows{display:flex;flex-direction:column;gap:0.2rem;}
+.shuffle-row{display:flex;align-items:center;justify-content:space-between;font-size:0.72rem;}
+.shuffle-row .label{color:var(--muted);}
+.shuffle-row .val{font-weight:700;font-family:var(--mono);font-size:0.7rem;}
+.shuffle-row .val.red{color:var(--red);}
+.shuffle-row .val.green{color:var(--green);}
+.teach-table{width:100%;border-collapse:collapse;font-size:0.8rem;margin-bottom:1rem;}
+.teach-table th{text-align:left;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);padding:0.5rem 0.75rem;border-bottom:2px solid var(--border);}
+.teach-table td{padding:0.55rem 0.75rem;border-bottom:1px solid var(--border);vertical-align:top;}
+.teach-table tr:last-child td{border-bottom:none;}
+.formula-box{background:#0a0a0a;border-radius:8px;padding:1rem 1.25rem;margin-bottom:1rem;}
+.formula-box pre{font-family:var(--mono);font-size:0.72rem;color:#e5e5e5;white-space:pre-wrap;}
+.formula-box .cm{color:#6b7280;}
+.ctx-box{border:1px solid var(--border);border-radius:8px;padding:1rem 1.25rem;margin-bottom:1rem;}
+.ctx-label{font-family:var(--mono);font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.4rem;}
+.ctx-row{display:flex;align-items:baseline;gap:0.5rem;margin-bottom:0.2rem;}
+.ctx-key{font-size:0.75rem;color:var(--muted);min-width:160px;}
+.ctx-val{font-size:0.8rem;font-weight:600;color:var(--text);}
+.pro-gate{border:2px dashed var(--border);border-radius:12px;padding:3rem 2rem;text-align:center;margin-bottom:1.5rem;}
+.pro-gate-icon{font-size:2rem;margin-bottom:0.75rem;}
+.pro-gate-title{font-size:1.1rem;font-weight:800;letter-spacing:-0.01em;margin-bottom:0.4rem;}
+.pro-gate-sub{font-size:0.82rem;color:var(--muted);margin-bottom:1.25rem;max-width:400px;margin-left:auto;margin-right:auto;}
+.pro-gate-features{display:flex;flex-wrap:wrap;justify-content:center;gap:0.4rem;margin-bottom:1.5rem;}
+.pro-gate-feature{font-size:0.72rem;font-weight:600;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:0.25rem 0.65rem;}
+.pro-btn{padding:0.7rem 1.75rem;background:var(--text);color:#fff;border:none;border-radius:7px;font-family:var(--font);font-size:0.88rem;font-weight:700;cursor:pointer;}
+.pro-tag{display:inline-block;font-family:var(--mono);font-size:0.58rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:3px;background:var(--text);color:#fff;margin-left:0.4rem;vertical-align:middle;}
+@media(max-width:600px){.shuffle-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <a href="../../../index.html" class="top-nav-logo">Valuation<strong>Desk</strong></a>
+  <div class="top-nav-right">
+    <button onclick="unlockPro()" class="top-nav-pro-btn">Unlock Pro</button>
+  </div>
+</nav>
+<nav class="domain-nav">
+  <div class="domain-nav-inner">
+    <a href="../../valuation-advisory/index.html">Valuation</a>
+    <a href="../../investment-banking/index.html">Investment Banking</a>
+    <a href="../../corporate-finance/index.html">Corporate Finance</a>
+    <a href="../../ma/index.html">M&amp;A</a>
+    <a href="../../pe/index.html">Private Equity</a>
+    <a href="../index.html" class="active">Venture Capital</a>
+  </div>
+</nav>
+
+<div class="step-bar">
+  <div class="step-bar-inner">
+    <div class="stp active" id="si1"><div class="stp-num">1</div><span>Pick Startup</span></div>
+    <div class="stp-line" id="sl1"></div>
+    <div class="stp idle" id="si2"><div class="stp-num">2</div><span>ESOP Mechanics</span></div>
+    <div class="stp-line" id="sl2"></div>
+    <div class="stp idle" id="si3"><div class="stp-num">3</div><span>Design Pool <span class="pro-tag">Pro</span></span></div>
+    <div class="stp-line" id="sl3"></div>
+    <div class="stp idle" id="si4"><div class="stp-num">4</div><span>Dilution Analysis</span></div>
+  </div>
+</div>
+
+<!-- STEP 1 -->
+<section class="calc-section active" id="s1">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../index.html">Venture Capital</a><span>/</span>
+      <a href="index.html">Calculators</a><span>/</span>
+      <span>Option Pool Modeller</span>
+    </div>
+    <div class="sec-eyebrow">VC Calculator · Pro</div>
+    <div class="sec-title">Option Pool Modeller</div>
+    <div class="sec-sub">Design your ESOP pool with vesting schedule, cliff, and exercise price. Quantify pre-money vs post-money pool shuffle dilution.</div>
+    <div class="sector-pills" id="sectorPills"></div>
+    <input class="search-input" id="searchInput" placeholder="Search startup or ticker..." oninput="filterCos()">
+    <div class="co-grid" id="coGrid"></div>
+    <button class="step-btn" id="s1btn" onclick="showStep(2)" disabled>Next: ESOP Mechanics →</button>
+  </div>
+</section>
+
+<!-- STEP 2 -->
+<section class="calc-section" id="s2">
+  <div class="container">
+    <div class="teach-card">
+      <div class="teach-title">ESOP Pool Design and the Pool Shuffle</div>
+
+      <div class="vesting-timeline">
+        <div class="vt-seg vt-seg-cliff">
+          <div>Cliff Period</div>
+          <div class="vt-label">Months 0–12</div>
+          <div style="margin-top:0.2rem;font-size:0.6rem;">0% vested</div>
+        </div>
+        <div class="vt-seg vt-seg-vest">
+          <div>Monthly Vesting</div>
+          <div class="vt-label">Months 13–48</div>
+          <div style="margin-top:0.2rem;font-size:0.6rem;">2.08%/month</div>
+        </div>
+        <div class="vt-seg vt-seg-post">
+          <div>Fully Vested</div>
+          <div class="vt-label">Month 48+</div>
+          <div style="margin-top:0.2rem;font-size:0.6rem;">100% vested</div>
+        </div>
+      </div>
+
+      <div class="shuffle-grid">
+        <div class="shuffle-box" style="border-color:#fecaca;">
+          <div class="shuffle-box-title" style="color:var(--red);">🔴 Pre-Money Pool Shuffle</div>
+          <div class="shuffle-rows">
+            <div class="shuffle-row"><span class="label">Pool created before investment</span></div>
+            <div class="shuffle-row"><span class="label">Founders diluted first</span><span class="val red">↓ diluted more</span></div>
+            <div class="shuffle-row"><span class="label">Investor's % is higher post-round</span></div>
+            <div class="shuffle-row"><span class="label">Effective pre-money is lower</span><span class="val red">⚠ founder unfriendly</span></div>
+          </div>
+        </div>
+        <div class="shuffle-box" style="border-color:#bbf7d0;">
+          <div class="shuffle-box-title" style="color:var(--green);">🟢 Post-Money Pool Shuffle</div>
+          <div class="shuffle-rows">
+            <div class="shuffle-row"><span class="label">Pool created after investment</span></div>
+            <div class="shuffle-row"><span class="label">All holders diluted equally</span><span class="val green">↓ diluted less</span></div>
+            <div class="shuffle-row"><span class="label">Investor's % same as agreed</span></div>
+            <div class="shuffle-row"><span class="label">Effective pre-money is higher</span><span class="val green">✓ founder friendly</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="formula-box">
+        <pre><span class="cm">// Pre-money pool shuffle (investor demands pre-money pool)</span>
+totalAfterESOP = founderShares / (1 - esopPct/100)
+esopShares     = totalAfterESOP - founderShares
+<span class="cm">// Investor then buys into the inflated share count</span>
+investorShares = totalAfterESOP × invPct / (1 - invPct)
+
+<span class="cm">// Post-money pool (pool comes from everyone post-close)</span>
+totalPostRound = founderShares + investorShares
+esopShares     = totalPostRound × esopPct / (1 - esopPct)
+<span class="cm">// Founders diluted only by their proportionate share</span></pre>
+      </div>
+
+      <table class="teach-table">
+        <thead><tr><th>Parameter</th><th>India VC standard</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Vesting period</strong></td><td>4 years total</td><td>Sometimes 3 years at Series B+ for accelerated schedules</td></tr>
+          <tr><td><strong>Cliff</strong></td><td>1 year (25% vests at cliff)</td><td>No cliff for co-founders at seed stage</td></tr>
+          <tr><td><strong>Exercise price</strong></td><td>Par value (₹1–10/share) or FMV</td><td>Companies Act 2013 allows below-FMV for employees</td></tr>
+          <tr><td><strong>ESOP pool size</strong></td><td>10–15% fully-diluted (seed); up to 20% for deep-tech/AI</td><td>Usually 10% at seed, refreshed 2–4% per round</td></tr>
+          <tr><td><strong>Acceleration</strong></td><td>Double-trigger on acquisition</td><td>Single-trigger is rare; board typically approves</td></tr>
+          <tr><td><strong>Post-termination exercise</strong></td><td>90 days for resignation; vested options remain</td><td>Extended to 10 years in founder-friendly terms</td></tr>
+        </tbody>
+      </table>
+
+      <div class="ctx-box" id="ctxBox">
+        <div class="ctx-label" id="ctxLabel">Sector Context</div>
+        <div id="ctxRows"></div>
+      </div>
+    </div>
+    <div class="step-nav">
+      <button class="step-btn step-btn-outline" onclick="showStep(1)">← Back</button>
+      <button class="step-btn" onclick="showStep(3)">Next: Design Pool →</button>
+    </div>
+  </div>
+</section>
+
+<!-- STEP 3 — PRO GATE -->
+<section class="calc-section" id="s3">
+  <div class="container">
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <div class="pro-gate-title">Option Pool Designer — Pro Feature</div>
+      <div class="pro-gate-sub">Configure pool size, vesting schedule, cliff, and exercise price — then compare pre-money vs post-money pool shuffle dilution impact on founders and investors, with a full grant-by-grant vesting table.</div>
+      <div class="pro-gate-features">
+        <span class="pro-gate-feature">Pre vs post-money shuffle</span>
+        <span class="pro-gate-feature">Vesting schedule builder</span>
+        <span class="pro-gate-feature">Grant-by-grant table</span>
+        <span class="pro-gate-feature">Exercise price modeling</span>
+        <span class="pro-gate-feature">Cliff vs linear vesting</span>
+        <span class="pro-gate-feature">Pool refresh per round</span>
+      </div>
+      <button class="pro-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    </div>
+    <div class="step-nav">
+      <button class="step-btn step-btn-outline" onclick="showStep(2)">← Back</button>
+    </div>
+  </div>
+</section>
+
+<!-- STEP 4 — PRO GATE -->
+<section class="calc-section" id="s4">
+  <div class="container">
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <div class="pro-gate-title">Dilution Analysis — Pro Feature</div>
+      <div class="pro-gate-sub">Side-by-side dilution comparison (pre vs post-money shuffle), grant vesting chart, and per-employee option value at various exit multiples.</div>
+      <button class="pro-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    </div>
+  </div>
+</section>
+
+<script>
+const COMPANIES=[
+  {name:'Razorpay',ticker:'RZRPAY',sector:'Fintech'},{name:'Groww',ticker:'GROWW',sector:'Fintech'},
+  {name:'PhonePe',ticker:'PHONEPE',sector:'Fintech'},{name:'CRED',ticker:'CRED',sector:'Fintech'},
+  {name:'Slice',ticker:'SLICE',sector:'Fintech'},{name:'Freshworks',ticker:'FRSH',sector:'SaaS'},
+  {name:'Zoho',ticker:'ZOHO',sector:'SaaS'},{name:'Darwinbox',ticker:'DRWNBX',sector:'SaaS'},
+  {name:'Chargebee',ticker:'CHRGBEE',sector:'SaaS'},{name:'BrowserStack',ticker:'BRSRSTK',sector:'SaaS'},
+  {name:'Meesho',ticker:'MEESHO',sector:'E-commerce'},{name:'Nykaa',ticker:'FSN',sector:'E-commerce'},
+  {name:'Mamaearth',ticker:'HMBL',sector:'D2C/Consumer'},{name:'Purplle',ticker:'PURPLLE',sector:'D2C/Consumer'},
+  {name:'boAt',ticker:'BOAT',sector:'D2C/Consumer'},{name:'Swiggy',ticker:'SWIGGY',sector:'Food Tech'},
+  {name:'Zomato',ticker:'ZOMATO',sector:'Food Tech'},{name:'OfBusiness',ticker:'OFBIZ',sector:'B2B Commerce'},
+  {name:'Udaan',ticker:'UDAAN',sector:'B2B Commerce'},{name:'Lenskart',ticker:'LNKRT',sector:'D2C/Consumer'},
+  {name:'Ola',ticker:'OLA',sector:'Mobility'},{name:'Rapido',ticker:'RAPIDO',sector:'Mobility'},
+  {name:"Byju's",ticker:'BYJU',sector:'EdTech'},{name:'Unacademy',ticker:'UNACAD',sector:'EdTech'},
+  {name:'Delhivery',ticker:'DELHIVERY',sector:'Logistics'},{name:'Ecom Express',ticker:'ECOMEX',sector:'Logistics'},
+  {name:'OYO',ticker:'OYO',sector:'Hospitality'},{name:'ideaForge',ticker:'IDEAFRG',sector:'Deep Tech'},
+  {name:'Agnikul Cosmos',ticker:'AGNIKUL',sector:'Deep Tech'},{name:'InMobi',ticker:'INMOBI',sector:'AdTech/Media'}
+];
+const SECTOR_CONTEXT={
+  'Fintech':{poolSize:'10–12% FD',vesting:'4yr/1yr cliff',exercisePrice:'₹1–5/share (par)',refresh:'2–3% per round'},
+  'SaaS':{poolSize:'10–15% FD',vesting:'4yr/1yr cliff',exercisePrice:'₹1–10/share',refresh:'2–4% per round'},
+  'E-commerce':{poolSize:'8–12% FD',vesting:'4yr/1yr cliff',exercisePrice:'₹1–5/share',refresh:'2–3% per round'},
+  'D2C/Consumer':{poolSize:'8–10% FD',vesting:'4yr/1yr cliff',exercisePrice:'₹1–5/share',refresh:'1–2% per round'},
+  'Food Tech':{poolSize:'10–12% FD',vesting:'4yr/1yr cliff',exercisePrice:'₹1–5/share',refresh:'2–3% per round'},
+  'B2B Commerce':{poolSize:'8–10% FD',vesting:'4yr/1yr cliff',exercisePrice:'₹1–5/share',refresh:'2–3% per round'},
+  'Mobility':{poolSize:'10–12% FD',vesting:'4yr/1yr cliff',exercisePrice:'₹1–5/share',refresh:'2–3% per round'},
+  'EdTech':{poolSize:'8–12% FD',vesting:'4yr/1yr cliff',exercisePrice:'₹1–10/share',refresh:'2–3% per round'},
+  'Logistics':{poolSize:'8–10% FD',vesting:'4yr/1yr cliff',exercisePrice:'₹1–5/share',refresh:'1–2% per round'},
+  'Hospitality':{poolSize:'8–10% FD',vesting:'4yr/1yr cliff',exercisePrice:'₹1–5/share',refresh:'2–3% per round'},
+  'Deep Tech':{poolSize:'15–20% FD',vesting:'4yr/1yr cliff',exercisePrice:'₹1–5/share (par)',refresh:'3–5% per round'},
+  'AdTech/Media':{poolSize:'10–12% FD',vesting:'4yr/1yr cliff',exercisePrice:'₹1–10/share',refresh:'2–3% per round'}
+};
+let activeSector='All',selectedCo=null;
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+function getSectors(){return['All',...new Set(COMPANIES.map(c=>c.sector))];}
+function renderSectors(){
+  document.getElementById('sectorPills').innerHTML=getSectors().map(s=>`<button class="pill${s===activeSector?' active':''}" onclick="setSector('${s}')">${s}</button>`).join('');
+}
+function setSector(s){activeSector=s;renderSectors();filterCos();}
+function filterCos(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const f=COMPANIES.filter(c=>(activeSector==='All'||c.sector===activeSector)&&(c.name.toLowerCase().includes(q)||c.ticker.toLowerCase().includes(q)));
+  document.getElementById('coGrid').innerHTML=f.map(c=>`<div class="co-card${selectedCo&&selectedCo.name===c.name?' selected':''}" data-co='${JSON.stringify(c)}'><div class="co-ticker">${c.ticker}</div><div class="co-name">${c.name}</div><div class="co-sector">${c.sector}</div></div>`).join('');
+}
+document.addEventListener('click',function(e){
+  const card=e.target.closest('.co-card[data-co]');
+  if(!card)return;
+  selectCo(JSON.parse(card.dataset.co));
+});
+function selectCo(c){selectedCo=c;document.getElementById('s1btn').disabled=false;filterCos();}
+function renderCtx(){
+  if(!selectedCo)return;
+  const ctx=SECTOR_CONTEXT[selectedCo.sector]||{};
+  document.getElementById('ctxLabel').textContent=`${selectedCo.sector} — ESOP Pool Benchmarks`;
+  document.getElementById('ctxRows').innerHTML=`
+    <div class="ctx-row"><span class="ctx-key">Pool size (FD)</span><span class="ctx-val">${ctx.poolSize||'—'}</span></div>
+    <div class="ctx-row"><span class="ctx-key">Vesting standard</span><span class="ctx-val">${ctx.vesting||'—'}</span></div>
+    <div class="ctx-row"><span class="ctx-key">Exercise price (seed)</span><span class="ctx-val">${ctx.exercisePrice||'—'}</span></div>
+    <div class="ctx-row"><span class="ctx-key">Pool refresh (per round)</span><span class="ctx-val">${ctx.refresh||'—'}</span></div>
+  `;
+}
+function showStep(n){
+  [1,2,3,4].forEach(i=>{
+    document.getElementById('s'+i).classList.toggle('active',i===n);
+    const si=document.getElementById('si'+i);
+    si.className='stp '+(i<n?'done':i===n?'active':'idle');
+    if(i<4){const ln=document.getElementById('sl'+i);if(ln)ln.className='stp-line'+(i<n?' stp-done-line':'');}
+  });
+  if(n===2&&selectedCo)renderCtx();
+}
+renderSectors();filterCos();
+</script>
+</body>
+</html>

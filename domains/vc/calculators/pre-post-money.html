@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pre/Post Money Valuation — VC Calculators — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;}
+.top-nav{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:56px;}
+.top-nav-logo{font-size:1rem;font-weight:800;color:var(--text);text-decoration:none;letter-spacing:-0.02em;}
+.top-nav-logo strong{font-weight:900;}
+.top-nav-right{display:flex;align-items:center;gap:0.75rem;}
+.top-nav-pro-btn{font-size:0.78rem;font-weight:700;color:#fff;background:var(--text);text-decoration:none;padding:0.4rem 1rem;border-radius:6px;border:none;cursor:pointer;}
+.domain-nav{background:var(--bg);border-bottom:1px solid var(--border);padding:0 2rem;}
+.domain-nav-inner{display:flex;overflow-x:auto;scrollbar-width:none;}
+.domain-nav-inner::-webkit-scrollbar{display:none;}
+.domain-nav-inner a{display:inline-block;font-size:0.8rem;font-weight:500;color:var(--muted);text-decoration:none;padding:0.65rem 1rem;border-bottom:2px solid transparent;white-space:nowrap;}
+.domain-nav-inner a:hover{color:var(--text);}
+.domain-nav-inner a.active{color:var(--text);font-weight:600;border-bottom-color:var(--text);}
+/* Steps */
+.step-bar{background:var(--card);border-bottom:1px solid var(--border);padding:0 2rem;}
+.step-bar-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;padding:0.9rem 0;gap:0;}
+.stp{display:flex;align-items:center;gap:0.45rem;font-size:0.75rem;font-weight:600;color:var(--muted);}
+.stp.active{color:var(--text);}
+.stp.done{color:var(--green);}
+.stp-num{width:22px;height:22px;border-radius:50%;border:2px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;flex-shrink:0;}
+.stp.done .stp-num{background:var(--green);border-color:var(--green);color:#fff;}
+.stp.active .stp-num{background:var(--text);border-color:var(--text);color:#fff;}
+.stp-line{flex:1;height:2px;background:var(--border);margin:0 0.5rem;}
+.stp-done-line{background:var(--green);}
+/* Sections */
+.calc-section{padding:2.5rem 2rem;display:none;}
+.calc-section.active{display:block;}
+.container{max-width:1100px;margin:0 auto;}
+.breadcrumb{display:flex;align-items:center;gap:0.5rem;font-size:0.78rem;color:var(--muted);margin-bottom:1.5rem;}
+.breadcrumb a{color:var(--muted);text-decoration:none;}
+.breadcrumb a:hover{color:var(--text);}
+.breadcrumb span{color:var(--border);}
+/* Step 1 — picker */
+.sec-eyebrow{font-family:var(--mono);font-size:0.65rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.4rem;}
+.sec-title{font-size:1.4rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:0.4rem;}
+.sec-sub{font-size:0.85rem;color:var(--muted);margin-bottom:1.5rem;}
+.sector-pills{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1rem;}
+.pill{font-size:0.72rem;font-weight:600;padding:0.3rem 0.7rem;border-radius:20px;border:1px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.pill:hover{border-color:#999;color:var(--text);}
+.pill.active{background:var(--text);color:#fff;border-color:var(--text);}
+.search-row{margin-bottom:1rem;}
+.search-input{width:100%;max-width:340px;padding:0.55rem 0.9rem;border:1px solid var(--border);border-radius:7px;font-family:var(--font);font-size:0.82rem;outline:none;}
+.search-input:focus{border-color:#999;}
+.co-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:0.6rem;margin-bottom:1.5rem;}
+.co-card{border:1px solid var(--border);border-radius:8px;padding:0.75rem 0.9rem;cursor:pointer;transition:all 0.15s;background:var(--bg);}
+.co-card:hover{border-color:#999;box-shadow:0 2px 8px rgba(0,0,0,0.06);}
+.co-card.selected{border-color:var(--text);background:#fafafa;box-shadow:0 0 0 2px var(--text);}
+.co-ticker{font-family:var(--mono);font-size:0.62rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:0.2rem;}
+.co-name{font-size:0.82rem;font-weight:700;color:var(--text);margin-bottom:0.15rem;}
+.co-sector{font-size:0.7rem;color:var(--muted);}
+.step-btn{display:inline-block;padding:0.65rem 1.5rem;background:var(--text);color:#fff;border:none;border-radius:7px;font-family:var(--font);font-size:0.85rem;font-weight:700;cursor:pointer;transition:opacity 0.15s;}
+.step-btn:disabled{opacity:0.35;cursor:not-allowed;}
+.step-btn-outline{background:transparent;color:var(--text);border:1.5px solid var(--border);}
+.step-btn-outline:hover{border-color:#999;}
+/* Step 2 — teaching card */
+.teach-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2rem;margin-bottom:1.5rem;}
+.teach-title{font-size:1rem;font-weight:800;letter-spacing:-0.01em;margin-bottom:0.9rem;}
+.valuation-visual{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:0;margin-bottom:1.2rem;align-items:center;}
+.val-box{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:1rem;text-align:center;}
+.val-box-label{font-family:var(--mono);font-size:0.6rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.3rem;}
+.val-box-val{font-size:1.1rem;font-weight:800;letter-spacing:-0.02em;color:var(--text);}
+.val-box-sub{font-size:0.65rem;color:var(--muted);margin-top:0.2rem;}
+.val-arrow{font-size:1.2rem;color:var(--muted);padding:0 0.5rem;text-align:center;}
+.val-box.blue-tint{border-color:#bfdbfe;background:#eff6ff;}
+.val-box.green-tint{border-color:#bbf7d0;background:#f0fdf4;}
+.teach-table{width:100%;border-collapse:collapse;font-size:0.8rem;margin-bottom:1rem;}
+.teach-table th{text-align:left;font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);padding:0.5rem 0.75rem;border-bottom:2px solid var(--border);}
+.teach-table td{padding:0.55rem 0.75rem;border-bottom:1px solid var(--border);vertical-align:top;}
+.teach-table tr:last-child td{border-bottom:none;}
+.formula-box{background:#0a0a0a;border-radius:8px;padding:1rem 1.25rem;margin-bottom:1rem;}
+.formula-box pre{font-family:var(--mono);font-size:0.72rem;color:#e5e5e5;white-space:pre-wrap;}
+.formula-box .cm{color:#6b7280;}
+.ctx-box{border:1px solid var(--border);border-radius:8px;padding:1rem 1.25rem;margin-bottom:1rem;}
+.ctx-label{font-family:var(--mono);font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.4rem;}
+.ctx-row{display:flex;align-items:baseline;gap:0.5rem;margin-bottom:0.2rem;}
+.ctx-key{font-size:0.75rem;color:var(--muted);min-width:130px;}
+.ctx-val{font-size:0.8rem;font-weight:600;color:var(--text);}
+.step-nav{display:flex;gap:0.75rem;margin-top:1.5rem;}
+/* Pro gate */
+.pro-gate{border:2px dashed var(--border);border-radius:12px;padding:3rem 2rem;text-align:center;margin-bottom:1.5rem;}
+.pro-gate-icon{font-size:2rem;margin-bottom:0.75rem;}
+.pro-gate-title{font-size:1.1rem;font-weight:800;letter-spacing:-0.01em;margin-bottom:0.4rem;}
+.pro-gate-sub{font-size:0.82rem;color:var(--muted);margin-bottom:1.25rem;max-width:380px;margin-left:auto;margin-right:auto;}
+.pro-gate-features{display:flex;flex-wrap:wrap;justify-content:center;gap:0.4rem;margin-bottom:1.5rem;}
+.pro-gate-feature{font-size:0.72rem;font-weight:600;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:0.25rem 0.65rem;color:var(--text);}
+.pro-btn{display:inline-block;padding:0.7rem 1.75rem;background:var(--text);color:#fff;border:none;border-radius:7px;font-family:var(--font);font-size:0.88rem;font-weight:700;cursor:pointer;}
+.pro-tag{display:inline-block;font-family:var(--mono);font-size:0.58rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:3px;background:var(--text);color:#fff;margin-left:0.4rem;vertical-align:middle;}
+@media(max-width:700px){.valuation-visual{grid-template-columns:1fr;}.val-arrow{transform:rotate(90deg);padding:0.3rem 0;}}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <a href="../../../index.html" class="top-nav-logo">Valuation<strong>Desk</strong></a>
+  <div class="top-nav-right">
+    <button onclick="unlockPro()" class="top-nav-pro-btn">Unlock Pro</button>
+  </div>
+</nav>
+<nav class="domain-nav">
+  <div class="domain-nav-inner">
+    <a href="../../valuation-advisory/index.html">Valuation</a>
+    <a href="../../investment-banking/index.html">Investment Banking</a>
+    <a href="../../corporate-finance/index.html">Corporate Finance</a>
+    <a href="../../ma/index.html">M&amp;A</a>
+    <a href="../../pe/index.html">Private Equity</a>
+    <a href="../index.html" class="active">Venture Capital</a>
+  </div>
+</nav>
+
+<div class="step-bar">
+  <div class="step-bar-inner">
+    <div class="stp active" id="si1"><div class="stp-num">1</div><span>Pick Startup</span></div>
+    <div class="stp-line" id="sl1"></div>
+    <div class="stp idle" id="si2"><div class="stp-num">2</div><span>How It Works</span></div>
+    <div class="stp-line" id="sl2"></div>
+    <div class="stp idle" id="si3"><div class="stp-num">3</div><span>Model Round <span class="pro-tag">Pro</span></span></div>
+    <div class="stp-line" id="sl3"></div>
+    <div class="stp idle" id="si4"><div class="stp-num">4</div><span>Ownership Table</span></div>
+  </div>
+</div>
+
+<!-- STEP 1 -->
+<section class="calc-section active" id="s1">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../index.html">Venture Capital</a><span>/</span>
+      <a href="index.html">Calculators</a><span>/</span>
+      <span>Pre/Post Money Valuation</span>
+    </div>
+    <div class="sec-eyebrow">VC Calculator · Pro</div>
+    <div class="sec-title">Pre/Post Money Valuation</div>
+    <div class="sec-sub">Select a startup to model how a new funding round reshapes ownership across all share classes.</div>
+    <div class="sector-pills" id="sectorPills"></div>
+    <div class="search-row"><input class="search-input" id="searchInput" placeholder="Search startup or ticker..." oninput="filterCos()"></div>
+    <div class="co-grid" id="coGrid"></div>
+    <button class="step-btn" id="s1btn" onclick="showStep(2)" disabled>Next: How It Works →</button>
+  </div>
+</section>
+
+<!-- STEP 2 -->
+<section class="calc-section" id="s2">
+  <div class="container">
+    <div class="teach-card">
+      <div class="teach-title">Pre-Money vs Post-Money Valuation</div>
+
+      <div class="valuation-visual">
+        <div class="val-box blue-tint">
+          <div class="val-box-label">Pre-Money</div>
+          <div class="val-box-val">₹X Cr</div>
+          <div class="val-box-sub">What investors value you at before their cheque</div>
+        </div>
+        <div class="val-arrow">+</div>
+        <div class="val-box">
+          <div class="val-box-label">New Investment</div>
+          <div class="val-box-val">₹Y Cr</div>
+          <div class="val-box-sub">Fresh capital into company</div>
+        </div>
+        <div class="val-arrow">=</div>
+        <div class="val-box green-tint">
+          <div class="val-box-label">Post-Money</div>
+          <div class="val-box-val">₹(X+Y) Cr</div>
+          <div class="val-box-sub">Investor's ownership = Y ÷ (X+Y)</div>
+        </div>
+      </div>
+
+      <table class="teach-table">
+        <thead><tr><th>Concept</th><th>Meaning</th><th>Why it matters</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Pre-money valuation</strong></td><td>Company value before new money in</td><td>Determines how much the round dilutes existing holders</td></tr>
+          <tr><td><strong>Post-money valuation</strong></td><td>Pre-money + new investment</td><td>Investor's ownership % = investment ÷ post-money</td></tr>
+          <tr><td><strong>Dilution</strong></td><td>Reduction in ownership % for existing shareholders</td><td>Everyone is diluted proportionally unless they exercise pro-rata</td></tr>
+          <tr><td><strong>Price per share</strong></td><td>Post-money ÷ fully diluted shares</td><td>Benchmark for all existing and new investors</td></tr>
+          <tr><td><strong>Anti-dilution</strong></td><td>Protection clause for investors in down rounds</td><td>Broad-based WA is Indian market standard; full ratchet is rare</td></tr>
+        </tbody>
+      </table>
+
+      <div class="formula-box">
+        <pre><span class="cm">// Core pre/post money math</span>
+postMoney     = preMoney + investment
+investorPct   = investment / postMoney
+founderPctNew = founderPctOld × (preMoney / postMoney)
+
+<span class="cm">// Price per share</span>
+pricePerShare = postMoney / fullyDilutedShares
+
+<span class="cm">// ESOP pool (pre-money convention)</span>
+<span class="cm">// Pool carved out BEFORE investor comes in → founders bear all dilution</span>
+postMoneyFD   = existingShares + esopShares + newInvestorShares</pre>
+      </div>
+
+      <div class="ctx-box" id="ctxBox">
+        <div class="ctx-label" id="ctxLabel">Sector Context</div>
+        <div id="ctxRows"></div>
+      </div>
+
+      <div class="ctx-box" style="border-color:#fef3c7;background:#fffbeb;">
+        <div class="ctx-label" style="color:var(--amber);">India-specific note — CCDs vs Equity</div>
+        <div style="font-size:0.78rem;color:var(--text);line-height:1.6;">
+          Most Indian VC deals use <strong>Compulsorily Convertible Debentures (CCDs)</strong> instead of direct equity for tax and regulatory efficiency. CCDs convert to equity at a pre-negotiated formula on a trigger (next round, IPO, or fixed date). The pre/post money math is the same — only the instrument differs. FDI guidelines under FEMA require CCDs for foreign investors in most sectors.
+        </div>
+      </div>
+    </div>
+    <div class="step-nav">
+      <button class="step-btn step-btn-outline" onclick="showStep(1)">← Back</button>
+      <button class="step-btn" onclick="showStep(3)">Next: Model Round →</button>
+    </div>
+  </div>
+</section>
+
+<!-- STEP 3 — PRO GATE -->
+<section class="calc-section" id="s3">
+  <div class="container">
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <div class="pro-gate-title">Pre/Post Money Model — Pro Feature</div>
+      <div class="pro-gate-sub">Model how a new funding round changes ownership across founders, ESOP pool, existing investors, and new investors — with share-class breakdown.</div>
+      <div class="pro-gate-features">
+        <span class="pro-gate-feature">Multi-class ownership table</span>
+        <span class="pro-gate-feature">ESOP shuffle (pre vs post)</span>
+        <span class="pro-gate-feature">Anti-dilution provisions</span>
+        <span class="pro-gate-feature">Pro-rata rights modeling</span>
+        <span class="pro-gate-feature">Price per share waterfall</span>
+        <span class="pro-gate-feature">Participation rights</span>
+      </div>
+      <button class="pro-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    </div>
+    <div class="step-nav">
+      <button class="step-btn step-btn-outline" onclick="showStep(2)">← Back</button>
+    </div>
+  </div>
+</section>
+
+<!-- STEP 4 — PRO GATE -->
+<section class="calc-section" id="s4">
+  <div class="container">
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <div class="pro-gate-title">Ownership Table — Pro Feature</div>
+      <div class="pro-gate-sub">See the full ownership table pre- and post-round, with dilution impact per stakeholder and fully-diluted share count.</div>
+      <button class="pro-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    </div>
+  </div>
+</section>
+
+<script>
+const COMPANIES=[
+  {name:'Razorpay',ticker:'RZRPAY',sector:'Fintech'},
+  {name:'Groww',ticker:'GROWW',sector:'Fintech'},
+  {name:'PhonePe',ticker:'PHONEPE',sector:'Fintech'},
+  {name:'CRED',ticker:'CRED',sector:'Fintech'},
+  {name:'Slice',ticker:'SLICE',sector:'Fintech'},
+  {name:'Freshworks',ticker:'FRSH',sector:'SaaS'},
+  {name:'Zoho',ticker:'ZOHO',sector:'SaaS'},
+  {name:'Darwinbox',ticker:'DRWNBX',sector:'SaaS'},
+  {name:'Chargebee',ticker:'CHRGBEE',sector:'SaaS'},
+  {name:'BrowserStack',ticker:'BRSRSTK',sector:'SaaS'},
+  {name:'Meesho',ticker:'MEESHO',sector:'E-commerce'},
+  {name:'Nykaa',ticker:'FSN',sector:'E-commerce'},
+  {name:'Mamaearth',ticker:'HMBL',sector:'D2C/Consumer'},
+  {name:'Purplle',ticker:'PURPLLE',sector:'D2C/Consumer'},
+  {name:'boAt',ticker:'BOAT',sector:'D2C/Consumer'},
+  {name:'Swiggy',ticker:'SWIGGY',sector:'Food Tech'},
+  {name:'Zomato',ticker:'ZOMATO',sector:'Food Tech'},
+  {name:'OfBusiness',ticker:'OFBIZ',sector:'B2B Commerce'},
+  {name:'Udaan',ticker:'UDAAN',sector:'B2B Commerce'},
+  {name:'Lenskart',ticker:'LNKRT',sector:'D2C/Consumer'},
+  {name:'Ola',ticker:'OLA',sector:'Mobility'},
+  {name:'Rapido',ticker:'RAPIDO',sector:'Mobility'},
+  {name:"Byju's",ticker:'BYJU',sector:'EdTech'},
+  {name:'Unacademy',ticker:'UNACAD',sector:'EdTech'},
+  {name:'Delhivery',ticker:'DELHIVERY',sector:'Logistics'},
+  {name:'Ecom Express',ticker:'ECOMEX',sector:'Logistics'},
+  {name:'OYO',ticker:'OYO',sector:'Hospitality'},
+  {name:'ideaForge',ticker:'IDEAFRG',sector:'Deep Tech'},
+  {name:'Agnikul Cosmos',ticker:'AGNIKUL',sector:'Deep Tech'},
+  {name:'InMobi',ticker:'INMOBI',sector:'AdTech/Media'}
+];
+const SECTOR_CONTEXT={
+  'Fintech':{seedValn:'₹10–30 Cr',seedPct:'10–20%',typicalEsop:'10–12%',exitRoute:'IPO or acquisition by bank/NBFC'},
+  'SaaS':{seedValn:'₹15–40 Cr',seedPct:'15–20%',typicalEsop:'10–15%',exitRoute:'Strategic acquisition or NASDAQ IPO'},
+  'E-commerce':{seedValn:'₹8–20 Cr',seedPct:'20–25%',typicalEsop:'8–12%',exitRoute:'IPO (NSE/BSE) or strategic sale'},
+  'D2C/Consumer':{seedValn:'₹5–15 Cr',seedPct:'20–30%',typicalEsop:'8–10%',exitRoute:'IPO or FMCG acquisition'},
+  'Food Tech':{seedValn:'₹10–25 Cr',seedPct:'15–25%',typicalEsop:'10–12%',exitRoute:'IPO or global platform acquisition'},
+  'B2B Commerce':{seedValn:'₹8–20 Cr',seedPct:'15–25%',typicalEsop:'8–10%',exitRoute:'Strategic or IPO'},
+  'Mobility':{seedValn:'₹5–15 Cr',seedPct:'20–30%',typicalEsop:'10–12%',exitRoute:'IPO or OEM acquisition'},
+  'EdTech':{seedValn:'₹5–20 Cr',seedPct:'20–30%',typicalEsop:'8–12%',exitRoute:'Consolidation or strategic acquisition'},
+  'Logistics':{seedValn:'₹8–15 Cr',seedPct:'15–25%',typicalEsop:'8–10%',exitRoute:'IPO or e-commerce platform acquisition'},
+  'Hospitality':{seedValn:'₹5–15 Cr',seedPct:'20–30%',typicalEsop:'8–10%',exitRoute:'IPO or hotel chain acquisition'},
+  'Deep Tech':{seedValn:'₹3–12 Cr',seedPct:'25–35%',typicalEsop:'15–20%',exitRoute:'Strategic acquisition or govt contracts'},
+  'AdTech/Media':{seedValn:'₹5–15 Cr',seedPct:'20–30%',typicalEsop:'10–12%',exitRoute:'Strategic acquisition or IPO'}
+};
+let activeSector='All',selectedCo=null,currentStep=1;
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+function getSectors(){const s=new Set(COMPANIES.map(c=>c.sector));return['All',...s];}
+function renderSectors(){
+  const el=document.getElementById('sectorPills');
+  el.innerHTML=getSectors().map(s=>`<button class="pill${s===activeSector?' active':''}" onclick="setSector('${s}')">${s}</button>`).join('');
+}
+function setSector(s){activeSector=s;renderSectors();filterCos();}
+function filterCos(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const filtered=COMPANIES.filter(c=>(activeSector==='All'||c.sector===activeSector)&&(c.name.toLowerCase().includes(q)||c.ticker.toLowerCase().includes(q)));
+  const el=document.getElementById('coGrid');
+  el.innerHTML=filtered.map(c=>`<div class="co-card${selectedCo&&selectedCo.name===c.name?' selected':''}" onclick="selectCo(${JSON.stringify(c).replace(/"/g,'&quot;')})"><div class="co-ticker">${c.ticker}</div><div class="co-name">${c.name}</div><div class="co-sector">${c.sector}</div></div>`).join('');
+}
+function selectCo(c){selectedCo=c;document.getElementById('s1btn').disabled=false;filterCos();}
+function renderCtx(){
+  if(!selectedCo)return;
+  const ctx=SECTOR_CONTEXT[selectedCo.sector]||{};
+  document.getElementById('ctxLabel').textContent=`${selectedCo.sector} Sector — Typical Round Benchmarks`;
+  document.getElementById('ctxRows').innerHTML=`
+    <div class="ctx-row"><span class="ctx-key">Seed pre-money range</span><span class="ctx-val">${ctx.seedValn||'—'}</span></div>
+    <div class="ctx-row"><span class="ctx-key">Seed dilution (typical)</span><span class="ctx-val">${ctx.seedPct||'—'}</span></div>
+    <div class="ctx-row"><span class="ctx-key">ESOP pool norm</span><span class="ctx-val">${ctx.typicalEsop||'—'}</span></div>
+    <div class="ctx-row"><span class="ctx-key">Common exit routes</span><span class="ctx-val">${ctx.exitRoute||'—'}</span></div>
+  `;
+}
+function showStep(n){
+  [1,2,3,4].forEach(i=>{
+    document.getElementById('s'+i).classList.toggle('active',i===n);
+    const si=document.getElementById('si'+i);
+    si.className='stp '+(i<n?'done':i===n?'active':'idle');
+    if(i<4){const ln=document.getElementById('sl'+i);if(ln)ln.className='stp-line'+(i<n?' stp-done-line':'');}
+  });
+  currentStep=n;
+  if(n===2&&selectedCo)renderCtx();
+}
+renderSectors();filterCos();
+</script>
+</body>
+</html>

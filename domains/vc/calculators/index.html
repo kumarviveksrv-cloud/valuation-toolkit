@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VC Calculators — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;}
+.top-nav{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:56px;}
+.top-nav-logo{font-size:1rem;font-weight:800;color:var(--text);text-decoration:none;letter-spacing:-0.02em;}
+.top-nav-logo strong{font-weight:900;}
+.top-nav-links{display:flex;align-items:center;gap:0.25rem;list-style:none;}
+.top-nav-links a{font-size:0.82rem;font-weight:500;color:var(--muted);text-decoration:none;padding:0.4rem 0.75rem;border-radius:6px;}
+.top-nav-links a:hover{color:var(--text);background:var(--card);}
+.top-nav-right{display:flex;align-items:center;gap:0.75rem;}
+.top-nav-pro-btn{font-size:0.78rem;font-weight:700;color:#fff;background:var(--text);text-decoration:none;padding:0.4rem 1rem;border-radius:6px;}
+.domain-nav{background:var(--bg);border-bottom:1px solid var(--border);padding:0 2rem;}
+.domain-nav-inner{display:flex;overflow-x:auto;scrollbar-width:none;}
+.domain-nav-inner::-webkit-scrollbar{display:none;}
+.domain-nav-inner a{display:inline-block;font-size:0.8rem;font-weight:500;color:var(--muted);text-decoration:none;padding:0.65rem 1rem;border-bottom:2px solid transparent;white-space:nowrap;}
+.domain-nav-inner a:hover{color:var(--text);}
+.domain-nav-inner a.active{color:var(--text);font-weight:600;border-bottom-color:var(--text);}
+.free-banner{background:#f0fdf4;border-bottom:1px solid #bbf7d0;padding:0.65rem 2rem;display:flex;align-items:center;gap:0.75rem;}
+.free-banner span{font-size:0.78rem;color:#166534;}
+.free-banner strong{font-weight:700;}
+.section{padding:3rem 2rem;}
+.container{max-width:1100px;margin:0 auto;}
+.breadcrumb{display:flex;align-items:center;gap:0.5rem;font-size:0.78rem;color:var(--muted);margin-bottom:1.5rem;}
+.breadcrumb a{color:var(--muted);text-decoration:none;}
+.breadcrumb a:hover{color:var(--text);}
+.breadcrumb span{color:var(--border);}
+.sec-eyebrow{font-family:var(--mono);font-size:0.65rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem;}
+.sec-title{font-size:1.4rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:0.4rem;}
+.sec-sub{font-size:0.85rem;color:var(--muted);margin-bottom:2rem;}
+.calc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1.1rem;}
+.calc-card{border:1px solid var(--border);border-radius:10px;padding:1.35rem;background:var(--bg);text-decoration:none;color:inherit;display:block;transition:all 0.2s;}
+.calc-card:hover{border-color:#999;box-shadow:0 3px 18px rgba(0,0,0,0.07);}
+.calc-card-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:0.7rem;}
+.calc-icon{width:36px;height:36px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:1rem;}
+.tag{font-family:var(--mono);font-size:0.58rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:3px;}
+.tag-free{background:#dcfce7;color:var(--green);}
+.tag-pro{background:var(--text);color:#fff;}
+.calc-name{font-size:0.9rem;font-weight:700;letter-spacing:-0.01em;margin-bottom:0.25rem;}
+.calc-desc{font-size:0.77rem;color:var(--muted);line-height:1.5;}
+.footer{border-top:1px solid var(--border);padding:2rem;text-align:center;}
+.footer-text{font-size:0.75rem;color:var(--muted);}
+@media(max-width:700px){.top-nav-links{display:none;}.calc-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <a href="../../../index.html" class="top-nav-logo">Valuation<strong>Desk</strong></a>
+  <ul class="top-nav-links">
+    <li><a href="../index.html">Venture Capital</a></li>
+    <li><a href="../learn/index.html">Learn</a></li>
+  </ul>
+  <div class="top-nav-right">
+    <a href="#" onclick="unlockPro()" class="top-nav-pro-btn">Unlock Pro</a>
+  </div>
+</nav>
+<nav class="domain-nav">
+  <div class="domain-nav-inner">
+    <a href="../../valuation-advisory/index.html">Valuation</a>
+    <a href="../../investment-banking/index.html">Investment Banking</a>
+    <a href="../../corporate-finance/index.html">Corporate Finance</a>
+    <a href="../../ma/index.html">M&amp;A</a>
+    <a href="../../pe/index.html">Private Equity</a>
+    <a href="../index.html" class="active">Venture Capital</a>
+  </div>
+</nav>
+<div class="free-banner">
+  <span>🎁 <strong>Cap Table Builder is free</strong> — no login needed. Pro unlocks 6 more VC calculators for ₹799/month.</span>
+</div>
+
+<section class="section">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../index.html">Venture Capital</a>
+      <span>/</span>
+      <span>Calculators</span>
+    </div>
+    <div class="sec-eyebrow">Domain 06 · Venture Capital</div>
+    <div class="sec-title">7 VC Calculators</div>
+    <div class="sec-sub">From cap table to SAFE note conversion — the full toolkit for founders, analysts, and investors navigating the Indian VC market.</div>
+
+    <div class="calc-grid">
+      <a href="cap-table.html" class="calc-card">
+        <div class="calc-card-top">
+          <div class="calc-icon" style="background:#dcfce7;">📋</div>
+          <span class="tag tag-free">Free</span>
+        </div>
+        <div class="calc-name">Cap Table Builder</div>
+        <div class="calc-desc">Build a pre-Series A cap table. Model founders, ESOP pool, and seed round. See dilution impact and exit payouts.</div>
+      </a>
+      <a href="pre-post-money.html" class="calc-card">
+        <div class="calc-card-top">
+          <div class="calc-icon" style="background:#dbeafe;">💰</div>
+          <span class="tag tag-pro">Pro</span>
+        </div>
+        <div class="calc-name">Pre/Post Money Valuation</div>
+        <div class="calc-desc">Calculate how a new round changes ownership across all share classes. Model equity split and investor economics.</div>
+      </a>
+      <a href="vc-method.html" class="calc-card">
+        <div class="calc-card-top">
+          <div class="calc-icon" style="background:#fef3c7;">🎯</div>
+          <span class="tag tag-pro">Pro</span>
+        </div>
+        <div class="calc-name">VC Method Valuation</div>
+        <div class="calc-desc">Work backwards from exit value. Compute implied pre-money, dilution, and required ownership given your target return.</div>
+      </a>
+      <a href="dilution-tracker.html" class="calc-card">
+        <div class="calc-card-top">
+          <div class="calc-icon" style="background:#ede9fe;">📉</div>
+          <span class="tag tag-pro">Pro</span>
+        </div>
+        <div class="calc-name">Multi-Round Dilution Tracker</div>
+        <div class="calc-desc">Track dilution across Seed → Series A → B → C. Model ESOP refreshes, pro-rata rights, and anti-dilution provisions.</div>
+      </a>
+      <a href="runway-calculator.html" class="calc-card">
+        <div class="calc-card-top">
+          <div class="calc-icon" style="background:#fee2e2;">⏱️</div>
+          <span class="tag tag-pro">Pro</span>
+        </div>
+        <div class="calc-name">Runway Calculator</div>
+        <div class="calc-desc">Calculate months of runway and model hiring plans, revenue ramp, and bridge financing scenarios to avoid default.</div>
+      </a>
+      <a href="safe-notes.html" class="calc-card">
+        <div class="calc-card-top">
+          <div class="calc-icon" style="background:#f0fdf4;">📄</div>
+          <span class="tag tag-pro">Pro</span>
+        </div>
+        <div class="calc-name">SAFE Notes Converter</div>
+        <div class="calc-desc">Model how SAFE notes convert at your priced round. Compare discount, valuation cap, MFN, and post-money SAFE mechanics.</div>
+      </a>
+      <a href="option-pool.html" class="calc-card">
+        <div class="calc-card-top">
+          <div class="calc-icon" style="background:#fff7ed;">🏊</div>
+          <span class="tag tag-pro">Pro</span>
+        </div>
+        <div class="calc-name">Option Pool Modeller</div>
+        <div class="calc-desc">Design your ESOP pool with vesting schedule, cliff, and exercise price. Quantify pre-money vs post-money pool shuffle dilution.</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <p class="footer-text">ValuationDesk · VC Calculators · <a href="../index.html" style="color:var(--muted);">Back to Venture Capital</a></p>
+</footer>
+<script>
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+</script>
+</body>
+</html>

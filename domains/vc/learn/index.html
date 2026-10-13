@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Venture Capital — Learn | ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;
+  --card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;
+  --purple:#7c3aed;--indigo:#4f46e5;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+a{color:inherit;text-decoration:none}
+
+/* NAV */
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;gap:16px;position:sticky;top:0;background:var(--bg);z-index:100}
+.nav-logo{font-weight:800;font-size:15px;letter-spacing:-.3px}
+.nav-logo span{color:var(--blue)}
+.nav-sep{color:var(--border);font-size:18px}
+.nav-crumb{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}
+.nav-crumb a:hover{color:var(--text)}
+.nav-crumb .sep{color:var(--border)}
+.nav-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.btn-sm{font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg);cursor:pointer;transition:all .15s}
+.btn-sm:hover{background:var(--card);border-color:#d1d5db}
+.btn-pro{background:var(--text);color:#fff;border-color:var(--text)}
+.btn-pro:hover{background:#333;border-color:#333}
+
+/* HERO */
+.hero{padding:48px 24px 32px;max-width:900px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--purple);background:#f5f3ff;border:1px solid #e9d5ff;padding:4px 10px;border-radius:20px;margin-bottom:16px}
+.hero h1{font-size:clamp(26px,5vw,40px);font-weight:900;letter-spacing:-.5px;line-height:1.1;margin-bottom:12px}
+.hero-sub{font-size:15px;color:var(--muted);max-width:580px;margin-bottom:24px}
+.hero-meta{display:flex;gap:20px;flex-wrap:wrap}
+.hero-stat{font-size:13px;color:var(--muted)}
+.hero-stat strong{color:var(--text);font-weight:700}
+
+/* LEARNING PATH */
+.section{padding:24px 24px 0;max-width:900px;margin:0 auto}
+.section-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+
+.path-steps{display:flex;flex-wrap:wrap;gap:0;margin-bottom:40px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.path-step{flex:1;min-width:160px;padding:16px;border-right:1px solid var(--border);position:relative}
+.path-step:last-child{border-right:none}
+.step-num{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--muted);margin-bottom:4px}
+.step-label{font-size:13px;font-weight:700;line-height:1.3}
+.step-sub{font-size:11px;color:var(--muted);margin-top:4px}
+.step-accent{height:3px;width:100%;position:absolute;top:0;left:0;border-radius:0}
+
+/* MODULES */
+.modules{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:16px;margin-bottom:40px}
+.module-card{border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:box-shadow .15s}
+.module-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.07)}
+.module-top{height:4px}
+.module-body{padding:20px}
+.module-row{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.module-num{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--muted)}
+.module-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-left:auto}
+.badge-free{background:#dcfce7;color:var(--green)}
+.badge-pro{background:#fef3c7;color:var(--amber)}
+.module-title{font-size:16px;font-weight:800;margin-bottom:6px;letter-spacing:-.2px}
+.module-desc{font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.55}
+.module-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.tag{font-size:10px;font-weight:600;padding:3px 8px;border-radius:6px;background:var(--card);border:1px solid var(--border);color:var(--muted)}
+.module-actions{display:flex;gap:8px}
+.btn-calc{font-size:12px;font-weight:700;padding:8px 16px;border-radius:7px;border:1px solid var(--border);background:var(--card);cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px}
+.btn-calc:hover{background:var(--text);color:#fff;border-color:var(--text)}
+.btn-calc.primary{background:var(--text);color:#fff;border-color:var(--text)}
+.btn-calc.primary:hover{background:#333;border-color:#333}
+
+/* CONCEPTS */
+.concepts{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;margin-bottom:40px}
+.concept-card{border:1px solid var(--border);border-radius:8px;padding:16px;background:var(--card)}
+.concept-icon{font-size:20px;margin-bottom:8px}
+.concept-name{font-size:13px;font-weight:700;margin-bottom:4px}
+.concept-desc{font-size:12px;color:var(--muted);line-height:1.5}
+.concept-formula{font-family:'JetBrains Mono',monospace;font-size:11px;background:#fff;border:1px solid var(--border);border-radius:5px;padding:6px 8px;margin-top:8px;color:var(--blue)}
+
+/* INDIA LANDSCAPE */
+.landscape{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:24px;margin-bottom:40px}
+.landscape h3{font-size:15px;font-weight:800;margin-bottom:16px}
+.landscape-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.ls-card{background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px}
+.ls-label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.ls-value{font-size:20px;font-weight:900;letter-spacing:-.5px;margin-bottom:2px}
+.ls-note{font-size:11px;color:var(--muted)}
+
+/* GLOSSARY */
+.glossary{margin-bottom:40px}
+.glossary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:0;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.gloss-item{padding:14px 18px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+.gloss-item:nth-child(2n){border-right:none}
+.gloss-item:nth-last-child(-n+2){border-bottom:none}
+.gloss-term{font-size:13px;font-weight:700;margin-bottom:3px}
+.gloss-def{font-size:12px;color:var(--muted);line-height:1.5}
+.gloss-tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:6px;vertical-align:middle}
+.gt-india{background:#fef9c3;color:#854d0e}
+.gt-formula{background:#ede9fe;color:var(--purple)}
+
+/* PRO BANNER */
+.pro-banner{background:linear-gradient(135deg,#0a0a0a 0%,#1e1b4b 100%);border-radius:12px;padding:28px;margin-bottom:40px;color:#fff;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.pro-banner-left h3{font-size:18px;font-weight:900;margin-bottom:6px}
+.pro-banner-left p{font-size:13px;color:rgba(255,255,255,.65);max-width:440px}
+.btn-unlock{background:#fff;color:var(--text);font-size:13px;font-weight:800;padding:12px 24px;border-radius:8px;border:none;cursor:pointer;white-space:nowrap;transition:opacity .15s}
+.btn-unlock:hover{opacity:.9}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:20px 24px;max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-left{font-size:12px;color:var(--muted)}
+.footer-left strong{color:var(--text)}
+.footer-links{display:flex;gap:16px}
+.footer-links a{font-size:12px;color:var(--muted);transition:color .15s}
+.footer-links a:hover{color:var(--text)}
+
+@media(max-width:600px){
+  .modules{grid-template-columns:1fr}
+  .glossary-grid{grid-template-columns:1fr}
+  .gloss-item{border-right:none}
+  .gloss-item:nth-last-child(-n+2){border-bottom:1px solid var(--border)}
+  .gloss-item:last-child{border-bottom:none}
+  .path-steps{flex-direction:column}
+  .path-step{border-right:none;border-bottom:1px solid var(--border)}
+  .path-step:last-child{border-bottom:none}
+  .pro-banner{flex-direction:column;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Valuation<span>Desk</span></div>
+  <span class="nav-sep">/</span>
+  <div class="nav-crumb">
+    <a href="/">Home</a><span class="sep">/</span>
+    <a href="/domains/vc/">Venture Capital</a><span class="sep">/</span>
+    <span>Learn</span>
+  </div>
+  <div class="nav-actions">
+    <button class="btn-sm">All Domains</button>
+    <button class="btn-sm btn-pro" onclick="alert('Pro unlock coming soon — ₹799/mo for all 15 domains.')">Unlock Pro — ₹799/mo</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">🚀 Domain 06</div>
+  <h1>Venture Capital<br>Fundamentals</h1>
+  <p class="hero-sub">From cap tables to term sheets — master how VCs value pre-revenue startups, structure deals, and think about returns across a portfolio.</p>
+  <div class="hero-meta">
+    <div class="hero-stat"><strong>4</strong> Modules</div>
+    <div class="hero-stat"><strong>6</strong> Calculators</div>
+    <div class="hero-stat"><strong>~3 hrs</strong> to complete</div>
+    <div class="hero-stat"><strong>1 free</strong> + 5 Pro</div>
+  </div>
+</div>
+
+<!-- LEARNING PATH -->
+<div class="section">
+  <div class="section-title">Your Learning Path</div>
+  <div class="path-steps">
+    <div class="path-step">
+      <div class="step-accent" style="background:var(--purple)"></div>
+      <div class="step-num">01</div>
+      <div class="step-label">Startup Valuation Fundamentals</div>
+      <div class="step-sub">Pre-money, post-money, VC method</div>
+    </div>
+    <div class="path-step">
+      <div class="step-accent" style="background:var(--blue)"></div>
+      <div class="step-num">02</div>
+      <div class="step-label">Cap Tables & Dilution</div>
+      <div class="step-sub">Ownership math across rounds</div>
+    </div>
+    <div class="path-step">
+      <div class="step-accent" style="background:var(--green)"></div>
+      <div class="step-num">03</div>
+      <div class="step-label">VC Fund Economics</div>
+      <div class="step-sub">2/20 model, runway, burn rate</div>
+    </div>
+    <div class="path-step">
+      <div class="step-accent" style="background:var(--amber)"></div>
+      <div class="step-num">04</div>
+      <div class="step-label">Term Sheets & SAFEs</div>
+      <div class="step-sub">SAFE notes, CCDs, option pools</div>
+    </div>
+    <div class="path-step">
+      <div class="step-accent" style="background:var(--red)"></div>
+      <div class="step-num">05</div>
+      <div class="step-label">Practice Calculators</div>
+      <div class="step-sub">Apply on 30 real Indian startups</div>
+    </div>
+  </div>
+</div>
+
+<!-- MODULES -->
+<div class="section">
+  <div class="section-title">4 Core Modules</div>
+  <div class="modules">
+
+    <!-- M1 -->
+    <div class="module-card">
+      <div class="module-top" style="background:var(--purple)"></div>
+      <div class="module-body">
+        <div class="module-row">
+          <span class="module-num">MODULE 01</span>
+          <span class="module-badge badge-free">FREE</span>
+        </div>
+        <div class="module-title">Startup Valuation Fundamentals</div>
+        <div class="module-desc">Pre-revenue startups have no earnings to discount. Learn how VCs use market multiples, comparable transactions, and the VC Method to work backwards from an expected exit to a justifiable entry price today.</div>
+        <div class="module-tags">
+          <span class="tag">Pre-Money</span>
+          <span class="tag">Post-Money</span>
+          <span class="tag">VC Method</span>
+          <span class="tag">IRR / MOIC</span>
+          <span class="tag">Exit Multiples</span>
+        </div>
+        <div class="module-actions">
+          <a href="/domains/vc/calculators/cap-table.html"><button class="btn-calc primary">→ Try Cap Table Calculator</button></a>
+          <a href="/domains/vc/calculators/pre-post-money.html"><button class="btn-calc">Pre/Post Money ↗</button></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- M2 -->
+    <div class="module-card">
+      <div class="module-top" style="background:var(--blue)"></div>
+      <div class="module-body">
+        <div class="module-row">
+          <span class="module-num">MODULE 02</span>
+          <span class="module-badge badge-pro">PRO</span>
+        </div>
+        <div class="module-title">Cap Tables &amp; Dilution</div>
+        <div class="module-desc">Every new round reshuffles ownership. Track founder dilution from Day 0 through a Series B, understand BBWA anti-dilution ratchets, and master the pre-money vs post-money ESOP pool shuffle — the silent dilution founders often miss.</div>
+        <div class="module-tags">
+          <span class="tag">Cap Table Math</span>
+          <span class="tag">Dilution Tracking</span>
+          <span class="tag">ESOP Pool</span>
+          <span class="tag">Anti-Dilution</span>
+          <span class="tag">BBWA</span>
+        </div>
+        <div class="module-actions">
+          <a href="/domains/vc/calculators/cap-table.html"><button class="btn-calc primary">→ Cap Table Calculator</button></a>
+          <a href="/domains/vc/calculators/dilution-tracker.html"><button class="btn-calc">Dilution Tracker ↗</button></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- M3 -->
+    <div class="module-card">
+      <div class="module-top" style="background:var(--green)"></div>
+      <div class="module-body">
+        <div class="module-row">
+          <span class="module-num">MODULE 03</span>
+          <span class="module-badge badge-pro">PRO</span>
+        </div>
+        <div class="module-title">VC Fund Economics</div>
+        <div class="module-desc">The 2% management fee and 20% carry model shapes everything a VC does. Understand why burn rate and runway dictate a startup's negotiating power, how the "burn multiple" reveals capital efficiency, and why most VC returns come from just 1–2 companies per fund.</div>
+        <div class="module-tags">
+          <span class="tag">2/20 Model</span>
+          <span class="tag">Burn Rate</span>
+          <span class="tag">Runway</span>
+          <span class="tag">Burn Multiple</span>
+          <span class="tag">Power Law</span>
+        </div>
+        <div class="module-actions">
+          <a href="/domains/vc/calculators/runway-calculator.html"><button class="btn-calc primary">→ Runway Calculator</button></a>
+          <a href="/domains/vc/calculators/vc-method.html"><button class="btn-calc">VC Method ↗</button></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- M4 -->
+    <div class="module-card">
+      <div class="module-top" style="background:var(--amber)"></div>
+      <div class="module-body">
+        <div class="module-row">
+          <span class="module-num">MODULE 04</span>
+          <span class="module-badge badge-pro">PRO</span>
+        </div>
+        <div class="module-title">Term Sheets &amp; SAFE Notes</div>
+        <div class="module-desc">SAFE notes and CCDs defer the valuation debate to later — but the cap, discount, and MFN clause buried in them determine who wins at conversion. Learn all 4 SAFE types, the India-specific CCD structure, and how option pool design gets weaponised in term sheet negotiations.</div>
+        <div class="module-tags">
+          <span class="tag">SAFE Notes</span>
+          <span class="tag">CCDs</span>
+          <span class="tag">Valuation Cap</span>
+          <span class="tag">Discount Rate</span>
+          <span class="tag">Option Pool</span>
+          <span class="tag">GIFT City</span>
+        </div>
+        <div class="module-actions">
+          <a href="/domains/vc/calculators/safe-notes.html"><button class="btn-calc primary">→ SAFE Notes Calculator</button></a>
+          <a href="/domains/vc/calculators/option-pool.html"><button class="btn-calc">Option Pool ↗</button></a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- INDIA VC LANDSCAPE -->
+<div class="section">
+  <div class="section-title">India VC Landscape — At a Glance</div>
+  <div class="landscape">
+    <h3>🇮🇳 What the Numbers Say (2024)</h3>
+    <div class="landscape-grid">
+      <div class="ls-card">
+        <div class="ls-label">Active Unicorns</div>
+        <div class="ls-value">120+</div>
+        <div class="ls-note">3rd largest unicorn hub globally</div>
+      </div>
+      <div class="ls-card">
+        <div class="ls-label">VC Funding (2024)</div>
+        <div class="ls-value">~$10B</div>
+        <div class="ls-note">Down from $35B peak in 2022</div>
+      </div>
+      <div class="ls-card">
+        <div class="ls-label">Typical Seed Round</div>
+        <div class="ls-value">$1–3M</div>
+        <div class="ls-note">₹8–25 Cr, 15–25% dilution</div>
+      </div>
+      <div class="ls-card">
+        <div class="ls-label">Typical Series A</div>
+        <div class="ls-value">$5–15M</div>
+        <div class="ls-note">₹40–120 Cr, 15–20% dilution</div>
+      </div>
+      <div class="ls-card">
+        <div class="ls-label">ESOP Pool (Standard)</div>
+        <div class="ls-value">10–15%</div>
+        <div class="ls-note">Created pre-money at Series A</div>
+      </div>
+      <div class="ls-card">
+        <div class="ls-label">CCD Usage</div>
+        <div class="ls-value">~80%</div>
+        <div class="ls-note">SAFEs need FEMA compliance via CCDs</div>
+      </div>
+      <div class="ls-card">
+        <div class="ls-label">Top Sectors (2024)</div>
+        <div class="ls-value">Fintech, SaaS</div>
+        <div class="ls-note">AI/ML growing fastest YoY</div>
+      </div>
+      <div class="ls-card">
+        <div class="ls-label">Avg Burn Multiple</div>
+        <div class="ls-value">1.5–2.5x</div>
+        <div class="ls-note">&lt;1.5x = efficient, &gt;3x = concerning</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- KEY CONCEPTS -->
+<div class="section">
+  <div class="section-title">12 Concepts Every VC Analyst Must Know</div>
+  <div class="concepts">
+
+    <div class="concept-card">
+      <div class="concept-icon">📐</div>
+      <div class="concept-name">Pre-Money Valuation</div>
+      <div class="concept-desc">What a startup is worth before new money comes in. The number founders negotiate hardest on.</div>
+      <div class="concept-formula">Post-Money = Pre-Money + Investment</div>
+    </div>
+
+    <div class="concept-card">
+      <div class="concept-icon">📊</div>
+      <div class="concept-name">Cap Table</div>
+      <div class="concept-desc">The ledger of who owns what. Every round, ESOP grant, and SAFE conversion changes it. Track it obsessively.</div>
+      <div class="concept-formula">Investor% = Investment ÷ Post-Money</div>
+    </div>
+
+    <div class="concept-card">
+      <div class="concept-icon">🔭</div>
+      <div class="concept-name">VC Method</div>
+      <div class="concept-desc">Work backwards from expected exit value, discount to present, then solve for required ownership to justify the investment.</div>
+      <div class="concept-formula">PV = Exit ÷ (1 + IRR)^n</div>
+    </div>
+
+    <div class="concept-card">
+      <div class="concept-icon">🏊</div>
+      <div class="concept-name">ESOP Pool Shuffle</div>
+      <div class="concept-desc">Creating the pool pre-money dilutes founders, not investors. Investors always push for this structure.</div>
+      <div class="concept-formula">Total = Founders ÷ (1 − ESOP%)</div>
+    </div>
+
+    <div class="concept-card">
+      <div class="concept-icon">🛡️</div>
+      <div class="concept-name">Anti-Dilution (BBWA)</div>
+      <div class="concept-desc">Broad-Based Weighted Average gives new shares if a down-round happens. Protects investors at the cost of founders.</div>
+      <div class="concept-formula">NewCP = OldCP × (OS + SS) ÷ (OS + AS)</div>
+    </div>
+
+    <div class="concept-card">
+      <div class="concept-icon">🔥</div>
+      <div class="concept-name">Burn Rate</div>
+      <div class="concept-desc">Net cash consumed per month (gross spend minus revenue). The single most-tracked metric between rounds.</div>
+      <div class="concept-formula">Net Burn = Gross Spend − Revenue</div>
+    </div>
+
+    <div class="concept-card">
+      <div class="concept-icon">✈️</div>
+      <div class="concept-name">Runway</div>
+      <div class="concept-desc">How many months until the bank account hits zero. Raise when you have 12+ months — not 3.</div>
+      <div class="concept-formula">Runway = Cash ÷ Net Burn</div>
+    </div>
+
+    <div class="concept-card">
+      <div class="concept-icon">⚡</div>
+      <div class="concept-name">Burn Multiple</div>
+      <div class="concept-desc">How much net cash burned per dollar of net new ARR. Below 1.5x is great. Above 3x raises flags.</div>
+      <div class="concept-formula">Burn Multiple = Net Burn ÷ Net New ARR</div>
+    </div>
+
+    <div class="concept-card">
+      <div class="concept-icon">📝</div>
+      <div class="concept-name">SAFE Note</div>
+      <div class="concept-desc">Simple Agreement for Future Equity. A convertible instrument with no interest, no maturity — just a cap and/or discount that determines conversion price at the next priced round.</div>
+      <div class="concept-formula">ConvPrice = min(Cap ÷ Shares, RoundPrice)</div>
+    </div>
+
+    <div class="concept-card">
+      <div class="concept-icon">🇮🇳</div>
+      <div class="concept-name">CCD (India)</div>
+      <div class="concept-desc">Compulsorily Convertible Debentures. India's FEMA-compliant equivalent of a SAFE for foreign investors. Converts to equity at a priced round.</div>
+      <div class="concept-formula">Must convert → equity within 10 years</div>
+    </div>
+
+    <div class="concept-card">
+      <div class="concept-icon">📈</div>
+      <div class="concept-name">MOIC</div>
+      <div class="concept-desc">Multiple on Invested Capital. The raw return multiple. A $1M investment returning $5M = 5x MOIC, regardless of time.</div>
+      <div class="concept-formula">MOIC = Exit Value ÷ Investment</div>
+    </div>
+
+    <div class="concept-card">
+      <div class="concept-icon">⏱️</div>
+      <div class="concept-name">IRR (VC Context)</div>
+      <div class="concept-desc">Internal rate of return — annualises MOIC. A 5x in 3 years (73% IRR) beats a 10x in 10 years (26% IRR). Time kills returns.</div>
+      <div class="concept-formula">MOIC = (1 + IRR)^n</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- PRO BANNER -->
+<div class="section">
+  <div class="pro-banner">
+    <div class="pro-banner-left">
+      <h3>🔒 5 Pro Calculators Waiting for You</h3>
+      <p>Pre/Post Money, VC Method, Dilution Tracker, Runway, SAFE Notes, and Option Pool — all with 30 real Indian startups as benchmarks. One plan. All 15 domains.</p>
+    </div>
+    <button class="btn-unlock" onclick="alert('Pro unlock coming soon — ₹799/mo for all 15 domains.')">Unlock Pro — ₹799/mo →</button>
+  </div>
+</div>
+
+<!-- GLOSSARY -->
+<div class="section">
+  <div class="section-title">Glossary — Key VC Terms</div>
+  <div class="glossary" style="margin-bottom:40px">
+    <div class="glossary-grid">
+
+      <div class="gloss-item">
+        <div class="gloss-term">Pre-Money Valuation <span class="gloss-tag gt-formula">Formula</span></div>
+        <div class="gloss-def">The agreed value of the company before a new investment round. Determines how much ownership the new investor gets.</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">Post-Money Valuation <span class="gloss-tag gt-formula">Formula</span></div>
+        <div class="gloss-def">Pre-money + the new investment. Investor ownership% = Investment ÷ Post-Money.</div>
+      </div>
+
+      <div class="gloss-item">
+        <div class="gloss-term">SAFE Note</div>
+        <div class="gloss-def">Simple Agreement for Future Equity. Converts to equity at the next priced round at a discounted price or valuation cap — whichever is lower.</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">CCD <span class="gloss-tag gt-india">India</span></div>
+        <div class="gloss-def">Compulsorily Convertible Debenture. India's FEMA-compliant equivalent of a SAFE. Required for foreign investment at seed stage.</div>
+      </div>
+
+      <div class="gloss-item">
+        <div class="gloss-term">Valuation Cap</div>
+        <div class="gloss-def">The maximum valuation at which a SAFE converts to equity. Protects early investors if the company's next-round valuation is very high.</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">Discount Rate (SAFE)</div>
+        <div class="gloss-def">Converts at a percentage below the next round price (e.g., 20% discount → convert at 80% of Series A price). Rewards early risk.</div>
+      </div>
+
+      <div class="gloss-item">
+        <div class="gloss-term">ESOP / Option Pool</div>
+        <div class="gloss-def">Employee Stock Option Plan. Typically 10–15% set aside for hiring. Created pre-money at investor insistence (dilutes founders, not investors).</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">Cliff Vesting</div>
+        <div class="gloss-def">No stock vests until the "cliff" date (typically 1 year). Standard 4-year vesting with 1-year cliff = 25% vests at month 12.</div>
+      </div>
+
+      <div class="gloss-item">
+        <div class="gloss-term">Anti-Dilution (BBWA) <span class="gloss-tag gt-formula">Formula</span></div>
+        <div class="gloss-def">Broad-Based Weighted Average. Adjusts investor's conversion price downward in a down-round, issuing more shares to compensate.</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">Full Ratchet</div>
+        <div class="gloss-def">Extreme anti-dilution: if any share is sold cheaper, investor gets fully repriced. Rare in normal deals. Punishes founders heavily.</div>
+      </div>
+
+      <div class="gloss-item">
+        <div class="gloss-term">Burn Rate</div>
+        <div class="gloss-def">Net cash consumed per month. Gross burn minus monthly revenue. The metric VCs watch most closely between rounds.</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">Runway</div>
+        <div class="gloss-def">Months until cash hits zero at current burn rate. "12 months of runway" is often the trigger to start a new fundraise.</div>
+      </div>
+
+      <div class="gloss-item">
+        <div class="gloss-term">Liquidation Preference</div>
+        <div class="gloss-def">Investors get paid first (usually 1x investment) in an exit before common shareholders (founders/employees) receive anything.</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">Participating Preferred</div>
+        <div class="gloss-def">Investor gets liquidation preference AND participates pro-rata in remaining proceeds. Founders often negotiate this out.</div>
+      </div>
+
+      <div class="gloss-item">
+        <div class="gloss-term">VC Method <span class="gloss-tag gt-formula">Formula</span></div>
+        <div class="gloss-def">PV of Exit ÷ (1+IRR)^n = required ownership % → implied pre-money valuation. Works backwards from exit to entry.</div>
+      </div>
+      <div class="gloss-item">
+        <div class="gloss-term">Power Law <span class="gloss-tag gt-india">Context</span></div>
+        <div class="gloss-def">In any VC fund, 1–2 companies generate 80%+ of returns. Every other investment is optional noise. VCs bet on outliers.</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-left"><strong>ValuationDesk</strong> · Domain 06 — Venture Capital · Learn</div>
+  <div class="footer-links">
+    <a href="/domains/vc/">← Back to VC Domain</a>
+    <a href="/domains/vc/calculators/">Calculators</a>
+    <a href="/">All Domains</a>
+  </div>
+</footer>
+
+</body>
+</html>

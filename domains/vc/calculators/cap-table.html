@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cap Table Builder — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;}
+
+/* NAV */
+.top-nav{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:56px;}
+.top-nav-logo{font-size:1rem;font-weight:800;color:var(--text);text-decoration:none;letter-spacing:-0.02em;}
+.top-nav-logo strong{font-weight:900;}
+.top-nav-links{display:flex;align-items:center;gap:0.25rem;list-style:none;}
+.top-nav-links a{font-size:0.82rem;font-weight:500;color:var(--muted);text-decoration:none;padding:0.4rem 0.75rem;border-radius:6px;}
+.top-nav-links a:hover,.top-nav-links a.active{color:var(--text);background:var(--card);}
+.top-nav-right{display:flex;align-items:center;gap:0.75rem;}
+.top-nav-free-badge{font-family:var(--mono);font-size:0.62rem;font-weight:700;color:var(--green);background:#dcfce7;padding:0.25rem 0.6rem;border-radius:4px;}
+.top-nav-pro-btn{font-size:0.78rem;font-weight:700;color:#fff;background:var(--text);text-decoration:none;padding:0.4rem 1rem;border-radius:6px;}
+.domain-nav{background:var(--bg);border-bottom:1px solid var(--border);padding:0 2rem;}
+.domain-nav-inner{display:flex;overflow-x:auto;scrollbar-width:none;}
+.domain-nav-inner::-webkit-scrollbar{display:none;}
+.domain-nav-inner a{display:inline-block;font-size:0.8rem;font-weight:500;color:var(--muted);text-decoration:none;padding:0.65rem 1rem;border-bottom:2px solid transparent;white-space:nowrap;}
+.domain-nav-inner a:hover{color:var(--text);}
+.domain-nav-inner a.active{color:var(--text);font-weight:600;border-bottom-color:var(--text);}
+
+/* LOADING OVERLAY */
+.loading-overlay{position:fixed;inset:0;background:#0a0a0a;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;transition:opacity 0.4s;}
+.loading-overlay.hidden{opacity:0;pointer-events:none;}
+.loading-logo{font-size:1.1rem;font-weight:800;color:#fff;letter-spacing:-0.02em;}
+.loading-logo strong{font-weight:900;}
+.loading-label{font-family:var(--mono);font-size:0.65rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.4);}
+.loading-bar-wrap{width:220px;height:3px;background:rgba(255,255,255,0.12);border-radius:2px;overflow:hidden;}
+.loading-bar{height:100%;background:#fff;border-radius:2px;width:0%;transition:width 0.3s ease;}
+.loading-step{font-family:var(--mono);font-size:0.6rem;color:rgba(255,255,255,0.4);text-align:center;min-height:1rem;}
+
+/* STEP PROGRESS */
+.step-progress{background:var(--bg);border-bottom:1px solid var(--border);padding:0.85rem 2rem;}
+.step-progress-inner{max-width:960px;margin:0 auto;display:flex;align-items:center;}
+.stp{display:flex;align-items:center;gap:0.5rem;cursor:default;}
+.stp-circle{width:26px;height:26px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.6rem;font-weight:700;color:var(--muted);transition:all 0.2s;}
+.stp.active .stp-circle{background:var(--text);border-color:var(--text);color:#fff;}
+.stp.done .stp-circle{background:var(--green);border-color:var(--green);color:#fff;}
+.stp-label{font-size:0.75rem;font-weight:600;color:var(--muted);}
+.stp.active .stp-label{color:var(--text);}
+.stp.done .stp-label{color:var(--green);}
+.stp-line{flex:1;height:1px;background:var(--border);margin:0 0.75rem;}
+.stp-done-line{background:var(--green);}
+
+/* STEP PANELS */
+.step-panel{display:none;padding:2rem;max-width:960px;margin:0 auto;}
+.step-panel.active{display:block;}
+
+/* COMPANY GRID (STEP 1) */
+.search-row{display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;flex-wrap:wrap;}
+.search-input{flex:1;min-width:180px;padding:0.55rem 0.85rem;border:1px solid var(--border);border-radius:6px;font-size:0.82rem;font-family:var(--font);outline:none;}
+.search-input:focus{border-color:var(--text);}
+.sector-pills{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1.25rem;}
+.sector-pill{font-size:0.72rem;font-weight:600;padding:0.3rem 0.7rem;border-radius:20px;border:1px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;transition:all 0.15s;}
+.sector-pill.active{background:var(--text);color:#fff;border-color:var(--text);}
+.co-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.6rem;margin-bottom:1.5rem;}
+.co-card{border:1px solid var(--border);border-radius:7px;padding:0.7rem 0.8rem;cursor:pointer;transition:all 0.15s;background:var(--bg);}
+.co-card:hover{border-color:#999;}
+.co-card.selected{border-color:var(--text);background:#f3f4f6;}
+.co-ticker{font-family:var(--mono);font-size:0.6rem;font-weight:700;color:var(--muted);margin-bottom:0.2rem;}
+.co-name{font-size:0.75rem;font-weight:600;color:var(--text);line-height:1.3;}
+.co-sector{font-size:0.65rem;color:var(--muted);margin-top:0.2rem;}
+
+/* STEP 2 TEACHING CARD */
+.teach-card{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:1.5rem;}
+.teach-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);}
+.teach-eyebrow{font-family:var(--mono);font-size:0.6rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);margin-bottom:0.3rem;}
+.teach-title{font-size:1rem;font-weight:800;letter-spacing:-0.02em;}
+.teach-body{padding:1.25rem 1.5rem;}
+
+/* CAP TABLE VISUAL */
+.ct-visual{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:1.25rem;}
+.ct-box{border-radius:8px;padding:1rem;text-align:center;}
+.ct-box-num{font-family:var(--mono);font-size:1.4rem;font-weight:700;margin-bottom:0.2rem;}
+.ct-box-label{font-size:0.72rem;font-weight:600;margin-bottom:0.2rem;}
+.ct-box-note{font-size:0.65rem;opacity:0.75;}
+
+/* DILUTION TABLE */
+.formula-box{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem 1.1rem;margin-bottom:1rem;font-family:var(--mono);font-size:0.73rem;line-height:1.9;color:var(--text);}
+.formula-box .hl{color:var(--blue);font-weight:700;}
+.formula-box .eq{color:var(--muted);}
+.info-table{width:100%;border-collapse:collapse;font-size:0.78rem;margin-bottom:1rem;}
+.info-table th{text-align:left;font-weight:700;padding:0.5rem 0.75rem;background:var(--card);border:1px solid var(--border);}
+.info-table td{padding:0.5rem 0.75rem;border:1px solid var(--border);}
+.info-table tr:nth-child(even) td{background:#fafafa;}
+.callout{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:7px;padding:0.9rem 1rem;font-size:0.78rem;color:#14532d;line-height:1.6;margin-top:0.75rem;}
+
+/* STEP 3 — CALCULATOR */
+.calc-layout{display:grid;grid-template-columns:340px 1fr;gap:1.5rem;}
+@media(max-width:750px){.calc-layout{grid-template-columns:1fr;}}
+.inputs-panel{border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.inputs-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);font-size:0.85rem;font-weight:700;}
+.inputs-body{padding:1.25rem;}
+.input-group{margin-bottom:1.1rem;}
+.input-label{font-size:0.75rem;font-weight:600;color:var(--text);margin-bottom:0.3rem;}
+.input-sub{font-size:0.68rem;color:var(--muted);margin-bottom:0.35rem;}
+.input-row{display:flex;gap:0.5rem;align-items:center;}
+.input-field{flex:1;padding:0.5rem 0.7rem;border:1px solid var(--border);border-radius:6px;font-size:0.82rem;font-family:var(--mono);outline:none;transition:border-color 0.15s;}
+.input-field:focus{border-color:var(--text);}
+.input-unit{font-family:var(--mono);font-size:0.7rem;color:var(--muted);white-space:nowrap;}
+.divider{height:1px;background:var(--border);margin:1rem 0;}
+.calc-btn{width:100%;padding:0.7rem;background:var(--text);color:#fff;border:none;border-radius:7px;font-size:0.85rem;font-weight:700;cursor:pointer;margin-top:0.5rem;}
+.calc-btn:hover{opacity:0.85;}
+.results-panel{border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.results-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);font-size:0.85rem;font-weight:700;display:flex;align-items:center;justify-content:space-between;}
+.results-body{padding:1.25rem;}
+
+/* CAP TABLE DISPLAY */
+.ct-table{width:100%;border-collapse:collapse;font-size:0.78rem;margin-bottom:1.25rem;}
+.ct-table th{text-align:left;font-weight:700;padding:0.5rem 0.75rem;background:var(--card);border:1px solid var(--border);}
+.ct-table td{padding:0.5rem 0.75rem;border:1px solid var(--border);}
+.ct-table .pct-cell{font-family:var(--mono);font-weight:700;}
+.ct-table .bar-cell{padding:0.35rem 0.75rem;}
+.pct-bar{height:6px;border-radius:3px;transition:width 0.4s;}
+.ct-total{background:var(--card);font-weight:700;}
+.metric-row{display:grid;grid-template-columns:repeat(3,1fr);gap:0.75rem;margin-bottom:1.25rem;}
+.metric-card{border:1px solid var(--border);border-radius:7px;padding:0.85rem;text-align:center;}
+.metric-num{font-family:var(--mono);font-size:1.1rem;font-weight:700;color:var(--text);margin-bottom:0.15rem;}
+.metric-label{font-size:0.68rem;color:var(--muted);}
+.exit-table{width:100%;border-collapse:collapse;font-size:0.78rem;}
+.exit-table th{text-align:right;font-weight:700;padding:0.5rem 0.75rem;background:var(--card);border:1px solid var(--border);}
+.exit-table th:first-child{text-align:left;}
+.exit-table td{padding:0.5rem 0.75rem;border:1px solid var(--border);text-align:right;font-family:var(--mono);font-size:0.75rem;}
+.exit-table td:first-child{text-align:left;font-family:var(--font);font-weight:600;}
+.exit-table tr.exit-hlt td{background:#f0fdf4;font-weight:700;}
+
+/* NAV BTNS */
+.step-nav{display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;}
+.btn-back{font-size:0.82rem;font-weight:600;color:var(--muted);background:none;border:1px solid var(--border);padding:0.55rem 1.1rem;border-radius:6px;cursor:pointer;}
+.btn-back:hover{color:var(--text);}
+.btn-next{font-size:0.82rem;font-weight:700;color:#fff;background:var(--text);border:none;padding:0.55rem 1.2rem;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:0.4rem;}
+.btn-next:disabled{opacity:0.35;cursor:not-allowed;}
+.btn-next:not(:disabled):hover{opacity:0.85;}
+
+.sec-eyebrow{font-family:var(--mono);font-size:0.65rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.4rem;}
+.step-title{font-size:1.3rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:0.35rem;}
+.step-sub{font-size:0.82rem;color:var(--muted);margin-bottom:1.5rem;}
+
+.footer{border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;}
+.footer-text{font-size:0.72rem;color:var(--muted);}
+@media(max-width:700px){.top-nav-links{display:none;}.ct-visual{grid-template-columns:1fr;}.metric-row{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-logo">Valuation<strong>Desk</strong></div>
+  <div class="loading-label">Loading · Cap Table Builder</div>
+  <div class="loading-bar-wrap"><div class="loading-bar" id="loadingBar"></div></div>
+  <div class="loading-step" id="loadingStep">Initialising...</div>
+</div>
+
+<nav class="top-nav">
+  <a href="../../../index.html" class="top-nav-logo">Valuation<strong>Desk</strong></a>
+  <ul class="top-nav-links">
+    <li><a href="../index.html">Venture Capital</a></li>
+    <li><a href="index.html">Calculators</a></li>
+  </ul>
+  <div class="top-nav-right">
+    <span class="top-nav-free-badge">FREE</span>
+    <a href="#" onclick="unlockPro()" class="top-nav-pro-btn">Unlock Pro</a>
+  </div>
+</nav>
+<nav class="domain-nav">
+  <div class="domain-nav-inner">
+    <a href="../../valuation-advisory/index.html">Valuation</a>
+    <a href="../../investment-banking/index.html">Investment Banking</a>
+    <a href="../../corporate-finance/index.html">Corporate Finance</a>
+    <a href="../../ma/index.html">M&amp;A</a>
+    <a href="../../pe/index.html">Private Equity</a>
+    <a href="../index.html" class="active">Venture Capital</a>
+  </div>
+</nav>
+
+<!-- STEP PROGRESS -->
+<div class="step-progress">
+  <div class="step-progress-inner">
+    <div class="stp active" id="si1">
+      <div class="stp-circle">1</div>
+      <div class="stp-label">Pick Startup</div>
+    </div>
+    <div class="stp-line" id="sl1"></div>
+    <div class="stp idle" id="si2">
+      <div class="stp-circle">2</div>
+      <div class="stp-label">Learn</div>
+    </div>
+    <div class="stp-line" id="sl2"></div>
+    <div class="stp idle" id="si3">
+      <div class="stp-circle">3</div>
+      <div class="stp-label">Build Table</div>
+    </div>
+    <div class="stp-line" id="sl3"></div>
+    <div class="stp idle" id="si4">
+      <div class="stp-circle">4</div>
+      <div class="stp-label">Results</div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 1: PICK STARTUP -->
+<div class="step-panel active" id="s1">
+  <div class="sec-eyebrow">Step 1 of 4</div>
+  <div class="step-title">Pick a Startup Context</div>
+  <div class="step-sub">Choose a startup to anchor your cap table analysis in a real sector and funding context.</div>
+
+  <div class="search-row">
+    <input type="text" class="search-input" id="search" placeholder="Search startup or category…" oninput="filterCos()">
+  </div>
+  <div class="sector-pills" id="sectorPills"></div>
+  <div class="co-grid" id="cogrid"></div>
+
+  <div class="step-nav">
+    <span></span>
+    <button class="btn-next" id="s1btn" disabled onclick="showStep(2)">Continue → Learn Cap Table</button>
+  </div>
+</div>
+
+<!-- STEP 2: TEACHING CARD -->
+<div class="step-panel" id="s2">
+  <div class="sec-eyebrow">Step 2 of 4 · Education</div>
+  <div class="step-title">How Cap Tables Work</div>
+  <div class="step-sub">Every startup has a cap table — a record of who owns what. It changes with every new round.</div>
+
+  <div class="teach-card">
+    <div class="teach-header">
+      <div class="teach-eyebrow">Concept · Cap Table</div>
+      <div class="teach-title">Ownership, Dilution, and the ESOP Shuffle</div>
+    </div>
+    <div class="teach-body">
+
+      <!-- 3-stage visual: founding → esop → seed -->
+      <div class="ct-visual">
+        <div class="ct-box" style="background:#f0fdf4;border:1px solid #bbf7d0;">
+          <div class="ct-box-num" style="color:#16a34a;">100%</div>
+          <div class="ct-box-label" style="color:#166534;">Founding</div>
+          <div class="ct-box-note" style="color:#166534;">Founders own everything before any dilution</div>
+        </div>
+        <div class="ct-box" style="background:#fef3c7;border:1px solid #fde68a;">
+          <div class="ct-box-num" style="color:#d97706;">10–15%</div>
+          <div class="ct-box-label" style="color:#92400e;">ESOP Pool</div>
+          <div class="ct-box-note" style="color:#92400e;">Carved out pre-round; dilutes founders first</div>
+        </div>
+        <div class="ct-box" style="background:#dbeafe;border:1px solid #bfdbfe;">
+          <div class="ct-box-num" style="color:#2563eb;">15–25%</div>
+          <div class="ct-box-label" style="color:#1d4ed8;">Seed Investor</div>
+          <div class="ct-box-note" style="color:#1d4ed8;">Post-money ownership after seed round closes</div>
+        </div>
+      </div>
+
+      <table class="info-table">
+        <thead><tr><th>Term</th><th>What It Means</th><th>Who Bears the Cost</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Pre-money Valuation</strong></td><td>Company value before new investment comes in</td><td>—</td></tr>
+          <tr><td><strong>Post-money Valuation</strong></td><td>Pre-money + New Investment = Post-money</td><td>—</td></tr>
+          <tr><td><strong>ESOP Pool Shuffle</strong></td><td>VCs demand the ESOP pool be created <em>before</em> the round, so it dilutes founders — not investors</td><td>Founders</td></tr>
+          <tr><td><strong>Price Per Share</strong></td><td>Pre-money ÷ Total shares outstanding (pre-ESOP, pre-investment)</td><td>—</td></tr>
+          <tr><td><strong>Fully Diluted</strong></td><td>All shares including unissued options, warrants, convertibles</td><td>All existing holders</td></tr>
+        </tbody>
+      </table>
+
+      <div class="formula-box">
+        <span class="hl">Post-money</span> <span class="eq">=</span> Pre-money + Investment<br>
+        <span class="hl">Investor %</span> <span class="eq">=</span> Investment ÷ Post-money<br>
+        <span class="hl">New Shares</span> <span class="eq">=</span> (Pre-money Shares × Investor %) ÷ (1 – Investor %)<br>
+        <span class="hl">Price/Share</span> <span class="eq">=</span> Investment ÷ New Shares<br>
+        <span class="hl">Founder %</span> <span class="eq">=</span> Founder Shares ÷ Total Fully Diluted Shares
+      </div>
+
+      <div id="sectorCtxBox"></div>
+
+      <div class="callout">
+        <strong>India Context:</strong> Indian early-stage deals typically use CCDs (Compulsory Convertible Debentures) rather than equity shares, due to FEMA and pricing regulations. SAFE notes (as Y Combinator defines them) are not natively recognised under Indian law — founders often use convertible notes with an equity conversion trigger instead.
+      </div>
+
+    </div>
+  </div>
+
+  <div class="step-nav">
+    <button class="btn-back" onclick="showStep(1)">← Back</button>
+    <button class="btn-next" onclick="showStep(3)">Continue → Build Cap Table</button>
+  </div>
+</div>
+
+<!-- STEP 3: INPUTS -->
+<div class="step-panel" id="s3">
+  <div class="sec-eyebrow">Step 3 of 4</div>
+  <div class="step-title">Build Your Cap Table</div>
+  <div class="step-sub">Enter your startup's founders, ESOP pool, and seed round details.</div>
+
+  <div class="calc-layout">
+    <div class="inputs-panel">
+      <div class="inputs-header">📋 Cap Table Inputs</div>
+      <div class="inputs-body">
+        <div style="font-family:var(--mono);font-size:0.6rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:0.75rem;">Founding Team</div>
+
+        <div class="input-group">
+          <div class="input-label">Founder 1 Name</div>
+          <div class="input-row"><input type="text" class="input-field" id="f1name" value="Founder A" placeholder="Founder A"></div>
+        </div>
+        <div class="input-group">
+          <div class="input-label">Founder 1 Shares</div>
+          <div class="input-sub">Initial shares allocated to Founder 1</div>
+          <div class="input-row">
+            <input type="number" class="input-field" id="f1shares" value="4500000" min="0">
+            <span class="input-unit">shares</span>
+          </div>
+        </div>
+        <div class="input-group">
+          <div class="input-label">Founder 2 Name</div>
+          <div class="input-row"><input type="text" class="input-field" id="f2name" value="Founder B" placeholder="Founder B"></div>
+        </div>
+        <div class="input-group">
+          <div class="input-label">Founder 2 Shares</div>
+          <div class="input-row">
+            <input type="number" class="input-field" id="f2shares" value="4500000" min="0">
+            <span class="input-unit">shares</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div style="font-family:var(--mono);font-size:0.6rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:0.75rem;">ESOP Pool (Pre-round Shuffle)</div>
+
+        <div class="input-group">
+          <div class="input-label">ESOP Pool Size</div>
+          <div class="input-sub">% of post-shuffle, pre-money cap table</div>
+          <div class="input-row">
+            <input type="number" class="input-field" id="esopPct" value="10" min="0" max="30" step="0.5">
+            <span class="input-unit">%</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+        <div style="font-family:var(--mono);font-size:0.6rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:0.75rem;">Seed Round</div>
+
+        <div class="input-group">
+          <div class="input-label">Investor Name</div>
+          <div class="input-row"><input type="text" class="input-field" id="invName" value="Seed VC Fund" placeholder="Investor name"></div>
+        </div>
+        <div class="input-group">
+          <div class="input-label">Pre-money Valuation</div>
+          <div class="input-row">
+            <input type="number" class="input-field" id="preMoney" value="15" min="0" step="0.5">
+            <span class="input-unit">₹ Cr</span>
+          </div>
+        </div>
+        <div class="input-group">
+          <div class="input-label">Investment Amount</div>
+          <div class="input-row">
+            <input type="number" class="input-field" id="investment" value="3" min="0" step="0.1">
+            <span class="input-unit">₹ Cr</span>
+          </div>
+        </div>
+
+        <button class="calc-btn" onclick="runCalc()">Calculate Cap Table →</button>
+      </div>
+    </div>
+
+    <div class="results-panel">
+      <div class="results-header">
+        <span>Cap Table Results</span>
+        <span id="companyLabel" style="font-family:var(--mono);font-size:0.65rem;color:var(--muted);font-weight:600;"></span>
+      </div>
+      <div class="results-body" id="resultsBody">
+        <div style="color:var(--muted);font-size:0.82rem;padding:2rem 0;text-align:center;">Enter inputs and click Calculate to see your cap table →</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step-nav">
+    <button class="btn-back" onclick="showStep(2)">← Back</button>
+    <button class="btn-next" id="s3btn" disabled onclick="showStep(4)">See Exit Scenarios →</button>
+  </div>
+</div>
+
+<!-- STEP 4: RESULTS / EXIT TABLE -->
+<div class="step-panel" id="s4">
+  <div class="sec-eyebrow">Step 4 of 4 · Results</div>
+  <div class="step-title">Exit Payout Analysis</div>
+  <div class="step-sub">How much does each stakeholder receive at different exit valuations?</div>
+  <div id="exitResults" style="font-size:0.82rem;color:var(--muted);text-align:center;padding:2rem 0;">Run the calculator in Step 3 first.</div>
+
+  <div class="step-nav">
+    <button class="btn-back" onclick="showStep(3)">← Back to Inputs</button>
+    <a href="pre-post-money.html" style="display:inline-flex;align-items:center;gap:0.4rem;font-size:0.82rem;font-weight:700;color:#fff;background:var(--text);text-decoration:none;padding:0.55rem 1.2rem;border-radius:6px;" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">Next: Multi-Round Modelling (Pro) →</a>
+  </div>
+</div>
+
+<footer class="footer">
+  <p class="footer-text">ValuationDesk · Cap Table Builder · Free Calculator · <a href="../index.html" style="color:var(--muted);">Back to VC</a></p>
+</footer>
+
+<script>
+// === DATA ===
+const COMPANIES=[
+  {name:'Razorpay',ticker:'RZRPAY',sector:'Fintech'},
+  {name:'Groww',ticker:'GROWW',sector:'Fintech'},
+  {name:'PhonePe',ticker:'PHONEPE',sector:'Fintech'},
+  {name:'CRED',ticker:'CRED',sector:'Fintech'},
+  {name:'Slice',ticker:'SLICE',sector:'Fintech'},
+  {name:'Freshworks',ticker:'FRSH',sector:'SaaS'},
+  {name:'Zoho',ticker:'ZOHO',sector:'SaaS'},
+  {name:'Darwinbox',ticker:'DRWNBX',sector:'SaaS'},
+  {name:'Chargebee',ticker:'CHRGBEE',sector:'SaaS'},
+  {name:'BrowserStack',ticker:'BRSRSTK',sector:'SaaS'},
+  {name:'Meesho',ticker:'MEESHO',sector:'E-commerce'},
+  {name:'Nykaa',ticker:'FSN',sector:'E-commerce'},
+  {name:'Mamaearth',ticker:'HMBL',sector:'D2C/Consumer'},
+  {name:'Purplle',ticker:'PURPLLE',sector:'D2C/Consumer'},
+  {name:'boAt',ticker:'BOAT',sector:'D2C/Consumer'},
+  {name:'Swiggy',ticker:'SWIGGY',sector:'Food Tech'},
+  {name:'Zomato',ticker:'ZOMATO',sector:'Food Tech'},
+  {name:'OfBusiness',ticker:'OFBIZ',sector:'B2B Commerce'},
+  {name:'Udaan',ticker:'UDAAN',sector:'B2B Commerce'},
+  {name:'Lenskart',ticker:'LNKRT',sector:'D2C/Consumer'},
+  {name:'Ola',ticker:'OLA',sector:'Mobility'},
+  {name:'Rapido',ticker:'RAPIDO',sector:'Mobility'},
+  {name:"Byju's",ticker:'BYJU',sector:'EdTech'},
+  {name:'Unacademy',ticker:'UNACAD',sector:'EdTech'},
+  {name:'Delhivery',ticker:'DELHIVERY',sector:'Logistics'},
+  {name:'Ecom Express',ticker:'ECOMEX',sector:'Logistics'},
+  {name:'OYO',ticker:'OYO',sector:'Hospitality'},
+  {name:'ideaForge',ticker:'IDEAFRG',sector:'Deep Tech'},
+  {name:'Agnikul Cosmos',ticker:'AGNIKUL',sector:'Deep Tech'},
+  {name:'InMobi',ticker:'INMOBI',sector:'AdTech/Media'}
+];
+
+const SECTOR_CONTEXT={
+  'Fintech':{seedValn:'₹10–30 Cr (pre-money)',esopPool:'10–12%',targetReturn:'10–15× (gross)',exitRoute:'IPO, strategic acquisition by bank/NBFC, secondary to growth PE'},
+  'SaaS':{seedValn:'₹15–40 Cr',esopPool:'10–15%',targetReturn:'8–12× (gross)',exitRoute:'Strategic acquisition by global SaaS, IPO (NASDAQ for global SaaS), secondary'},
+  'E-commerce':{seedValn:'₹8–20 Cr',esopPool:'8–12%',targetReturn:'8–12× (gross)',exitRoute:'IPO (NSE/BSE), strategic sale to Reliance/Tata, secondary to growth fund'},
+  'D2C/Consumer':{seedValn:'₹5–15 Cr',esopPool:'8–10%',targetReturn:'5–10× (gross)',exitRoute:'IPO, strategic to FMCG major, secondary buyout'},
+  'Food Tech':{seedValn:'₹10–25 Cr',esopPool:'10–12%',targetReturn:'7–12× (gross)',exitRoute:'IPO, global acquisition (DoorDash, Delivery Hero), secondary to sovereign wealth fund'},
+  'B2B Commerce':{seedValn:'₹8–20 Cr',esopPool:'8–10%',targetReturn:'8–12× (gross)',exitRoute:'Strategic to distributor/conglomerate, IPO, secondary to growth PE'},
+  'Mobility':{seedValn:'₹5–15 Cr',esopPool:'10–12%',targetReturn:'6–10× (gross)',exitRoute:'IPO, acquisition by OEM or ride-hailing platform, secondary'},
+  'EdTech':{seedValn:'₹5–20 Cr',esopPool:'8–12%',targetReturn:'8–15× (gross)',exitRoute:'Consolidation (inorganic), strategic acquisition, IPO (difficult post-2022 correction)'},
+  'Logistics':{seedValn:'₹8–15 Cr',esopPool:'8–10%',targetReturn:'5–8× (gross)',exitRoute:'IPO (NSE/BSE), acquisition by e-commerce platform, secondary to infrastructure fund'},
+  'Hospitality':{seedValn:'₹5–15 Cr',esopPool:'8–10%',targetReturn:'6–10× (gross)',exitRoute:'IPO, strategic buyer (hotel chain), secondary PE'},
+  'Deep Tech':{seedValn:'₹3–12 Cr',esopPool:'15–20%',targetReturn:'10–20× (gross)',exitRoute:'Strategic acquisition (defence, aerospace), govt contracts, later-stage VC/PE'},
+  'AdTech/Media':{seedValn:'₹5–15 Cr',esopPool:'10–12%',targetReturn:'6–10× (gross)',exitRoute:'Strategic acquisition by media conglomerate, secondary, IPO'}
+};
+
+let activeSector='All',selectedCo=null,currentStep=1,lastCalc=null;
+
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+
+// === SECTORS ===
+function renderSectors(){
+  const sectors=['All',...[...new Set(COMPANIES.map(c=>c.sector))].sort()];
+  document.getElementById('sectorPills').innerHTML=sectors.map(s=>
+    `<button class="sector-pill${s===activeSector?' active':''}" onclick="setSector('${s}')">${s}</button>`
+  ).join('');
+}
+function setSector(s){activeSector=s;renderSectors();renderGrid();}
+function filterCos(){renderGrid();}
+
+function renderGrid(){
+  const q=document.getElementById('search').value.toLowerCase();
+  const list=COMPANIES.filter(c=>(activeSector==='All'||c.sector===activeSector)&&(!q||c.name.toLowerCase().includes(q)||c.ticker.toLowerCase().includes(q)));
+  document.getElementById('cogrid').innerHTML=list.map(c=>`
+    <div class="co-card${selectedCo&&selectedCo.name===c.name?' selected':''}" onclick="selectCo(${JSON.stringify(c).replace(/"/g,'&quot;')})">
+      <div class="co-ticker">${c.ticker}</div>
+      <div class="co-name">${c.name}</div>
+      <div class="co-sector">${c.sector}</div>
+    </div>`).join('');
+}
+
+function selectCo(c){
+  selectedCo=typeof c==='string'?JSON.parse(c):c;
+  document.getElementById('s1btn').disabled=false;
+  renderGrid();
+}
+
+// === STEPS ===
+function showStep(n){
+  [1,2,3,4].forEach(i=>{
+    document.getElementById('s'+i).classList.toggle('active',i===n);
+    const si=document.getElementById('si'+i);
+    si.className='stp '+(i<n?'done':i===n?'active':'idle');
+    if(i<4){const ln=document.getElementById('sl'+i);if(ln)ln.className='stp-line'+(i<n?' stp-done-line':'');}
+  });
+  currentStep=n;
+  if(n===2&&selectedCo)renderSectorCtx();
+  if(n===3&&selectedCo)document.getElementById('companyLabel').textContent=selectedCo.ticker;
+  if(n===4&&lastCalc)renderExitTable();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderSectorCtx(){
+  const ctx=SECTOR_CONTEXT[selectedCo.sector]||{};
+  if(!ctx.seedValn)return;
+  document.getElementById('sectorCtxBox').innerHTML=`
+    <table class="info-table" style="margin-bottom:0.75rem;">
+      <thead><tr><th colspan="2">📌 ${selectedCo.name} (${selectedCo.sector}) — Seed Round Benchmarks</th></tr></thead>
+      <tbody>
+        <tr><td>Typical Seed Pre-money</td><td><strong>${ctx.seedValn}</strong></td></tr>
+        <tr><td>Standard ESOP Pool</td><td><strong>${ctx.esopPool}</strong></td></tr>
+        <tr><td>VC Target Return</td><td><strong>${ctx.targetReturn}</strong></td></tr>
+        <tr><td>Primary Exit Routes</td><td>${ctx.exitRoute}</td></tr>
+      </tbody>
+    </table>`;
+}
+
+// === CALCULATOR ===
+function fmt(n){return'₹'+n.toFixed(1)+'Cr';}
+function fmtPct(n){return(n*100).toFixed(1)+'%';}
+function fmtShares(n){return n>=1e6?(n/1e6).toFixed(2)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':n.toString();}
+
+function runCalc(){
+  const f1name=document.getElementById('f1name').value||'Founder A';
+  const f2name=document.getElementById('f2name').value||'Founder B';
+  const f1shares=parseFloat(document.getElementById('f1shares').value)||4500000;
+  const f2shares=parseFloat(document.getElementById('f2shares').value)||4500000;
+  const esopPct=parseFloat(document.getElementById('esopPct').value)||10;
+  const invName=document.getElementById('invName').value||'Seed Investor';
+  const preMoney=parseFloat(document.getElementById('preMoney').value)||15;
+  const investment=parseFloat(document.getElementById('investment').value)||3;
+
+  const founderTotal=f1shares+f2shares;
+  // ESOP shuffle: founders diluted first, ESOP = esopPct% of post-ESOP shares
+  // If founderTotal = (1-esopPct/100) * totalAfterESOP, then totalAfterESOP = founderTotal / (1-esopPct/100)
+  const totalAfterESOP=founderTotal/(1-esopPct/100);
+  const esopShares=totalAfterESOP-founderTotal;
+
+  // Seed round
+  const postMoney=preMoney+investment;
+  const invPct=investment/postMoney;
+  // New shares for investor: invPct = newShares / (totalAfterESOP + newShares)
+  const newShares=totalAfterESOP*invPct/(1-invPct);
+  const totalFD=totalAfterESOP+newShares;
+  const pricePerShare=investment*1e7/newShares; // ₹ per share (₹Cr * 1e7 = paise -> ₹)
+
+  const f1pct=f1shares/totalFD;
+  const f2pct=f2shares/totalFD;
+  const esopPctFinal=esopShares/totalFD;
+  const invPctFinal=newShares/totalFD;
+
+  lastCalc={f1name,f2name,f1shares,f2shares,esopShares,newShares,totalFD,
+    f1pct,f2pct,esopPctFinal,invPctFinal,invName,preMoney,investment,postMoney,pricePerShare,investment};
+
+  // Render cap table
+  const barColors=['#16a34a','#2563eb','#d97706','#7c3aed'];
+  const stakeholders=[
+    {name:f1name,shares:f1shares,pct:f1pct,color:barColors[0]},
+    {name:f2name,shares:f2shares,pct:f2pct,color:barColors[1]},
+    {name:'ESOP Pool',shares:esopShares,pct:esopPctFinal,color:barColors[2]},
+    {name:invName,shares:newShares,pct:invPctFinal,color:barColors[3]}
+  ];
+
+  let rows=stakeholders.map(s=>`
+    <tr>
+      <td><strong>${s.name}</strong></td>
+      <td>${fmtShares(Math.round(s.shares))}</td>
+      <td class="pct-cell" style="color:${s.color};">${fmtPct(s.pct)}</td>
+      <td class="bar-cell"><div class="pct-bar" style="width:${(s.pct*100).toFixed(1)}%;background:${s.color};"></div></td>
+    </tr>`).join('');
+
+  document.getElementById('resultsBody').innerHTML=`
+    <div class="metric-row">
+      <div class="metric-card">
+        <div class="metric-num">${fmt(preMoney)}</div>
+        <div class="metric-label">Pre-money Valuation</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-num">${fmt(postMoney)}</div>
+        <div class="metric-label">Post-money Valuation</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-num">₹${pricePerShare.toFixed(2)}</div>
+        <div class="metric-label">Price Per Share</div>
+      </div>
+    </div>
+    <table class="ct-table">
+      <thead><tr><th>Stakeholder</th><th>Shares</th><th>Ownership %</th><th style="width:120px;">Ownership Bar</th></tr></thead>
+      <tbody>${rows}</tbody>
+      <tfoot><tr class="ct-total"><td><strong>Total (Fully Diluted)</strong></td><td>${fmtShares(Math.round(totalFD))}</td><td class="pct-cell">100.0%</td><td></td></tr></tfoot>
+    </table>
+    <div style="font-size:0.72rem;color:var(--muted);">* ESOP Pool created pre-round (pool shuffle). All percentages on fully diluted basis.</div>
+  `;
+
+  document.getElementById('s3btn').disabled=false;
+}
+
+function renderExitTable(){
+  const d=lastCalc;
+  if(!d)return;
+  const multiples=[2,3,5,7,10];
+  const exitVals=multiples.map(m=>m*d.postMoney);
+
+  let rows=multiples.map((m,i)=>{
+    const ev=exitVals[i];
+    const f1=ev*d.f1pct;
+    const f2=ev*d.f2pct;
+    const esop=ev*d.esopPctFinal;
+    const inv=ev*d.invPctFinal;
+    const highlight=m===5?' class="exit-hlt"':'';
+    return`<tr${highlight}>
+      <td>${m}× Post-money</td>
+      <td>${fmt(ev)}</td>
+      <td>${fmt(f1)}</td>
+      <td>${fmt(f2)}</td>
+      <td>${fmt(esop)}</td>
+      <td>${fmt(inv)}</td>
+    </tr>`;
+  }).join('');
+
+  // VC return multiple column
+  let moicRows=multiples.map((m,i)=>{
+    const exitEq=exitVals[i];
+    const invPayout=exitEq*d.invPctFinal;
+    const moic=invPayout/d.investment;
+    const highlight=m===5?' class="exit-hlt"':'';
+    return`<tr${highlight}><td>${m}× Exit</td><td style="font-family:var(--mono);font-weight:700;">${moic.toFixed(1)}×</td><td>${fmt(invPayout)}</td></tr>`;
+  }).join('');
+
+  document.getElementById('exitResults').innerHTML=`
+    <div style="margin-bottom:1.5rem;">
+      <div style="font-family:var(--mono);font-size:0.6rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:0.75rem;">Exit Payout — All Stakeholders (₹ Cr)</div>
+      <div style="overflow-x:auto;">
+        <table class="exit-table">
+          <thead><tr><th>Exit Scenario</th><th>Exit Value</th><th>${d.f1name}</th><th>${d.f2name}</th><th>ESOP</th><th>${d.invName}</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+      <div style="font-size:0.7rem;color:var(--muted);margin-top:0.5rem;">* Assumes no liquidation preference. Preferred equity treatment modelled in Pro plans.</div>
+    </div>
+    <div>
+      <div style="font-family:var(--mono);font-size:0.6rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);margin-bottom:0.75rem;">VC Return Analysis — ${d.invName} (Investment: ${fmt(d.investment)})</div>
+      <div style="overflow-x:auto;">
+        <table class="exit-table" style="max-width:420px;">
+          <thead><tr><th>Exit Scenario</th><th>MOIC</th><th>VC Payout</th></tr></thead>
+          <tbody>${moicRows}</tbody>
+        </table>
+      </div>
+      <div style="font-size:0.7rem;color:var(--muted);margin-top:0.5rem;">* MOIC = Money on Invested Capital (gross, pre-carry and fee). IRR depends on hold period — model it in the VC Method calculator (Pro).</div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem 1.1rem;margin-top:1.25rem;font-size:0.78rem;color:var(--muted);">
+      <strong style="color:var(--text);">What this doesn't model (Pro features):</strong> Liquidation preferences · Anti-dilution provisions · Participating preferred vs non-participating · Multi-round dilution (Series A, B, C) · SAFE note conversion · Waterfall by share class
+    </div>
+  `;
+}
+
+// === INIT ===
+function initLoading(){
+  const steps=[
+    {pct:20,text:'Loading startup database…'},
+    {pct:45,text:'Building sector maps…'},
+    {pct:70,text:'Preparing cap table engine…'},
+    {pct:90,text:'Calibrating exit models…'},
+    {pct:100,text:'Ready.'}
+  ];
+  let i=0;
+  const bar=document.getElementById('loadingBar');
+  const lbl=document.getElementById('loadingStep');
+  function next(){
+    if(i>=steps.length){
+      setTimeout(()=>{document.getElementById('loadingOverlay').classList.add('hidden');},300);
+      return;
+    }
+    bar.style.width=steps[i].pct+'%';
+    lbl.textContent=steps[i].text;
+    i++;
+    setTimeout(next,i===steps.length?400:900);
+  }
+  setTimeout(next,300);
+}
+
+renderSectors();
+renderGrid();
+initLoading();
+</script>
+</body>
+</html>
