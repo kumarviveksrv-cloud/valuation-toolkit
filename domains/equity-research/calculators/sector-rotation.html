@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sector Rotation | ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--teal:#0d9488;--accent:#dc2626;--accent-bg:#fef2f2;--accent-border:#fecaca}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;gap:16px;position:sticky;top:0;background:var(--bg);z-index:100}
+.nav-logo{font-weight:800;font-size:15px;letter-spacing:-.3px}.nav-logo span{color:var(--blue)}
+.nav-sep{color:var(--border);font-size:18px}
+.nav-crumb{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}.nav-crumb a:hover{color:var(--text)}.nav-crumb .sep{color:var(--border)}
+.nav-actions{margin-left:auto}
+.btn-pro{font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;background:var(--text);color:#fff;border:1px solid var(--text);cursor:pointer}.btn-pro:hover{background:#333}
+
+.page{padding:28px 24px;max-width:860px;margin:0 auto}
+
+.steps{display:flex;align-items:center;margin-bottom:28px}
+.step-item{display:flex;flex-direction:column;align-items:center;gap:4px;flex:1}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--muted);transition:all .2s}
+.step-dot.active{border-color:var(--accent);background:var(--accent);color:#fff}
+.step-dot.done{border-color:var(--green);background:var(--green);color:#fff}
+.step-label{font-size:10px;color:var(--muted);font-weight:600;text-align:center}
+.step-line{height:2px;background:var(--border);flex:1;margin-bottom:18px;transition:background .2s}
+.step-line.done{background:var(--green)}
+
+.card{border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px}
+.card-title{font-size:16px;font-weight:800;margin-bottom:4px;letter-spacing:-.2px}
+.card-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+
+.sector-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.pill{font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--bg);cursor:pointer;transition:all .15s}
+.pill.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.search-box{width:100%;padding:9px 14px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:'Inter',sans-serif;margin-bottom:14px;outline:none}
+.search-box:focus{border-color:var(--accent)}
+.co-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.co-card{border:1px solid var(--border);border-radius:8px;padding:12px 14px;cursor:pointer;transition:all .15s}
+.co-card:hover{border-color:var(--accent);background:var(--accent-bg)}
+.co-card.selected{border-color:var(--accent);background:var(--accent-bg);box-shadow:0 0 0 2px rgba(220,38,38,.12)}
+.co-name{font-size:13px;font-weight:700}
+.co-ticker{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:2px}
+.co-meta{display:flex;gap:10px;margin-top:6px}
+.co-stat{font-size:11px;color:var(--muted)}.co-stat span{font-weight:700;color:var(--text)}
+
+.ctx-card{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:12px;padding:20px;margin-bottom:16px}
+.ctx-header{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.ctx-icon{font-size:24px}
+.ctx-company{font-size:15px;font-weight:800}
+.ctx-sector{font-size:12px;color:var(--accent);font-weight:600}
+.ctx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.ctx-stat{background:#fff;border:1px solid var(--accent-border);border-radius:8px;padding:10px}
+.ctx-stat-label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.ctx-stat-val{font-size:18px;font-weight:900;letter-spacing:-.5px;margin-top:2px}
+
+.teach-box{border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px}
+.teach-title{font-size:13px;font-weight:800;margin-bottom:10px}
+.teach-row{display:grid;grid-template-columns:160px 1fr;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px}
+.teach-row:last-child{border-bottom:none}
+.teach-key{font-weight:700;color:var(--text)}
+.teach-val{color:var(--muted);line-height:1.5}
+
+.bench-box{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:16px}
+.bench-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:10px}
+.bench-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.bench-item{display:flex;flex-direction:column;gap:2px}
+.bench-label{font-size:10px;color:var(--muted);font-weight:600}
+.bench-val{font-size:14px;font-weight:800;color:var(--accent)}
+
+.pro-gate{border:2px dashed var(--border);border-radius:12px;padding:40px 24px;text-align:center;margin-bottom:16px}
+.pro-lock{font-size:36px;margin-bottom:12px}
+.pro-title{font-size:18px;font-weight:900;letter-spacing:-.3px;margin-bottom:6px}
+.pro-sub{font-size:13px;color:var(--muted);margin-bottom:20px;max-width:420px;margin-left:auto;margin-right:auto}
+.pro-pills{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:24px}
+.pro-pill{font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;background:var(--card);border:1px solid var(--border)}
+.btn-unlock{display:inline-block;background:var(--text);color:#fff;font-size:13px;font-weight:700;padding:12px 28px;border-radius:8px;border:none;cursor:pointer;transition:opacity .15s}.btn-unlock:hover{opacity:.85}
+.pro-price{font-size:11px;color:var(--muted);margin-top:10px}
+
+.nav-btns{display:flex;gap:10px;margin-top:4px}
+.btn-back{font-size:13px;font-weight:600;padding:10px 20px;border-radius:8px;border:1px solid var(--border);background:var(--bg);cursor:pointer}.btn-back:hover{background:var(--card)}
+.btn-next{font-size:13px;font-weight:700;padding:10px 24px;border-radius:8px;border:none;background:var(--accent);color:#fff;cursor:pointer;transition:opacity .15s}.btn-next:hover{opacity:.85}
+.btn-next:disabled{opacity:.35;cursor:not-allowed}
+
+.hidden{display:none}
+footer{border-top:1px solid var(--border);padding:20px 24px;max-width:860px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-left{font-size:12px;color:var(--muted)}.footer-left strong{color:var(--text)}
+.footer-links{display:flex;gap:16px}.footer-links a{font-size:12px;color:var(--muted)}.footer-links a:hover{color:var(--text)}
+@media(max-width:600px){.co-grid{grid-template-columns:1fr 1fr}.ctx-grid{grid-template-columns:1fr 1fr}.bench-grid{grid-template-columns:1fr 1fr}.nav-btns{flex-direction:column}.teach-row{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo">Valuation<span>Desk</span></div>
+  <span class="nav-sep">/</span>
+  <div class="nav-crumb"><a href="/">Home</a><span class="sep">/</span><a href="/domains/equity-research/">Equity Research</a><span class="sep">/</span><a href="/domains/equity-research/calculators/">Calculators</a><span class="sep">/</span><span>Sector Rotation</span></div>
+  <div class="nav-actions">
+    <button class="btn-pro" onclick="unlockPro()">Unlock Pro — ₹799/mo</button>
+  </div>
+</nav>
+
+<div class="page">
+
+  <div class="steps">
+    <div class="step-item">
+      <div class="step-dot active" id="dot1">1</div>
+      <div class="step-label">Pick Stock</div>
+    </div>
+    <div class="step-line" id="line1"></div>
+    <div class="step-item">
+      <div class="step-dot" id="dot2">2</div>
+      <div class="step-label">Understand</div>
+    </div>
+    <div class="step-line" id="line2"></div>
+    <div class="step-item">
+      <div class="step-dot" id="dot3">3</div>
+      <div class="step-label">Macro Phase</div>
+    </div>
+    <div class="step-line" id="line3"></div>
+    <div class="step-item">
+      <div class="step-dot" id="dot4">4</div>
+      <div class="step-label">Allocation</div>
+    </div>
+  </div>
+
+  <!-- Step 1 -->
+  <div id="step1">
+    <div class="card">
+      <div class="card-title">Pick your stock</div>
+      <div class="card-sub">Choose a company to map its sector against the current macro cycle phase — and see whether to be overweight, underweight, or neutral on its sector right now.</div>
+      <div class="sector-pills" id="sectorPills">
+        <span class="pill active" data-sector="All">All</span>
+        <span class="pill" data-sector="Financials">Financials</span>
+        <span class="pill" data-sector="IT">IT</span>
+        <span class="pill" data-sector="FMCG">FMCG</span>
+        <span class="pill" data-sector="Energy">Energy</span>
+        <span class="pill" data-sector="Auto">Auto</span>
+        <span class="pill" data-sector="Industrials">Industrials</span>
+      </div>
+      <input class="search-box" id="searchBox" type="text" placeholder="Search by name or ticker…">
+      <div class="co-grid" id="coGrid"></div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-next" id="nextBtn1" onclick="showStep(2)" disabled>Continue →</button>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div id="step2" class="hidden">
+    <div class="ctx-card" id="ctxCard"></div>
+    <div class="teach-box">
+      <div class="teach-title">🌀 How Macro Cycles Drive Sector Performance</div>
+      <div class="teach-row">
+        <div class="teach-key">4 Macro Cycle Phases</div>
+        <div class="teach-val">Expansion (GDP up, rates rising, earnings strong) → Peak (inflation high, rate hikes peak) → Contraction (GDP slows, earnings fall) → Trough (rate cuts begin, recovery signs). Each phase favours different sectors</div>
+      </div>
+      <div class="teach-row">
+        <div class="teach-key">Sector Leadership by Phase</div>
+        <div class="teach-val">Expansion: Financials, Industrials, Auto. Peak: Energy, Materials. Contraction: FMCG, Healthcare, Utilities (defensive). Trough: IT, Consumer Discretionary, Real Estate. These are historical patterns, not guarantees</div>
+      </div>
+      <div class="teach-row">
+        <div class="teach-key">India-Specific Context</div>
+        <div class="teach-val">India's cycle is partly decoupled from the US. A domestic capex upcycle can drive Industrials and Financials even when the global cycle is at Peak. Watch RBI policy, GST collections, and credit growth for India-specific signals</div>
+      </div>
+      <div class="teach-row">
+        <div class="teach-key">Portfolio Construction</div>
+        <div class="teach-val">Sector rotation is about relative weights, not binary all-in/all-out calls. Overweight means +5–10% vs benchmark; underweight means −5–10%. Core holdings rarely go below 5% even in an underweight call</div>
+      </div>
+    </div>
+    <div class="bench-box" id="benchBox"></div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="showStep(1)">← Back</button>
+      <button class="btn-next" onclick="showStep(3)">Set Macro Phase →</button>
+    </div>
+  </div>
+
+  <!-- Step 3: Pro Gate -->
+  <div id="step3" class="hidden">
+    <div class="pro-gate">
+      <div class="pro-lock">🔒</div>
+      <div class="pro-title">Identify the Current Macro Phase</div>
+      <div class="pro-sub">Input current macro signals — GDP growth, rate direction, inflation trend, credit growth — and the model maps you to the active cycle phase and identifies which sectors should be overweight or underweight.</div>
+      <div class="pro-pills">
+        <span class="pro-pill">🔍 Current macro phase ID</span>
+        <span class="pro-pill">📈 Phase-optimal sectors</span>
+        <span class="pro-pill">📊 Relative performance data</span>
+        <span class="pro-pill">🔮 3–6 month sector outlook</span>
+        <span class="pro-pill">⚖️ Sector weight recommendation</span>
+      </div>
+      <button class="btn-unlock" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+      <div class="pro-price">All 6 Equity Research tools + 14 other domains · Monthly · Cancel anytime</div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="showStep(2)">← Back</button>
+    </div>
+  </div>
+
+  <!-- Step 4: Pro Gate -->
+  <div id="step4" class="hidden">
+    <div class="pro-gate">
+      <div class="pro-lock">🔒</div>
+      <div class="pro-title">Sector Allocation Output</div>
+      <div class="pro-sub">See overweight and underweight calls across all 6 sectors, phase transition signals to watch for, India-specific catalysts by sector, historical sector return data by phase, and a portfolio positioning summary.</div>
+      <div class="pro-pills">
+        <span class="pro-pill">✅ Overweight / underweight calls</span>
+        <span class="pro-pill">🔄 Phase transition signals</span>
+        <span class="pro-pill">🇮🇳 India-specific catalysts</span>
+        <span class="pro-pill">📉 Historical sector returns by phase</span>
+        <span class="pro-pill">📋 Portfolio positioning summary</span>
+      </div>
+      <button class="btn-unlock" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+      <div class="pro-price">All 6 Equity Research tools + 14 other domains · Monthly · Cancel anytime</div>
+    </div>
+    <div class="nav-btns">
+      <button class="btn-back" onclick="showStep(3)">← Back</button>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-left"><strong>ValuationDesk</strong> · Sector Rotation · PRO</div>
+  <div class="footer-links">
+    <a href="index.html">← Calculators</a>
+    <a href="../learn/">Learn</a>
+    <a href="/">All Domains</a>
+  </div>
+</footer>
+
+<script>
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+
+const COMPANIES=[
+  {name:'HDFC Bank',ticker:'HDFCBANK',sector:'Financials',pe:18,evEbitda:null,roe:15,revGrowth:15,mcap:'₹12.1L Cr',rating:'Buy'},
+  {name:'ICICI Bank',ticker:'ICICIBANK',sector:'Financials',pe:17,evEbitda:null,roe:18,revGrowth:18,mcap:'₹8.2L Cr',rating:'Buy'},
+  {name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',sector:'Financials',pe:20,evEbitda:null,roe:15,revGrowth:12,mcap:'₹3.8L Cr',rating:'Hold'},
+  {name:'Axis Bank',ticker:'AXISBANK',sector:'Financials',pe:14,evEbitda:null,roe:18,revGrowth:20,mcap:'₹3.5L Cr',rating:'Buy'},
+  {name:'State Bank of India',ticker:'SBIN',sector:'Financials',pe:10,evEbitda:null,roe:20,revGrowth:15,mcap:'₹7.1L Cr',rating:'Buy'},
+  {name:'TCS',ticker:'TCS',sector:'IT',pe:28,evEbitda:20,roe:55,revGrowth:6,mcap:'₹14.2L Cr',rating:'Hold'},
+  {name:'Infosys',ticker:'INFY',sector:'IT',pe:25,evEbitda:18,roe:32,revGrowth:4,mcap:'₹6.5L Cr',rating:'Hold'},
+  {name:'Wipro',ticker:'WIPRO',sector:'IT',pe:22,evEbitda:16,roe:15,revGrowth:2,mcap:'₹2.4L Cr',rating:'Hold'},
+  {name:'HCL Technologies',ticker:'HCLTECH',sector:'IT',pe:26,evEbitda:18,roe:22,revGrowth:8,mcap:'₹4.5L Cr',rating:'Buy'},
+  {name:'Tech Mahindra',ticker:'TECHM',sector:'IT',pe:28,evEbitda:18,roe:12,revGrowth:2,mcap:'₹1.2L Cr',rating:'Hold'},
+  {name:'Hindustan Unilever',ticker:'HINDUNILVR',sector:'FMCG',pe:52,evEbitda:40,roe:18,revGrowth:3,mcap:'₹5.4L Cr',rating:'Hold'},
+  {name:'ITC',ticker:'ITC',sector:'FMCG',pe:28,evEbitda:18,roe:28,revGrowth:8,mcap:'₹5.6L Cr',rating:'Buy'},
+  {name:'Nestle India',ticker:'NESTLEIND',sector:'FMCG',pe:65,evEbitda:45,roe:80,revGrowth:10,mcap:'₹2.4L Cr',rating:'Hold'},
+  {name:'Dabur India',ticker:'DABUR',sector:'FMCG',pe:45,evEbitda:32,roe:22,revGrowth:6,mcap:'₹1.0L Cr',rating:'Hold'},
+  {name:'Marico',ticker:'MARICO',sector:'FMCG',pe:48,evEbitda:35,roe:38,revGrowth:4,mcap:'₹0.8L Cr',rating:'Hold'},
+  {name:'Reliance Industries',ticker:'RELIANCE',sector:'Energy',pe:26,evEbitda:14,roe:10,revGrowth:8,mcap:'₹19.8L Cr',rating:'Buy'},
+  {name:'ONGC',ticker:'ONGC',sector:'Energy',pe:8,evEbitda:4,roe:12,revGrowth:5,mcap:'₹3.5L Cr',rating:'Buy'},
+  {name:'BPCL',ticker:'BPCL',sector:'Energy',pe:12,evEbitda:8,roe:18,revGrowth:10,mcap:'₹1.4L Cr',rating:'Buy'},
+  {name:'Coal India',ticker:'COALINDIA',sector:'Energy',pe:8,evEbitda:5,roe:45,revGrowth:4,mcap:'₹2.4L Cr',rating:'Buy'},
+  {name:'NTPC',ticker:'NTPC',sector:'Energy',pe:14,evEbitda:8,roe:12,revGrowth:12,mcap:'₹3.5L Cr',rating:'Buy'},
+  {name:'Tata Motors',ticker:'TATAMOTORS',sector:'Auto',pe:8,evEbitda:4,roe:20,revGrowth:18,mcap:'₹3.2L Cr',rating:'Buy'},
+  {name:'Maruti Suzuki',ticker:'MARUTI',sector:'Auto',pe:26,evEbitda:18,roe:18,revGrowth:12,mcap:'₹3.8L Cr',rating:'Hold'},
+  {name:'Bajaj Auto',ticker:'BAJAJAUTO',sector:'Auto',pe:32,evEbitda:22,roe:22,revGrowth:10,mcap:'₹2.8L Cr',rating:'Buy'},
+  {name:'Hero MotoCorp',ticker:'HEROMOTOCO',sector:'Auto',pe:22,evEbitda:14,roe:28,revGrowth:8,mcap:'₹0.9L Cr',rating:'Hold'},
+  {name:'Mahindra & Mahindra',ticker:'M_M',sector:'Auto',pe:28,evEbitda:18,roe:18,revGrowth:20,mcap:'₹3.5L Cr',rating:'Buy'},
+  {name:'Larsen & Toubro',ticker:'LT',sector:'Industrials',pe:32,evEbitda:22,roe:14,revGrowth:15,mcap:'₹4.8L Cr',rating:'Buy'},
+  {name:'Adani Ports',ticker:'ADANIPORTS',sector:'Industrials',pe:26,evEbitda:18,roe:15,revGrowth:18,mcap:'₹2.8L Cr',rating:'Buy'},
+  {name:'Power Grid Corp',ticker:'POWERGRID',sector:'Industrials',pe:14,evEbitda:10,roe:20,revGrowth:8,mcap:'₹2.8L Cr',rating:'Buy'},
+  {name:'Bharat Electronics',ticker:'BEL',sector:'Industrials',pe:45,evEbitda:30,roe:22,revGrowth:20,mcap:'₹2.2L Cr',rating:'Buy'},
+  {name:'BHEL',ticker:'BHEL',sector:'Industrials',pe:120,evEbitda:40,roe:5,revGrowth:25,mcap:'₹0.8L Cr',rating:'Hold'}
+];
+
+const SECTOR_CONTEXT={
+  'Financials':{macroPhase:'Expansion',momentum:'Strong',relValuation:'Fair',allocation:'Overweight'},
+  'IT':{macroPhase:'Slowdown',momentum:'Weak',relValuation:'Premium',allocation:'Underweight'},
+  'FMCG':{macroPhase:'Neutral',momentum:'Neutral',relValuation:'Expensive',allocation:'Neutral'},
+  'Energy':{macroPhase:'Peak',momentum:'Strong',relValuation:'Cheap',allocation:'Overweight'},
+  'Auto':{macroPhase:'Expansion',momentum:'Strong',relValuation:'Fair',allocation:'Overweight'},
+  'Industrials':{macroPhase:'Expansion',momentum:'Very Strong',relValuation:'Fair',allocation:'Overweight'}
+};
+
+let selectedCo=null;
+let activeSector='All';
+
+function renderGrid(){
+  const q=document.getElementById('searchBox').value.toLowerCase();
+  const filtered=COMPANIES.filter(c=>{
+    if(activeSector!=='All'&&c.sector!==activeSector)return false;
+    if(q&&!c.name.toLowerCase().includes(q)&&!c.ticker.toLowerCase().includes(q))return false;
+    return true;
+  });
+  const grid=document.getElementById('coGrid');
+  grid.innerHTML=filtered.map(c=>`
+    <div class="co-card${selectedCo&&selectedCo.ticker===c.ticker?' selected':''}" data-co='${JSON.stringify(c)}'>
+      <div class="co-name">${c.name}</div>
+      <div class="co-ticker">${c.ticker} · ${c.sector}</div>
+      <div class="co-meta">
+        <div class="co-stat">P/E <span>${c.pe}x</span></div>
+        <div class="co-stat">ROE <span>${c.roe}%</span></div>
+      </div>
+    </div>`).join('');
+}
+
+document.getElementById('coGrid').addEventListener('click',function(e){
+  const card=e.target.closest('.co-card[data-co]');
+  if(!card)return;
+  selectedCo=JSON.parse(card.dataset.co);
+  document.getElementById('nextBtn1').disabled=false;
+  renderGrid();
+});
+
+document.getElementById('sectorPills').addEventListener('click',function(e){
+  if(!e.target.dataset.sector)return;
+  activeSector=e.target.dataset.sector;
+  document.querySelectorAll('#sectorPills .pill').forEach(p=>p.classList.remove('active'));
+  e.target.classList.add('active');
+  renderGrid();
+});
+
+document.getElementById('searchBox').addEventListener('input',renderGrid);
+
+function renderCtx(){
+  const c=selectedCo;
+  const sc=SECTOR_CONTEXT[c.sector]||{};
+  document.getElementById('ctxCard').innerHTML=`
+    <div class="ctx-header">
+      <div class="ctx-icon">🌀</div>
+      <div>
+        <div class="ctx-company">${c.name} (${c.ticker})</div>
+        <div class="ctx-sector">${c.sector} · ${c.mcap} · Analyst Consensus: ${c.rating}</div>
+      </div>
+    </div>
+    <div class="ctx-grid">
+      <div class="ctx-stat"><div class="ctx-stat-label">P/E</div><div class="ctx-stat-val">${c.pe}x</div></div>
+      <div class="ctx-stat"><div class="ctx-stat-label">EV/EBITDA</div><div class="ctx-stat-val">${c.evEbitda!==null?c.evEbitda+'x':'N/A'}</div></div>
+      <div class="ctx-stat"><div class="ctx-stat-label">ROE</div><div class="ctx-stat-val">${c.roe}%</div></div>
+      <div class="ctx-stat"><div class="ctx-stat-label">Rev Growth</div><div class="ctx-stat-val">${c.revGrowth}%</div></div>
+    </div>`;
+  document.getElementById('benchBox').innerHTML=`
+    <div class="bench-title">🌀 ${c.sector} Sector Rotation Snapshot</div>
+    <div class="bench-grid">
+      <div class="bench-item"><div class="bench-label">Current Macro Phase</div><div class="bench-val">${sc.macroPhase||'—'}</div></div>
+      <div class="bench-item"><div class="bench-label">Price Momentum</div><div class="bench-val">${sc.momentum||'—'}</div></div>
+      <div class="bench-item"><div class="bench-label">Relative Valuation</div><div class="bench-val">${sc.relValuation||'—'}</div></div>
+      <div class="bench-item"><div class="bench-label">Tactical Allocation</div><div class="bench-val">${sc.allocation||'—'}</div></div>
+    </div>`;
+}
+
+function showStep(n){
+  for(let i=1;i<=4;i++){
+    document.getElementById('step'+i).classList.toggle('hidden',i!==n);
+    const dot=document.getElementById('dot'+i);
+    dot.classList.remove('active','done');
+    if(i===n)dot.classList.add('active');
+    else if(i<n)dot.classList.add('done');
+    if(i<4){
+      const line=document.getElementById('line'+i);
+      line.classList.toggle('done',i<n);
+    }
+  }
+  if(n===2)renderCtx();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+renderGrid();
+</script>
+</body>
+</html>

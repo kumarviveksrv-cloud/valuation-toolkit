@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ER Calculators | ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--teal:#0d9488}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;gap:16px;position:sticky;top:0;background:var(--bg);z-index:100}
+.nav-logo{font-weight:800;font-size:15px;letter-spacing:-.3px}.nav-logo span{color:var(--blue)}
+.nav-sep{color:var(--border);font-size:18px}
+.nav-crumb{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}.nav-crumb a:hover{color:var(--text)}.nav-crumb .sep{color:var(--border)}
+.nav-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.btn-sm{font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg);cursor:pointer}.btn-sm:hover{background:var(--card)}
+.btn-pro{background:var(--text);color:#fff;border-color:var(--text)}.btn-pro:hover{background:#333}
+
+.free-banner{background:linear-gradient(135deg,#0d9488 0%,#0f766e 100%);color:#fff;text-align:center;padding:12px 24px;font-size:13px;font-weight:600}
+.free-banner a{color:#fff;text-decoration:underline;text-underline-offset:2px}
+
+.page{padding:32px 24px;max-width:860px;margin:0 auto}
+.page-title{font-size:22px;font-weight:900;letter-spacing:-.3px;margin-bottom:4px}
+.page-sub{font-size:13px;color:var(--muted);margin-bottom:28px}
+
+.list{display:flex;flex-direction:column;gap:12px}
+.calc-row{border:1px solid var(--border);border-radius:10px;padding:18px 20px;display:flex;align-items:center;gap:16px;transition:box-shadow .15s}
+.calc-row:hover{box-shadow:0 4px 14px rgba(0,0,0,.06)}
+.calc-accent{width:4px;height:44px;border-radius:2px;flex-shrink:0}
+.calc-info{flex:1}
+.calc-meta{display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.calc-num{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--muted)}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.badge-free{background:#dcfce7;color:var(--green)}
+.badge-pro{background:#fef3c7;color:var(--amber)}
+.calc-title{font-size:15px;font-weight:800;letter-spacing:-.1px}
+.calc-desc{font-size:12px;color:var(--muted);margin-top:3px}
+.btn-open{font-size:12px;font-weight:700;padding:8px 16px;border-radius:7px;border:1px solid var(--border);background:var(--card);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s}
+.btn-open:hover{background:var(--text);color:#fff;border-color:var(--text)}
+.btn-open.primary{background:var(--text);color:#fff;border-color:var(--text)}.btn-open.primary:hover{background:#333}
+
+footer{border-top:1px solid var(--border);padding:20px 24px;max-width:860px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-left{font-size:12px;color:var(--muted)}.footer-left strong{color:var(--text)}
+.footer-links{display:flex;gap:16px}.footer-links a{font-size:12px;color:var(--muted)}.footer-links a:hover{color:var(--text)}
+@media(max-width:600px){.calc-row{flex-direction:column;align-items:flex-start}.btn-open{width:100%;text-align:center}}
+</style>
+</head>
+<body>
+<div class="free-banner">🎉 Stock Screener is free — no login needed. <a href="stock-screener.html">Try it now →</a></div>
+<nav>
+  <div class="nav-logo">Valuation<span>Desk</span></div>
+  <span class="nav-sep">/</span>
+  <div class="nav-crumb"><a href="/">Home</a><span class="sep">/</span><a href="/domains/equity-research/">Equity Research</a><span class="sep">/</span><span>Calculators</span></div>
+  <div class="nav-actions">
+    <button class="btn-sm btn-pro" onclick="alert('Pro unlock coming soon — ₹799/mo for all 15 domains.')">Unlock Pro — ₹799/mo</button>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-title">Equity Research Calculators</div>
+  <div class="page-sub">6 tools · 30 NSE companies · 1 free + 5 Pro</div>
+
+  <div class="list">
+
+    <div class="calc-row">
+      <div class="calc-accent" style="background:var(--teal)"></div>
+      <div class="calc-info">
+        <div class="calc-meta"><span class="calc-num">01</span><span class="badge badge-free">FREE</span></div>
+        <div class="calc-title">Stock Screener</div>
+        <div class="calc-desc">Filter by P/E, EV/EBITDA, ROE, revenue growth across 30 NSE companies. Find value, GARP, and momentum candidates instantly.</div>
+      </div>
+      <a href="stock-screener.html"><button class="btn-open primary">Open →</button></a>
+    </div>
+
+    <div class="calc-row">
+      <div class="calc-accent" style="background:var(--blue)"></div>
+      <div class="calc-info">
+        <div class="calc-meta"><span class="calc-num">02</span><span class="badge badge-pro">PRO</span></div>
+        <div class="calc-title">Earnings Model</div>
+        <div class="calc-desc">3-year forward revenue and EPS model with margin assumptions. Outputs EPS trajectory and PEG ratio for each company.</div>
+      </div>
+      <a href="earnings-model.html"><button class="btn-open">Unlock Pro</button></a>
+    </div>
+
+    <div class="calc-row">
+      <div class="calc-accent" style="background:var(--green)"></div>
+      <div class="calc-info">
+        <div class="calc-meta"><span class="calc-num">03</span><span class="badge badge-pro">PRO</span></div>
+        <div class="calc-title">Price Target Builder</div>
+        <div class="calc-desc">Set 12-month price targets using PE, EV/EBITDA, or reverse-DCF methods. Quantify upside, downside, and risk-to-reward ratio.</div>
+      </div>
+      <a href="price-target.html"><button class="btn-open">Unlock Pro</button></a>
+    </div>
+
+    <div class="calc-row">
+      <div class="calc-accent" style="background:#7c3aed"></div>
+      <div class="calc-info">
+        <div class="calc-meta"><span class="calc-num">04</span><span class="badge badge-pro">PRO</span></div>
+        <div class="calc-title">Comps Spreads</div>
+        <div class="calc-desc">Build a sector peer comparison on P/E, EV/EBITDA, and ROE. See the company's premium or discount versus the peer median.</div>
+      </div>
+      <a href="comps-spreads.html"><button class="btn-open">Unlock Pro</button></a>
+    </div>
+
+    <div class="calc-row">
+      <div class="calc-accent" style="background:var(--amber)"></div>
+      <div class="calc-info">
+        <div class="calc-meta"><span class="calc-num">05</span><span class="badge badge-pro">PRO</span></div>
+        <div class="calc-title">Rating Framework</div>
+        <div class="calc-desc">Structure a bull/base/bear case with probability weights. Outputs a risk-adjusted price target and formal Buy/Hold/Sell rating.</div>
+      </div>
+      <a href="rating-framework.html"><button class="btn-open">Unlock Pro</button></a>
+    </div>
+
+    <div class="calc-row">
+      <div class="calc-accent" style="background:var(--red)"></div>
+      <div class="calc-info">
+        <div class="calc-meta"><span class="calc-num">06</span><span class="badge badge-pro">PRO</span></div>
+        <div class="calc-title">Sector Rotation</div>
+        <div class="calc-desc">Overlay the macro cycle (expansion, peak, contraction, trough) on sector positioning. See which sectors historically outperform each phase.</div>
+      </div>
+      <a href="sector-rotation.html"><button class="btn-open">Unlock Pro</button></a>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <div class="footer-left"><strong>ValuationDesk</strong> · Equity Research Calculators</div>
+  <div class="footer-links">
+    <a href="/domains/equity-research/">← Domain</a>
+    <a href="/domains/equity-research/learn/">Learn</a>
+    <a href="/">All Domains</a>
+  </div>
+</footer>
+</body>
+</html>

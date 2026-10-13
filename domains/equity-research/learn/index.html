@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Learn Equity Research | ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--teal:#0d9488}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;gap:16px;position:sticky;top:0;background:var(--bg);z-index:100}
+.nav-logo{font-weight:800;font-size:15px;letter-spacing:-.3px}.nav-logo span{color:var(--blue)}
+.nav-sep{color:var(--border);font-size:18px}
+.nav-crumb{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}.nav-crumb a:hover{color:var(--text)}.nav-crumb .sep{color:var(--border)}
+.nav-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.btn-sm{font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg);cursor:pointer}.btn-sm:hover{background:var(--card)}
+.btn-pro{background:var(--text);color:#fff;border-color:var(--text)}.btn-pro:hover{background:#333}
+
+.hero{padding:40px 24px 28px;max-width:960px;margin:0 auto;border-bottom:1px solid var(--border)}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--teal);background:#f0fdfa;border:1px solid #99f6e4;padding:4px 10px;border-radius:20px;margin-bottom:14px}
+.hero h1{font-size:clamp(24px,4vw,36px);font-weight:900;letter-spacing:-.4px;line-height:1.15;margin-bottom:8px}
+.hero-sub{font-size:14px;color:var(--muted);max-width:520px;margin-bottom:24px}
+.path-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:14px}
+.path-steps{display:flex;align-items:center;gap:0;flex-wrap:wrap;gap:8px}
+.path-step{display:flex;align-items:center;gap:8px;font-size:12px}
+.path-dot{width:24px;height:24px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0}
+.path-text{font-weight:600}
+.path-arr{color:var(--border);font-size:14px;margin:0 2px}
+
+.section{padding:28px 24px 0;max-width:960px;margin:0 auto}
+.section-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+
+.modules{display:flex;flex-direction:column;gap:12px;margin-bottom:40px}
+.module-row{border:1px solid var(--border);border-radius:10px;padding:20px;display:flex;gap:16px;align-items:flex-start;transition:box-shadow .15s}
+.module-row:hover{box-shadow:0 4px 14px rgba(0,0,0,.06)}
+.module-num-wrap{flex-shrink:0}
+.module-num{width:36px;height:36px;border-radius:8px;background:var(--card);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:var(--muted)}
+.module-num.free{background:#f0fdfa;border-color:#99f6e4;color:var(--teal)}
+.module-info{flex:1}
+.module-meta{display:flex;align-items:center;gap:8px;margin-bottom:5px}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.badge-free{background:#dcfce7;color:var(--green)}
+.badge-pro{background:#fef3c7;color:var(--amber)}
+.module-title{font-size:15px;font-weight:800;letter-spacing:-.1px;margin-bottom:4px}
+.module-desc{font-size:12px;color:var(--muted);line-height:1.55}
+.module-topics{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px}
+.topic-chip{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--card);border:1px solid var(--border);color:var(--muted)}
+.module-cta{flex-shrink:0;padding-top:4px}
+.btn-open{font-size:12px;font-weight:700;padding:8px 16px;border-radius:7px;border:1px solid var(--border);background:var(--card);cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn-open:hover{background:var(--text);color:#fff;border-color:var(--text)}
+.btn-open.primary{background:var(--teal);color:#fff;border-color:var(--teal)}.btn-open.primary:hover{opacity:.85}
+
+.concepts{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:40px}
+.concept-card{border:1px solid var(--border);border-radius:8px;padding:14px}
+.concept-icon{font-size:20px;margin-bottom:6px}
+.concept-term{font-size:13px;font-weight:800;margin-bottom:3px}
+.concept-def{font-size:11px;color:var(--muted);line-height:1.55}
+
+.india-box{background:linear-gradient(135deg,#f0fdfa 0%,#eff6ff 100%);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:40px}
+.india-title{font-size:14px;font-weight:800;margin-bottom:14px}
+.india-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.india-item{background:#fff;border:1px solid var(--border);border-radius:8px;padding:12px}
+.india-label{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.india-val{font-size:15px;font-weight:900;letter-spacing:-.3px}
+.india-note{font-size:10px;color:var(--muted);margin-top:2px}
+
+.glossary{margin-bottom:40px}
+.gloss-grid{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.gloss-row{display:grid;grid-template-columns:180px 1fr;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);font-size:12px}
+.gloss-row:last-child{border-bottom:none}
+.gloss-term{font-weight:700;color:var(--text)}
+.gloss-def{color:var(--muted);line-height:1.5}
+
+footer{border-top:1px solid var(--border);padding:20px 24px;max-width:960px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-left{font-size:12px;color:var(--muted)}.footer-left strong{color:var(--text)}
+.footer-links{display:flex;gap:16px}.footer-links a{font-size:12px;color:var(--muted)}.footer-links a:hover{color:var(--text)}
+@media(max-width:600px){.module-row{flex-direction:column}.module-cta{width:100%}.btn-open{width:100%;text-align:center}.concepts{grid-template-columns:1fr 1fr}.gloss-grid{grid-template-columns:1fr}.gloss-row{grid-template-columns:1fr;gap:4px}.path-steps{flex-direction:column;align-items:flex-start}.path-arr{display:none}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo">Valuation<span>Desk</span></div>
+  <span class="nav-sep">/</span>
+  <div class="nav-crumb"><a href="/">Home</a><span class="sep">/</span><a href="/domains/equity-research/">Equity Research</a><span class="sep">/</span><span>Learn</span></div>
+  <div class="nav-actions">
+    <button class="btn-sm" onclick="location.href='../calculators/'">Calculators →</button>
+    <button class="btn-sm btn-pro" onclick="alert('Pro unlock coming soon — ₹799/mo for all 15 domains.')">Unlock Pro — ₹799/mo</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">📊 Domain 07 · Learn</div>
+  <h1>Equity Research</h1>
+  <p class="hero-sub">Learn how sell-side analysts build earnings models, set price targets, and publish Buy/Hold/Sell ratings on India's listed companies — from first principles.</p>
+  <div class="path-label">Learning Path</div>
+  <div class="path-steps">
+    <div class="path-step"><div class="path-dot">1</div><div class="path-text">Stock Screening</div></div>
+    <div class="path-arr">→</div>
+    <div class="path-step"><div class="path-dot">2</div><div class="path-text">Earnings Models</div></div>
+    <div class="path-arr">→</div>
+    <div class="path-step"><div class="path-dot">3</div><div class="path-text">Price Targets</div></div>
+    <div class="path-arr">→</div>
+    <div class="path-step"><div class="path-dot">4</div><div class="path-text">Relative Valuation</div></div>
+    <div class="path-arr">→</div>
+    <div class="path-step"><div class="path-dot">5</div><div class="path-text">Formal Rating</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">4 Learning Modules</div>
+  <div class="modules">
+
+    <div class="module-row">
+      <div class="module-num-wrap"><div class="module-num free">01</div></div>
+      <div class="module-info">
+        <div class="module-meta"><span class="badge badge-free">FREE</span></div>
+        <div class="module-title">Stock Screening — Finding the Investment Universe</div>
+        <div class="module-desc">Before building a model, analysts narrow 5,000+ listed stocks to a watchlist of 20–30 using quantitative screens. This module covers the ratios that matter, how to set thresholds by sector, and how to identify value, GARP (growth at a reasonable price), and momentum candidates — all illustrated with 30 NSE companies.</div>
+        <div class="module-topics">
+          <span class="topic-chip">P/E ratio</span>
+          <span class="topic-chip">EV/EBITDA</span>
+          <span class="topic-chip">ROE</span>
+          <span class="topic-chip">Revenue growth</span>
+          <span class="topic-chip">Sector filters</span>
+          <span class="topic-chip">Value vs GARP</span>
+        </div>
+      </div>
+      <div class="module-cta"><a href="../calculators/stock-screener.html"><button class="btn-open primary">Try Screener →</button></a></div>
+    </div>
+
+    <div class="module-row">
+      <div class="module-num-wrap"><div class="module-num">02</div></div>
+      <div class="module-info">
+        <div class="module-meta"><span class="badge badge-pro">PRO</span></div>
+        <div class="module-title">Earnings Models — Building the 3-Year P&amp;L Forecast</div>
+        <div class="module-desc">The earnings model is the engine of every research report. Analysts project revenue using volume and realisation drivers, forecast EBITDA margins based on operating leverage and input cost assumptions, then step down to PAT and EPS. This module walks through the full income statement build for each NSE sector — including how to handle D&amp;A, interest, and tax assumptions.</div>
+        <div class="module-topics">
+          <span class="topic-chip">Revenue drivers</span>
+          <span class="topic-chip">EBITDA margin</span>
+          <span class="topic-chip">EPS trajectory</span>
+          <span class="topic-chip">PEG ratio</span>
+          <span class="topic-chip">Consensus estimates</span>
+          <span class="topic-chip">Forward P/E</span>
+        </div>
+      </div>
+      <div class="module-cta"><button class="btn-open" onclick="alert('Pro unlock coming soon — ₹799/mo for all 15 domains.')">Unlock Pro</button></div>
+    </div>
+
+    <div class="module-row">
+      <div class="module-num-wrap"><div class="module-num">03</div></div>
+      <div class="module-info">
+        <div class="module-meta"><span class="badge badge-pro">PRO</span></div>
+        <div class="module-title">Price Targets &amp; Peer Comps — Setting the 12-Month View</div>
+        <div class="module-desc">Once the earnings model is built, analysts derive a price target using one or more valuation methods — PE multiple, EV/EBITDA, or reverse-DCF — and cross-check it against sector peers. This module covers how to pick the right method by sector, how to build a peer comparison table, and how to quantify the premium or discount a company deserves versus its sector median.</div>
+        <div class="module-topics">
+          <span class="topic-chip">PE multiple method</span>
+          <span class="topic-chip">EV/EBITDA method</span>
+          <span class="topic-chip">Reverse DCF</span>
+          <span class="topic-chip">Peer comps table</span>
+          <span class="topic-chip">Premium / discount</span>
+          <span class="topic-chip">Risk-reward ratio</span>
+        </div>
+      </div>
+      <div class="module-cta"><button class="btn-open" onclick="alert('Pro unlock coming soon — ₹799/mo for all 15 domains.')">Unlock Pro</button></div>
+    </div>
+
+    <div class="module-row">
+      <div class="module-num-wrap"><div class="module-num">04</div></div>
+      <div class="module-info">
+        <div class="module-meta"><span class="badge badge-pro">PRO</span></div>
+        <div class="module-title">Rating Framework &amp; Sector Rotation — From Analysis to Call</div>
+        <div class="module-desc">The final step is converting the analysis into a formal rating. Analysts build three scenarios (bull, base, bear), assign probability weights, and derive a risk-adjusted price target. A Buy requires ≥15% upside with 2:1 risk-reward. This module also covers sector rotation — how the macro cycle determines which sectors to overweight and which to underweight in a portfolio context.</div>
+        <div class="module-topics">
+          <span class="topic-chip">Bull/Base/Bear</span>
+          <span class="topic-chip">Probability weights</span>
+          <span class="topic-chip">Risk-adjusted PT</span>
+          <span class="topic-chip">Buy/Hold/Sell</span>
+          <span class="topic-chip">Macro cycle phases</span>
+          <span class="topic-chip">Sector allocation</span>
+        </div>
+      </div>
+      <div class="module-cta"><button class="btn-open" onclick="alert('Pro unlock coming soon — ₹799/mo for all 15 domains.')">Unlock Pro</button></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">12 Key Concepts</div>
+  <div class="concepts">
+    <div class="concept-card">
+      <div class="concept-icon">📊</div>
+      <div class="concept-term">Price-to-Earnings (P/E)</div>
+      <div class="concept-def">Market price per share ÷ EPS. Tells you what investors pay for ₹1 of earnings. Sector-specific: IT trades at 25–30x, PSU banks at 8–12x.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon">🏢</div>
+      <div class="concept-term">EV/EBITDA</div>
+      <div class="concept-def">Enterprise Value ÷ EBITDA. Capital-structure neutral — better than P/E for comparing companies with different debt levels. Not used for banks.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon">💰</div>
+      <div class="concept-term">Return on Equity (ROE)</div>
+      <div class="concept-def">Net profit ÷ Shareholders' equity. Measures how efficiently a company generates profit from shareholder funds. Best-in-class NSE companies target 20%+.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon">📈</div>
+      <div class="concept-term">EPS (Earnings Per Share)</div>
+      <div class="concept-def">Net profit ÷ shares outstanding. The core output of every earnings model. Analysts forecast FY1, FY2, FY3 EPS and derive price targets from them.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon">🔢</div>
+      <div class="concept-term">PEG Ratio</div>
+      <div class="concept-def">P/E ÷ EPS growth rate. Accounts for growth: a 30x P/E with 30% EPS growth (PEG = 1.0x) can be cheaper than a 20x P/E with 10% growth (PEG = 2.0x).</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon">🔄</div>
+      <div class="concept-term">Reverse DCF</div>
+      <div class="concept-def">Works backwards from current price to derive the implied growth rate. If that rate is unrealistically high, the stock is expensive — even if P/E looks reasonable.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon">⚖️</div>
+      <div class="concept-term">Risk-Reward Ratio</div>
+      <div class="concept-def">(Upside to target) ÷ (Downside to bear case). Analysts require at least 2:1 before publishing a Buy — ₹20 of potential gain for every ₹10 of risk.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon">🎯</div>
+      <div class="concept-term">Price Target</div>
+      <div class="concept-def">12-month forward equity value per share, derived from one or more valuation methods. Published with a Buy, Hold, or Sell rating and a thesis for why it's achievable.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon">🐂</div>
+      <div class="concept-term">Bull / Bear / Base Case</div>
+      <div class="concept-def">Three scenario outcomes probability-weighted to produce the risk-adjusted price target. Typical split: 25% bull, 55% base, 20% bear.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon">📉</div>
+      <div class="concept-term">EBITDA Margin</div>
+      <div class="concept-def">EBITDA ÷ Revenue. Measures operating profitability before capital structure and tax effects. Key lever in earnings models — a 1% margin change has outsized EPS impact.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon">🌀</div>
+      <div class="concept-term">Sector Rotation</div>
+      <div class="concept-def">Shifting portfolio weights across sectors as the macro cycle evolves. Financials and Industrials lead in expansion; defensives (FMCG, Utilities) outperform in contraction.</div>
+    </div>
+    <div class="concept-card">
+      <div class="concept-icon">🔍</div>
+      <div class="concept-term">GARP Investing</div>
+      <div class="concept-def">Growth At a Reasonable Price — targeting companies with above-market growth but P/E multiples not yet stretched. PEG ratio is the core GARP screening metric.</div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">India Market Snapshot — NSE Reference Data</div>
+  <div class="india-box">
+    <div class="india-title">🇮🇳 NSE Sector Median Multiples (FY25 Estimates)</div>
+    <div class="india-grid">
+      <div class="india-item">
+        <div class="india-label">Financials P/E</div>
+        <div class="india-val">17x</div>
+        <div class="india-note">P/BV 2.5–4x for private banks</div>
+      </div>
+      <div class="india-item">
+        <div class="india-label">IT Sector P/E</div>
+        <div class="india-val">26x</div>
+        <div class="india-note">EV/EBITDA 18x for large-caps</div>
+      </div>
+      <div class="india-item">
+        <div class="india-label">FMCG P/E</div>
+        <div class="india-val">48x</div>
+        <div class="india-note">Premium for consistent compounder</div>
+      </div>
+      <div class="india-item">
+        <div class="india-label">Energy P/E</div>
+        <div class="india-val">13x</div>
+        <div class="india-note">PSU discount; RIL at 26x</div>
+      </div>
+      <div class="india-item">
+        <div class="india-label">Auto Sector P/E</div>
+        <div class="india-val">26x</div>
+        <div class="india-note">EV cycle adds premium to leaders</div>
+      </div>
+      <div class="india-item">
+        <div class="india-label">Industrials P/E</div>
+        <div class="india-val">29x</div>
+        <div class="india-note">Capex cycle driving re-rating</div>
+      </div>
+      <div class="india-item">
+        <div class="india-label">Nifty 50 P/E</div>
+        <div class="india-val">~22x</div>
+        <div class="india-note">Long-run average: 19–20x</div>
+      </div>
+      <div class="india-item">
+        <div class="india-label">Nifty EPS Growth</div>
+        <div class="india-val">14–16%</div>
+        <div class="india-note">FY25–26 consensus estimate</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Glossary — 16 Terms Every Equity Analyst Knows</div>
+  <div class="glossary">
+    <div class="gloss-row"><div class="gloss-term">CMP</div><div class="gloss-def">Current Market Price — the live stock price used as the reference point for upside/downside calculations.</div></div>
+    <div class="gloss-row"><div class="gloss-term">TP / PT</div><div class="gloss-def">Target Price — the 12-month forward price an analyst expects the stock to reach, based on valuation models.</div></div>
+    <div class="gloss-row"><div class="gloss-term">EPS</div><div class="gloss-def">Earnings Per Share — net profit divided by total shares. The key metric price targets are built on.</div></div>
+    <div class="gloss-row"><div class="gloss-term">P/E (Trailing)</div><div class="gloss-def">Price divided by last 12 months' actual EPS. Useful for context but less used in target-setting than forward P/E.</div></div>
+    <div class="gloss-row"><div class="gloss-term">Forward P/E</div><div class="gloss-def">Price divided by estimated next 12-month EPS. The standard multiple used in price target calculations.</div></div>
+    <div class="gloss-row"><div class="gloss-term">EV (Enterprise Value)</div><div class="gloss-def">Market cap + net debt. Represents total firm value, which is more meaningful than equity value for capital-heavy companies.</div></div>
+    <div class="gloss-row"><div class="gloss-term">EBITDA</div><div class="gloss-def">Earnings Before Interest, Tax, Depreciation and Amortisation. The proxy for operating cash generation from the business.</div></div>
+    <div class="gloss-row"><div class="gloss-term">NIM</div><div class="gloss-def">Net Interest Margin — the banking equivalent of EBITDA margin. Spread between lending rate and cost of funds.</div></div>
+    <div class="gloss-row"><div class="gloss-term">ROE</div><div class="gloss-def">Return on Equity. Net profit as a % of shareholders' equity. The premier measure of capital efficiency.</div></div>
+    <div class="gloss-row"><div class="gloss-term">CAGR</div><div class="gloss-def">Compound Annual Growth Rate. The year-on-year growth rate used for revenue, EPS, and other forecasts over multi-year horizons.</div></div>
+    <div class="gloss-row"><div class="gloss-term">Overweight / Underweight</div><div class="gloss-def">Portfolio positioning relative to benchmark allocation. Overweight = hold more of a sector than the index; underweight = hold less.</div></div>
+    <div class="gloss-row"><div class="gloss-term">Bull / Bear / Base Case</div><div class="gloss-def">Three scenario outcomes: optimistic, pessimistic, and most-likely. Probability-weighted to produce the risk-adjusted price target.</div></div>
+    <div class="gloss-row"><div class="gloss-term">Consensus</div><div class="gloss-def">The average of all sell-side analysts' EPS estimates or price targets for a stock. Beating or missing consensus drives stock price moves.</div></div>
+    <div class="gloss-row"><div class="gloss-term">Comps</div><div class="gloss-def">Comparable companies analysis. Building a peer set and comparing trading multiples to assess relative valuation.</div></div>
+    <div class="gloss-row"><div class="gloss-term">Upside / Downside</div><div class="gloss-def">(Target Price − CMP) ÷ CMP × 100. Buy ratings typically imply ≥15% upside; Sell implies negative or near-zero return.</div></div>
+    <div class="gloss-row"><div class="gloss-term">Margin of Safety</div><div class="gloss-def">The gap between a stock's intrinsic value and its current market price. A buffer for being wrong — the more the better.</div></div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-left"><strong>ValuationDesk</strong> · Domain 07 — Equity Research · Learn</div>
+  <div class="footer-links">
+    <a href="../calculators/">Calculators →</a>
+    <a href="../">← Domain</a>
+    <a href="/">All Domains</a>
+  </div>
+</footer>
+</body>
+</html>

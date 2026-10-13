@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stock Screener — Equity Research | ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--teal:#0d9488}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+
+/* NAV */
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;gap:16px;position:sticky;top:0;background:var(--bg);z-index:200}
+.nav-logo{font-weight:800;font-size:15px;letter-spacing:-.3px}.nav-logo span{color:var(--blue)}
+.nav-sep{color:var(--border);font-size:18px}
+.nav-crumb{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}.nav-crumb a{color:var(--muted)}.nav-crumb a:hover{color:var(--text)}.nav-crumb .sep{color:var(--border)}
+.nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.free-pill{font-size:11px;font-weight:700;padding:4px 10px;border-radius:10px;background:#dcfce7;color:var(--green)}
+
+/* LOADING OVERLAY */
+#loadingOverlay{position:fixed;inset:0;background:#fff;z-index:500;display:none;flex-direction:column;align-items:center;justify-content:center;gap:24px}
+.lo-title{font-size:28px;font-weight:900;letter-spacing:-.5px;text-align:center}
+.lo-title span{color:var(--teal)}
+.lo-sub{font-size:13px;color:var(--muted);text-align:center;max-width:340px}
+.lo-bar-wrap{width:320px;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.lo-bar{height:100%;width:0%;background:linear-gradient(90deg,var(--teal),var(--blue));border-radius:3px;transition:width .12s linear}
+.lo-pct{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--teal)}
+.lo-steps{display:flex;flex-direction:column;gap:6px;align-items:center}
+.lo-step{font-size:12px;color:var(--muted);opacity:0;transition:opacity .3s}.lo-step.vis{opacity:1}.lo-step.done{color:var(--green)}
+.lo-step::before{content:'○ '}.lo-step.done::before{content:'✓ '}
+
+/* STEPPER */
+.stepper{display:flex;align-items:center;padding:16px 24px;border-bottom:1px solid var(--border);overflow-x:auto;gap:0;max-width:960px;margin:0 auto}
+.stp{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:6px 10px;border-radius:6px;white-space:nowrap;transition:all .2s;color:var(--muted)}
+.stp.active{color:var(--text);background:var(--card)}
+.stp.done{color:var(--green)}
+.stp-num{width:20px;height:20px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.stp.done .stp-num{background:var(--green);border-color:var(--green);color:#fff}
+.stp-line{width:24px;height:1.5px;background:var(--border);flex-shrink:0;transition:background .3s}
+.stp-done-line{background:var(--green)}
+
+/* STEPS */
+.step{display:none;max-width:960px;margin:0 auto;padding:24px}
+.step.active{display:block}
+
+/* STEP 1 */
+.step-header{margin-bottom:20px}
+.step-title{font-size:20px;font-weight:900;letter-spacing:-.3px;margin-bottom:4px}
+.step-sub{font-size:13px;color:var(--muted)}
+.filter-bar{display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+#searchInput{font-size:13px;padding:8px 12px;border:1px solid var(--border);border-radius:7px;background:var(--bg);outline:none;width:200px;font-family:inherit}
+#searchInput:focus{border-color:var(--teal)}
+.pills{display:flex;gap:6px;flex-wrap:wrap}
+.pill{font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--bg);cursor:pointer;transition:all .15s;color:var(--muted)}
+.pill.active{background:var(--text);color:#fff;border-color:var(--text)}
+.co-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.co-card{border:1px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;transition:all .15s;background:var(--bg)}
+.co-card:hover{border-color:var(--teal);background:#f0fdfa}
+.co-card.selected{border-color:var(--teal);background:#f0fdfa;box-shadow:0 0 0 2px rgba(13,148,136,.15)}
+.co-ticker{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--teal);margin-bottom:2px}
+.co-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.co-sector{font-size:10px;color:var(--muted)}
+.co-pe{font-size:10px;color:var(--muted);margin-top:4px;font-family:'JetBrains Mono',monospace}
+.s1-footer{display:flex;justify-content:flex-end;margin-top:16px}
+.btn-next{font-size:13px;font-weight:700;padding:10px 24px;border-radius:8px;border:none;background:var(--text);color:#fff;cursor:pointer;transition:opacity .15s}
+.btn-next:hover{opacity:.85}.btn-next:disabled{opacity:.3;cursor:not-allowed}
+.btn-back{font-size:13px;font-weight:700;padding:10px 24px;border-radius:8px;border:1px solid var(--border);background:var(--bg);cursor:pointer;margin-right:8px}
+
+/* STEP 2 — TEACHING CARD */
+.teach-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px}
+.tc-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);margin-bottom:8px}
+.tc-title{font-size:17px;font-weight:900;letter-spacing:-.2px;margin-bottom:12px}
+.screen-types{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.st-box{background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px}
+.st-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.st-def{font-size:12px;color:var(--muted);line-height:1.55;margin-bottom:8px}
+.st-eg{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--blue)}
+.ratio-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px}
+.ratio-table th{text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:6px 10px;border-bottom:1px solid var(--border)}
+.ratio-table td{padding:8px 10px;border-bottom:1px solid var(--border)}
+.ratio-table tr:last-child td{border-bottom:none}
+.ratio-table tr:hover td{background:var(--card)}
+.ctx-box{background:#f0fdfa;border:1px solid #99f6e4;border-radius:8px;padding:14px}
+.ctx-title{font-size:11px;font-weight:700;color:var(--teal);margin-bottom:8px;text-transform:uppercase;letter-spacing:.06em}
+.ctx-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.ctx-item{background:#fff;border-radius:6px;padding:10px}
+.ctx-item-label{font-size:10px;color:var(--muted);margin-bottom:2px}
+.ctx-item-val{font-size:14px;font-weight:800;font-family:'JetBrains Mono',monospace}
+
+/* STEP 3 — SCREENER */
+.screen-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.filter-group{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px}
+.fg-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:10px}
+.range-row{display:flex;gap:8px;align-items:center}
+.range-input{flex:1;font-size:13px;font-family:'JetBrains Mono',monospace;padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:#fff;outline:none}
+.range-input:focus{border-color:var(--teal)}
+.range-sep{font-size:12px;color:var(--muted);font-weight:600}
+.select-input{width:100%;font-size:13px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:#fff;outline:none;font-family:inherit;cursor:pointer}
+.screen-hint{font-size:12px;color:var(--muted);margin-bottom:16px}
+.btn-run{width:100%;font-size:14px;font-weight:800;padding:12px;border-radius:8px;border:none;background:var(--teal);color:#fff;cursor:pointer;transition:opacity .15s;margin-bottom:8px}
+.btn-run:hover{opacity:.88}
+
+/* STEP 4 — RESULTS */
+.results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.results-count{font-size:14px;font-weight:700}
+.anchor-badge{font-size:12px;font-weight:600;padding:5px 12px;background:#f0fdfa;border:1px solid #99f6e4;border-radius:20px;color:var(--teal)}
+.results-table{width:100%;border-collapse:collapse;font-size:12px}
+.results-table th{text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:8px 10px;border-bottom:2px solid var(--border);background:var(--card)}
+.results-table td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+.results-table tr:last-child td{border-bottom:none}
+.results-table tr:hover td{background:var(--card)}
+.rt-ticker{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--teal)}
+.rt-name{font-weight:600}
+.rt-sector{font-size:10px;color:var(--muted)}
+.rt-num{font-family:'JetBrains Mono',monospace;font-weight:700}
+.rt-anchor{background:#f0fdfa}
+.tag-match{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:#dcfce7;color:var(--green)}
+.tag-anchor{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:#f0fdfa;color:var(--teal)}
+.no-results{text-align:center;padding:40px;color:var(--muted);font-size:13px}
+
+@media(max-width:640px){.screen-types{grid-template-columns:1fr}.screen-grid{grid-template-columns:1fr}.stepper{padding:12px 16px}.step{padding:16px}}
+</style>
+</head>
+<body>
+
+<!-- LOADING OVERLAY -->
+<div id="loadingOverlay">
+  <div class="lo-title">Loading <span>Market Data</span></div>
+  <div class="lo-sub">Fetching NSE ratios, sector benchmarks, and 30-company dataset</div>
+  <div class="lo-bar-wrap"><div class="lo-bar" id="loBar"></div></div>
+  <div class="lo-pct" id="loPct">0%</div>
+  <div class="lo-steps">
+    <div class="lo-step" id="ls1">Initialising screener engine</div>
+    <div class="lo-step" id="ls2">Loading NSE company data</div>
+    <div class="lo-step" id="ls3">Computing sector benchmarks</div>
+    <div class="lo-step" id="ls4">Building filter index</div>
+    <div class="lo-step" id="ls5">Ready</div>
+  </div>
+</div>
+
+<nav>
+  <div class="nav-logo">Valuation<span>Desk</span></div>
+  <span class="nav-sep">/</span>
+  <div class="nav-crumb">
+    <a href="/domains/equity-research/">Equity Research</a><span class="sep">/</span>
+    <a href="/domains/equity-research/calculators/">Calculators</a><span class="sep">/</span>
+    <span>Stock Screener</span>
+  </div>
+  <div class="nav-right"><span class="free-pill">FREE</span></div>
+</nav>
+
+<!-- STEPPER -->
+<div class="stepper">
+  <div class="stp active" id="si1"><div class="stp-num">1</div>Pick Stock</div>
+  <div class="stp-line" id="sl1"></div>
+  <div class="stp idle" id="si2"><div class="stp-num">2</div>Learn Screening</div>
+  <div class="stp-line" id="sl2"></div>
+  <div class="stp idle" id="si3"><div class="stp-num">3</div>Set Filters</div>
+  <div class="stp-line" id="sl3"></div>
+  <div class="stp idle" id="si4"><div class="stp-num">4</div>Results</div>
+</div>
+
+<!-- STEP 1 -->
+<div class="step active" id="s1">
+  <div class="step-header">
+    <div class="step-title">Pick your anchor stock</div>
+    <div class="step-sub">Select the company you want to benchmark your screen against. The screener will find similar or contrasting peers.</div>
+  </div>
+  <div class="filter-bar">
+    <input id="searchInput" type="text" placeholder="Search by name or ticker…" oninput="filterCos()">
+    <div class="pills" id="sectorPills"></div>
+  </div>
+  <div class="co-grid" id="coGrid"></div>
+  <div class="s1-footer">
+    <button class="btn-next" id="s1btn" disabled onclick="showStep(2)">Next: Learn Screening →</button>
+  </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="step" id="s2">
+  <div class="teach-card">
+    <div class="tc-label">📊 Equity Research · Module 1</div>
+    <div class="tc-title">How Analysts Screen for Stocks</div>
+    <div class="screen-types">
+      <div class="st-box">
+        <div class="st-label" style="color:var(--blue)">Value Screen</div>
+        <div class="st-def">Find stocks trading below intrinsic value. Low P/E, low EV/EBITDA relative to peers and history.</div>
+        <div class="st-eg">P/E &lt; 15 · EV/EBITDA &lt; 10 · PBV &lt; 2</div>
+      </div>
+      <div class="st-box">
+        <div class="st-label" style="color:var(--green)">GARP Screen</div>
+        <div class="st-def">Growth at a Reasonable Price. High earnings growth but not at an excessive valuation multiple.</div>
+        <div class="st-eg">PEG &lt; 1 · ROE &gt; 15% · Rev Growth &gt; 12%</div>
+      </div>
+      <div class="st-box">
+        <div class="st-label" style="color:var(--teal)">Quality Screen</div>
+        <div class="st-def">High-quality compounders. Consistent ROE, low debt, strong FCF conversion, durable moat.</div>
+        <div class="st-eg">ROE &gt; 20% · D/E &lt; 0.5 · EBITDA margin &gt; 20%</div>
+      </div>
+    </div>
+    <table class="ratio-table">
+      <thead><tr><th>Ratio</th><th>What It Measures</th><th>Low = ?</th><th>High = ?</th></tr></thead>
+      <tbody>
+        <tr><td><strong>P/E</strong></td><td>Price per rupee of earnings</td><td>Cheap or low growth</td><td>Premium or high growth</td></tr>
+        <tr><td><strong>EV/EBITDA</strong></td><td>Enterprise value vs operating profit</td><td>Undervalued / value trap</td><td>Growth premium</td></tr>
+        <tr><td><strong>ROE</strong></td><td>Return on shareholder equity</td><td>Capital inefficient</td><td>High-quality compounder</td></tr>
+        <tr><td><strong>Rev Growth</strong></td><td>YoY revenue expansion</td><td>Mature / declining</td><td>High growth / cyclical peak</td></tr>
+        <tr><td><strong>PEG</strong></td><td>P/E relative to growth rate</td><td>Attractive (GARP)</td><td>Expensive relative to growth</td></tr>
+      </tbody>
+    </table>
+    <div class="ctx-box" id="ctxBox">
+      <div class="ctx-title" id="ctxTitle">Sector Benchmarks</div>
+      <div class="ctx-grid" id="ctxGrid"></div>
+    </div>
+  </div>
+  <div class="s1-footer">
+    <button class="btn-back" onclick="showStep(1)">← Back</button>
+    <button class="btn-next" onclick="triggerLoad()">Next: Set Filters →</button>
+  </div>
+</div>
+
+<!-- STEP 3 -->
+<div class="step" id="s3">
+  <div class="step-header">
+    <div class="step-title">Set your screening criteria</div>
+    <div class="step-sub">Adjust the filters below. Leave fields blank to ignore that criterion. <strong id="anchorLabel"></strong></div>
+  </div>
+  <p class="screen-hint">💡 Tip: Start broad — narrow down after seeing the initial results.</p>
+  <div class="screen-grid">
+    <div class="filter-group">
+      <div class="fg-label">P/E Ratio Range</div>
+      <div class="range-row">
+        <input class="range-input" id="peMin" type="number" placeholder="Min" min="0">
+        <span class="range-sep">to</span>
+        <input class="range-input" id="peMax" type="number" placeholder="Max" min="0">
+      </div>
+    </div>
+    <div class="filter-group">
+      <div class="fg-label">EV/EBITDA Range</div>
+      <div class="range-row">
+        <input class="range-input" id="evMin" type="number" placeholder="Min" min="0">
+        <span class="range-sep">to</span>
+        <input class="range-input" id="evMax" type="number" placeholder="Max" min="0">
+      </div>
+    </div>
+    <div class="filter-group">
+      <div class="fg-label">Minimum ROE (%)</div>
+      <div class="range-row">
+        <input class="range-input" id="roeMin" type="number" placeholder="e.g. 15" min="0" style="max-width:140px">
+      </div>
+    </div>
+    <div class="filter-group">
+      <div class="fg-label">Min Revenue Growth (%)</div>
+      <div class="range-row">
+        <input class="range-input" id="growthMin" type="number" placeholder="e.g. 10" min="0" style="max-width:140px">
+      </div>
+    </div>
+    <div class="filter-group">
+      <div class="fg-label">Sector Filter</div>
+      <select class="select-input" id="sectorFilter">
+        <option value="All">All Sectors</option>
+        <option value="Financials">Financials</option>
+        <option value="IT">IT</option>
+        <option value="FMCG">FMCG</option>
+        <option value="Energy">Energy</option>
+        <option value="Auto">Auto</option>
+        <option value="Industrials">Industrials</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <div class="fg-label">Include Banks (no EV/EBITDA)</div>
+      <select class="select-input" id="bankFilter">
+        <option value="yes">Yes — include Financials</option>
+        <option value="no">No — exclude Financials</option>
+      </select>
+    </div>
+  </div>
+  <button class="btn-run" onclick="runScreen()">Run Screen →</button>
+  <div class="s1-footer" style="margin-top:0">
+    <button class="btn-back" onclick="showStep(2)">← Back</button>
+  </div>
+</div>
+
+<!-- STEP 4 -->
+<div class="step" id="s4">
+  <div class="results-header">
+    <div class="results-count" id="resultsCount">0 companies matched</div>
+    <div class="anchor-badge" id="anchorBadge"></div>
+  </div>
+  <div id="resultsWrap"></div>
+  <div class="s1-footer" style="margin-top:20px">
+    <button class="btn-back" onclick="showStep(3)">← Adjust Filters</button>
+    <button class="btn-next" onclick="showStep(1)" style="background:var(--teal)">New Screen</button>
+  </div>
+</div>
+
+<script>
+const COMPANIES=[
+  {name:'HDFC Bank',ticker:'HDFCBANK',sector:'Financials',pe:18,evEbitda:null,roe:15,revGrowth:15,mcap:'₹12.1L Cr',rating:'Buy'},
+  {name:'ICICI Bank',ticker:'ICICIBANK',sector:'Financials',pe:17,evEbitda:null,roe:18,revGrowth:18,mcap:'₹8.2L Cr',rating:'Buy'},
+  {name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',sector:'Financials',pe:20,evEbitda:null,roe:15,revGrowth:12,mcap:'₹3.8L Cr',rating:'Hold'},
+  {name:'Axis Bank',ticker:'AXISBANK',sector:'Financials',pe:14,evEbitda:null,roe:18,revGrowth:20,mcap:'₹3.5L Cr',rating:'Buy'},
+  {name:'State Bank of India',ticker:'SBIN',sector:'Financials',pe:10,evEbitda:null,roe:20,revGrowth:15,mcap:'₹7.1L Cr',rating:'Buy'},
+  {name:'TCS',ticker:'TCS',sector:'IT',pe:28,evEbitda:20,roe:55,revGrowth:6,mcap:'₹14.2L Cr',rating:'Hold'},
+  {name:'Infosys',ticker:'INFY',sector:'IT',pe:25,evEbitda:18,roe:32,revGrowth:4,mcap:'₹6.5L Cr',rating:'Hold'},
+  {name:'Wipro',ticker:'WIPRO',sector:'IT',pe:22,evEbitda:16,roe:15,revGrowth:2,mcap:'₹2.4L Cr',rating:'Hold'},
+  {name:'HCL Technologies',ticker:'HCLTECH',sector:'IT',pe:26,evEbitda:18,roe:22,revGrowth:8,mcap:'₹4.5L Cr',rating:'Buy'},
+  {name:'Tech Mahindra',ticker:'TECHM',sector:'IT',pe:28,evEbitda:18,roe:12,revGrowth:2,mcap:'₹1.2L Cr',rating:'Hold'},
+  {name:'Hindustan Unilever',ticker:'HINDUNILVR',sector:'FMCG',pe:52,evEbitda:40,roe:18,revGrowth:3,mcap:'₹5.4L Cr',rating:'Hold'},
+  {name:'ITC',ticker:'ITC',sector:'FMCG',pe:28,evEbitda:18,roe:28,revGrowth:8,mcap:'₹5.6L Cr',rating:'Buy'},
+  {name:'Nestle India',ticker:'NESTLEIND',sector:'FMCG',pe:65,evEbitda:45,roe:80,revGrowth:10,mcap:'₹2.4L Cr',rating:'Hold'},
+  {name:'Dabur India',ticker:'DABUR',sector:'FMCG',pe:45,evEbitda:32,roe:22,revGrowth:6,mcap:'₹1.0L Cr',rating:'Hold'},
+  {name:'Marico',ticker:'MARICO',sector:'FMCG',pe:48,evEbitda:35,roe:38,revGrowth:4,mcap:'₹0.8L Cr',rating:'Hold'},
+  {name:'Reliance Industries',ticker:'RELIANCE',sector:'Energy',pe:26,evEbitda:14,roe:10,revGrowth:8,mcap:'₹19.8L Cr',rating:'Buy'},
+  {name:'ONGC',ticker:'ONGC',sector:'Energy',pe:8,evEbitda:4,roe:12,revGrowth:5,mcap:'₹3.5L Cr',rating:'Buy'},
+  {name:'BPCL',ticker:'BPCL',sector:'Energy',pe:12,evEbitda:8,roe:18,revGrowth:10,mcap:'₹1.4L Cr',rating:'Buy'},
+  {name:'Coal India',ticker:'COALINDIA',sector:'Energy',pe:8,evEbitda:5,roe:45,revGrowth:4,mcap:'₹2.4L Cr',rating:'Buy'},
+  {name:'NTPC',ticker:'NTPC',sector:'Energy',pe:14,evEbitda:8,roe:12,revGrowth:12,mcap:'₹3.5L Cr',rating:'Buy'},
+  {name:'Tata Motors',ticker:'TATAMOTORS',sector:'Auto',pe:8,evEbitda:4,roe:20,revGrowth:18,mcap:'₹3.2L Cr',rating:'Buy'},
+  {name:'Maruti Suzuki',ticker:'MARUTI',sector:'Auto',pe:26,evEbitda:18,roe:18,revGrowth:12,mcap:'₹3.8L Cr',rating:'Hold'},
+  {name:'Bajaj Auto',ticker:'BAJAJAUTO',sector:'Auto',pe:32,evEbitda:22,roe:22,revGrowth:10,mcap:'₹2.8L Cr',rating:'Buy'},
+  {name:'Hero MotoCorp',ticker:'HEROMOTOCO',sector:'Auto',pe:22,evEbitda:14,roe:28,revGrowth:8,mcap:'₹0.9L Cr',rating:'Hold'},
+  {name:'Mahindra & Mahindra',ticker:'M_M',sector:'Auto',pe:28,evEbitda:18,roe:18,revGrowth:20,mcap:'₹3.5L Cr',rating:'Buy'},
+  {name:'Larsen & Toubro',ticker:'LT',sector:'Industrials',pe:32,evEbitda:22,roe:14,revGrowth:15,mcap:'₹4.8L Cr',rating:'Buy'},
+  {name:'Adani Ports',ticker:'ADANIPORTS',sector:'Industrials',pe:26,evEbitda:18,roe:15,revGrowth:18,mcap:'₹2.8L Cr',rating:'Buy'},
+  {name:'Power Grid Corp',ticker:'POWERGRID',sector:'Industrials',pe:14,evEbitda:10,roe:20,revGrowth:8,mcap:'₹2.8L Cr',rating:'Buy'},
+  {name:'Bharat Electronics',ticker:'BEL',sector:'Industrials',pe:45,evEbitda:30,roe:22,revGrowth:20,mcap:'₹2.2L Cr',rating:'Buy'},
+  {name:'BHEL',ticker:'BHEL',sector:'Industrials',pe:120,evEbitda:40,roe:5,revGrowth:25,mcap:'₹0.8L Cr',rating:'Hold'}
+];
+
+const SECTOR_CONTEXT={
+  'Financials':{peMedian:17,evebitdaMedian:'N/A (banks)',roeMedian:18,growthMedian:16},
+  'IT':{peMedian:26,evebitdaMedian:18,roeMedian:27,growthMedian:4},
+  'FMCG':{peMedian:48,evebitdaMedian:35,roeMedian:28,growthMedian:6},
+  'Energy':{peMedian:13,evebitdaMedian:8,roeMedian:15,growthMedian:8},
+  'Auto':{peMedian:26,evebitdaMedian:16,roeMedian:20,growthMedian:12},
+  'Industrials':{peMedian:29,evebitdaMedian:20,roeMedian:16,growthMedian:17}
+};
+
+let activeSector='All',selectedCo=null;
+
+function getSectors(){return['All',...new Set(COMPANIES.map(c=>c.sector))];}
+function renderSectors(){
+  document.getElementById('sectorPills').innerHTML=getSectors().map(s=>`<button class="pill${s===activeSector?' active':''}" onclick="setSector('${s}')">${s}</button>`).join('');
+}
+function setSector(s){activeSector=s;renderSectors();filterCos();}
+function filterCos(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const f=COMPANIES.filter(c=>(activeSector==='All'||c.sector===activeSector)&&(c.name.toLowerCase().includes(q)||c.ticker.toLowerCase().includes(q)));
+  document.getElementById('coGrid').innerHTML=f.map(c=>`<div class="co-card${selectedCo&&selectedCo.ticker===c.ticker?' selected':''}" data-co='${JSON.stringify(c)}'><div class="co-ticker">${c.ticker}</div><div class="co-name">${c.name}</div><div class="co-sector">${c.sector}</div><div class="co-pe">P/E ${c.pe}x · ROE ${c.roe}%</div></div>`).join('');
+}
+document.addEventListener('click',function(e){
+  const card=e.target.closest('.co-card[data-co]');
+  if(!card)return;
+  selectCo(JSON.parse(card.dataset.co));
+});
+function selectCo(c){selectedCo=c;document.getElementById('s1btn').disabled=false;filterCos();}
+
+function renderCtx(){
+  if(!selectedCo)return;
+  const s=selectedCo.sector;
+  const ctx=SECTOR_CONTEXT[s]||{};
+  document.getElementById('ctxTitle').textContent=s+' Sector — Median Benchmarks';
+  document.getElementById('ctxGrid').innerHTML=`
+    <div class="ctx-item"><div class="ctx-item-label">Median P/E</div><div class="ctx-item-val">${ctx.peMedian}x</div></div>
+    <div class="ctx-item"><div class="ctx-item-label">Median EV/EBITDA</div><div class="ctx-item-val">${ctx.evebitdaMedian}${typeof ctx.evebitdaMedian==='number'?'x':''}</div></div>
+    <div class="ctx-item"><div class="ctx-item-label">Median ROE</div><div class="ctx-item-val">${ctx.roeMedian}%</div></div>
+    <div class="ctx-item"><div class="ctx-item-label">Median Rev Growth</div><div class="ctx-item-val">${ctx.growthMedian}%</div></div>
+  `;
+}
+
+function triggerLoad(){
+  const overlay=document.getElementById('loadingOverlay');
+  overlay.style.display='flex';
+  const bar=document.getElementById('loBar');
+  const pct=document.getElementById('loPct');
+  const steps=['ls1','ls2','ls3','ls4','ls5'];
+  const delays=[400,900,1800,2900,4100];
+  const pcts=[12,30,55,80,100];
+  let idx=0;
+  const timer=setInterval(()=>{
+    if(idx<steps.length){
+      document.getElementById(steps[idx]).classList.add('vis');
+      if(idx>0)document.getElementById(steps[idx-1]).classList.add('done');
+      bar.style.width=pcts[idx]+'%';
+      pct.textContent=pcts[idx]+'%';
+      idx++;
+    }else{
+      clearInterval(timer);
+    }
+  },900);
+  setTimeout(()=>{
+    document.getElementById('ls5').classList.add('done');
+    bar.style.width='100%';
+    pct.textContent='100%';
+    setTimeout(()=>{
+      overlay.style.display='none';
+      showStep(3);
+    },400);
+  },5000);
+}
+
+function showStep(n){
+  [1,2,3,4].forEach(i=>{
+    document.getElementById('s'+i).classList.toggle('active',i===n);
+    const si=document.getElementById('si'+i);
+    si.className='stp '+(i<n?'done':i===n?'active':'idle');
+    const ln=document.getElementById('sl'+i);if(ln)ln.className='stp-line'+(i<n?' stp-done-line':'');
+  });
+  if(n===2&&selectedCo)renderCtx();
+  if(n===3&&selectedCo){
+    document.getElementById('anchorLabel').textContent='Anchor: '+selectedCo.name+' ('+selectedCo.ticker+') · P/E '+selectedCo.pe+'x · ROE '+selectedCo.roe+'%';
+  }
+}
+
+function runScreen(){
+  const peMin=parseFloat(document.getElementById('peMin').value)||0;
+  const peMax=parseFloat(document.getElementById('peMax').value)||Infinity;
+  const evMin=parseFloat(document.getElementById('evMin').value)||0;
+  const evMax=parseFloat(document.getElementById('evMax').value)||Infinity;
+  const roeMin=parseFloat(document.getElementById('roeMin').value)||0;
+  const growthMin=parseFloat(document.getElementById('growthMin').value)||0;
+  const sectorF=document.getElementById('sectorFilter').value;
+  const bankF=document.getElementById('bankFilter').value;
+
+  const matched=COMPANIES.filter(c=>{
+    if(bankF==='no'&&c.sector==='Financials')return false;
+    if(sectorF!=='All'&&c.sector!==sectorF)return false;
+    if(c.pe<peMin||c.pe>peMax)return false;
+    if(c.evEbitda!==null&&(c.evEbitda<evMin||c.evEbitda>evMax))return false;
+    if(c.roe<roeMin)return false;
+    if(c.revGrowth<growthMin)return false;
+    return true;
+  });
+
+  const isAnchor=c=>selectedCo&&c.ticker===selectedCo.ticker;
+  const allShown=isAnchor&&matched.find(isAnchor)?matched:[...matched.filter(c=>!isAnchor(c)),...(selectedCo?[selectedCo]:[])];
+
+  document.getElementById('resultsCount').textContent=matched.length+' compan'+(matched.length===1?'y':'ies')+' matched your screen';
+  if(selectedCo)document.getElementById('anchorBadge').textContent='Anchor: '+selectedCo.ticker;
+
+  if(allShown.length===0){
+    document.getElementById('resultsWrap').innerHTML='<div class="no-results">No companies matched. Try widening your filters.</div>';
+  } else {
+    document.getElementById('resultsWrap').innerHTML=`
+      <table class="results-table">
+        <thead><tr><th>Ticker</th><th>Company</th><th>Sector</th><th>P/E</th><th>EV/EBITDA</th><th>ROE%</th><th>Rev Growth%</th><th>Mkt Cap</th><th>Rating</th><th></th></tr></thead>
+        <tbody>${allShown.map(c=>{
+          const anchor=isAnchor(c);
+          const matchedInScreen=matched.find(m=>m.ticker===c.ticker);
+          return`<tr class="${anchor?'rt-anchor':''}">
+            <td class="rt-ticker">${c.ticker}</td>
+            <td class="rt-name">${c.name}</td>
+            <td class="rt-sector">${c.sector}</td>
+            <td class="rt-num">${c.pe}x</td>
+            <td class="rt-num">${c.evEbitda!==null?c.evEbitda+'x':'—'}</td>
+            <td class="rt-num">${c.roe}%</td>
+            <td class="rt-num">${c.revGrowth}%</td>
+            <td>${c.mcap}</td>
+            <td><span style="font-size:11px;font-weight:700;color:${c.rating==='Buy'?'var(--green)':c.rating==='Hold'?'var(--amber)':'var(--red)'}">${c.rating}</span></td>
+            <td>${anchor?'<span class="tag-anchor">Anchor</span>':matchedInScreen?'<span class="tag-match">✓ Match</span>':''}</td>
+          </tr>`;
+        }).join('')}</tbody>
+      </table>`;
+  }
+  showStep(4);
+}
+
+renderSectors();filterCos();
+</script>
+</body>
+</html>
