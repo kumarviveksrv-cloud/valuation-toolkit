@@ -11,7 +11,7 @@
 :root{
   --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
   --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;
-  --accent:#7c3aed;--accent-bg:#f5f3ff;--accent-border:#ddd6fe;
+  --accent:#475569;--accent-bg:#f8fafc;--accent-border:#cbd5e1;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
@@ -40,10 +40,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 
 .calc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:40px}
 .calc-card{border:1px solid var(--border);border-radius:12px;padding:20px;text-decoration:none;color:inherit;display:block;transition:all .15s;position:relative}
-.calc-card:hover{border-color:var(--accent);box-shadow:0 4px 16px rgba(124,58,237,.1);transform:translateY(-1px)}
+.calc-card:hover{border-color:var(--accent);box-shadow:0 4px 16px rgba(71,85,105,.1);transform:translateY(-1px)}
 .calc-tag{position:absolute;top:14px;right:14px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
 .tag-free{background:#dcfce7;color:#16a34a}
-.tag-pro{background:#f3e8ff;color:#7c3aed}
+.tag-pro{background:#f8fafc;color:#475569;border:1px solid #cbd5e1}
 .calc-icon{font-size:24px;margin-bottom:10px}
 .calc-name{font-size:15px;font-weight:700;margin-bottom:4px}
 .calc-desc{font-size:13px;color:var(--muted);line-height:1.5}
