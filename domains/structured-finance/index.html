@@ -9,9 +9,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
+  --bg:#1c1917;--text:#e7e5e4;--muted:#a8a29e;--border:#33302c;--card:#262220;
   --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;
-  --accent:#0d9488;--accent-bg:#f0fdfa;--accent-border:#99f6e4;
+  --accent:#0d9488;--accent-bg:rgba(13,148,136,.18);--accent-border:rgba(13,148,136,.3);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
@@ -42,7 +42,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .calc-card{border:1px solid var(--border);border-radius:12px;padding:20px;text-decoration:none;color:inherit;display:block;transition:all .15s;position:relative}
 .calc-card:hover{border-color:var(--accent);box-shadow:0 4px 16px rgba(13,148,136,.1);transform:translateY(-1px)}
 .calc-tag{position:absolute;top:14px;right:14px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
-.tag-free{background:#dcfce7;color:#16a34a}
+.tag-free{background:rgba(22,163,74,.15);color:#4ade80}
 .tag-pro{background:var(--accent-bg);color:var(--accent)}
 .calc-icon{font-size:24px;margin-bottom:10px}
 .calc-name{font-size:15px;font-weight:700;margin-bottom:4px}
@@ -58,7 +58,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .learn-cta-text h3{font-size:18px;font-weight:800;margin-bottom:6px}
 .learn-cta-text p{font-size:14px;color:var(--muted)}
 .learn-modules{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.learn-pill{font-size:11px;font-weight:600;background:#fff;border:1px solid var(--accent-border);color:var(--accent);padding:3px 10px;border-radius:12px}
+.learn-pill{font-size:11px;font-weight:600;background:var(--bg);border:1px solid var(--accent-border);color:var(--accent);padding:3px 10px;border-radius:12px}
 
 @media(max-width:700px){
   .hero{grid-template-columns:1fr;padding:28px 16px 24px}
