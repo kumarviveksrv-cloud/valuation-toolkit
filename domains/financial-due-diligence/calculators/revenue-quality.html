@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Revenue Quality Analyzer — Financial Due Diligence</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
+  --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--teal:#0d9488;
+  --violet:#7c3aed;
+  --accent:#7c3aed;--accent-bg:#faf5ff;--accent-border:#ddd6fe;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);z-index:100}
+.nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-.5px}
+.nav-logo span{color:var(--blue)}
+.nav-links{display:flex;gap:1.5rem;align-items:center;font-size:.875rem;font-weight:500;color:var(--muted)}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--accent);color:#fff;padding:.45rem 1rem;border-radius:6px;font-size:.8rem;font-weight:600}
+.nav-cta:hover{opacity:.85}
+
+.calc-wrap{max-width:780px;margin:0 auto;padding:2.5rem 2rem;width:100%}
+.calc-badge{display:inline-flex;align-items:center;gap:.4rem;background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);border-radius:999px;padding:.25rem .75rem;font-size:.72rem;font-weight:700;letter-spacing:.04em;margin-bottom:1rem}
+.calc-title{font-size:clamp(1.5rem,4vw,2rem);font-weight:900;letter-spacing:-.04em;margin-bottom:.4rem}
+.calc-sub{font-size:.9rem;color:var(--muted);margin-bottom:2rem}
+
+.steps-nav{display:flex;gap:0;margin-bottom:2rem;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.step-btn{flex:1;padding:.6rem .5rem;font-size:.75rem;font-weight:600;text-align:center;background:var(--bg);color:var(--muted);border:none;cursor:pointer;border-right:1px solid var(--border);transition:all .15s;line-height:1.3}
+.step-btn:last-child{border-right:none}
+.step-btn.active{background:var(--accent);color:#fff}
+.step-btn.done{background:var(--accent-bg);color:var(--accent)}
+
+.step{display:none}
+.step.active{display:block}
+
+.search-box{width:100%;padding:.7rem 1rem;border:1.5px solid var(--border);border-radius:8px;font-size:.9rem;font-family:'Inter',sans-serif;margin-bottom:1rem;outline:none}
+.search-box:focus{border-color:var(--accent)}
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.6rem;max-height:420px;overflow-y:auto}
+.co-card{border:1.5px solid var(--border);border-radius:10px;padding:.85rem 1rem;cursor:pointer;transition:all .15s;background:var(--bg)}
+.co-card:hover{border-color:var(--accent);background:var(--accent-bg)}
+.co-card.selected{border-color:var(--accent);background:var(--accent-bg)}
+.co-name{font-weight:700;font-size:.88rem;margin-bottom:.2rem}
+.co-meta{font-size:.75rem;color:var(--muted)}
+
+.ctx-card{border:1px solid var(--border);border-radius:14px;padding:1.75rem;margin-bottom:1.25rem;background:var(--bg)}
+.ctx-title{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem}
+.concept-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.25rem}
+.concept-card{border:1px solid var(--border);border-radius:10px;padding:1rem;background:var(--bg)}
+.concept-card .label{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem}
+.concept-card .val{font-size:1.3rem;font-weight:800;font-family:'JetBrains Mono',monospace;letter-spacing:-.02em}
+.concept-card .sub{font-size:.75rem;color:var(--muted);margin-top:.15rem}
+.pill{display:inline-block;padding:.2rem .6rem;border-radius:999px;font-size:.72rem;font-weight:700;margin:.1rem .2rem .1rem 0}
+.pill-green{background:#dcfce7;color:#15803d}
+.pill-amber{background:#fef3c7;color:#92400e}
+.pill-red{background:#fee2e2;color:#991b1b}
+.pill-blue{background:#dbeafe;color:#1e40af}
+.pill-violet{background:var(--accent-bg);color:var(--accent)}
+
+.qa-list{display:flex;flex-direction:column;gap:.75rem;margin-top:1.25rem}
+.qa-item{border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.qa-q{font-size:.85rem;font-weight:600;padding:.85rem 1rem;background:var(--card);cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.qa-q::after{content:'＋';font-size:.9rem;color:var(--muted);flex-shrink:0}
+.qa-item.open .qa-q::after{content:'－'}
+.qa-a{display:none;font-size:.82rem;color:var(--muted);padding:.85rem 1rem;line-height:1.65;border-top:1px solid var(--border)}
+.qa-item.open .qa-a{display:block}
+
+/* PRO gate */
+.pro-gate{border:2px dashed var(--border);border-radius:14px;padding:2.5rem 2rem;text-align:center;background:var(--bg)}
+.pro-lock{font-size:2.5rem;margin-bottom:.75rem}
+.pro-gate h3{font-size:1.1rem;font-weight:800;margin-bottom:.4rem}
+.pro-gate p{font-size:.85rem;color:var(--muted);max-width:400px;margin:0 auto 1.5rem}
+.pro-features{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-bottom:1.5rem}
+.pro-feat{background:var(--card);border:1px solid var(--border);border-radius:999px;padding:.25rem .75rem;font-size:.78rem;font-weight:600;color:var(--muted)}
+.pro-btn{background:var(--accent);color:#fff;border:none;padding:.75rem 1.75rem;border-radius:8px;font-size:.92rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+.pro-btn:hover{opacity:.85}
+
+.btn{padding:.65rem 1.4rem;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer;border:none;font-family:'Inter',sans-serif}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{opacity:.85}
+.btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--muted)}
+.btn-ghost:hover{border-color:var(--text);color:var(--text)}
+.step-actions{display:flex;gap:.75rem;margin-top:1.5rem;flex-wrap:wrap}
+
+footer{border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-size:.8rem;color:var(--muted);margin-top:auto}
+.footer-nav{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:.5rem}
+.footer-nav a:hover{color:var(--text)}
+
+@media(max-width:640px){
+  nav{padding:1rem}
+  .nav-links{display:none}
+  .calc-wrap{padding:1.5rem 1rem}
+  .concept-row{grid-template-columns:1fr}
+  .company-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/valuation-toolkit/" class="nav-logo">Valuation<span>Desk</span></a>
+  <div class="nav-links">
+    <a href="/valuation-toolkit/domains/financial-due-diligence/">Domain</a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/">All Calculators</a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/learn/">Learn</a>
+  </div>
+  <a href="working-capital-deepdive.html" class="nav-cta">Next →</a>
+</nav>
+
+<div class="calc-wrap">
+  <div class="calc-badge">📈 Calculator 02 · Financial Due Diligence</div>
+  <div class="calc-title">Revenue Quality Analyzer</div>
+  <div class="calc-sub">Recurring mix · Contract strength · Concentration · Recognition · RQS Score</div>
+
+  <div class="steps-nav">
+    <button class="step-btn active" id="sBtn1" onclick="goStep(1)">1 · Pick Company</button>
+    <button class="step-btn" id="sBtn2" onclick="goStep(2)">2 · Understand</button>
+    <button class="step-btn" id="sBtn3" onclick="goStep(3)">3 · RQS Model 🔒</button>
+    <button class="step-btn" id="sBtn4" onclick="goStep(4)">4 · Quality Score 🔒</button>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step active" id="step1">
+    <input class="search-box" type="text" id="searchBox" placeholder="Search company or sector…" oninput="filterCos()"/>
+    <div class="company-grid" id="coGrid"></div>
+    <div class="step-actions">
+      <button class="btn btn-primary" onclick="goStep(2)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step" id="step2">
+    <div class="ctx-card" id="ctxCard"></div>
+    <div class="step-actions">
+      <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
+      <button class="btn btn-primary" onclick="goStep(3)">Build RQS Model →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3 — PRO GATE -->
+  <div class="step" id="step3">
+    <div class="pro-gate">
+      <div class="pro-lock">🔒</div>
+      <h3>Revenue Quality Score Model</h3>
+      <p>Score this company's revenue across four pillars and output the RQS that determines acquirer pricing confidence.</p>
+      <div class="pro-features">
+        <span class="pro-feat">Recurring Revenue %</span>
+        <span class="pro-feat">Contract Strength Score</span>
+        <span class="pro-feat">Top 5 Customer Concentration</span>
+        <span class="pro-feat">Recognition Policy Risk</span>
+        <span class="pro-feat">Composite RQS (0-100)</span>
+        <span class="pro-feat">Acquirer Pricing View</span>
+      </div>
+      <button class="pro-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    </div>
+    <div class="step-actions">
+      <button class="btn btn-ghost" onclick="goStep(2)">← Back</button>
+    </div>
+  </div>
+
+  <!-- STEP 4 — PRO GATE -->
+  <div class="step" id="step4">
+    <div class="pro-gate">
+      <div class="pro-lock">🔒</div>
+      <h3>Revenue Quality Score — Results</h3>
+      <p>Full RQS breakdown, pillar scores, deal implications, and the revenue sustainability narrative for your FDD report.</p>
+      <div class="pro-features">
+        <span class="pro-feat">RQS Rating (Excellent/Good/Adequate/Weak)</span>
+        <span class="pro-feat">Revenue Haircut Recommendation</span>
+        <span class="pro-feat">Renegotiation Risk by Customer</span>
+        <span class="pro-feat">EV Impact of Revenue Deterioration</span>
+        <span class="pro-feat">FDD Language for Reps & Warranties</span>
+      </div>
+      <button class="pro-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    </div>
+    <div class="step-actions">
+      <button class="btn btn-ghost" onclick="goStep(3)">← Back</button>
+      <a href="working-capital-deepdive.html" class="btn btn-primary">WC Deep-Dive →</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-nav">
+    <a href="pl-restatement.html">← P&L Restatement</a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/">All Calculators</a>
+    <a href="working-capital-deepdive.html">WC Deep-Dive →</a>
+  </div>
+  <div>© 2025 ValuationDesk</div>
+</footer>
+
+<script>
+var COMPANIES=[
+  {id:'tcs',name:'TCS',sector:'IT',revenue:249000,recurringPct:88,topCustPct:4,contractStrength:'Strong',recogRisk:'Low',isBank:false},
+  {id:'infy',name:'Infosys',sector:'IT',revenue:157936,recurringPct:85,topCustPct:5,contractStrength:'Strong',recogRisk:'Low',isBank:false},
+  {id:'wipro',name:'Wipro',sector:'IT',revenue:89838,recurringPct:82,topCustPct:6,contractStrength:'Strong',recogRisk:'Low',isBank:false},
+  {id:'hcl',name:'HCL Tech',sector:'IT',revenue:113401,recurringPct:80,topCustPct:7,contractStrength:'Strong',recogRisk:'Low',isBank:false},
+  {id:'reliance',name:'Reliance Industries',sector:'Conglomerate',revenue:1000122,recurringPct:65,topCustPct:15,contractStrength:'Moderate',recogRisk:'Medium',isBank:false},
+  {id:'tatasteel',name:'Tata Steel',sector:'Metals',revenue:243354,recurringPct:55,topCustPct:18,contractStrength:'Weak',recogRisk:'Medium',isBank:false},
+  {id:'jswsteel',name:'JSW Steel',sector:'Metals',revenue:195164,recurringPct:52,topCustPct:20,contractStrength:'Weak',recogRisk:'Medium',isBank:false},
+  {id:'ultracemco',name:'UltraTech Cement',sector:'Cement',revenue:70880,recurringPct:60,topCustPct:12,contractStrength:'Moderate',recogRisk:'Low',isBank:false},
+  {id:'hindalco',name:'Hindalco',sector:'Metals',revenue:230085,recurringPct:50,topCustPct:22,contractStrength:'Weak',recogRisk:'High',isBank:false},
+  {id:'ntpc',name:'NTPC',sector:'Power',revenue:174416,recurringPct:90,topCustPct:30,contractStrength:'Very Strong',recogRisk:'Low',isBank:false},
+  {id:'powergrid',name:'Power Grid',sector:'Power',revenue:45283,recurringPct:95,topCustPct:35,contractStrength:'Very Strong',recogRisk:'Low',isBank:false},
+  {id:'ongc',name:'ONGC',sector:'Energy',revenue:663141,recurringPct:70,topCustPct:20,contractStrength:'Moderate',recogRisk:'Medium',isBank:false},
+  {id:'coalindia',name:'Coal India',sector:'Energy',revenue:140392,recurringPct:85,topCustPct:40,contractStrength:'Strong',recogRisk:'Low',isBank:false},
+  {id:'bpcl',name:'BPCL',sector:'Energy',revenue:530789,recurringPct:65,topCustPct:10,contractStrength:'Moderate',recogRisk:'Medium',isBank:false},
+  {id:'drreddy',name:'Dr Reddy\'s',sector:'Pharma',revenue:27086,recurringPct:72,topCustPct:8,contractStrength:'Moderate',recogRisk:'Medium',isBank:false},
+  {id:'sunpharma',name:'Sun Pharma',sector:'Pharma',revenue:50022,recurringPct:75,topCustPct:7,contractStrength:'Moderate',recogRisk:'Medium',isBank:false},
+  {id:'cipla',name:'Cipla',sector:'Pharma',revenue:25774,recurringPct:70,topCustPct:9,contractStrength:'Moderate',recogRisk:'Medium',isBank:false},
+  {id:'asianpaint',name:'Asian Paints',sector:'Consumer',revenue:34489,recurringPct:68,topCustPct:6,contractStrength:'Moderate',recogRisk:'Low',isBank:false},
+  {id:'hul',name:'HUL',sector:'FMCG',revenue:61896,recurringPct:78,topCustPct:5,contractStrength:'Strong',recogRisk:'Low',isBank:false},
+  {id:'itc',name:'ITC',sector:'FMCG',revenue:69446,recurringPct:75,topCustPct:4,contractStrength:'Strong',recogRisk:'Low',isBank:false},
+  {id:'bhartiairtel',name:'Bharti Airtel',sector:'Telecom',revenue:149982,recurringPct:88,topCustPct:2,contractStrength:'Very Strong',recogRisk:'Low',isBank:false},
+  {id:'l&t',name:'L&T',sector:'Industrials',revenue:221113,recurringPct:45,topCustPct:25,contractStrength:'Weak',recogRisk:'High',isBank:false},
+  {id:'bel',name:'Bharat Electronics',sector:'Industrials',revenue:20264,recurringPct:40,topCustPct:90,contractStrength:'Strong',recogRisk:'Medium',isBank:false},
+  {id:'mahindra',name:'Mahindra & Mahindra',sector:'Auto',revenue:135488,recurringPct:58,topCustPct:12,contractStrength:'Moderate',recogRisk:'Low',isBank:false},
+  {id:'maruti',name:'Maruti Suzuki',sector:'Auto',revenue:141174,recurringPct:55,topCustPct:8,contractStrength:'Moderate',recogRisk:'Low',isBank:false},
+  {id:'sbi',name:'SBI',sector:'Banking',revenue:355257,recurringPct:null,topCustPct:null,contractStrength:null,recogRisk:null,isBank:true},
+  {id:'hdfc',name:'HDFC Bank',sector:'Banking',revenue:281811,recurringPct:null,topCustPct:null,contractStrength:null,recogRisk:null,isBank:true},
+  {id:'icici',name:'ICICI Bank',sector:'Banking',revenue:183522,recurringPct:null,topCustPct:null,contractStrength:null,recogRisk:null,isBank:true},
+  {id:'axis',name:'Axis Bank',sector:'Banking',revenue:116637,recurringPct:null,topCustPct:null,contractStrength:null,recogRisk:null,isBank:true},
+  {id:'kotak',name:'Kotak Mahindra',sector:'Banking',revenue:74095,recurringPct:null,topCustPct:null,contractStrength:null,recogRisk:null,isBank:true}
+];
+
+var selectedCo=null;
+
+function fmt(n){if(n==null)return'N/A';return'₹'+(n/1000).toFixed(1)+' Cr';}
+function riskColor(r){if(r==='Low'||r==='Very Strong')return'var(--green)';if(r==='Medium'||r==='Strong')return'var(--amber)';return'var(--red)';}
+function riskPill(r){if(r==='Low'||r==='Very Strong')return'pill-green';if(r==='Medium'||r==='Strong'||r==='Moderate')return'pill-amber';return'pill-red';}
+
+function renderGrid(list){
+  var g=document.getElementById('coGrid');
+  g.innerHTML='';
+  list.forEach(function(c){
+    var d=document.createElement('div');
+    d.className='co-card'+(selectedCo&&selectedCo.id===c.id?' selected':'');
+    d.innerHTML='<div class="co-name">'+c.name+'</div><div class="co-meta">'+c.sector+' · '+fmt(c.revenue)+'</div>';
+    d.onclick=function(){selectedCo=c;renderGrid(currentList());};
+    g.appendChild(d);
+  });
+}
+
+function currentList(){
+  var q=document.getElementById('searchBox').value.toLowerCase();
+  if(!q)return COMPANIES;
+  return COMPANIES.filter(function(c){return c.name.toLowerCase().includes(q)||c.sector.toLowerCase().includes(q);});
+}
+
+function filterCos(){renderGrid(currentList());}
+
+function buildContext(){
+  if(!selectedCo){alert('Pick a company first.');return false;}
+  var c=selectedCo;
+  if(c.isBank){
+    document.getElementById('ctxCard').innerHTML='<div class="ctx-title">'+c.name+' — Banking</div><div style="padding:1.5rem 0;text-align:center;color:var(--muted);font-size:.9rem">Bank revenue quality uses NIM stability and fee income mix — not this RQS framework.<br><br>Use <a href="/valuation-toolkit/domains/credit-analysis/calculators/credit-ratios.html" style="color:var(--accent);font-weight:700">Credit Ratios Calculator →</a> for banking sector analysis.</div>';
+    return true;
+  }
+  var html='<div class="ctx-title">'+c.name+' — Revenue Quality Profile</div>';
+  html+='<div class="concept-row">';
+  var recSub=c.recurringPct>=80?'High quality':c.recurringPct>=60?'Moderate':'Low — investigate';
+  html+='<div class="concept-card"><div class="label">Recurring Revenue</div><div class="val" style="color:'+(c.recurringPct>=80?'var(--green)':c.recurringPct>=60?'var(--amber)':'var(--red)')+'">'+c.recurringPct+'%</div><div class="sub">'+recSub+'</div></div>';
+  html+='<div class="concept-card"><div class="label">Contract Strength</div><div class="val" style="font-size:1rem;color:'+riskColor(c.contractStrength)+'">'+c.contractStrength+'</div><div class="sub">Binding terms and tenure</div></div>';
+  html+='<div class="concept-card"><div class="label">Top Customer Conc.</div><div class="val" style="color:'+(c.topCustPct<=10?'var(--green)':c.topCustPct<=25?'var(--amber)':'var(--red)')+'">'+c.topCustPct+'%</div><div class="sub">Top 5 customers % of rev</div></div>';
+  html+='<div class="concept-card"><div class="label">Recognition Risk</div><div class="val" style="font-size:1rem;color:'+riskColor(c.recogRisk)+'">'+c.recogRisk+'</div><div class="sub">Policy complexity flag</div></div>';
+  html+='</div>';
+  html+='<div class="ctx-title">Revenue Quality Pillars</div>';
+  html+='<div class="qa-list">';
+  html+='<div class="qa-item"><div class="qa-q" onclick="toggleQA(this)">What is a Revenue Quality Score (RQS)?</div><div class="qa-a">The RQS is a composite 0-100 score that quantifies how reliable, sustainable, and verifiable a target company\'s reported revenue is. It\'s built across four pillars: Recurring Mix (how much revenue repeats without new sales effort), Contract Strength (how firmly committed customers are), Concentration Risk (exposure to a small number of large customers), and Recognition Policy (how complex and judgement-dependent the revenue accounting is). A high RQS (80+) means an acquirer can pay a full multiple with confidence. A low RQS triggers a revenue haircut in deal pricing.</div></div>';
+  var recNote=c.recurringPct>=80?'strong multiple support':c.recurringPct>=60?'adequate but improvable stability':'a structural concern that will depress deal pricing';
+  html+='<div class="qa-item"><div class="qa-q" onclick="toggleQA(this)">Why does recurring revenue command a premium valuation?</div><div class="qa-a">Recurring revenue reduces sales risk. Subscription SaaS companies trade at 8-15x revenue multiples vs 1-3x for project-based businesses, because recurring revenue is predictable, cheaper to retain than acquire, and compounds over time. In FDD, every 10% increase in recurring revenue mix typically justifies a 0.5-1.0x expansion in EBITDA multiple. For '+c.name+' at '+c.recurringPct+'% recurring, this represents '+recNote+'.</div></div>';
+  var concNote=c.topCustPct>40?'This is highly concentrated — acquirers will typically require customer consent agreements pre-close, and price in a 10-15% revenue haircut scenario.':c.topCustPct>20?'Moderate concentration — customer retention letters and lock-in provisions in the SPA are standard.':'Diversified base — concentration risk is manageable with standard reps and warranties coverage.';
+  html+='<div class="qa-item"><div class="qa-q" onclick="toggleQA(this)">How does customer concentration affect deal terms?</div><div class="qa-a">When one customer accounts for more than 15-20% of revenue, acquirers price in the risk that losing them would materially impair the business. '+c.name+'\'s top 5 customers represent '+c.topCustPct+'% of revenue. '+concNote+' The FDD team will interview these customers to assess switching probability post-acquisition.</div></div>';
+  var recogNote=c.recogRisk==='High'?'this demands detailed testing of large contracts and customer confirmation letters.':c.recogRisk==='Medium'?'standard cut-off testing and management representation letters are required.':'routine testing is sufficient, but a sample of the top 20 contracts should still be reviewed.';
+  html+='<div class="qa-item"><div class="qa-q" onclick="toggleQA(this)">What revenue recognition risks should FDD teams flag?</div><div class="qa-a">Revenue recognition is a primary earnings manipulation vector. Key red flags: percentage-of-completion method (common in construction/IT projects like '+c.name+') allowing management to estimate progress; bill-and-hold arrangements where goods are shipped but revenue recognised before delivery; channel stuffing near quarter-end inflating reported sales; related-party sales at inflated prices. '+c.name+'\'s recognition risk is rated '+c.recogRisk+' — '+recogNote+'</div></div>';
+  html+='</div>';
+  document.getElementById('ctxCard').innerHTML=html;
+  return true;
+}
+
+function goStep(n){
+  if(n===2&&!buildContext())return;
+  if(n===1&&!selectedCo){renderGrid(COMPANIES);}
+  document.querySelectorAll('.step').forEach(function(s,i){s.classList.toggle('active',i===n-1);});
+  document.querySelectorAll('.step-btn').forEach(function(b,i){b.classList.remove('active','done');if(i===n-1)b.classList.add('active');else if(i<n-1)b.classList.add('done');});
+}
+
+function toggleQA(el){el.parentElement.classList.toggle('open');}
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+
+renderGrid(COMPANIES);
+if(COMPANIES.length>0){selectedCo=COMPANIES[0];renderGrid(COMPANIES);}
+</script>
+</body>
+</html>

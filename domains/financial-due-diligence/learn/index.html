@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Financial Due Diligence — Learning Hub · ValuationDesk</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
+  --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--teal:#0d9488;
+  --violet:#7c3aed;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);z-index:100}
+.nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-.5px}
+.nav-logo span{color:var(--blue)}
+.nav-links{display:flex;gap:1.5rem;align-items:center;font-size:.875rem;font-weight:500;color:var(--muted)}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--teal);color:#fff;padding:.45rem 1rem;border-radius:6px;font-size:.8rem;font-weight:600}
+.nav-cta:hover{opacity:.85}
+
+.hero{max-width:820px;margin:0 auto;padding:3rem 2rem 2rem;width:100%}
+.breadcrumb{font-size:.8rem;color:var(--muted);margin-bottom:1rem;display:flex;gap:.4rem;align-items:center;flex-wrap:wrap}
+.breadcrumb a:hover{color:var(--text)}
+.domain-badge{display:inline-flex;align-items:center;gap:.4rem;background:#f0fdfa;border:1px solid #99f6e4;color:var(--teal);border-radius:999px;padding:.25rem .75rem;font-size:.75rem;font-weight:700;letter-spacing:.03em;margin-bottom:1rem}
+h1{font-size:clamp(1.6rem,4vw,2.25rem);font-weight:900;letter-spacing:-.04em;margin-bottom:.5rem}
+.hero-sub{color:var(--muted);font-size:.95rem;margin-bottom:1.5rem}
+.module-pills{display:flex;gap:.5rem;flex-wrap:wrap}
+.pill{background:var(--card);border:1px solid var(--border);border-radius:999px;padding:.25rem .7rem;font-size:.75rem;font-weight:600;color:var(--muted)}
+
+.content{max-width:820px;margin:0 auto;padding:2.5rem 2rem;width:100%}
+.section-label{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem}
+
+/* Module cards */
+.module-card{border:1px solid var(--border);border-radius:14px;margin-bottom:1.5rem;overflow:hidden}
+.module-header{padding:1.25rem 1.5rem;background:var(--card);display:flex;align-items:center;gap:1rem;cursor:pointer;transition:background .15s}
+.module-header:hover{background:#f3f4f6}
+.module-num{font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:700;color:var(--muted);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.2rem .5rem;flex-shrink:0}
+.module-title{font-size:1rem;font-weight:800;flex:1}
+.module-chevron{color:var(--muted);font-size:.9rem;transition:transform .2s}
+.module-header.open .module-chevron{transform:rotate(90deg)}
+.module-body{padding:1.5rem;border-top:1px solid var(--border);display:none}
+.module-body.open{display:block}
+
+/* Content inside modules */
+.module-body h3{font-size:.92rem;font-weight:700;margin-bottom:.5rem;margin-top:1.25rem;display:flex;align-items:center;gap:.4rem}
+.module-body h3:first-child{margin-top:0}
+.module-body p{font-size:.85rem;color:var(--muted);margin-bottom:.85rem;line-height:1.65}
+.module-body ul{padding-left:1.2rem;margin-bottom:.85rem}
+.module-body ul li{font-size:.85rem;color:var(--muted);margin-bottom:.35rem;line-height:1.6}
+.module-body strong{color:var(--text);font-weight:700}
+
+.formula-box{background:#f8faff;border:1px solid #bfdbfe;border-radius:8px;padding:.85rem 1rem;margin:.75rem 0;font-family:'JetBrains Mono',monospace;font-size:.82rem;color:#1e3a8a;line-height:1.8}
+
+.example-box{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:.85rem 1rem;margin:.75rem 0;font-size:.83rem;color:#14532d;line-height:1.6}
+.example-box strong{color:#15803d}
+
+.warn-box{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:.85rem 1rem;margin:.75rem 0;font-size:.83rem;color:#78350f;line-height:1.6}
+
+.flag-table{width:100%;border-collapse:collapse;margin:.75rem 0}
+.flag-table th{background:var(--card);padding:.55rem .8rem;text-align:left;font-size:.75rem;font-weight:700;color:var(--muted);border-bottom:2px solid var(--border)}
+.flag-table td{padding:.55rem .8rem;border-bottom:1px solid var(--border);font-size:.82rem}
+.flag-table tr:last-child td{border-bottom:none}
+.badge-red{background:#fecaca;color:var(--red);border-radius:999px;padding:.1rem .5rem;font-size:.7rem;font-weight:700}
+.badge-amber{background:#fde68a;color:#92400e;border-radius:999px;padding:.1rem .5rem;font-size:.7rem;font-weight:700}
+.badge-green{background:#bbf7d0;color:#14532d;border-radius:999px;padding:.1rem .5rem;font-size:.7rem;font-weight:700}
+
+/* Glossary */
+.glossary-grid{display:flex;flex-direction:column;gap:.6rem}
+.gloss-item{border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.gloss-term{padding:.7rem 1rem;font-size:.88rem;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:var(--card)}
+.gloss-term:hover{background:#f3f4f6}
+.gloss-def{padding:.75rem 1rem;font-size:.82rem;color:var(--muted);line-height:1.6;border-top:1px solid var(--border);display:none}
+.gloss-def.open{display:block}
+
+/* CTA */
+.cta-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.75rem 2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-top:2rem}
+.cta-left h3{font-size:1rem;font-weight:800;margin-bottom:.3rem}
+.cta-left p{font-size:.85rem;color:var(--muted)}
+.cta-actions{display:flex;gap:.75rem;flex-shrink:0;flex-wrap:wrap}
+.btn-primary{background:var(--teal);color:#fff;padding:.6rem 1.25rem;border-radius:7px;font-size:.85rem;font-weight:700}
+.btn-primary:hover{opacity:.85}
+.btn-outline{border:1.5px solid var(--border);padding:.6rem 1.25rem;border-radius:7px;font-size:.85rem;font-weight:600;color:var(--muted)}
+.btn-outline:hover{border-color:var(--text);color:var(--text)}
+
+footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-size:.8rem;color:var(--muted);margin-top:auto}
+.footer-nav{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:.75rem}
+.footer-nav a:hover{color:var(--text)}
+
+@media(max-width:640px){
+  nav{padding:1rem}
+  .nav-links{display:none}
+  .hero{padding:2rem 1rem 1.5rem}
+  .content{padding:1.5rem 1rem}
+  .cta-card{flex-direction:column;align-items:flex-start}
+  .module-body{padding:1rem}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/valuation-toolkit/" class="nav-logo">Valuation<span>Desk</span></a>
+  <div class="nav-links">
+    <a href="/valuation-toolkit/domains/financial-due-diligence/">Domain Overview</a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/">Calculators</a>
+    <a href="/valuation-toolkit/">All Domains</a>
+  </div>
+  <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/pl-restatement.html" class="nav-cta">Try Free →</a>
+</nav>
+
+<div class="hero">
+  <div class="breadcrumb">
+    <a href="/valuation-toolkit/">Home</a><span>/</span>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/">Financial Due Diligence</a><span>/</span>
+    <span>Learning Hub</span>
+  </div>
+  <div class="domain-badge">🔍 Financial Due Diligence</div>
+  <h1>The Complete FDD Guide</h1>
+  <p class="hero-sub">3 modules covering P&L restatement mechanics, cash flow forensics, and the FDD red flag framework used by Big 4 teams on live deals.</p>
+  <div class="module-pills">
+    <span class="pill">P&L Restatement</span>
+    <span class="pill">Cash Flow Forensics</span>
+    <span class="pill">Red Flag Framework</span>
+    <span class="pill">~20 min read</span>
+  </div>
+</div>
+
+<div class="content">
+  <p class="section-label">3 Learning Modules</p>
+
+  <!-- MODULE 1 -->
+  <div class="module-card">
+    <div class="module-header" onclick="toggleModule(this)">
+      <span class="module-num">01</span>
+      <span class="module-title">📊 P&L Restatement Mechanics</span>
+      <span class="module-chevron">›</span>
+    </div>
+    <div class="module-body">
+      <h3>What Is P&L Restatement?</h3>
+      <p>Every Financial Due Diligence engagement starts with the same question: do the numbers the seller presents reflect the true, sustainable earning power of the business — or have they been shaped by accounting choices, one-time windfalls, or related-party transactions that inflate the picture?</p>
+      <p>P&L restatement is the process of rebuilding the income statement from the reported version to two cleaner versions: <strong>Adjusted P&L</strong> (removing one-time and non-recurring items) and <strong>Normalised P&L</strong> (further removing structural distortions like related-party costs or accounting policy differences).</p>
+      <p>The normalised EBITDA is what the buyer uses to anchor the purchase price multiple. A 1× EBITDA multiple difference on ₹100Cr EBITDA = ₹100Cr of deal value. Getting restatement right is not an accounting exercise — it is the core of deal pricing.</p>
+
+      <h3>The Three-Column P&L</h3>
+      <p>FDD teams always present the P&L in three columns:</p>
+      <div class="formula-box">
+Reported P&L → Adjusted P&L → Normalised P&L
+
+Reported: what the audited financials show
+Adjusted: remove one-time items (OT adjustments)
+Normalised: remove structural distortions (policy, RPT, mgmt comp)
+      </div>
+      <p>Each column has a clear purpose. <strong>Reported</strong> is the starting point — never ignored, always the base. <strong>Adjusted</strong> reflects underlying recurring performance. <strong>Normalised</strong> is what a standalone business under new ownership would look like — removing the seller's structural fingerprints.</p>
+
+      <h3>The Four Adjustment Types</h3>
+      <ul>
+        <li><strong>One-Time Items (OT):</strong> Gains or costs that will not recur — asset sale profits, litigation settlements, restructuring charges, COVID relief payments. Added back or removed to reflect ongoing run-rate earnings.</li>
+        <li><strong>Related-Party Adjustments (RPT):</strong> Transactions with promoter-owned entities — management fees, property rentals, loans at off-market rates. Replace with market-rate equivalent and adjust EBITDA accordingly. Often the single largest adjustment in Indian SME and promoter-led businesses.</li>
+        <li><strong>Management Compensation (MGMT):</strong> Promoter-directors often pay themselves below-market salaries (or above-market). Normalise to the market rate for the role. A promoter earning ₹15 lakh in a ₹200Cr revenue business is significantly undercompensating — the buyer will pay a professional CEO ₹2–3Cr, reducing normalised EBITDA materially.</li>
+        <li><strong>Accounting Policy (Policy):</strong> Revenue recognition timing, depreciation rates, provisions policy. When the target uses a more aggressive policy than industry peers, adjust to conservative or peer-standard assumptions for normalised EBITDA.</li>
+      </ul>
+
+      <h3>EBITDA Bridge Formula</h3>
+      <div class="formula-box">
+Reported EBITDA
++ One-Time Charges (add back)
+- One-Time Income (remove)
+= Adjusted EBITDA
+
++ RPT Cost Overcharge (normalise to market)
+- RPT Income Below-Market (normalise to market)
++ Management Comp Undercharge
+- Management Comp Overcharge
+± Policy Adjustments
+= Normalised EBITDA
+      </div>
+
+      <h3>Real-World Example — RPT Adjustment</h3>
+      <div class="example-box">
+        <strong>Scenario:</strong> Target company pays ₹8Cr/year in "office rental" to a promoter-owned property entity. Market rent for the same space is ₹4Cr/year.<br><br>
+        <strong>Reported EBITDA:</strong> ₹40Cr (after paying ₹8Cr RPT rent)<br>
+        <strong>RPT Add-back:</strong> ₹8Cr - ₹4Cr = +₹4Cr (replace RPT rent with market rent)<br>
+        <strong>Normalised EBITDA:</strong> ₹44Cr<br><br>
+        At a 10× multiple: deal value increases from ₹400Cr → ₹440Cr. This one adjustment adds ₹40Cr of deal value — and the seller may contest it aggressively.
+      </div>
+
+      <h3>Common Mistakes in Restatement</h3>
+      <div class="warn-box">
+        ⚠️ <strong>Double-counting adjustments:</strong> Adding back a restructuring charge that was already excluded from a management "adjusted EBITDA" presentation.<br><br>
+        ⚠️ <strong>Symmetric adjustments:</strong> One-time income must be removed with the same rigour as one-time costs — buyers often add back charges but miss removing windfall income.<br><br>
+        ⚠️ <strong>Not testing sustainability:</strong> An RPT adjustment assumed as "one-time" that the seller will actually recreate post-close in a different form — check transaction agreements carefully.
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 2 -->
+  <div class="module-card">
+    <div class="module-header" onclick="toggleModule(this)">
+      <span class="module-num">02</span>
+      <span class="module-title">💰 Cash Flow Forensics</span>
+      <span class="module-chevron">›</span>
+    </div>
+    <div class="module-body">
+      <h3>Why Cash Flow FDD Matters</h3>
+      <p>Reported EBITDA is an accounting metric. Cash is reality. A business with 90% EBITDA margin but a 30% Cash Conversion Ratio (CCR) is converting very little of its "profit" into real cash the acquirer can use to service debt, pay dividends, or fund growth.</p>
+      <p>Cash Flow FDD forensics uncovers three things: whether reported profits are converting to cash at a normal rate, where the leakage is occurring, and what the normalised free cash flow available to the acquirer actually is.</p>
+
+      <h3>The EBITDA → FCF Bridge</h3>
+      <div class="formula-box">
+EBITDA (Normalised)
+- Tax Paid (Cash Basis)            ← not P&L tax expense
++/- Working Capital Movement       ← net absorb or release
+= Operating Cash Flow (OCF)
+
+CCR = OCF / EBITDA  (target: 80%+)
+
+- Maintenance Capex                ← sustaining spend only
+= Maintenance Free Cash Flow       ← core acquirer value
+
+- Growth Capex                     ← discretionary investment
+= Total Free Cash Flow
+      </div>
+
+      <h3>Cash Conversion Ratio — What It Reveals</h3>
+      <p>CCR is the single most informative ratio in cash flow FDD:</p>
+      <ul>
+        <li><strong>CCR 85%+:</strong> Clean conversion — EBITDA closely tracks real cash generation. Typical for IT services, FMCG with negative WC cycles.</li>
+        <li><strong>CCR 60–85%:</strong> Moderate conversion — working capital absorbs some cash, or tax timing effects exist. Monitor trends over 3 years.</li>
+        <li><strong>CCR below 60%:</strong> Significant leakage — deep dive into WC movement, deferred tax, and capex is mandatory. Often a price chip or EV adjustment issue.</li>
+        <li><strong>CCR near 0% or negative:</strong> EBITDA is essentially a phantom metric for this business — pricing on FCF or EV/Revenue instead.</li>
+      </ul>
+
+      <h3>Three Leakage Sources</h3>
+      <p><strong>1. Tax Timing:</strong> Deferred tax liabilities are created when book depreciation lags cash depreciation. Eventually they unwind — and the acquirer absorbs the cash tax surge. FDD models when deferred taxes crystallise and adjusts FCF for timing.</p>
+      <p><strong>2. Working Capital Swings:</strong> A deliberate pre-deal WC build (stretch payables, push receivables) can temporarily inflate year-end cash balances. FDD tests the normalised WC level and quantifies how much WC the business needs to operate at steady state — versus what the accounts show at the measurement date.</p>
+      <p><strong>3. Capex Classification:</strong> All capex reduces cash, but only maintenance capex is truly unavoidable. Growth capex is at the discretion of the post-acquisition ownership. Buyers should insist on the maintenance vs growth split — a ₹50Cr "total capex" business where ₹40Cr is growth has very different FCF than one where all ₹50Cr is maintenance-level.</p>
+
+      <h3>FCF Yield vs EBITDA Multiple</h3>
+      <div class="example-box">
+        <strong>Scenario:</strong> Deal priced at 10× EBITDA of ₹100Cr = ₹1,000Cr EV<br>
+        CCR is 55% → OCF = ₹55Cr. Maintenance capex = ₹20Cr. FCF = ₹35Cr.<br><br>
+        FCF yield = ₹35Cr / ₹1,000Cr = 3.5%<br>
+        If sector peers trade at 6% FCF yield, true EV should be ₹35Cr / 6% = ₹583Cr<br><br>
+        <strong>The deal is priced ₹417Cr above what FCF supports at sector yield.</strong> This is the insight cash flow FDD delivers.
+      </div>
+
+      <h3>Pre-Deal Cash Manipulation Warning Signs</h3>
+      <div class="warn-box">
+        ⚠️ <strong>CCR spike in deal year:</strong> CCR jumps from 60% to 90% in the year the company is put up for sale — supplier payments deferred, customer collections accelerated.<br><br>
+        ⚠️ <strong>Capex drought:</strong> Capex/D&A ratio drops sharply in the 1-2 years before the deal — seller deferring maintenance to inflate short-term FCF.<br><br>
+        ⚠️ <strong>Tax payment deferral:</strong> Advance tax payments lower than expected relative to reported profits — creates a cash tax liability that lands post-acquisition.
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 3 -->
+  <div class="module-card">
+    <div class="module-header" onclick="toggleModule(this)">
+      <span class="module-num">03</span>
+      <span class="module-title">🚩 FDD Red Flag Framework</span>
+      <span class="module-chevron">›</span>
+    </div>
+    <div class="module-body">
+      <h3>Why a Systematic Framework?</h3>
+      <p>Red flags in FDD are not about finding fraud — they are about identifying risks that will affect deal value, deal structure, or deal completion. A skilled FDD team uses a systematic, reproducible framework across every engagement so that no dimension is missed under time pressure.</p>
+      <p>The six-dimension framework covers the full risk surface of a target company's financials and governance. Each dimension is scored and triggers a specific deal lever if a flag is identified.</p>
+
+      <h3>The Six Dimensions</h3>
+      <table class="flag-table">
+        <thead><tr><th>Dimension</th><th>What It Tests</th><th>Key Signal</th></tr></thead>
+        <tbody>
+          <tr><td><strong>1. Audit Quality</strong></td><td>Auditor independence, opinion type, key audit matters</td><td>Qualified opinion, auditor resignation, Big 4 → mid-tier switch</td></tr>
+          <tr><td><strong>2. Related-Party Transactions</strong></td><td>Off-market transactions with promoter entities</td><td>RPT &gt;10% of revenue, undisclosed family transactions</td></tr>
+          <tr><td><strong>3. Working Capital Health</strong></td><td>DSO, DPO, DII trends over 3+ years</td><td>Deteriorating trends, sudden pre-deal improvement</td></tr>
+          <tr><td><strong>4. Capex vs D&A</strong></td><td>Asset maintenance adequacy</td><td>Capex/D&A &lt; 0.6× sustained for 3+ years</td></tr>
+          <tr><td><strong>5. Revenue Recognition</strong></td><td>Policy appropriateness, cut-off risk</td><td>Bill-and-hold, milestone billing, policy changes</td></tr>
+          <tr><td><strong>6. Governance</strong></td><td>Board independence, regulatory standing, litigation</td><td>SEBI proceedings, promoter pledge, concentrated control</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Flag → Deal Structure Mapping</h3>
+      <p>Not all flags have the same consequence. The key is mapping each flag to the appropriate deal lever:</p>
+      <table class="flag-table">
+        <thead><tr><th>Flag Type</th><th>Severity</th><th>Deal Response</th></tr></thead>
+        <tbody>
+          <tr><td>RPT inflating EBITDA</td><td><span class="badge-amber">Watch</span></td><td>EBITDA adjustment, price reduction</td></tr>
+          <tr><td>Pre-deal WC build</td><td><span class="badge-amber">Watch</span></td><td>NWC peg, locked-box period</td></tr>
+          <tr><td>Capex underinvestment</td><td><span class="badge-amber">Watch</span></td><td>EV reduction for catch-up capex</td></tr>
+          <tr><td>Qualified audit opinion</td><td><span class="badge-red">Red Flag</span></td><td>Escrow (10–15% EV), resolve before close</td></tr>
+          <tr><td>Revenue recognition risk</td><td><span class="badge-red">Red Flag</span></td><td>Revenue haircut, earn-out structure</td></tr>
+          <tr><td>SEBI / regulatory action</td><td><span class="badge-red">Red Flag</span></td><td>Walk-away or deferred consideration pending resolution</td></tr>
+          <tr><td>No material issues found</td><td><span class="badge-green">Clean</span></td><td>Standard W&I insurance, proceed at agreed price</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Timing: When Red Flags Hit Hardest</h3>
+      <p>The year before a sale is the highest-risk period for financial manipulation. Sellers preparing for a deal have strong incentives to present the best possible numbers. FDD always analyses at least 3 years of financials, specifically watching for:</p>
+      <ul>
+        <li>Revenue or EBITDA growth that accelerates sharply only in the deal year</li>
+        <li>Working capital improvement (lower DSO, higher DPO) that reverses historical trends</li>
+        <li>Provision reversals or write-back of bad debts in the final year</li>
+        <li>Capex deferrals that spike maintenance-deferred asset risk post-close</li>
+      </ul>
+
+      <h3>Red Flags in Indian M&A Context</h3>
+      <p>India-specific flags that experienced FDD teams watch for:</p>
+      <ul>
+        <li><strong>Related-party intensity:</strong> Indian promoter-led businesses routinely have material RPTs — property, management services, inter-company loans. Assume RPT scrutiny is mandatory, not optional.</li>
+        <li><strong>Tax holiday distortions:</strong> SEZ or Section 80IC benefits create P&L tax vs cash tax timing differences that inflate reported CCR during the holiday period.</li>
+        <li><strong>GST compliance:</strong> ITC (Input Tax Credit) mismatches, pending GST disputes, or input credit reversals create contingent liabilities not visible in the P&L.</li>
+        <li><strong>Promoter pledge:</strong> High promoter pledging of listed shares creates refinancing risk post-acquisition if the market moves against the promoter's other holdings.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- GLOSSARY -->
+  <p class="section-label" style="margin-top:2.5rem">Key Terminology</p>
+  <div class="glossary-grid">
+    <div class="gloss-item">
+      <div class="gloss-term" onclick="toggleGloss(this)"><span>Adjusted EBITDA</span><span>+</span></div>
+      <div class="gloss-def">EBITDA after removing one-time and non-recurring items but before structural normalisation adjustments. The intermediate step between reported and normalised EBITDA.</div>
+    </div>
+    <div class="gloss-item">
+      <div class="gloss-term" onclick="toggleGloss(this)"><span>Normalised EBITDA</span><span>+</span></div>
+      <div class="gloss-def">The sustainable, run-rate EBITDA of the business as it would operate under standalone ownership — after removing one-time items, RPT distortions, non-market management compensation, and accounting policy differences. The deal pricing anchor.</div>
+    </div>
+    <div class="gloss-item">
+      <div class="gloss-term" onclick="toggleGloss(this)"><span>Cash Conversion Ratio (CCR)</span><span>+</span></div>
+      <div class="gloss-def">Operating Cash Flow divided by EBITDA. Measures how efficiently the business converts accrual profits to real cash. CCR above 85% is strong; below 60% signals significant leakage from tax timing, WC swings, or structural cash drains.</div>
+    </div>
+    <div class="gloss-item">
+      <div class="gloss-term" onclick="toggleGloss(this)"><span>Related-Party Transaction (RPT)</span><span>+</span></div>
+      <div class="gloss-def">A commercial transaction between the target company and an entity connected to its promoters or controllers. RPTs are not inherently improper, but off-market pricing (above or below arm's length) distorts reported EBITDA and must be normalised.</div>
+    </div>
+    <div class="gloss-item">
+      <div class="gloss-term" onclick="toggleGloss(this)"><span>NWC Peg</span><span>+</span></div>
+      <div class="gloss-def">The agreed "normal" level of Net Working Capital that the seller must deliver at close. If actual NWC at close differs from the peg, the deal price adjusts dollar-for-dollar. Setting the right peg is one of the most contested FDD outputs.</div>
+    </div>
+    <div class="gloss-item">
+      <div class="gloss-term" onclick="toggleGloss(this)"><span>Locked-Box Mechanism</span><span>+</span></div>
+      <div class="gloss-def">A deal structure where price is fixed at a historical balance sheet date and the seller gives representations that no "leakage" (dividends, RPT cash-outs, management payments) has occurred between that date and closing. Simpler than completion accounts but requires strong FDD comfort on the locked-box date balance sheet.</div>
+    </div>
+    <div class="gloss-item">
+      <div class="gloss-term" onclick="toggleGloss(this)"><span>Qualified Audit Opinion</span><span>+</span></div>
+      <div class="gloss-def">An auditor's opinion that the financial statements are "fairly presented except for" a specific issue where they could not obtain sufficient evidence. A qualified opinion is a material red flag in FDD — it signals that the audited numbers carry an unresolved uncertainty on at least one area.</div>
+    </div>
+    <div class="gloss-item">
+      <div class="gloss-term" onclick="toggleGloss(this)"><span>Maintenance vs Growth Capex</span><span>+</span></div>
+      <div class="gloss-def">Maintenance capex sustains current productive capacity (replacing worn machinery, renewing software licences). Growth capex builds new capacity (new plant, new geography). Only maintenance capex is "unavoidable" — FCF analysis for deal pricing deducts maintenance capex but may treat growth capex as discretionary.</div>
+    </div>
+    <div class="gloss-item">
+      <div class="gloss-term" onclick="toggleGloss(this)"><span>Deferred Tax Liability (DTL)</span><span>+</span></div>
+      <div class="gloss-def">Created when a company's tax depreciation (accelerated for tax purposes) exceeds book depreciation. The difference is a timing benefit — the company pays less tax now but will pay more later. FDD models when DTLs unwind to estimate future cash tax surges that will reduce FCF to the acquirer.</div>
+    </div>
+    <div class="gloss-item">
+      <div class="gloss-term" onclick="toggleGloss(this)"><span>Revenue Quality Score (RQS)</span><span>+</span></div>
+      <div class="gloss-def">A composite 0–100 score across four dimensions: recurring revenue mix, contract strength, customer concentration, and revenue recognition policy risk. Higher RQS supports higher deal multiples; low RQS signals revenue instability that depresses pricing.</div>
+    </div>
+    <div class="gloss-item">
+      <div class="gloss-term" onclick="toggleGloss(this)"><span>Earn-Out</span><span>+</span></div>
+      <div class="gloss-def">A deal structure where part of the purchase price is contingent on the business achieving defined future milestones (revenue, EBITDA, customer growth). Earn-outs are used when there is disagreement on sustainable profitability — often triggered by FDD findings that make the buyer uncertain about the seller's projections.</div>
+    </div>
+    <div class="gloss-item">
+      <div class="gloss-term" onclick="toggleGloss(this)"><span>Warranty & Indemnity (W&I) Insurance</span><span>+</span></div>
+      <div class="gloss-def">Insurance that covers the buyer if the seller's representations and warranties in the SPA prove inaccurate. W&I is now standard in larger Indian PE transactions. FDD informs which warranties need the strongest cover — areas with identified flags require explicit warranty language and sometimes exclusion from the insurance policy.</div>
+    </div>
+  </div>
+
+  <div class="cta-card">
+    <div class="cta-left">
+      <h3>Ready to apply these concepts?</h3>
+      <p>Open the P&L Restatement Tool — free, no signup, 30 real companies.</p>
+    </div>
+    <div class="cta-actions">
+      <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/pl-restatement.html" class="btn-primary">▶ Start Free Calculator</a>
+      <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/" class="btn-outline">All 5 Calculators →</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-nav">
+    <a href="/valuation-toolkit/">Home</a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/">Domain Overview</a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/">Calculators</a>
+    <a href="/valuation-toolkit/domains/transaction-advisory/learn/">← TA Learning Hub</a>
+  </div>
+  <div>© 2025 ValuationDesk · Built for finance learners</div>
+</footer>
+
+<script>
+function toggleModule(header){
+  var body=header.nextElementSibling;
+  var isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  header.classList.toggle('open',!isOpen);
+}
+function toggleGloss(term){
+  var def=term.nextElementSibling;
+  var isOpen=def.classList.contains('open');
+  document.querySelectorAll('.gloss-def').forEach(function(x){x.classList.remove('open');});
+  document.querySelectorAll('.gloss-term span:last-child').forEach(function(x){x.textContent='+';});
+  if(!isOpen){def.classList.add('open');term.querySelector('span:last-child').textContent='−';}
+}
+// Open first module by default
+document.querySelector('.module-header').click();
+</script>
+</body>
+</html>

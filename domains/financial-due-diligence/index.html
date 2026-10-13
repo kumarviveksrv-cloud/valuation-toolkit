@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Financial Due Diligence — ValuationDesk</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
+  --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--teal:#0d9488;
+  --violet:#7c3aed;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);z-index:100}
+.nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-.5px}
+.nav-logo span{color:var(--blue)}
+.nav-links{display:flex;gap:1.5rem;align-items:center;font-size:.875rem;font-weight:500;color:var(--muted)}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--text);color:#fff;padding:.45rem 1rem;border-radius:6px;font-size:.8rem;font-weight:600}
+.nav-cta:hover{opacity:.85}
+
+.hero{max-width:900px;margin:0 auto;padding:4rem 2rem 3rem;width:100%}
+.breadcrumb{font-size:.8rem;color:var(--muted);margin-bottom:1rem;display:flex;gap:.4rem;align-items:center}
+.breadcrumb a:hover{color:var(--text)}
+.domain-badge{display:inline-flex;align-items:center;gap:.4rem;background:#f0fdfa;border:1px solid #99f6e4;color:var(--teal);border-radius:999px;padding:.25rem .75rem;font-size:.75rem;font-weight:700;letter-spacing:.03em;margin-bottom:1rem}
+h1{font-size:clamp(2rem,5vw,3rem);font-weight:900;letter-spacing:-.04em;line-height:1.05;margin-bottom:1rem}
+.hero-sub{font-size:1.1rem;color:var(--muted);max-width:600px;margin-bottom:2rem;line-height:1.6}
+.hero-pills{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:2.5rem}
+.hero-pill{background:var(--card);border:1px solid var(--border);border-radius:999px;padding:.3rem .75rem;font-size:.78rem;font-weight:600;color:var(--muted)}
+.hero-actions{display:flex;gap:.75rem;flex-wrap:wrap}
+.btn-primary{background:var(--text);color:#fff;padding:.7rem 1.5rem;border-radius:8px;font-weight:700;font-size:.9rem;display:inline-flex;align-items:center;gap:.4rem}
+.btn-primary:hover{opacity:.85}
+.btn-secondary{border:1.5px solid var(--border);padding:.7rem 1.5rem;border-radius:8px;font-weight:600;font-size:.9rem;color:var(--muted)}
+.btn-secondary:hover{border-color:var(--text);color:var(--text)}
+
+.stats-row{background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:1.5rem 2rem}
+.stats-inner{max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1.5rem}
+.stat-item{display:flex;flex-direction:column;gap:.2rem}
+.stat-num{font-size:1.6rem;font-weight:900;letter-spacing:-.03em;font-family:'JetBrains Mono',monospace}
+.stat-label{font-size:.78rem;color:var(--muted);font-weight:500}
+
+.content{max-width:900px;margin:0 auto;padding:3rem 2rem;width:100%}
+.section-label{font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:1.25rem}
+
+.what-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:3rem}
+.what-card{border:1px solid var(--border);border-radius:12px;padding:1.5rem;background:var(--bg)}
+.what-card h3{font-size:.95rem;font-weight:700;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem}
+.what-card p{font-size:.85rem;color:var(--muted);line-height:1.6}
+
+.calc-list{display:flex;flex-direction:column;gap:.75rem;margin-bottom:3rem}
+.calc-row{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;background:var(--bg);transition:border-color .15s,box-shadow .15s}
+.calc-row:hover{border-color:var(--teal);box-shadow:0 3px 12px rgba(0,0,0,.06)}
+.calc-left{display:flex;align-items:center;gap:.9rem}
+.calc-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.calc-info h3{font-size:.9rem;font-weight:700;margin-bottom:.15rem}
+.calc-info p{font-size:.78rem;color:var(--muted)}
+.calc-right{display:flex;align-items:center;gap:.75rem}
+.tag-free{background:#dcfce7;color:#15803d;font-size:.7rem;font-weight:700;padding:.2rem .55rem;border-radius:999px}
+.tag-pro{background:#f0fdfa;color:var(--teal);font-size:.7rem;font-weight:700;padding:.2rem .55rem;border-radius:999px}
+.calc-arrow{color:var(--muted);font-size:.85rem}
+
+.learn-card{border:1px solid var(--border);border-radius:12px;padding:1.5rem;background:var(--card);display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.learn-left h3{font-size:1rem;font-weight:700;margin-bottom:.3rem}
+.learn-left p{font-size:.85rem;color:var(--muted)}
+.learn-right a{background:var(--text);color:#fff;padding:.55rem 1.1rem;border-radius:7px;font-size:.82rem;font-weight:600}
+.learn-right a:hover{opacity:.85}
+
+footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-size:.8rem;color:var(--muted);margin-top:auto}
+.footer-nav{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:.75rem}
+.footer-nav a:hover{color:var(--text)}
+
+@media(max-width:640px){
+  nav{padding:1rem}
+  .nav-links{display:none}
+  .hero{padding:2.5rem 1rem 2rem}
+  .content{padding:2rem 1rem}
+  .what-grid{grid-template-columns:1fr}
+  .stats-row{padding:1.25rem 1rem}
+  .learn-card{flex-direction:column;align-items:flex-start}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/valuation-toolkit/" class="nav-logo">Valuation<span>Desk</span></a>
+  <div class="nav-links">
+    <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/">Calculators</a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/learn/">Learn</a>
+    <a href="/valuation-toolkit/">All Domains</a>
+  </div>
+  <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/pl-restatement.html" class="nav-cta">Try Free →</a>
+</nav>
+
+<div class="hero">
+  <div class="breadcrumb">
+    <a href="/valuation-toolkit/">Home</a> <span>/</span>
+    <a href="/valuation-toolkit/">Domains</a> <span>/</span>
+    <span>Financial Due Diligence</span>
+  </div>
+  <div class="domain-badge">🔍 Domain 10 of 15</div>
+  <h1>Financial Due Diligence</h1>
+  <p class="hero-sub">Verify what sellers report. Restate financials, test revenue quality, scan for red flags, and build the adjusted P&amp;L that drives deal pricing.</p>
+  <div class="hero-pills">
+    <span class="hero-pill">P&amp;L Restatement</span>
+    <span class="hero-pill">Revenue Quality</span>
+    <span class="hero-pill">Working Capital Deep-Dive</span>
+    <span class="hero-pill">Cash Flow Verification</span>
+    <span class="hero-pill">Red Flag Scanner</span>
+  </div>
+  <div class="hero-actions">
+    <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/pl-restatement.html" class="btn-primary">▶ Start with Free Calculator</a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/learn/" class="btn-secondary">Read the Guide →</a>
+  </div>
+</div>
+
+<div class="stats-row">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <span class="stat-num">5</span>
+      <span class="stat-label">Calculators</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">3</span>
+      <span class="stat-label">Learning Modules</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">30</span>
+      <span class="stat-label">Companies</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">1</span>
+      <span class="stat-label">Free Tool</span>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <p class="section-label">What You'll Learn</p>
+  <div class="what-grid">
+    <div class="what-card">
+      <h3>📊 P&amp;L Restatement</h3>
+      <p>Strip out one-time items, related-party distortions, and accounting policy differences to build the true normalised income statement buyers rely on.</p>
+    </div>
+    <div class="what-card">
+      <h3>📈 Revenue Quality</h3>
+      <p>Assess recurring vs one-time revenue, contract terms, concentration risk, and recognition policies — the pillars of revenue sustainability.</p>
+    </div>
+    <div class="what-card">
+      <h3>💰 Cash Flow Verification</h3>
+      <p>Bridge EBITDA to operating cash flow, identify leakage points, and test whether reported profits are actually converting to cash.</p>
+    </div>
+    <div class="what-card">
+      <h3>🚩 Red Flag Detection</h3>
+      <p>Systematically scan auditor commentary, related-party transactions, working capital trends, and capex patterns to surface hidden risks early.</p>
+    </div>
+  </div>
+
+  <p class="section-label">Calculators</p>
+  <div class="calc-list">
+    <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/pl-restatement.html" class="calc-row">
+      <div class="calc-left">
+        <div class="calc-icon" style="background:#f0fdfa;">📊</div>
+        <div class="calc-info">
+          <h3>P&amp;L Restatement Tool</h3>
+          <p>Reported → Adjusted → Normalised income statement with line-by-line walkthrough</p>
+        </div>
+      </div>
+      <div class="calc-right">
+        <span class="tag-free">FREE</span>
+        <span class="calc-arrow">→</span>
+      </div>
+    </a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/revenue-quality.html" class="calc-row">
+      <div class="calc-left">
+        <div class="calc-icon" style="background:#f5f3ff;">📈</div>
+        <div class="calc-info">
+          <h3>Revenue Quality Analyzer</h3>
+          <p>Score recurring mix, contract strength, concentration risk and recognition policies</p>
+        </div>
+      </div>
+      <div class="calc-right">
+        <span class="tag-pro">PRO</span>
+        <span class="calc-arrow">→</span>
+      </div>
+    </a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/working-capital-deepdive.html" class="calc-row">
+      <div class="calc-left">
+        <div class="calc-icon" style="background:#f0fdf4;">⚙️</div>
+        <div class="calc-info">
+          <h3>Working Capital Deep-Dive</h3>
+          <p>DSO, DPO, DII trends, WC cycle health and seasonality-adjusted normalisation</p>
+        </div>
+      </div>
+      <div class="calc-right">
+        <span class="tag-pro">PRO</span>
+        <span class="calc-arrow">→</span>
+      </div>
+    </a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/cash-flow-verification.html" class="calc-row">
+      <div class="calc-left">
+        <div class="calc-icon" style="background:#eff6ff;">💰</div>
+        <div class="calc-info">
+          <h3>Cash Flow Verification</h3>
+          <p>EBITDA-to-cash bridge, conversion ratio analysis, leakage detection and free cash flow build</p>
+        </div>
+      </div>
+      <div class="calc-right">
+        <span class="tag-pro">PRO</span>
+        <span class="calc-arrow">→</span>
+      </div>
+    </a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/red-flag-scanner.html" class="calc-row">
+      <div class="calc-left">
+        <div class="calc-icon" style="background:#fef2f2;">🚩</div>
+        <div class="calc-info">
+          <h3>Red Flag Scanner</h3>
+          <p>Systematic scan across 6 risk dimensions — audit, RPT, WC, capex, revenue, governance</p>
+        </div>
+      </div>
+      <div class="calc-right">
+        <span class="tag-pro">PRO</span>
+        <span class="calc-arrow">→</span>
+      </div>
+    </a>
+  </div>
+
+  <p class="section-label">Learning Hub</p>
+  <div class="learn-card">
+    <div class="learn-left">
+      <h3>Financial Due Diligence — The Complete Guide</h3>
+      <p>3 modules covering P&amp;L restatement mechanics, cash flow forensics, and the FDD red flag framework used by Big 4 teams.</p>
+    </div>
+    <div class="learn-right">
+      <a href="/valuation-toolkit/domains/financial-due-diligence/learn/">Open Guide →</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-nav">
+    <a href="/valuation-toolkit/">Home</a>
+    <a href="/valuation-toolkit/domains/transaction-advisory/">← Transaction Advisory</a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/">Calculators</a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/learn/">Learn</a>
+  </div>
+  <div>© 2025 ValuationDesk · Built for finance learners</div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>P&L Restatement Tool — Financial Due Diligence</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
+  --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--teal:#0d9488;
+  --violet:#7c3aed;
+  --accent:#0d9488;--accent-bg:#f0fdfa;--accent-border:#99f6e4;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);z-index:100}
+.nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-.5px}
+.nav-logo span{color:var(--blue)}
+.nav-links{display:flex;gap:1.5rem;align-items:center;font-size:.875rem;font-weight:500;color:var(--muted)}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--accent);color:#fff;padding:.45rem 1rem;border-radius:6px;font-size:.8rem;font-weight:600}
+.nav-cta:hover{opacity:.85}
+
+.calc-wrap{max-width:780px;margin:0 auto;padding:2.5rem 2rem;width:100%}
+.calc-badge{display:inline-flex;align-items:center;gap:.4rem;background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);border-radius:999px;padding:.25rem .75rem;font-size:.72rem;font-weight:700;letter-spacing:.04em;margin-bottom:1rem}
+.calc-title{font-size:clamp(1.5rem,4vw,2rem);font-weight:900;letter-spacing:-.04em;margin-bottom:.4rem}
+.calc-sub{font-size:.9rem;color:var(--muted);margin-bottom:2rem}
+
+.steps-nav{display:flex;gap:0;margin-bottom:2rem;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.step-btn{flex:1;padding:.6rem .5rem;font-size:.75rem;font-weight:600;text-align:center;background:var(--bg);color:var(--muted);border:none;cursor:pointer;border-right:1px solid var(--border);transition:all .15s;line-height:1.3}
+.step-btn:last-child{border-right:none}
+.step-btn.active{background:var(--accent);color:#fff}
+.step-btn.done{background:var(--accent-bg);color:var(--accent)}
+
+.step{display:none}
+.step.active{display:block}
+
+/* Step 1 — company grid */
+.search-box{width:100%;padding:.7rem 1rem;border:1.5px solid var(--border);border-radius:8px;font-size:.9rem;font-family:'Inter',sans-serif;margin-bottom:1rem;outline:none}
+.search-box:focus{border-color:var(--accent)}
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.6rem;max-height:420px;overflow-y:auto}
+.co-card{border:1.5px solid var(--border);border-radius:10px;padding:.85rem 1rem;cursor:pointer;transition:all .15s;background:var(--bg)}
+.co-card:hover{border-color:var(--accent);background:var(--accent-bg)}
+.co-card.selected{border-color:var(--accent);background:var(--accent-bg)}
+.co-name{font-weight:700;font-size:.88rem;margin-bottom:.2rem}
+.co-meta{font-size:.75rem;color:var(--muted)}
+.co-flag{font-size:.7rem;font-weight:600;margin-top:.3rem;padding:.15rem .45rem;border-radius:4px;display:inline-block}
+.flag-bank{background:#eff6ff;color:var(--blue)}
+.flag-normal{background:var(--accent-bg);color:var(--accent)}
+
+/* Step 2 — context */
+.ctx-card{border:1px solid var(--border);border-radius:14px;padding:1.75rem;margin-bottom:1.25rem;background:var(--bg)}
+.ctx-title{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem}
+.pl-table{width:100%;border-collapse:collapse;font-size:.85rem;font-family:'JetBrains Mono',monospace;margin-bottom:1rem}
+.pl-table th{text-align:left;font-size:.7rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:.5rem .6rem;border-bottom:1.5px solid var(--border)}
+.pl-table td{padding:.5rem .6rem;border-bottom:1px solid var(--card)}
+.pl-table tr:last-child td{border-bottom:none}
+.pl-line-label{font-family:'Inter',sans-serif;color:var(--muted)}
+.pl-line-main{font-family:'Inter',sans-serif;font-weight:600}
+.pl-line-sep td{border-top:1.5px solid var(--border);font-weight:700;padding-top:.75rem}
+.num-rep{color:var(--text)}
+.num-adj{color:var(--amber)}
+.num-norm{color:var(--accent)}
+.delta-pos{color:var(--green);font-size:.75rem}
+.delta-neg{color:var(--red);font-size:.75rem}
+
+.concept-row{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.25rem}
+.concept-card{border:1px solid var(--border);border-radius:10px;padding:1rem;background:var(--bg)}
+.concept-card .label{font-size:.7rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem}
+.concept-card .val{font-size:1.3rem;font-weight:800;font-family:'JetBrains Mono',monospace;letter-spacing:-.02em}
+.concept-card .sub{font-size:.75rem;color:var(--muted);margin-top:.15rem}
+
+.qa-list{display:flex;flex-direction:column;gap:.75rem;margin-top:1.25rem}
+.qa-item{border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.qa-q{font-size:.85rem;font-weight:600;padding:.85rem 1rem;background:var(--card);cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+.qa-q::after{content:'＋';font-size:.9rem;color:var(--muted);flex-shrink:0}
+.qa-item.open .qa-q::after{content:'－'}
+.qa-a{display:none;font-size:.82rem;color:var(--muted);padding:.85rem 1rem;line-height:1.65;border-top:1px solid var(--border)}
+.qa-item.open .qa-a{display:block}
+
+/* loading */
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(255,255,255,.97);z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem}
+.loading-overlay.active{display:flex}
+.loading-logo{font-weight:900;font-size:1.4rem;letter-spacing:-.05em}
+.loading-logo span{color:var(--accent)}
+.loading-bar-wrap{width:240px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.loading-bar{height:100%;width:0;background:var(--accent);border-radius:2px;transition:width .4s ease}
+.loading-msg{font-size:.82rem;color:var(--muted);text-align:center;min-height:1.2rem}
+
+/* Step 4 — results */
+.result-hero{border:1px solid var(--accent-border);border-radius:14px;padding:1.75rem;background:var(--accent-bg);margin-bottom:1.25rem;text-align:center}
+.result-label{font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:.5rem}
+.result-num{font-size:3rem;font-weight:900;font-family:'JetBrains Mono',monospace;letter-spacing:-.04em;color:var(--accent)}
+.result-sub{font-size:.82rem;color:var(--muted);margin-top:.3rem}
+
+.bridge-table{width:100%;border-collapse:collapse;font-size:.85rem;margin-bottom:1.25rem}
+.bridge-table th{text-align:left;font-size:.7rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:.5rem .6rem;border-bottom:1.5px solid var(--border)}
+.bridge-table td{padding:.55rem .6rem;border-bottom:1px solid var(--card);font-family:'JetBrains Mono',monospace}
+.bridge-table .lbl{font-family:'Inter',sans-serif;color:var(--muted)}
+.bridge-table .add{color:var(--green)}
+.bridge-table .ded{color:var(--red)}
+.bridge-table tr.total-row td{font-weight:700;border-top:1.5px solid var(--border);padding-top:.75rem;color:var(--accent)}
+.bridge-table .label-col{font-family:'Inter',sans-serif}
+
+.insight-box{border-left:3px solid var(--accent);background:var(--accent-bg);border-radius:0 10px 10px 0;padding:1rem 1.25rem;margin-bottom:1.25rem;font-size:.85rem;color:var(--text);line-height:1.65}
+.insight-box strong{display:block;margin-bottom:.3rem;font-weight:700}
+
+.next-strip{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;margin-top:1rem;font-size:.85rem}
+.next-strip a{color:var(--accent);font-weight:700}
+
+.btn{padding:.65rem 1.4rem;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer;border:none;font-family:'Inter',sans-serif}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{opacity:.85}
+.btn-ghost{background:transparent;border:1.5px solid var(--border);color:var(--muted)}
+.btn-ghost:hover{border-color:var(--text);color:var(--text)}
+.step-actions{display:flex;gap:.75rem;margin-top:1.5rem;flex-wrap:wrap}
+
+footer{border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-size:.8rem;color:var(--muted);margin-top:auto}
+.footer-nav{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:.5rem}
+.footer-nav a:hover{color:var(--text)}
+
+@media(max-width:640px){
+  nav{padding:1rem}
+  .nav-links{display:none}
+  .calc-wrap{padding:1.5rem 1rem}
+  .concept-row{grid-template-columns:1fr}
+  .company-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-logo">Valuation<span>Desk</span></div>
+  <div>
+    <div class="loading-bar-wrap"><div class="loading-bar" id="loadingBar"></div></div>
+  </div>
+  <div class="loading-msg" id="loadingMsg">Loading FDD model…</div>
+</div>
+
+<nav>
+  <a href="/valuation-toolkit/" class="nav-logo">Valuation<span>Desk</span></a>
+  <div class="nav-links">
+    <a href="/valuation-toolkit/domains/financial-due-diligence/">Domain</a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/">All Calculators</a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/learn/">Learn</a>
+  </div>
+  <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/revenue-quality.html" class="nav-cta">Next →</a>
+</nav>
+
+<div class="calc-wrap">
+  <div class="calc-badge">📊 Calculator 01 · Financial Due Diligence</div>
+  <div class="calc-title">P&amp;L Restatement Tool</div>
+  <div class="calc-sub">Reported → Adjusted → Normalised · Free · 30 Indian companies</div>
+
+  <div class="steps-nav">
+    <button class="step-btn active" id="sBtn1" onclick="goStep(1)">1 · Pick Company</button>
+    <button class="step-btn" id="sBtn2" onclick="goStep(2)">2 · Understand</button>
+    <button class="step-btn" id="sBtn3" onclick="goStep(3)">3 · Restatement</button>
+    <button class="step-btn" id="sBtn4" onclick="goStep(4)">4 · Normalised P&amp;L</button>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step active" id="step1">
+    <input class="search-box" type="text" id="searchBox" placeholder="Search company or sector…" oninput="filterCos()"/>
+    <div class="company-grid" id="coGrid"></div>
+    <div class="step-actions">
+      <button class="btn btn-primary" onclick="goStep(2)">Continue →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step" id="step2">
+    <div class="ctx-card" id="ctxCard"></div>
+    <div class="step-actions">
+      <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
+      <button class="btn btn-primary" onclick="goStep(3)">Build Restatement →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step" id="step3">
+    <div class="ctx-card" id="adjCard"></div>
+    <div class="step-actions">
+      <button class="btn btn-ghost" onclick="goStep(2)">← Back</button>
+      <button class="btn btn-primary" onclick="startLoading()">Reveal Normalised P&amp;L →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step" id="step4">
+    <div id="resultArea"></div>
+    <div class="step-actions">
+      <button class="btn btn-ghost" onclick="goStep(3)">← Adjust</button>
+      <a href="revenue-quality.html" class="btn btn-primary">Revenue Quality →</a>
+    </div>
+    <div class="next-strip">
+      <span>Next: Test the quality of this company's revenue</span>
+      <a href="revenue-quality.html">Revenue Quality Analyzer 🔒</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-nav">
+    <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/">← All FDD Calculators</a>
+    <a href="revenue-quality.html">Revenue Quality →</a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/learn/">Learn FDD</a>
+  </div>
+  <div>© 2025 ValuationDesk</div>
+</footer>
+
+<script>
+var COMPANIES=[
+  {id:'tcs',name:'TCS',sector:'IT',revenue:249000,cogs:120000,sgna:38000,da:8000,reportedEBITDA:91000,ot:4200,rr:0,pf:0,mgmt:1500,rpt:8,hasInventory:false,isBank:false},
+  {id:'infy',name:'Infosys',sector:'IT',revenue:157936,cogs:78000,sgna:22000,da:6500,reportedEBITDA:51436,ot:2800,rr:0,pf:0,mgmt:1200,rpt:5,hasInventory:false,isBank:false},
+  {id:'wipro',name:'Wipro',sector:'IT',revenue:89838,cogs:44000,sgna:14000,da:4200,reportedEBITDA:27638,ot:1900,rr:0,pf:0,mgmt:800,rpt:6,hasInventory:false,isBank:false},
+  {id:'hcl',name:'HCL Tech',sector:'IT',revenue:113401,cogs:56000,sgna:15000,da:5000,reportedEBITDA:37401,ot:2200,rr:0,pf:0,mgmt:900,rpt:4,hasInventory:false,isBank:false},
+  {id:'reliance',name:'Reliance Industries',sector:'Conglomerate',revenue:1000122,cogs:650000,sgna:80000,da:95000,reportedEBITDA:175122,ot:12000,rr:8000,pf:5000,mgmt:3000,rpt:28,hasInventory:true,isBank:false},
+  {id:'tatasteel',name:'Tata Steel',sector:'Metals',revenue:243354,cogs:185000,sgna:18000,da:16000,reportedEBITDA:24354,ot:9800,rr:4000,pf:2000,mgmt:1200,rpt:15,hasInventory:true,isBank:false},
+  {id:'jswsteel',name:'JSW Steel',sector:'Metals',revenue:195164,cogs:150000,sgna:14000,da:14000,reportedEBITDA:17164,ot:7200,rr:3500,pf:1500,mgmt:900,rpt:12,hasInventory:true,isBank:false},
+  {id:'ultracemco',name:'UltraTech Cement',sector:'Cement',revenue:70880,cogs:44000,sgna:8000,da:7000,reportedEBITDA:11880,ot:3100,rr:1200,pf:800,mgmt:600,rpt:9,hasInventory:true,isBank:false},
+  {id:'hindalco',name:'Hindalco',sector:'Metals',revenue:230085,cogs:175000,sgna:18000,da:13000,reportedEBITDA:24085,ot:6500,rr:2800,pf:1200,mgmt:700,rpt:18,hasInventory:true,isBank:false},
+  {id:'ntpc',name:'NTPC',sector:'Power',revenue:174416,cogs:110000,sgna:10000,da:22000,reportedEBITDA:32416,ot:4200,rr:2000,pf:900,mgmt:500,rpt:22,hasInventory:true,isBank:false},
+  {id:'powergrid',name:'Power Grid',sector:'Power',revenue:45283,cogs:12000,sgna:5000,da:18000,reportedEBITDA:10283,ot:1800,rr:800,pf:400,mgmt:300,rpt:5,hasInventory:false,isBank:false},
+  {id:'ongc',name:'ONGC',sector:'Energy',revenue:663141,cogs:420000,sgna:35000,da:55000,reportedEBITDA:153141,ot:18000,rr:10000,pf:4000,mgmt:2000,rpt:35,hasInventory:true,isBank:false},
+  {id:'coalindia',name:'Coal India',sector:'Energy',revenue:140392,cogs:75000,sgna:15000,da:10000,reportedEBITDA:40392,ot:8000,rr:3000,pf:2000,mgmt:1000,rpt:8,hasInventory:true,isBank:false},
+  {id:'bpcl',name:'BPCL',sector:'Energy',revenue:530789,cogs:465000,sgna:18000,da:8000,reportedEBITDA:39789,ot:14000,rr:5000,pf:2500,mgmt:1200,rpt:20,hasInventory:true,isBank:false},
+  {id:'drreddy',name:'Dr Reddy\'s',sector:'Pharma',revenue:27086,cogs:10500,sgna:5000,da:2200,reportedEBITDA:9386,ot:1800,rr:500,pf:300,mgmt:400,rpt:7,hasInventory:true,isBank:false},
+  {id:'sunpharma',name:'Sun Pharma',sector:'Pharma',revenue:50022,cogs:19000,sgna:9000,da:4000,reportedEBITDA:18022,ot:2900,rr:900,pf:500,mgmt:600,rpt:9,hasInventory:true,isBank:false},
+  {id:'cipla',name:'Cipla',sector:'Pharma',revenue:25774,cogs:10000,sgna:6000,da:2000,reportedEBITDA:7774,ot:1500,rr:400,pf:200,mgmt:350,rpt:6,hasInventory:true,isBank:false},
+  {id:'asianpaint',name:'Asian Paints',sector:'Consumer',revenue:34489,cogs:19000,sgna:5000,da:1800,reportedEBITDA:8689,ot:1200,rr:300,pf:150,mgmt:300,rpt:4,hasInventory:true,isBank:false},
+  {id:'hul',name:'HUL',sector:'FMCG',revenue:61896,cogs:34000,sgna:10000,da:2000,reportedEBITDA:15896,ot:2200,rr:600,pf:300,mgmt:500,rpt:3,hasInventory:true,isBank:false},
+  {id:'itc',name:'ITC',sector:'FMCG',revenue:69446,cogs:34000,sgna:10000,da:3500,reportedEBITDA:21946,ot:3000,rr:800,pf:400,mgmt:600,rpt:5,hasInventory:true,isBank:false},
+  {id:'bhartiairtel',name:'Bharti Airtel',sector:'Telecom',revenue:149982,cogs:65000,sgna:20000,da:40000,reportedEBITDA:24982,ot:5500,rr:2200,pf:1000,mgmt:700,rpt:11,hasInventory:false,isBank:false},
+  {id:'l&t',name:'L&T',sector:'Industrials',revenue:221113,cogs:155000,sgna:22000,da:8000,reportedEBITDA:36113,ot:7000,rr:3000,pf:1500,mgmt:1000,rpt:16,hasInventory:false,isBank:false},
+  {id:'bel',name:'Bharat Electronics',sector:'Industrials',revenue:20264,cogs:11000,sgna:3000,da:1200,reportedEBITDA:5064,ot:800,rr:300,pf:150,mgmt:200,rpt:28,hasInventory:true,isBank:false},
+  {id:'mahindra',name:'Mahindra & Mahindra',sector:'Auto',revenue:135488,cogs:95000,sgna:14000,da:7000,reportedEBITDA:19488,ot:4500,rr:2000,pf:800,mgmt:700,rpt:14,hasInventory:true,isBank:false},
+  {id:'maruti',name:'Maruti Suzuki',sector:'Auto',revenue:141174,cogs:108000,sgna:10000,da:5500,reportedEBITDA:17674,ot:3800,rr:1500,pf:600,mgmt:600,rpt:8,hasInventory:true,isBank:false},
+  // Banks
+  {id:'sbi',name:'SBI',sector:'Banking',revenue:355257,cogs:null,sgna:null,da:null,reportedEBITDA:null,ot:null,rr:null,pf:null,mgmt:null,rpt:null,hasInventory:false,isBank:true},
+  {id:'hdfc',name:'HDFC Bank',sector:'Banking',revenue:281811,cogs:null,sgna:null,da:null,reportedEBITDA:null,ot:null,rr:null,pf:null,mgmt:null,rpt:null,hasInventory:false,isBank:true},
+  {id:'icici',name:'ICICI Bank',sector:'Banking',revenue:183522,cogs:null,sgna:null,da:null,reportedEBITDA:null,ot:null,rr:null,pf:null,mgmt:null,rpt:null,hasInventory:false,isBank:true},
+  {id:'axis',name:'Axis Bank',sector:'Banking',revenue:116637,cogs:null,sgna:null,da:null,reportedEBITDA:null,ot:null,rr:null,pf:null,mgmt:null,rpt:null,hasInventory:false,isBank:true},
+  {id:'kotak',name:'Kotak Mahindra',sector:'Banking',revenue:74095,cogs:null,sgna:null,da:null,reportedEBITDA:null,ot:null,rr:null,pf:null,mgmt:null,rpt:null,hasInventory:false,isBank:true}
+];
+
+var selectedCo = null;
+var adjOT = 0, adjRR = 0, adjPF = 0, adjMGMT = 0;
+
+function fmt(n){if(n==null)return'N/A';return(n/1000).toFixed(1)+' Cr';}
+function fmtCr(n){if(n==null)return'N/A';return '₹'+(n/1000).toFixed(1)+' Cr';}
+function pct(a,b){if(!b)return'—';return((a/b)*100).toFixed(1)+'%';}
+
+function renderGrid(list){
+  var g=document.getElementById('coGrid');
+  g.innerHTML='';
+  list.forEach(function(c){
+    var d=document.createElement('div');
+    d.className='co-card'+(selectedCo&&selectedCo.id===c.id?' selected':'');
+    d.innerHTML='<div class="co-name">'+c.name+'</div><div class="co-meta">'+c.sector+' · '+fmtCr(c.revenue)+'</div><div class="co-flag '+(c.isBank?'flag-bank':'flag-normal')+'">'+(c.isBank?'🏦 Banking':'📊 FDD')+'</div>';
+    d.onclick=function(){selectCo(c);};
+    g.appendChild(d);
+  });
+}
+
+function selectCo(c){
+  selectedCo=c;
+  renderGrid(currentList());
+}
+
+function currentList(){
+  var q=document.getElementById('searchBox').value.toLowerCase();
+  if(!q)return COMPANIES;
+  return COMPANIES.filter(function(c){return c.name.toLowerCase().includes(q)||c.sector.toLowerCase().includes(q);});
+}
+
+function filterCos(){renderGrid(currentList());}
+
+function buildContext(){
+  if(!selectedCo){alert('Pick a company first.');return false;}
+  var c=selectedCo;
+  if(c.isBank){
+    document.getElementById('ctxCard').innerHTML='<div class="ctx-title">'+c.name+' — '+c.sector+'</div><div style="padding:1.5rem 0;text-align:center;color:var(--muted);font-size:.9rem">Banks use Net Interest Margin and PPOP — not EBITDA-based restatement.<br><br>Use <a href="/valuation-toolkit/domains/credit-analysis/calculators/credit-ratios.html" style="color:var(--accent);font-weight:700">Credit Ratios Calculator →</a> for banking sector analysis.</div>';
+    return true;
+  }
+  adjOT=c.ot||0; adjRR=c.rr||0; adjPF=c.pf||0; adjMGMT=c.mgmt||0;
+  var adjEBITDA=c.reportedEBITDA+adjOT+adjRR+adjPF+adjMGMT;
+  var adjMargin=pct(adjEBITDA,c.revenue);
+  var repMargin=pct(c.reportedEBITDA,c.revenue);
+  var html='<div class="ctx-title">'+c.name+' — Reported Financials (FY2024, ₹ Cr)</div>';
+  html+='<table class="pl-table"><thead><tr><th>P&amp;L Line</th><th style="text-align:right">Reported</th><th style="text-align:right">Adj. Est.</th><th style="text-align:right">∆</th></tr></thead><tbody>';
+  html+='<tr><td class="pl-line-main">Revenue</td><td class="num-rep" style="text-align:right">'+fmt(c.revenue)+'</td><td class="num-adj" style="text-align:right">'+fmt(c.revenue)+'</td><td style="text-align:right">—</td></tr>';
+  html+='<tr><td class="pl-line-label">Cost of Goods</td><td class="num-rep" style="text-align:right">'+fmt(c.cogs)+'</td><td class="num-adj" style="text-align:right">'+fmt(c.cogs)+'</td><td style="text-align:right">—</td></tr>';
+  html+='<tr><td class="pl-line-label">SG&amp;A / Overheads</td><td class="num-rep" style="text-align:right">'+fmt(c.sgna)+'</td><td class="num-adj" style="text-align:right">'+fmt(c.sgna)+'</td><td style="text-align:right">—</td></tr>';
+  html+='<tr class="pl-line-sep"><td class="pl-line-main">Reported EBITDA</td><td class="num-rep" style="text-align:right;font-weight:700">'+fmt(c.reportedEBITDA)+'</td><td class="num-adj" style="text-align:right;font-weight:700">'+fmt(adjEBITDA)+'</td><td class="delta-pos" style="text-align:right">+'+(adjOT+adjRR+adjPF+adjMGMT>0?fmt(adjOT+adjRR+adjPF+adjMGMT):'0')+'</td></tr>';
+  html+='<tr><td class="pl-line-label">EBITDA Margin</td><td class="num-rep" style="text-align:right">'+repMargin+'</td><td class="num-adj" style="text-align:right">'+adjMargin+'</td><td style="text-align:right"></td></tr>';
+  html+='</tbody></table>';
+  html+='<div class="concept-row">';
+  html+='<div class="concept-card"><div class="label">Reported EBITDA</div><div class="val" style="color:var(--text)">'+fmt(c.reportedEBITDA)+'</div><div class="sub">As filed by company</div></div>';
+  html+='<div class="concept-card"><div class="label">Total Adjustments</div><div class="val" style="color:var(--amber)">+'+fmt(adjOT+adjRR+adjPF+adjMGMT)+'</div><div class="sub">Est. add-backs available</div></div>';
+  html+='<div class="concept-card"><div class="label">Normalised EBITDA</div><div class="val" style="color:var(--accent)">'+fmt(adjEBITDA)+'</div><div class="sub">Adjusted figure</div></div>';
+  html+='<div class="concept-card"><div class="label">RPT Exposure</div><div class="val" style="color:'+(c.rpt>20?'var(--red)':c.rpt>10?'var(--amber)':'var(--green)')+'">'+c.rpt+'%</div><div class="sub">Related-party revenue</div></div>';
+  html+='</div>';
+  html+='<div class="ctx-title" style="margin-top:1.25rem">Key FDD Concepts</div>';
+  html+='<div class="qa-list">';
+  html+='<div class="qa-item"><div class="qa-q" onclick="toggleQA(this)">What is P&L restatement and why does it matter?</div><div class="qa-a">P&L restatement is the process of adjusting a target company\'s reported income statement to reflect sustainable, recurring financial performance. Reported P&Ls often include one-time gains/losses, related-party transactions at non-market prices, and accounting policy choices that distort the true earnings power. An acquirer pricing a deal at 8x EBITDA pays very different amounts depending on whether they use ₹100 Cr reported EBITDA vs ₹85 Cr normalised EBITDA — a ₹120 Cr difference on the same multiple.</div></div>';
+  html+='<div class="qa-item"><div class="qa-q" onclick="toggleQA(this)">What are the four types of P&L adjustments?</div><div class="qa-a"><strong>One-Time Items (OT):</strong> Non-recurring gains or losses — insurance claims, litigation settlements, asset sale profits, restructuring charges. Added back because they won\'t repeat. <strong>Run-Rate Adjustments (RR):</strong> Annualise partial-year changes — a new factory operational for 6 months gets 12-month revenue credited. <strong>Pro-Forma Adjustments (PF):</strong> Reflect completed acquisitions or disposals as if they were in place for the full year. <strong>Management Add-Backs (MGMT):</strong> Excess compensation paid to owner-managers above market rates, personal expenses run through the company, one-time bonuses.</div></div>';
+  var rptCtx=c.rpt>20?('(like '+c.name+'\'s '+c.rpt+'% — above the 20% danger threshold)'):c.rpt>10?('('+c.name+'\'s '+c.rpt+'% warrants careful review)'):('('+c.name+'\'s '+c.rpt+'% is within acceptable range)');
+  html+='<div class="qa-item"><div class="qa-q" onclick="toggleQA(this)">How does Related Party Transaction (RPT) exposure affect the restatement?</div><div class="qa-a">When a target sells to or buys from connected parties (subsidiaries, promoter entities, sister companies), the pricing may not be at arm\'s length. If '+c.name+' earns '+c.rpt+'% of revenue from related parties, an acquirer must verify whether those transactions will continue post-acquisition, and whether the pricing is market-consistent. High RPT exposure '+rptCtx+' often leads to revenue haircuts in the normalised P&L.</div></div>';
+  html+='<div class="qa-item"><div class="qa-q" onclick="toggleQA(this)">What is the difference between Adjusted and Normalised EBITDA?</div><div class="qa-a"><strong>Reported EBITDA</strong> is what the company files. <strong>Adjusted EBITDA</strong> strips out factual one-time items that both sides agree are non-recurring. <strong>Normalised EBITDA</strong> goes further — it also reflects structural changes (run-rate from capacity additions, acquired EBITDA, new contracts), management cost replacements, and RPT repricing. Normalised EBITDA is the number that deal multiples are applied to. A deal at 10x Normalised EBITDA vs 10x Reported EBITDA can differ by hundreds of crores.</div></div>';
+  html+='<div class="qa-item"><div class="qa-q" onclick="toggleQA(this)">How does FDD differ from Transaction Advisory work?</div><div class="qa-a">Transaction Advisory focuses on the deal structure — EBITDA bridge, working capital peg, and deal mechanics. Financial Due Diligence (FDD) is the verification layer — it independently audits the claims in the Information Memorandum, stress-tests management\'s numbers, identifies risks that would never appear in a seller-prepared document, and builds the adjusted P&L that the buyer\'s pricing team actually uses. FDD practitioners are typically Big 4 advisory teams brought in by the acquirer.</div></div>';
+  html+='</div>';
+  document.getElementById('ctxCard').innerHTML=html;
+  return true;
+}
+
+function buildAdjCard(){
+  if(!selectedCo||selectedCo.isBank){
+    document.getElementById('adjCard').innerHTML='<div style="padding:2rem;text-align:center;color:var(--muted)">Select a non-bank company to build the restatement.</div>';
+    return;
+  }
+  var c=selectedCo;
+  var html='<div class="ctx-title">'+c.name+' — Adjustment Inputs (₹ Cr, estimated)</div>';
+  html+='<p style="font-size:.82rem;color:var(--muted);margin-bottom:1.25rem">Review each adjustment category. The values are pre-filled with estimates based on company profile. Adjust to test different normalisation scenarios.</p>';
+  html+='<table class="bridge-table"><thead><tr><th>Adjustment Type</th><th>Est. Add-Back</th><th>Description</th></tr></thead><tbody>';
+  html+='<tr><td class="label-col">📌 One-Time Items</td><td class="add" style="font-family:\'JetBrains Mono\',monospace">+'+fmt(c.ot)+'</td><td style="font-size:.78rem;color:var(--muted)">Non-recurring gains/losses reversed</td></tr>';
+  html+='<tr><td class="label-col">📈 Run-Rate Adj.</td><td class="add" style="font-family:\'JetBrains Mono\',monospace">+'+fmt(c.rr)+'</td><td style="font-size:.78rem;color:var(--muted)">Annualise partial-year capacity/contracts</td></tr>';
+  html+='<tr><td class="label-col">🏗 Pro-Forma Adj.</td><td class="add" style="font-family:\'JetBrains Mono\',monospace">+'+fmt(c.pf)+'</td><td style="font-size:.78rem;color:var(--muted)">Full-year effect of acquisitions/disposals</td></tr>';
+  html+='<tr><td class="label-col">👤 Management Adj.</td><td class="add" style="font-family:\'JetBrains Mono\',monospace">+'+fmt(c.mgmt)+'</td><td style="font-size:.78rem;color:var(--muted)">Excess owner comp replaced at market rate</td></tr>';
+  var total=c.ot+c.rr+c.pf+c.mgmt;
+  html+='<tr class="total-row"><td>Total Add-Back</td><td class="add" style="font-family:\'JetBrains Mono\',monospace">+'+fmt(total)+'</td><td style="font-size:.78rem">'+pct(total,c.reportedEBITDA)+' uplift to EBITDA</td></tr>';
+  html+='</tbody></table>';
+  html+='<div class="insight-box"><strong>What happens next</strong>We\'ll apply these adjustments to '+c.name+'\'s reported EBITDA of '+fmt(c.reportedEBITDA)+', walk through each line of the P&L bridge, and show you the normalised EBITDA figure that an acquirer would use for deal pricing at various multiples.</div>';
+  document.getElementById('adjCard').innerHTML=html;
+}
+
+function buildResults(){
+  if(!selectedCo||selectedCo.isBank){
+    document.getElementById('resultArea').innerHTML='<div style="padding:2rem;text-align:center;color:var(--muted)">Banks are excluded from EBITDA-based restatement analysis.</div>';
+    return;
+  }
+  var c=selectedCo;
+  var total=c.ot+c.rr+c.pf+c.mgmt;
+  var normEBITDA=c.reportedEBITDA+total;
+  var normMargin=pct(normEBITDA,c.revenue);
+  var repMargin=pct(c.reportedEBITDA,c.revenue);
+  var uplift=pct(total,c.reportedEBITDA);
+  var ev8x=fmtCr(normEBITDA*8);
+  var ev10x=fmtCr(normEBITDA*10);
+  var ev12x=fmtCr(normEBITDA*12);
+
+  var html='<div class="result-hero"><div class="result-label">Normalised EBITDA — '+c.name+'</div><div class="result-num">'+fmt(normEBITDA)+'</div><div class="result-sub">vs Reported '+fmt(c.reportedEBITDA)+' · Margin: '+normMargin+' (up from '+repMargin+')</div></div>';
+  html+='<div class="ctx-title">P&amp;L Restatement Bridge</div>';
+  html+='<table class="bridge-table"><thead><tr><th>Line</th><th style="text-align:right">Amount (₹ Cr)</th><th style="text-align:right">Running Total</th></tr></thead><tbody>';
+  html+='<tr><td class="label-col">Reported EBITDA</td><td class="num-rep" style="text-align:right">'+fmt(c.reportedEBITDA)+'</td><td style="text-align:right;font-family:\'JetBrains Mono\',monospace">'+fmt(c.reportedEBITDA)+'</td></tr>';
+  html+='<tr><td class="label-col" style="padding-left:1.5rem">+ One-Time Items add-back</td><td class="add" style="text-align:right">+'+fmt(c.ot)+'</td><td style="text-align:right;font-family:\'JetBrains Mono\',monospace">'+fmt(c.reportedEBITDA+c.ot)+'</td></tr>';
+  html+='<tr><td class="label-col" style="padding-left:1.5rem">+ Run-Rate Adjustment</td><td class="add" style="text-align:right">+'+fmt(c.rr)+'</td><td style="text-align:right;font-family:\'JetBrains Mono\',monospace">'+fmt(c.reportedEBITDA+c.ot+c.rr)+'</td></tr>';
+  html+='<tr><td class="label-col" style="padding-left:1.5rem">+ Pro-Forma Adjustment</td><td class="add" style="text-align:right">+'+fmt(c.pf)+'</td><td style="text-align:right;font-family:\'JetBrains Mono\',monospace">'+fmt(c.reportedEBITDA+c.ot+c.rr+c.pf)+'</td></tr>';
+  html+='<tr><td class="label-col" style="padding-left:1.5rem">+ Management Add-Back</td><td class="add" style="text-align:right">+'+fmt(c.mgmt)+'</td><td style="text-align:right;font-family:\'JetBrains Mono\',monospace">'+fmt(normEBITDA)+'</td></tr>';
+  html+='<tr class="total-row"><td>Normalised EBITDA</td><td class="add" style="text-align:right">+'+fmt(total)+' ('+uplift+')</td><td style="text-align:right">'+fmt(normEBITDA)+'</td></tr>';
+  html+='</tbody></table>';
+
+  html+='<div class="ctx-title">Implied EV at Key Multiples</div>';
+  html+='<div class="concept-row">';
+  html+='<div class="concept-card"><div class="label">8x EBITDA</div><div class="val" style="font-size:1.1rem">'+ev8x+'</div><div class="sub">Conservative / stressed</div></div>';
+  html+='<div class="concept-card"><div class="label">10x EBITDA</div><div class="val" style="font-size:1.1rem;color:var(--accent)">'+ev10x+'</div><div class="sub">Base case</div></div>';
+  html+='<div class="concept-card"><div class="label">12x EBITDA</div><div class="val" style="font-size:1.1rem">'+ev12x+'</div><div class="sub">Optimistic / strategic</div></div>';
+  html+='<div class="concept-card"><div class="label">RPT Risk</div><div class="val" style="font-size:1.5rem;color:'+(c.rpt>20?'var(--red)':c.rpt>10?'var(--amber)':'var(--green)')+'">'+c.rpt+'%</div><div class="sub">'+(c.rpt>20?'High — investigate':c.rpt>10?'Medium — watch':'Low — clean')+'</div></div>';
+  html+='</div>';
+
+  var rptNote=c.rpt>20?('RPT concentration of '+c.rpt+'% is high. Verify transaction pricing, assess continuity risk post-close, and model a haircut scenario in deal pricing.'):c.rpt>10?('RPT at '+c.rpt+'% is moderate. Confirm arm\'s-length pricing on the top 3 related-party relationships.'):('RPT exposure of '+c.rpt+'% is manageable. Standard reps and warranties coverage should suffice.');
+  html+='<div class="insight-box"><strong>FDD Takeaway — '+c.name+'</strong>The '+uplift+' uplift to normalised EBITDA ('+fmt(total)+' in add-backs) means pricing this business at 10x normalised vs 10x reported EBITDA changes the enterprise value by '+fmtCr(total*10)+'. '+rptNote+'</div>';
+  document.getElementById('resultArea').innerHTML=html;
+}
+
+function goStep(n){
+  if(n===2&&!buildContext())return;
+  if(n===3){if(!selectedCo){alert('Pick a company first.');return;}buildAdjCard();}
+  document.querySelectorAll('.step').forEach(function(s,i){s.classList.toggle('active',i===n-1);});
+  document.querySelectorAll('.step-btn').forEach(function(b,i){b.classList.remove('active','done');if(i===n-1)b.classList.add('active');else if(i<n-1)b.classList.add('done');});
+}
+
+function startLoading(){
+  var ol=document.getElementById('loadingOverlay');
+  var bar=document.getElementById('loadingBar');
+  var msg=document.getElementById('loadingMsg');
+  var msgs=['Loading FDD model…','Mapping reported P&L…','Identifying adjustments…','Building normalised bridge…','Calculating deal-implied EV…'];
+  var i=0;ol.classList.add('active');bar.style.width='0%';
+  var interval=setInterval(function(){
+    i++;bar.style.width=(i*20)+'%';
+    if(msgs[i])msg.textContent=msgs[i];
+    if(i>=5){clearInterval(interval);setTimeout(function(){ol.classList.remove('active');buildResults();goStep(4);},400);}
+  },900);
+}
+
+function toggleQA(el){el.parentElement.classList.toggle('open');}
+
+renderGrid(COMPANIES);
+if(COMPANIES.length>0){selectedCo=COMPANIES[0];renderGrid(COMPANIES);}
+</script>
+</body>
+</html>

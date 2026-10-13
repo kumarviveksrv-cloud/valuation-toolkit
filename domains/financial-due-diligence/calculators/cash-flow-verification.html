@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Cash Flow Verification — Financial Due Diligence · ValuationDesk</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
+  --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--teal:#0d9488;
+  --violet:#7c3aed;
+  --accent:#2563eb;--accent-bg:#eff6ff;--accent-border:#bfdbfe;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);z-index:100}
+.nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-.5px}
+.nav-logo span{color:var(--blue)}
+.nav-links{display:flex;gap:1.5rem;align-items:center;font-size:.875rem;font-weight:500;color:var(--muted)}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--accent);color:#fff;padding:.45rem 1rem;border-radius:6px;font-size:.8rem;font-weight:600}
+.nav-cta:hover{opacity:.85}
+
+.hero{max-width:760px;margin:0 auto;padding:2.5rem 2rem 1.5rem;width:100%}
+.breadcrumb{font-size:.78rem;color:var(--muted);margin-bottom:1rem;display:flex;gap:.4rem;align-items:center;flex-wrap:wrap}
+.breadcrumb a:hover{color:var(--text)}
+.calc-badge{display:inline-flex;align-items:center;gap:.4rem;background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);border-radius:999px;padding:.25rem .75rem;font-size:.75rem;font-weight:700;letter-spacing:.03em;margin-bottom:.75rem}
+h1{font-size:clamp(1.5rem,4vw,2rem);font-weight:900;letter-spacing:-.04em;margin-bottom:.4rem}
+.hero-sub{color:var(--muted);font-size:.9rem;max-width:520px}
+
+.steps-bar{max-width:760px;margin:0 auto;padding:0 2rem 1.5rem;width:100%}
+.steps{display:flex;gap:0;align-items:stretch}
+.step-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:.3rem;cursor:pointer;padding:.5rem .25rem;border-radius:8px;transition:background .15s}
+.step-item:hover{background:var(--card)}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--muted);background:var(--bg);transition:all .2s;flex-shrink:0}
+.step-label{font-size:.68rem;font-weight:600;color:var(--muted);text-align:center;line-height:1.3}
+.step-connector{flex:1;height:2px;background:var(--border);align-self:center;margin-top:-1rem}
+.step-item.active .step-dot{background:var(--accent);border-color:var(--accent);color:#fff}
+.step-item.active .step-label{color:var(--accent)}
+.step-item.done .step-dot{background:var(--green);border-color:var(--green);color:#fff}
+.step-item.done .step-label{color:var(--green)}
+
+.panel{max-width:760px;margin:0 auto;padding:0 2rem 3rem;width:100%;display:none}
+.panel.active{display:block}
+
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.6rem;margin-bottom:1.5rem}
+.co-card{border:1.5px solid var(--border);border-radius:10px;padding:.75rem 1rem;cursor:pointer;transition:all .15s}
+.co-card:hover{border-color:var(--accent);background:var(--accent-bg)}
+.co-card.selected{border-color:var(--accent);background:var(--accent-bg)}
+.co-name{font-weight:700;font-size:.88rem}
+.co-sector{font-size:.72rem;color:var(--muted);margin-top:.1rem}
+.co-hint{font-size:.7rem;color:var(--accent);margin-top:.25rem;font-weight:600}
+
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.65rem 1.4rem;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer;border:none;transition:all .15s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{opacity:.87}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--muted)}
+.btn-outline:hover{border-color:var(--text);color:var(--text)}
+.nav-btns{display:flex;gap:.75rem;margin-top:1.75rem;flex-wrap:wrap}
+
+.context-section{margin-bottom:2rem}
+.section-label{font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:.85rem}
+
+.concept-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+.concept-card{border:1px solid var(--border);border-radius:10px;padding:1.1rem;background:var(--bg)}
+.concept-card h3{font-size:.88rem;font-weight:700;margin-bottom:.35rem;display:flex;align-items:center;gap:.4rem}
+.concept-card p{font-size:.8rem;color:var(--muted);line-height:1.55}
+
+.qa-list{display:flex;flex-direction:column;gap:.75rem}
+.qa-item{border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.qa-q{padding:.8rem 1rem;font-size:.85rem;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:var(--card)}
+.qa-q:hover{background:#f3f4f6}
+.qa-a{padding:.85rem 1rem;font-size:.82rem;color:var(--muted);line-height:1.6;border-top:1px solid var(--border);display:none}
+.qa-a.open{display:block}
+
+.cf-table{width:100%;border-collapse:collapse;margin-bottom:1.5rem;font-size:.85rem}
+.cf-table th{background:var(--card);padding:.6rem .8rem;text-align:left;font-weight:700;font-size:.75rem;color:var(--muted);border-bottom:2px solid var(--border);letter-spacing:.03em}
+.cf-table td{padding:.6rem .8rem;border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:.8rem}
+.cf-table tr:last-child td{border-bottom:none}
+.cf-table .label{font-family:'Inter',sans-serif;font-size:.83rem}
+.cf-table .subtotal{background:#f8faff;font-weight:700}
+.cf-table .total{background:var(--accent-bg);font-weight:700}
+.signal-good{color:var(--green);font-weight:700}
+.signal-warn{color:var(--amber);font-weight:700}
+.signal-bad{color:var(--red);font-weight:700}
+
+.pro-gate{border:2px dashed var(--border);border-radius:14px;padding:2.5rem 2rem;text-align:center;background:var(--card)}
+.pro-gate-icon{font-size:2.5rem;margin-bottom:.75rem}
+.pro-gate h2{font-size:1.2rem;font-weight:800;margin-bottom:.4rem}
+.pro-gate p{color:var(--muted);font-size:.88rem;margin-bottom:1.25rem;max-width:400px;margin-left:auto;margin-right:auto}
+.pro-features{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-bottom:1.5rem}
+.pro-feat-pill{background:#fff;border:1px solid var(--border);border-radius:999px;padding:.3rem .8rem;font-size:.75rem;font-weight:600;color:var(--muted)}
+.btn-unlock{background:var(--accent);color:#fff;padding:.75rem 1.75rem;border-radius:8px;font-size:.9rem;font-weight:700;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem}
+.btn-unlock:hover{opacity:.87}
+
+.bank-note{background:#fff8ed;border:1px solid #fde68a;border-radius:10px;padding:1rem 1.25rem;font-size:.85rem;color:#92400e;margin-bottom:1.5rem}
+
+.calc-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:.5rem}
+.calc-header h2{font-size:1rem;font-weight:800}
+.calc-company-tag{background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);border-radius:999px;padding:.25rem .75rem;font-size:.78rem;font-weight:700}
+
+.metric-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.75rem;margin-bottom:1.5rem}
+.metric-box{border:1px solid var(--border);border-radius:10px;padding:1rem;background:var(--bg)}
+.metric-label{font-size:.72rem;color:var(--muted);font-weight:600;letter-spacing:.03em;margin-bottom:.3rem}
+.metric-val{font-size:1.3rem;font-weight:900;font-family:'JetBrains Mono',monospace}
+.metric-sub{font-size:.72rem;color:var(--muted);margin-top:.15rem}
+.metric-box.highlight{background:var(--accent-bg);border-color:var(--accent-border)}
+.metric-box.highlight .metric-val{color:var(--accent)}
+
+.insight-box{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:10px;padding:1rem 1.25rem;font-size:.85rem;color:#1e3a8a;margin-top:1.25rem;line-height:1.6}
+.insight-box strong{font-weight:700}
+
+footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-size:.8rem;color:var(--muted);margin-top:auto}
+.footer-nav{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:.75rem}
+.footer-nav a:hover{color:var(--text)}
+.calc-nav{display:flex;gap:1rem;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap}
+.calc-nav a{font-size:.82rem;font-weight:600;color:var(--muted);padding:.4rem .75rem;border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;gap:.3rem}
+.calc-nav a:hover{border-color:var(--text);color:var(--text)}
+
+@media(max-width:640px){
+  nav{padding:1rem}
+  .nav-links{display:none}
+  .hero{padding:1.75rem 1rem 1rem}
+  .steps-bar{padding:0 1rem 1.25rem}
+  .step-label{display:none}
+  .panel{padding:0 1rem 2.5rem}
+  .concept-grid{grid-template-columns:1fr}
+  .company-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/valuation-toolkit/" class="nav-logo">Valuation<span>Desk</span></a>
+  <div class="nav-links">
+    <a href="/valuation-toolkit/domains/financial-due-diligence/">FDD Overview</a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/">All Calculators</a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/learn/">Learn</a>
+  </div>
+  <button class="nav-cta" onclick="unlockPro()">Unlock Pro — ₹799/mo</button>
+</nav>
+
+<div class="hero">
+  <div class="breadcrumb">
+    <a href="/valuation-toolkit/">Home</a><span>/</span>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/">Financial Due Diligence</a><span>/</span>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/">Calculators</a><span>/</span>
+    <span>Cash Flow Verification</span>
+  </div>
+  <div class="calc-badge">💰 Calculator 04 · Financial Due Diligence</div>
+  <h1>Cash Flow Verification</h1>
+  <p class="hero-sub">Bridge EBITDA to free cash flow, compute the Cash Conversion Ratio, identify leakage in capex and working capital, and stress-test what cash is truly available to an acquirer.</p>
+</div>
+
+<div class="steps-bar">
+  <div class="steps">
+    <div class="step-item active" id="s1" onclick="goStep(1)">
+      <div class="step-dot">1</div>
+      <div class="step-label">Pick Company</div>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step-item" id="s2" onclick="goStep(2)">
+      <div class="step-dot">2</div>
+      <div class="step-label">Understand</div>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step-item" id="s3" onclick="goStep(3)">
+      <div class="step-dot">3</div>
+      <div class="step-label">Cash Flow Model 🔒</div>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step-item" id="s4" onclick="goStep(4)">
+      <div class="step-dot">4</div>
+      <div class="step-label">FCF Bridge 🔒</div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 1 -->
+<div class="panel active" id="panel1">
+  <p class="section-label">Select a Company</p>
+  <div class="company-grid" id="companyGrid"></div>
+  <div class="nav-btns">
+    <button class="btn btn-primary" onclick="goStep(2)">Understand Cash Flow Verification →</button>
+  </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="panel" id="panel2">
+  <div id="contextContent"></div>
+</div>
+
+<!-- STEP 3 -->
+<div class="panel" id="panel3">
+  <div class="pro-gate">
+    <div class="pro-gate-icon">🔒</div>
+    <h2>Cash Flow Model</h2>
+    <p>The EBITDA-to-FCF bridge is where deals get revised — or killed. Pro unlocks the full quantitative model.</p>
+    <div class="pro-features">
+      <span class="pro-feat-pill">EBITDA → EBIT → OCF Bridge</span>
+      <span class="pro-feat-pill">Cash Conversion Ratio (CCR)</span>
+      <span class="pro-feat-pill">Capex Intensity Analysis</span>
+      <span class="pro-feat-pill">Tax Timing Adjustments</span>
+      <span class="pro-feat-pill">Working Capital Movement Impact</span>
+      <span class="pro-feat-pill">Maintenance vs Growth Capex Split</span>
+    </div>
+    <button class="btn-unlock" onclick="unlockPro()">🔓 Unlock Pro — ₹799/mo →</button>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-outline" onclick="goStep(2)">← Back</button>
+    <button class="btn btn-primary" onclick="goStep(4)">FCF Bridge →</button>
+  </div>
+</div>
+
+<!-- STEP 4 -->
+<div class="panel" id="panel4">
+  <div class="pro-gate">
+    <div class="pro-gate-icon">🔒</div>
+    <h2>Free Cash Flow Bridge</h2>
+    <p>The FCF available to acquirers is rarely the headline EBITDA multiple implies. Unlock to see the full leakage analysis.</p>
+    <div class="pro-features">
+      <span class="pro-feat-pill">FCF Available to Acquirer</span>
+      <span class="pro-feat-pill">Leakage Point Breakdown</span>
+      <span class="pro-feat-pill">Normalised vs Reported FCF Delta</span>
+      <span class="pro-feat-pill">CCR Trend vs Sector Peers</span>
+      <span class="pro-feat-pill">Implied Enterprise Value at 3 FCF Yields</span>
+      <span class="pro-feat-pill">FDD Memo Language for Cash Conversion</span>
+    </div>
+    <button class="btn-unlock" onclick="unlockPro()">🔓 Unlock Pro — ₹799/mo →</button>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-outline" onclick="goStep(3)">← Back</button>
+  </div>
+</div>
+
+<div class="calc-nav" style="max-width:760px;margin:0 auto;padding:0 2rem 1rem">
+  <a href="working-capital-deepdive.html">← Working Capital Deep-Dive</a>
+  <a href="red-flag-scanner.html">Red Flag Scanner →</a>
+</div>
+
+<footer>
+  <div class="footer-nav">
+    <a href="/valuation-toolkit/">Home</a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/">FDD Overview</a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/">Calculators</a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/learn/">Learn</a>
+  </div>
+  <div>© 2025 ValuationDesk · Built for finance learners</div>
+</footer>
+
+<script>
+var COMPANIES=[
+  {id:'tcs',name:'TCS',sector:'IT Services',ebitda:91000,capex:4200,taxPaid:18500,wcMovement:-3200,dna:8000,ccrPct:88,cashQuality:'High',isBank:false},
+  {id:'infy',name:'Infosys',sector:'IT Services',ebitda:38200,capex:2800,taxPaid:8100,wcMovement:-1800,dna:5200,ccrPct:87,cashQuality:'High',isBank:false},
+  {id:'wipro',name:'Wipro',sector:'IT Services',ebitda:19800,capex:2200,taxPaid:4200,wcMovement:-900,dna:3600,ccrPct:82,cashQuality:'High',isBank:false},
+  {id:'hcl',name:'HCL Tech',sector:'IT Services',ebitda:22400,capex:3100,taxPaid:4800,wcMovement:-2100,dna:4800,ccrPct:80,cashQuality:'High',isBank:false},
+  {id:'reliance',name:'Reliance',sector:'Conglomerate',ebitda:177200,capex:147000,taxPaid:14800,wcMovement:8200,dna:55000,ccrPct:34,cashQuality:'Low',isBank:false},
+  {id:'hul',name:'HUL',sector:'FMCG',ebitda:12800,capex:1200,taxPaid:3200,wcMovement:-4200,dna:1800,ccrPct:95,cashQuality:'High',isBank:false},
+  {id:'itc',name:'ITC',sector:'FMCG',ebitda:21600,capex:2800,taxPaid:5400,wcMovement:-1800,dna:3200,ccrPct:88,cashQuality:'High',isBank:false},
+  {id:'nestle',name:'Nestlé India',sector:'FMCG',ebitda:5400,capex:1200,taxPaid:1400,wcMovement:-2800,dna:800,ccrPct:92,cashQuality:'High',isBank:false},
+  {id:'titan',name:'Titan',sector:'Consumer',ebitda:4800,capex:900,taxPaid:1100,wcMovement:3200,dna:700,ccrPct:62,cashQuality:'Medium',isBank:false},
+  {id:'asian',name:'Asian Paints',sector:'Paints',ebitda:6900,capex:2200,taxPaid:1700,wcMovement:1400,dna:1200,ccrPct:68,cashQuality:'Medium',isBank:false},
+  {id:'maruti',name:'Maruti Suzuki',sector:'Auto',ebitda:22400,capex:9800,taxPaid:4800,wcMovement:2800,dna:7200,ccrPct:60,cashQuality:'Medium',isBank:false},
+  {id:'tatamotor',name:'Tata Motors',sector:'Auto',ebitda:52400,capex:28000,taxPaid:2400,wcMovement:8800,dna:32000,ccrPct:40,cashQuality:'Low',isBank:false},
+  {id:'bajaj',name:'Bajaj Auto',sector:'Auto',ebitda:8200,capex:1400,taxPaid:2100,wcMovement:-1200,dna:1800,ccrPct:82,cashQuality:'High',isBank:false},
+  {id:'hero',name:'Hero MotoCorp',sector:'Auto',ebitda:5800,capex:1800,taxPaid:1400,wcMovement:-400,dna:1600,ccrPct:78,cashQuality:'Medium',isBank:false},
+  {id:'sun',name:'Sun Pharma',sector:'Pharma',ebitda:15800,capex:4800,taxPaid:2400,wcMovement:2200,dna:5200,ccrPct:65,cashQuality:'Medium',isBank:false},
+  {id:'drreddy',name:'Dr Reddy\'s',sector:'Pharma',ebitda:9200,capex:3600,taxPaid:1800,wcMovement:1800,dna:3800,ccrPct:62,cashQuality:'Medium',isBank:false},
+  {id:'cipla',name:'Cipla',sector:'Pharma',ebitda:6400,capex:2200,taxPaid:1400,wcMovement:1200,dna:2400,ccrPct:65,cashQuality:'Medium',isBank:false},
+  {id:'bel',name:'BEL',sector:'Defence PSU',ebitda:4200,capex:1200,taxPaid:900,wcMovement:2800,dna:1000,ccrPct:55,cashQuality:'Medium',isBank:false},
+  {id:'hal',name:'HAL',sector:'Defence PSU',ebitda:5800,capex:2200,taxPaid:1200,wcMovement:4800,dna:2400,ccrPct:42,cashQuality:'Low',isBank:false},
+  {id:'ltim',name:'LTIMindtree',sector:'IT Services',ebitda:7200,capex:800,taxPaid:1600,wcMovement:-1200,dna:1400,ccrPct:86,cashQuality:'High',isBank:false},
+  {id:'zomato',name:'Zomato',sector:'Consumer Tech',ebitda:2400,capex:1200,taxPaid:100,wcMovement:800,dna:2800,ccrPct:58,cashQuality:'Medium',isBank:false},
+  {id:'paytm',name:'Paytm',sector:'Fintech',ebitda:-1800,capex:1600,taxPaid:0,wcMovement:1200,dna:3200,ccrPct:0,cashQuality:'Low',isBank:false},
+  {id:'irfc',name:'IRFC',sector:'NBFC',ebitda:8400,capex:0,taxPaid:1800,wcMovement:0,dna:200,ccrPct:72,cashQuality:'Medium',isBank:false},
+  {id:'pidilite',name:'Pidilite',sector:'Specialty Chem',ebitda:3800,capex:900,taxPaid:900,wcMovement:400,dna:600,ccrPct:80,cashQuality:'High',isBank:false},
+  {id:'dmart',name:'D-Mart',sector:'Retail',ebitda:5200,capex:4800,taxPaid:1200,wcMovement:-3200,dna:2400,ccrPct:68,cashQuality:'Medium',isBank:false},
+  {id:'sbi',name:'SBI',sector:'Banking',ebitda:null,capex:null,taxPaid:null,wcMovement:null,dna:null,ccrPct:null,cashQuality:null,isBank:true},
+  {id:'hdfc',name:'HDFC Bank',sector:'Banking',ebitda:null,capex:null,taxPaid:null,wcMovement:null,dna:null,ccrPct:null,cashQuality:null,isBank:true},
+  {id:'icici',name:'ICICI Bank',sector:'Banking',ebitda:null,capex:null,taxPaid:null,wcMovement:null,dna:null,ccrPct:null,cashQuality:null,isBank:true},
+  {id:'axis',name:'Axis Bank',sector:'Banking',ebitda:null,capex:null,taxPaid:null,wcMovement:null,dna:null,ccrPct:null,cashQuality:null,isBank:true},
+  {id:'kotak',name:'Kotak Bank',sector:'Banking',ebitda:null,capex:null,taxPaid:null,wcMovement:null,dna:null,ccrPct:null,cashQuality:null,isBank:true}
+];
+
+var current=COMPANIES[0];
+
+function fmt(n){if(n===null||n===undefined)return'N/A';if(Math.abs(n)>=100000)return'₹'+(n/100000).toFixed(1)+'L Cr';if(Math.abs(n)>=1000)return'₹'+(n/1000).toFixed(0)+'K Cr';return'₹'+n+'Cr';}
+function fmtN(n){if(n===null||n===undefined)return'N/A';return n.toFixed(0)+'%';}
+
+function buildGrid(){
+  var g=document.getElementById('companyGrid');
+  g.innerHTML='';
+  COMPANIES.forEach(function(c){
+    var hint=c.isBank?'Banking — see Credit Analysis':c.cashQuality?'CCR: '+(c.ccrPct||0)+'%':'';
+    var el=document.createElement('div');
+    el.className='co-card'+(c.id===current.id?' selected':'');
+    el.innerHTML='<div class="co-name">'+c.name+'</div><div class="co-sector">'+c.sector+'</div>'+(hint?'<div class="co-hint">'+hint+'</div>':'');
+    el.onclick=function(){current=c;buildGrid();};
+    g.appendChild(el);
+  });
+}
+
+function buildContext(){
+  var c=current;
+  var html='';
+
+  if(c.isBank){
+    html+='<div class="bank-note">🏦 <strong>'+c.name+' is a bank.</strong> Cash flow verification for banks works differently — interest income, loan disbursements, and deposit flows replace EBITDA bridges. See the <a href="/valuation-toolkit/domains/credit-analysis/" style="color:var(--amber);text-decoration:underline;">Credit Analysis domain</a> for bank-specific tools.</div>';
+    html+='<div class="nav-btns"><button class="btn btn-outline" onclick="goStep(1)">← Pick Another Company</button></div>';
+    document.getElementById('contextContent').innerHTML=html;
+    return;
+  }
+
+  // Metric cards
+  var ccrSignalClass=c.ccrPct>=80?'signal-good':c.ccrPct>=60?'signal-warn':'signal-bad';
+  var ccrLabel=c.ccrPct>=80?'Strong conversion':c.ccrPct>=60?'Watch for leakage':'Significant leakage';
+  var capexIntensity=c.ebitda>0?Math.round(c.capex/c.ebitda*100):0;
+  var capexLabel=capexIntensity>50?'Capex-heavy':capexIntensity>25?'Moderate capex':'Low capex';
+
+  html+='<div class="context-section"><p class="section-label">'+c.name+' — Cash Flow Snapshot</p>';
+  html+='<div class="metric-row">';
+  html+='<div class="metric-box highlight"><div class="metric-label">EBITDA</div><div class="metric-val">'+fmt(c.ebitda)+'</div><div class="metric-sub">Reported</div></div>';
+  html+='<div class="metric-box"><div class="metric-label">Total Capex</div><div class="metric-val">'+fmt(c.capex)+'</div><div class="metric-sub">'+capexLabel+'</div></div>';
+  html+='<div class="metric-box"><div class="metric-label">Tax Paid</div><div class="metric-val">'+fmt(c.taxPaid)+'</div><div class="metric-sub">Cash basis</div></div>';
+  html+='<div class="metric-box"><div class="metric-label">CCR</div><div class="metric-val '+ccrSignalClass+'">'+fmtN(c.ccrPct)+'</div><div class="metric-sub">'+ccrLabel+'</div></div>';
+  html+='</div></div>';
+
+  // Quick bridge preview
+  var ebit=c.ebitda-c.dna;
+  var ocf=c.ebitda-c.taxPaid-(c.wcMovement||0);
+  var fcf=ocf-c.capex;
+  var ccrCalc=c.ebitda>0?Math.round(ocf/c.ebitda*100):0;
+
+  html+='<div class="context-section"><p class="section-label">EBITDA → Free Cash Flow Bridge</p>';
+  html+='<table class="cf-table"><thead><tr><th>Line Item</th><th>₹ Crore</th><th>Note</th></tr></thead><tbody>';
+  html+='<tr><td class="label"><strong>EBITDA (Reported)</strong></td><td><strong>'+fmt(c.ebitda)+'</strong></td><td>Starting point</td></tr>';
+  html+='<tr><td class="label">Less: Tax Paid (Cash)</td><td style="color:var(--red)">('+(fmt(c.taxPaid))+')</td><td>Actual cash outflow</td></tr>';
+  var wcDir=c.wcMovement>0?'WC consumed cash':'WC released cash';
+  var wcVal=c.wcMovement>0?'('+fmt(Math.abs(c.wcMovement))+')':'+'+fmt(Math.abs(c.wcMovement));
+  html+='<tr><td class="label">+/- Working Capital Movement</td><td style="color:'+(c.wcMovement>0?'var(--red)':'var(--green)')+'">'+wcVal+'</td><td>'+wcDir+'</td></tr>';
+  html+='<tr class="subtotal"><td class="label">Operating Cash Flow</td><td>'+fmt(ocf)+'</td><td>CCR: '+ccrCalc+'%</td></tr>';
+  html+='<tr><td class="label">Less: Total Capex</td><td style="color:var(--red)">('+fmt(c.capex)+')</td><td>'+capexLabel+'</td></tr>';
+  html+='<tr class="total"><td class="label">Free Cash Flow</td><td>'+fmt(fcf)+'</td><td>Available to acquirer</td></tr>';
+  html+='</tbody></table></div>';
+
+  // Concept cards
+  html+='<div class="context-section"><p class="section-label">Core Concepts</p><div class="concept-grid">';
+  html+='<div class="concept-card"><h3>📊 Cash Conversion Ratio</h3><p>CCR = Operating Cash Flow / EBITDA. Measures how much reported profit converts to real cash. Above 85% is excellent; below 60% raises serious questions about earnings quality and working capital management.</p></div>';
+  html+='<div class="concept-card"><h3>🔍 EBITDA-to-FCF Bridge</h3><p>Tax, working capital swings, and capex are the three main "leaks" between EBITDA and what the acquirer can actually use. FDD must verify each line and test whether the reported figures reflect sustainable run-rates.</p></div>';
+  html+='<div class="concept-card"><h3>🏗 Maintenance vs Growth Capex</h3><p>Total capex overstates the "unavoidable" spend if the business is investing for growth. FDD teams split capex into maintenance (must-do) and growth (discretionary) — only maintenance capex reduces normalised FCF.</p></div>';
+  html+='<div class="concept-card"><h3>⚠️ Leakage Analysis</h3><p>Leakage = the difference between normalised EBITDA and FCF available to the acquirer. Each leakage point — accelerated capex, deferred tax crystallisation, WC build — becomes a price chip or an EV adjustment in negotiations.</p></div>';
+  html+='</div></div>';
+
+  // Q&A
+  html+='<div class="context-section"><p class="section-label">Key Questions FDD Asks</p><div class="qa-list">';
+  var qas=[
+    ['What is the Cash Conversion Ratio and why does it matter?',
+     'CCR measures what fraction of EBITDA actually becomes operating cash. A CCR of 95% means the business generates ₹0.95 in cash for every ₹1 of EBITDA — very healthy. A CCR of 40% means 60% of EBITDA is absorbed by tax, working capital swings, or accounting effects before a rupee of cash leaves the business. FDD teams benchmark CCR against the sector — IT services typically run 80-90%; capital-intensive industrials often run 30-50%.'],
+    ['Why do tax timings cause CCR distortions?',
+     'P&L tax expense (book tax) and actual cash tax paid can diverge significantly. Accelerated depreciation creates deferred tax liabilities that make reported tax expense higher than cash paid — temporarily boosting CCR. When deferred taxes unwind, the cash tax surges above book tax, crushing FCF in future years. FDD models the timing: if a deferred tax liability is about to crystallise post-acquisition, the acquirer inherits the cash outflow.'],
+    ['How does working capital movement affect free cash flow?',
+     'If a business grows revenues 20% but collects slower (rising receivables), working capital absorbs cash — EBITDA looks great but cash is trapped in the balance sheet. Conversely, a supplier stretched (rising payables) releases cash temporarily that will eventually unwind. FDD analyses the WC movement over 3 years and normalises for one-time items to estimate the sustainable WC absorb or release the acquirer should expect.'],
+    ['What is maintenance vs growth capex and why split them?',
+     'Maintenance capex keeps existing capacity operational — replacing worn machinery, upgrading legacy systems. Growth capex builds new capacity — a new factory, a new data centre. In a PE deal, the acquirer might plan to reduce growth capex post-acquisition, so only maintenance capex is "unavoidable." Splitting them is critical: a business with ₹100Cr total capex where ₹80Cr is growth might be bought assuming a much higher normalised FCF than a business where all ₹100Cr is maintenance.'],
+    ['How does the FCF bridge impact deal pricing?',
+     'The deal multiple is typically quoted on EBITDA (e.g., 10× EBITDA), but buyers ultimately care about FCF yield. If CCR is 60%, then 10× EBITDA is really 10× / 60% = ~17× FCF — implying a 6% FCF yield. If peers trade at 8% FCF yield, the deal is overpriced even at a "cheap-looking" 10× EBITDA. FDD bridges this gap, giving PE and strategic buyers a cleaner basis for pricing.']
+  ];
+  qas.forEach(function(q,i){
+    html+='<div class="qa-item"><div class="qa-q" onclick="toggleQA(this)"><span>'+q[0]+'</span><span>+</span></div><div class="qa-a">'+q[1]+'</div></div>';
+  });
+  html+='</div></div>';
+
+  var ccrInsight=c.ccrPct>=80?'strong cash conversion — EBITDA closely tracks real cash generation, reducing deal risk':
+                 c.ccrPct>=60?'moderate conversion — verify WC trends and whether capex is normalised':
+                 c.ccrPct>0?'low conversion — expect a price chip or EV adjustment in deal negotiations':'negative EBITDA base — cash flow verification is critical before pricing';
+  html+='<div class="insight-box">💡 <strong>FDD Takeaway:</strong> '+c.name+'\'s CCR of '+(c.ccrPct||'N/A')+'% signals '+ccrInsight+'. The EBITDA-to-FCF bridge strips out timing differences and reveals the cash actually available to service acquisition debt.</div>';
+
+  html+='<div class="nav-btns"><button class="btn btn-outline" onclick="goStep(1)">← Back</button><button class="btn btn-primary" onclick="goStep(3)">Cash Flow Model →</button></div>';
+  document.getElementById('contextContent').innerHTML=html;
+}
+
+function toggleQA(el){
+  var a=el.nextElementSibling;
+  var isOpen=a.classList.contains('open');
+  document.querySelectorAll('.qa-a').forEach(function(x){x.classList.remove('open');});
+  document.querySelectorAll('.qa-q span:last-child').forEach(function(x){x.textContent='+';});
+  if(!isOpen){a.classList.add('open');el.querySelector('span:last-child').textContent='−';}
+}
+
+function goStep(n){
+  for(var i=1;i<=4;i++){
+    document.getElementById('panel'+i).classList.toggle('active',i===n);
+    var s=document.getElementById('s'+i);
+    s.className='step-item'+(i===n?' active':i<n?' done':'');
+  }
+  if(n===2) buildContext();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function unlockPro(){
+  alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');
+}
+
+buildGrid();
+</script>
+</body>
+</html>

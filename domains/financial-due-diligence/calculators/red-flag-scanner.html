@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Red Flag Scanner — Financial Due Diligence · ValuationDesk</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
+  --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--teal:#0d9488;
+  --violet:#7c3aed;
+  --accent:#dc2626;--accent-bg:#fef2f2;--accent-border:#fecaca;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);z-index:100}
+.nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-.5px}
+.nav-logo span{color:var(--blue)}
+.nav-links{display:flex;gap:1.5rem;align-items:center;font-size:.875rem;font-weight:500;color:var(--muted)}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--accent);color:#fff;padding:.45rem 1rem;border-radius:6px;font-size:.8rem;font-weight:600}
+.nav-cta:hover{opacity:.85}
+
+.hero{max-width:760px;margin:0 auto;padding:2.5rem 2rem 1.5rem;width:100%}
+.breadcrumb{font-size:.78rem;color:var(--muted);margin-bottom:1rem;display:flex;gap:.4rem;align-items:center;flex-wrap:wrap}
+.breadcrumb a:hover{color:var(--text)}
+.calc-badge{display:inline-flex;align-items:center;gap:.4rem;background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);border-radius:999px;padding:.25rem .75rem;font-size:.75rem;font-weight:700;letter-spacing:.03em;margin-bottom:.75rem}
+h1{font-size:clamp(1.5rem,4vw,2rem);font-weight:900;letter-spacing:-.04em;margin-bottom:.4rem}
+.hero-sub{color:var(--muted);font-size:.9rem;max-width:520px}
+
+.steps-bar{max-width:760px;margin:0 auto;padding:0 2rem 1.5rem;width:100%}
+.steps{display:flex;gap:0;align-items:stretch}
+.step-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:.3rem;cursor:pointer;padding:.5rem .25rem;border-radius:8px;transition:background .15s}
+.step-item:hover{background:var(--card)}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;color:var(--muted);background:var(--bg);transition:all .2s;flex-shrink:0}
+.step-label{font-size:.68rem;font-weight:600;color:var(--muted);text-align:center;line-height:1.3}
+.step-connector{flex:1;height:2px;background:var(--border);align-self:center;margin-top:-1rem}
+.step-item.active .step-dot{background:var(--accent);border-color:var(--accent);color:#fff}
+.step-item.active .step-label{color:var(--accent)}
+.step-item.done .step-dot{background:var(--green);border-color:var(--green);color:#fff}
+.step-item.done .step-label{color:var(--green)}
+
+.panel{max-width:760px;margin:0 auto;padding:0 2rem 3rem;width:100%;display:none}
+.panel.active{display:block}
+
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.6rem;margin-bottom:1.5rem}
+.co-card{border:1.5px solid var(--border);border-radius:10px;padding:.75rem 1rem;cursor:pointer;transition:all .15s}
+.co-card:hover{border-color:var(--accent);background:var(--accent-bg)}
+.co-card.selected{border-color:var(--accent);background:var(--accent-bg)}
+.co-name{font-weight:700;font-size:.88rem}
+.co-sector{font-size:.72rem;color:var(--muted);margin-top:.1rem}
+.co-hint{font-size:.7rem;color:var(--accent);margin-top:.25rem;font-weight:600}
+
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.65rem 1.4rem;border-radius:8px;font-size:.88rem;font-weight:700;cursor:pointer;border:none;transition:all .15s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{opacity:.87}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--muted)}
+.btn-outline:hover{border-color:var(--text);color:var(--text)}
+.nav-btns{display:flex;gap:.75rem;margin-top:1.75rem;flex-wrap:wrap}
+
+.context-section{margin-bottom:2rem}
+.section-label{font-size:.72rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:.85rem}
+
+.concept-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem}
+.concept-card{border:1px solid var(--border);border-radius:10px;padding:1.1rem;background:var(--bg)}
+.concept-card h3{font-size:.88rem;font-weight:700;margin-bottom:.35rem;display:flex;align-items:center;gap:.4rem}
+.concept-card p{font-size:.8rem;color:var(--muted);line-height:1.55}
+
+.qa-list{display:flex;flex-direction:column;gap:.75rem}
+.qa-item{border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.qa-q{padding:.8rem 1rem;font-size:.85rem;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:var(--card)}
+.qa-q:hover{background:#f3f4f6}
+.qa-a{padding:.85rem 1rem;font-size:.82rem;color:var(--muted);line-height:1.6;border-top:1px solid var(--border);display:none}
+.qa-a.open{display:block}
+
+.flag-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:.75rem;margin-bottom:1.5rem}
+.flag-card{border:1px solid var(--border);border-radius:10px;padding:1rem;background:var(--bg);transition:border-color .15s}
+.flag-card.red-flag{border-color:var(--red);background:#fef2f2}
+.flag-card.amber-flag{border-color:var(--amber);background:#fffbeb}
+.flag-card.green-flag{border-color:var(--green);background:#f0fdf4}
+.flag-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem}
+.flag-dim{font-size:.78rem;font-weight:700}
+.flag-badge{font-size:.68rem;font-weight:700;padding:.15rem .5rem;border-radius:999px}
+.flag-badge.red{background:#fecaca;color:var(--red)}
+.flag-badge.amber{background:#fde68a;color:#92400e}
+.flag-badge.green{background:#bbf7d0;color:#14532d}
+.flag-desc{font-size:.75rem;color:var(--muted);line-height:1.5}
+
+.pro-gate{border:2px dashed var(--border);border-radius:14px;padding:2.5rem 2rem;text-align:center;background:var(--card)}
+.pro-gate-icon{font-size:2.5rem;margin-bottom:.75rem}
+.pro-gate h2{font-size:1.2rem;font-weight:800;margin-bottom:.4rem}
+.pro-gate p{color:var(--muted);font-size:.88rem;margin-bottom:1.25rem;max-width:400px;margin-left:auto;margin-right:auto}
+.pro-features{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-bottom:1.5rem}
+.pro-feat-pill{background:#fff;border:1px solid var(--border);border-radius:999px;padding:.3rem .8rem;font-size:.75rem;font-weight:600;color:var(--muted)}
+.btn-unlock{background:var(--accent);color:#fff;padding:.75rem 1.75rem;border-radius:8px;font-size:.9rem;font-weight:700;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem}
+.btn-unlock:hover{opacity:.87}
+
+.bank-note{background:#fff8ed;border:1px solid #fde68a;border-radius:10px;padding:1rem 1.25rem;font-size:.85rem;color:#92400e;margin-bottom:1.5rem}
+
+.insight-box{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:10px;padding:1rem 1.25rem;font-size:.85rem;color:#7f1d1d;margin-top:1.25rem;line-height:1.6}
+.insight-box strong{font-weight:700}
+
+.signal-bad{color:var(--red);font-weight:700}
+.signal-warn{color:var(--amber);font-weight:700}
+.signal-good{color:var(--green);font-weight:700}
+
+footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-size:.8rem;color:var(--muted);margin-top:auto}
+.footer-nav{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:.75rem}
+.footer-nav a:hover{color:var(--text)}
+.calc-nav{display:flex;gap:1rem;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap}
+.calc-nav a{font-size:.82rem;font-weight:600;color:var(--muted);padding:.4rem .75rem;border:1px solid var(--border);border-radius:6px;display:flex;align-items:center;gap:.3rem}
+.calc-nav a:hover{border-color:var(--text);color:var(--text)}
+
+@media(max-width:640px){
+  nav{padding:1rem}
+  .nav-links{display:none}
+  .hero{padding:1.75rem 1rem 1rem}
+  .steps-bar{padding:0 1rem 1.25rem}
+  .step-label{display:none}
+  .panel{padding:0 1rem 2.5rem}
+  .concept-grid{grid-template-columns:1fr}
+  .flag-grid{grid-template-columns:1fr 1fr}
+  .company-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/valuation-toolkit/" class="nav-logo">Valuation<span>Desk</span></a>
+  <div class="nav-links">
+    <a href="/valuation-toolkit/domains/financial-due-diligence/">FDD Overview</a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/">All Calculators</a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/learn/">Learn</a>
+  </div>
+  <button class="nav-cta" onclick="unlockPro()">Unlock Pro — ₹799/mo</button>
+</nav>
+
+<div class="hero">
+  <div class="breadcrumb">
+    <a href="/valuation-toolkit/">Home</a><span>/</span>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/">Financial Due Diligence</a><span>/</span>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/">Calculators</a><span>/</span>
+    <span>Red Flag Scanner</span>
+  </div>
+  <div class="calc-badge">🚩 Calculator 05 · Financial Due Diligence</div>
+  <h1>Red Flag Scanner</h1>
+  <p class="hero-sub">Systematically scan a target across six risk dimensions — audit quality, related-party transactions, working capital health, capex vs D&A, revenue recognition, and governance — to surface deal-breakers early.</p>
+</div>
+
+<div class="steps-bar">
+  <div class="steps">
+    <div class="step-item active" id="s1" onclick="goStep(1)">
+      <div class="step-dot">1</div>
+      <div class="step-label">Pick Company</div>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step-item" id="s2" onclick="goStep(2)">
+      <div class="step-dot">2</div>
+      <div class="step-label">Understand</div>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step-item" id="s3" onclick="goStep(3)">
+      <div class="step-dot">3</div>
+      <div class="step-label">Flag Scanner 🔒</div>
+    </div>
+    <div class="step-connector"></div>
+    <div class="step-item" id="s4" onclick="goStep(4)">
+      <div class="step-dot">4</div>
+      <div class="step-label">Risk Summary 🔒</div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 1 -->
+<div class="panel active" id="panel1">
+  <p class="section-label">Select a Company</p>
+  <div class="company-grid" id="companyGrid"></div>
+  <div class="nav-btns">
+    <button class="btn btn-primary" onclick="goStep(2)">Understand FDD Red Flags →</button>
+  </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="panel" id="panel2">
+  <div id="contextContent"></div>
+</div>
+
+<!-- STEP 3 -->
+<div class="panel" id="panel3">
+  <div class="pro-gate">
+    <div class="pro-gate-icon">🔒</div>
+    <h2>Red Flag Scanner — Full Model</h2>
+    <p>The 6-dimension scanner scores each risk area 0–100 and aggregates into a composite deal risk rating. Unlock Pro to run it.</p>
+    <div class="pro-features">
+      <span class="pro-feat-pill">Audit Quality Score (AQS)</span>
+      <span class="pro-feat-pill">RPT Materiality Scoring</span>
+      <span class="pro-feat-pill">WC Health Index</span>
+      <span class="pro-feat-pill">Capex / D&A Ratio Analysis</span>
+      <span class="pro-feat-pill">Revenue Recognition Risk Score</span>
+      <span class="pro-feat-pill">Governance Composite Score</span>
+    </div>
+    <button class="btn-unlock" onclick="unlockPro()">🔓 Unlock Pro — ₹799/mo →</button>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-outline" onclick="goStep(2)">← Back</button>
+    <button class="btn btn-primary" onclick="goStep(4)">Risk Summary →</button>
+  </div>
+</div>
+
+<!-- STEP 4 -->
+<div class="panel" id="panel4">
+  <div class="pro-gate">
+    <div class="pro-gate-icon">🔒</div>
+    <h2>Composite Risk Summary & Deal Recommendation</h2>
+    <p>The final output — a composite risk score, deal recommendation (proceed / renegotiate / walk), and suggested FDD language for the SPA.</p>
+    <div class="pro-features">
+      <span class="pro-feat-pill">Composite Risk Score (0–100)</span>
+      <span class="pro-feat-pill">Deal Recommendation</span>
+      <span class="pro-feat-pill">Risk-to-Deal-Structure Mapping</span>
+      <span class="pro-feat-pill">Price Chip / Escrow Recommendations</span>
+      <span class="pro-feat-pill">SPA Rep & Warranty Language</span>
+      <span class="pro-feat-pill">Priority FDD Work-Plan Items</span>
+    </div>
+    <button class="btn-unlock" onclick="unlockPro()">🔓 Unlock Pro — ₹799/mo →</button>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-outline" onclick="goStep(3)">← Back</button>
+  </div>
+</div>
+
+<div class="calc-nav" style="max-width:760px;margin:0 auto;padding:0 2rem 1rem">
+  <a href="cash-flow-verification.html">← Cash Flow Verification</a>
+  <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/">All FDD Calculators</a>
+</div>
+
+<footer>
+  <div class="footer-nav">
+    <a href="/valuation-toolkit/">Home</a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/">FDD Overview</a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/calculators/">Calculators</a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/learn/">Learn</a>
+  </div>
+  <div>© 2025 ValuationDesk · Built for finance learners</div>
+</footer>
+
+<script>
+var COMPANIES=[
+  {id:'tcs',name:'TCS',sector:'IT Services',auditRisk:'Low',rptRisk:'Low',wcRisk:'Low',capexRisk:'Low',revenueRecogRisk:'Low',governanceRisk:'Low',isBank:false},
+  {id:'infy',name:'Infosys',sector:'IT Services',auditRisk:'Low',rptRisk:'Low',wcRisk:'Low',capexRisk:'Low',revenueRecogRisk:'Medium',governanceRisk:'Low',isBank:false},
+  {id:'wipro',name:'Wipro',sector:'IT Services',auditRisk:'Low',rptRisk:'Low',wcRisk:'Low',capexRisk:'Low',revenueRecogRisk:'Low',governanceRisk:'Medium',isBank:false},
+  {id:'hcl',name:'HCL Tech',sector:'IT Services',auditRisk:'Low',rptRisk:'Medium',wcRisk:'Low',capexRisk:'Low',revenueRecogRisk:'Low',governanceRisk:'Low',isBank:false},
+  {id:'reliance',name:'Reliance',sector:'Conglomerate',auditRisk:'Low',rptRisk:'High',wcRisk:'Medium',capexRisk:'High',revenueRecogRisk:'Medium',governanceRisk:'Medium',isBank:false},
+  {id:'hul',name:'HUL',sector:'FMCG',auditRisk:'Low',rptRisk:'Medium',wcRisk:'Low',capexRisk:'Low',revenueRecogRisk:'Low',governanceRisk:'Low',isBank:false},
+  {id:'itc',name:'ITC',sector:'FMCG',auditRisk:'Low',rptRisk:'Low',wcRisk:'Low',capexRisk:'Low',revenueRecogRisk:'Low',governanceRisk:'Medium',isBank:false},
+  {id:'nestle',name:'Nestlé India',sector:'FMCG',auditRisk:'Low',rptRisk:'High',wcRisk:'Low',capexRisk:'Low',revenueRecogRisk:'Low',governanceRisk:'Medium',isBank:false},
+  {id:'titan',name:'Titan',sector:'Consumer',auditRisk:'Low',rptRisk:'Low',wcRisk:'Medium',capexRisk:'Low',revenueRecogRisk:'Medium',governanceRisk:'Low',isBank:false},
+  {id:'asian',name:'Asian Paints',sector:'Paints',auditRisk:'Low',rptRisk:'Low',wcRisk:'Medium',capexRisk:'Medium',revenueRecogRisk:'Low',governanceRisk:'Low',isBank:false},
+  {id:'maruti',name:'Maruti Suzuki',sector:'Auto',auditRisk:'Low',rptRisk:'High',wcRisk:'Medium',capexRisk:'Medium',revenueRecogRisk:'Low',governanceRisk:'Low',isBank:false},
+  {id:'tatamotor',name:'Tata Motors',sector:'Auto',auditRisk:'Low',rptRisk:'High',wcRisk:'High',capexRisk:'High',revenueRecogRisk:'Medium',governanceRisk:'Medium',isBank:false},
+  {id:'bajaj',name:'Bajaj Auto',sector:'Auto',auditRisk:'Low',rptRisk:'Low',wcRisk:'Low',capexRisk:'Low',revenueRecogRisk:'Low',governanceRisk:'Low',isBank:false},
+  {id:'hero',name:'Hero MotoCorp',sector:'Auto',auditRisk:'Low',rptRisk:'Medium',wcRisk:'Low',capexRisk:'Low',revenueRecogRisk:'Low',governanceRisk:'Low',isBank:false},
+  {id:'sun',name:'Sun Pharma',sector:'Pharma',auditRisk:'Medium',rptRisk:'High',wcRisk:'Medium',capexRisk:'Medium',revenueRecogRisk:'High',governanceRisk:'High',isBank:false},
+  {id:'drreddy',name:'Dr Reddy\'s',sector:'Pharma',auditRisk:'Low',rptRisk:'Low',wcRisk:'Medium',capexRisk:'Medium',revenueRecogRisk:'Medium',governanceRisk:'Low',isBank:false},
+  {id:'cipla',name:'Cipla',sector:'Pharma',auditRisk:'Low',rptRisk:'Low',wcRisk:'Medium',capexRisk:'Medium',revenueRecogRisk:'Medium',governanceRisk:'Medium',isBank:false},
+  {id:'bel',name:'BEL',sector:'Defence PSU',auditRisk:'Low',rptRisk:'Low',wcRisk:'High',capexRisk:'Low',revenueRecogRisk:'High',governanceRisk:'Medium',isBank:false},
+  {id:'hal',name:'HAL',sector:'Defence PSU',auditRisk:'Low',rptRisk:'Low',wcRisk:'High',capexRisk:'Medium',revenueRecogRisk:'High',governanceRisk:'Medium',isBank:false},
+  {id:'ltim',name:'LTIMindtree',sector:'IT Services',auditRisk:'Low',rptRisk:'Low',wcRisk:'Low',capexRisk:'Low',revenueRecogRisk:'Medium',governanceRisk:'Low',isBank:false},
+  {id:'zomato',name:'Zomato',sector:'Consumer Tech',auditRisk:'Low',rptRisk:'Medium',wcRisk:'Medium',capexRisk:'Medium',revenueRecogRisk:'High',governanceRisk:'Medium',isBank:false},
+  {id:'paytm',name:'Paytm',sector:'Fintech',auditRisk:'Medium',rptRisk:'High',wcRisk:'High',capexRisk:'Medium',revenueRecogRisk:'High',governanceRisk:'High',isBank:false},
+  {id:'irfc',name:'IRFC',sector:'NBFC',auditRisk:'Low',rptRisk:'Medium',wcRisk:'Low',capexRisk:'Low',revenueRecogRisk:'Low',governanceRisk:'Low',isBank:false},
+  {id:'pidilite',name:'Pidilite',sector:'Specialty Chem',auditRisk:'Low',rptRisk:'Low',wcRisk:'Low',capexRisk:'Low',revenueRecogRisk:'Low',governanceRisk:'Low',isBank:false},
+  {id:'dmart',name:'D-Mart',sector:'Retail',auditRisk:'Low',rptRisk:'Low',wcRisk:'Low',capexRisk:'Medium',revenueRecogRisk:'Low',governanceRisk:'Low',isBank:false},
+  {id:'sbi',name:'SBI',sector:'Banking',auditRisk:null,rptRisk:null,wcRisk:null,capexRisk:null,revenueRecogRisk:null,governanceRisk:null,isBank:true},
+  {id:'hdfc',name:'HDFC Bank',sector:'Banking',auditRisk:null,rptRisk:null,wcRisk:null,capexRisk:null,revenueRecogRisk:null,governanceRisk:null,isBank:true},
+  {id:'icici',name:'ICICI Bank',sector:'Banking',auditRisk:null,rptRisk:null,wcRisk:null,capexRisk:null,revenueRecogRisk:null,governanceRisk:null,isBank:true},
+  {id:'axis',name:'Axis Bank',sector:'Banking',auditRisk:null,rptRisk:null,wcRisk:null,capexRisk:null,revenueRecogRisk:null,governanceRisk:null,isBank:true},
+  {id:'kotak',name:'Kotak Bank',sector:'Banking',auditRisk:null,rptRisk:null,wcRisk:null,capexRisk:null,revenueRecogRisk:null,governanceRisk:null,isBank:true}
+];
+
+var current=COMPANIES[0];
+
+function riskScore(r){return r==='Low'?0:r==='Medium'?1:r==='High'?2:0;}
+function riskClass(r){return r==='Low'?'green-flag':r==='Medium'?'amber-flag':'red-flag';}
+function riskBadgeClass(r){return r==='Low'?'green':r==='Medium'?'amber':'red';}
+function riskLabel(r){return r==='Low'?'Low Risk':r==='Medium'?'Watch':r==='High'?'Red Flag':'N/A';}
+
+function buildGrid(){
+  var g=document.getElementById('companyGrid');
+  g.innerHTML='';
+  COMPANIES.forEach(function(c){
+    var score=c.isBank?null:riskScore(c.auditRisk)+riskScore(c.rptRisk)+riskScore(c.wcRisk)+riskScore(c.capexRisk)+riskScore(c.revenueRecogRisk)+riskScore(c.governanceRisk);
+    var hint=c.isBank?'Banking — see Credit Analysis':score===0?'Clean profile':score<=3?'Some flags — review':score<=6?'Multiple flags':'High risk profile';
+    var el=document.createElement('div');
+    el.className='co-card'+(c.id===current.id?' selected':'');
+    el.innerHTML='<div class="co-name">'+c.name+'</div><div class="co-sector">'+c.sector+'</div><div class="co-hint">'+hint+'</div>';
+    el.onclick=function(){current=c;buildGrid();};
+    g.appendChild(el);
+  });
+}
+
+function buildContext(){
+  var c=current;
+  var html='';
+
+  if(c.isBank){
+    html+='<div class="bank-note">🏦 <strong>'+c.name+' is a bank.</strong> Red flag scanning for banks uses NPA ratios, capital adequacy, provisions coverage, and regulatory compliance — not the standard FDD dimensions. See the <a href="/valuation-toolkit/domains/credit-analysis/" style="color:var(--amber);text-decoration:underline;">Credit Analysis domain</a> for bank-specific risk tools.</div>';
+    html+='<div class="nav-btns"><button class="btn btn-outline" onclick="goStep(1)">← Pick Another Company</button></div>';
+    document.getElementById('contextContent').innerHTML=html;
+    return;
+  }
+
+  // Flag cards - 6 dimensions
+  var dims=[
+    {key:'auditRisk',icon:'📋',label:'Audit Quality',risk:c.auditRisk,
+     low:'Big 4 auditor, clean opinions, no key audit matters — baseline clean.',
+     medium:'Mid-tier auditor or recent qualifier / key audit matter noted — warrants review.',
+     high:'Auditor resignation, emphasis of matter, or qualified opinion — deal risk signal.'},
+    {key:'rptRisk',icon:'🤝',label:'Related-Party Transactions',risk:c.rptRisk,
+     low:'RPTs below 5% of revenue, arm\'s-length pricing, fully disclosed.',
+     medium:'RPTs 5-15% of revenue or pricing slightly off-market — needs investigation.',
+     high:'Material RPTs, possible profit shifting, or undisclosed family transactions.'},
+    {key:'wcRisk',icon:'⚙️',label:'Working Capital Health',risk:c.wcRisk,
+     low:'DSO, DPO and DII stable over 3 years — no deterioration signals.',
+     medium:'One metric deteriorating — rising DSO or inventory build. Monitor trend.',
+     high:'Multiple metrics deteriorating or sudden WC spike in pre-deal year — price-chip territory.'},
+    {key:'capexRisk',icon:'🏗',label:'Capex vs D&A',risk:c.capexRisk,
+     low:'Capex/D&A ratio 0.8–1.2× — maintenance-level spend, assets not depleting.',
+     medium:'Capex < 0.6× D&A — assets underinvested; buyer may face catch-up spend post-close.',
+     high:'Capex > 2× D&A for multiple years — question whether growth or necessity is driving.'},
+    {key:'revenueRecogRisk',icon:'📈',label:'Revenue Recognition',risk:c.revenueRecogRisk,
+     low:'Standard recognition, stable policy, no material cut-off complexity.',
+     medium:'Long-term contracts or milestone billing — cut-off risk present.',
+     high:'Bill-and-hold, channel stuffing risk, or recent policy change — material earnings risk.'},
+    {key:'governanceRisk',icon:'🏛',label:'Governance',risk:c.governanceRisk,
+     low:'Professional board, independent directors, transparent disclosures, no litigation.',
+     medium:'Promoter-dominated board or pending litigation — review disclosures carefully.',
+     high:'Regulatory action, promoter pledge, SEBI proceedings, or governance lapses noted.'}
+  ];
+
+  html+='<div class="context-section"><p class="section-label">'+c.name+' — 6-Dimension Risk Scan</p><div class="flag-grid">';
+  dims.forEach(function(d){
+    var note=d.risk==='Low'?d.low:d.risk==='Medium'?d.medium:d.high;
+    html+='<div class="flag-card '+riskClass(d.risk)+'"><div class="flag-header"><span class="flag-dim">'+d.icon+' '+d.label+'</span><span class="flag-badge '+riskBadgeClass(d.risk)+'">'+riskLabel(d.risk)+'</span></div><div class="flag-desc">'+note+'</div></div>';
+  });
+  html+='</div></div>';
+
+  // Concept cards
+  html+='<div class="context-section"><p class="section-label">What Each Dimension Catches</p><div class="concept-grid">';
+  html+='<div class="concept-card"><h3>📋 Audit Quality</h3><p>Auditor independence, opinion type, and key audit matters signal the reliability of reported numbers. A mid-tier auditor or qualified opinion demands further scrutiny — it does not automatically mean fraud, but it raises the bar for verification work.</p></div>';
+  html+='<div class="concept-card"><h3>🤝 Related-Party Transactions</h3><p>Promoter families often route non-arm\'s-length transactions through the target — renting premises above market, paying management fees to holding companies, or lending at below-market rates. These must be stripped from normalised EBITDA.</p></div>';
+  html+='<div class="concept-card"><h3>⚙️ Working Capital Health</h3><p>A sudden deterioration in DSO or inventory build in the year before a deal is one of the most reliable pre-deal manipulation signals — the seller may be accelerating revenue recognition or deferring supplier payments to inflate year-end cash.</p></div>';
+  html+='<div class="concept-card"><h3>🏗 Capex vs D&A</h3><p>When capex consistently runs below depreciation, assets are slowly ageing without reinvestment. The acquirer faces a catch-up spend post-close that should reduce deal EV. Conversely, a pre-deal capex surge can inflate assets and reported EBITDA while hiding cash burn.</p></div>';
+  html+='</div></div>';
+
+  // Q&A
+  html+='<div class="context-section"><p class="section-label">FDD Red Flag Framework</p><div class="qa-list">';
+  var qas=[
+    ['What makes a red flag a deal-breaker vs a price chip?',
+     'The test is whether the risk is quantifiable and bounded. A ₹20Cr RPT that artificially inflates EBITDA by ₹5Cr is a price chip — adjustable through a normalisation. A governance flag (SEBI investigation, pending shareholder litigation) is potentially deal-breaking because it creates open-ended liability that cannot be escrowed away cleanly. FDD teams triage flags into: adjust-for (quantifiable), escrow-for (estimable range), or walk-away (unquantifiable exposure).'],
+    ['Why is the pre-deal year the highest-risk period for financial manipulation?',
+     'Sellers preparing a business for sale have strong incentives to maximise reported earnings and cash in the year before the deal. Common tactics: stretching receivables to inflate revenue, reversing provisions, deferring capital maintenance, or releasing bad debt reserves. FDD always analyses at least 3 years of financials, specifically looking for anomalies in the most recent year vs the trend.'],
+    ['How does a qualified audit opinion affect deal pricing?',
+     'A qualified opinion signals that auditors could not obtain sufficient evidence on a material item — which directly contradicts the seller\'s representations about financial accuracy. Buyers typically demand a significant escrow (often 10–15% of deal value) and require the seller to resolve the qualification before closing, or price in the risk explicitly. An audit resignation is even more serious — it is treated as a potential deal-breaker until the reason is fully explained.'],
+    ['What is the capex/D&A ratio and what does it signal?',
+     'Capex/D&A below 0.6× for three consecutive years means assets are being consumed faster than they are replaced — the business is implicitly "selling" its asset base. Post-acquisition, the buyer will face a surge in capex to catch up. This catch-up capex should be deducted from EV (or required as a purchase price adjustment). Conversely, a ratio above 2× may indicate aggressive growth investment — fine if the returns are visible, but a risk if growth projections are missed.'],
+    ['How does FDD red flag output translate into deal structure?',
+     'Each identified flag maps to a deal lever: a P&L flag (RPT, policy change) → EBITDA adjustment. A cash risk flag (WC deterioration) → locked-box period or WC peg. A contingent risk (litigation, regulatory) → escrow or deferred consideration. A governance flag → warranty & indemnity insurance requirement or walk-away. The Red Flag Scanner\'s deal recommendation output maps each flag category to the appropriate structural protection.']
+  ];
+  qas.forEach(function(q){
+    html+='<div class="qa-item"><div class="qa-q" onclick="toggleQA(this)"><span>'+q[0]+'</span><span>+</span></div><div class="qa-a">'+q[1]+'</div></div>';
+  });
+  html+='</div></div>';
+
+  var totalFlags=dims.filter(function(d){return d.risk==='High';}).length;
+  var watchFlags=dims.filter(function(d){return d.risk==='Medium';}).length;
+  var riskSummary=totalFlags>=3?'high-risk profile — deal restructuring or walk-away analysis required':totalFlags>=1?'moderate-to-high risk — price chip or escrow warranted for red flag areas':watchFlags>=3?'some watch items — targeted deep-dive recommended':'broadly clean — standard FDD procedures apply';
+  html+='<div class="insight-box">🚩 <strong>FDD Takeaway:</strong> '+c.name+' shows '+totalFlags+' Red Flag(s) and '+watchFlags+' Watch item(s) across the 6 dimensions — a '+riskSummary+'. The Pro scanner quantifies each flag into a composite risk score and maps it to a deal recommendation.</div>';
+
+  html+='<div class="nav-btns"><button class="btn btn-outline" onclick="goStep(1)">← Back</button><button class="btn btn-primary" onclick="goStep(3)">Flag Scanner →</button></div>';
+  document.getElementById('contextContent').innerHTML=html;
+}
+
+function toggleQA(el){
+  var a=el.nextElementSibling;
+  var isOpen=a.classList.contains('open');
+  document.querySelectorAll('.qa-a').forEach(function(x){x.classList.remove('open');});
+  document.querySelectorAll('.qa-q span:last-child').forEach(function(x){x.textContent='+';});
+  if(!isOpen){a.classList.add('open');el.querySelector('span:last-child').textContent='−';}
+}
+
+function goStep(n){
+  for(var i=1;i<=4;i++){
+    document.getElementById('panel'+i).classList.toggle('active',i===n);
+    var s=document.getElementById('s'+i);
+    s.className='step-item'+(i===n?' active':i<n?' done':'');
+  }
+  if(n===2) buildContext();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function unlockPro(){
+  alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');
+}
+
+buildGrid();
+</script>
+</body>
+</html>

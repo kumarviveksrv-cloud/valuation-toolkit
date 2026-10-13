@@ -1,8 +1,8 @@
-// ValuationDesk Service Worker v9.0
+// ValuationDesk Service Worker v10.0
 // Configured for GitHub Pages subfolder: /valuation-toolkit/
 
 const BASE = '/valuation-toolkit';
-const CACHE_NAME = 'valuationdesk-v9';
+const CACHE_NAME = 'valuationdesk-v10';
 
 const STATIC_ASSETS = [
   BASE + '/',
@@ -98,6 +98,14 @@ const STATIC_ASSETS = [
   BASE + '/domains/transaction-advisory/calculators/quality-of-earnings.html',
   BASE + '/domains/transaction-advisory/calculators/deal-checklist.html',
   BASE + '/domains/transaction-advisory/learn/index.html',
+  BASE + '/domains/financial-due-diligence/index.html',
+  BASE + '/domains/financial-due-diligence/calculators/index.html',
+  BASE + '/domains/financial-due-diligence/calculators/pl-restatement.html',
+  BASE + '/domains/financial-due-diligence/calculators/revenue-quality.html',
+  BASE + '/domains/financial-due-diligence/calculators/working-capital-deepdive.html',
+  BASE + '/domains/financial-due-diligence/calculators/cash-flow-verification.html',
+  BASE + '/domains/financial-due-diligence/calculators/red-flag-scanner.html',
+  BASE + '/domains/financial-due-diligence/learn/index.html',
 ];
 
 // Install — cache all static assets
