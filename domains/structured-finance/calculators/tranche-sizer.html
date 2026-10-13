@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tranche Sizer · Structured Finance · ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--accent:#0d9488;--accent-bg:#f0fdfa;--accent-border:#99f6e4;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
+.nav{display:flex;align-items:center;gap:8px;padding:14px 24px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.nav a{font-size:13px;color:var(--muted);text-decoration:none}.nav a:hover{color:var(--text)}
+.nav-sep{color:var(--border);font-size:13px}.nav-cur{font-size:13px;font-weight:600}
+.calc-shell{max-width:860px;margin:0 auto;padding:24px}
+.calc-hd{margin-bottom:24px}
+.calc-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700;color:var(--accent);margin-bottom:10px}
+.calc-hd h1{font-size:26px;font-weight:900;margin-bottom:4px}
+.calc-hd p{font-size:14px;color:var(--muted)}
+.steps{display:flex;gap:0;margin-bottom:28px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.step-tab{flex:1;padding:12px 8px;text-align:center;font-size:12px;font-weight:600;color:var(--muted);background:var(--card);cursor:pointer;border-right:1px solid var(--border);transition:all .15s}
+.step-tab:last-child{border-right:none}
+.step-tab.active{background:var(--accent);color:#fff}
+.step-tab.done{background:var(--accent-bg);color:var(--accent)}
+.step-tab.locked{opacity:.5;cursor:default}
+.step-num{display:block;font-size:18px;font-weight:900;margin-bottom:1px}
+.step-panel{display:none}.step-panel.active{display:block}
+.search-box{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;margin-bottom:14px;outline:none}
+.search-box:focus{border-color:var(--accent)}
+.pool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;max-height:440px;overflow-y:auto}
+.pool-card{border:1.5px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all .15s}
+.pool-card:hover,.pool-card.selected{border-color:var(--accent);background:var(--accent-bg)}
+.pool-name{font-size:13px;font-weight:700;margin-bottom:4px}
+.pool-orig{font-size:11px;color:var(--muted);margin-bottom:8px}
+.pool-chips{display:flex;gap:4px;flex-wrap:wrap}
+.pool-chip{font-size:10px;font-weight:600;background:var(--card);border:1px solid var(--border);color:var(--muted);padding:2px 6px;border-radius:6px}
+.pool-chip.aaa{background:#dcfce7;border-color:#bbf7d0;color:#16a34a}
+.pool-chip.aa{background:#dbeafe;border-color:#bfdbfe;color:#2563eb}
+.pool-chip.a{background:#fef9c3;border-color:#fde68a;color:#92400e}
+.pool-chip.bbb{background:#fee2e2;border-color:#fecaca;color:#dc2626}
+.ctx-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.ctx-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
+.ctx-card h3{font-size:13px;font-weight:700;margin-bottom:8px;color:var(--accent)}
+.ctx-card p{font-size:13px;color:var(--muted);line-height:1.6}
+.ctx-stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px}
+.ctx-stat{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:8px;padding:12px;text-align:center}
+.ctx-stat-val{font-size:18px;font-weight:900;color:var(--accent);font-family:'JetBrains Mono',monospace}
+.ctx-stat-lbl{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
+.pro-gate{border:2px dashed var(--border);border-radius:14px;padding:36px;text-align:center;margin-bottom:20px}
+.pro-lock{font-size:36px;margin-bottom:12px}
+.pro-gate h3{font-size:18px;font-weight:800;margin-bottom:8px}
+.pro-gate p{font-size:14px;color:var(--muted);margin-bottom:16px}
+.pro-features{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:20px}
+.pro-pill{font-size:11px;font-weight:600;background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);padding:4px 12px;border-radius:12px}
+.btn-pro{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:13px 32px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn-secondary{background:var(--bg);color:var(--text);border:1.5px solid var(--border);border-radius:8px;padding:11px 22px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+@media(max-width:600px){.calc-shell{padding:16px}.ctx-grid{grid-template-columns:1fr}.ctx-stat-grid{grid-template-columns:1fr 1fr}.steps{border-radius:8px}.step-tab{padding:10px 4px;font-size:11px}}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="/valuation-toolkit/">ValuationDesk</a><span class="nav-sep">›</span>
+  <a href="/valuation-toolkit/domains/structured-finance/">Structured Finance</a><span class="nav-sep">›</span>
+  <a href="/valuation-toolkit/domains/structured-finance/calculators/">Calculators</a><span class="nav-sep">›</span>
+  <span class="nav-cur">Tranche Sizer</span>
+</nav>
+<div class="calc-shell">
+  <div class="calc-hd">
+    <div class="calc-badge">🔒 PRO Calculator</div>
+    <h1>📐 Tranche Sizer</h1>
+    <p>Size senior, mezzanine, and equity tranches based on pool loss distribution, target ratings, and attachment/detachment points.</p>
+  </div>
+  <div class="steps">
+    <div class="step-tab active" id="tab1"><span class="step-num">1</span>Pick Pool</div>
+    <div class="step-tab locked" id="tab2"><span class="step-num">2</span>Context</div>
+    <div class="step-tab locked" id="tab3"><span class="step-num">3</span>Inputs</div>
+    <div class="step-tab locked" id="tab4"><span class="step-num">4</span>Results</div>
+  </div>
+  <div class="step-panel active" id="step1">
+    <input class="search-box" id="poolSearch" placeholder="Search pools…" oninput="filterPools()">
+    <div class="pool-grid" id="poolGrid"></div>
+  </div>
+  <div class="step-panel" id="step2">
+    <div class="ctx-stat-grid" id="ctxStats"></div>
+    <div class="ctx-grid">
+      <div class="ctx-card"><h3>Attachment &amp; Detachment Points</h3><p>The attachment point is the loss level at which a tranche starts absorbing losses. The detachment point is where it is fully wiped out. Senior tranche attaches at the top — it only absorbs losses after all subordinate tranches are exhausted.</p></div>
+      <div class="ctx-card"><h3>Loss Distribution Model</h3><p>Rating agencies model pool losses using historical default rates, recovery rates, and correlation assumptions. For AAA sizing, the model uses a stressed scenario (e.g., 3–5× base losses). India uses RBI/SEBI guidelines for PTC structuring.</p></div>
+      <div class="ctx-card"><h3>Target Rating Mechanics</h3><p>Senior tranche sized to withstand a multiple of expected loss (credit enhancement covers the gap). Mezz rated AA/A absorbs intermediate stress. Equity (unrated) is the first-loss piece — typically held by the originator under SEBI rules.</p></div>
+      <div class="ctx-card"><h3>SEBI MRR Requirement</h3><p>SEBI mandates a Minimum Retention Requirement (MRR) of 10% of the pool for originators. This is usually structured as the equity tranche — aligning originator incentives with pool performance over the life of the PTC.</p></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goStep(1)">← Back</button>
+      <button class="btn-secondary" onclick="goStep(3)">Set Inputs →</button>
+    </div>
+  </div>
+  <div class="step-panel" id="step3">
+    <div class="pro-gate">
+      <div class="pro-lock">🔒</div>
+      <h3>PRO Feature</h3>
+      <p>Tranche sizing with attachment/detachment points, rating agency loss multiples, and SEBI MRR compliance checks requires ValuationDesk PRO.</p>
+      <div class="pro-features">
+        <span class="pro-pill">Loss Multiple Sizing</span>
+        <span class="pro-pill">AAA / AA / A Attachment Points</span>
+        <span class="pro-pill">SEBI MRR Check</span>
+        <span class="pro-pill">Sensitivity Table</span>
+        <span class="pro-pill">Rating Agency Model</span>
+        <span class="pro-pill">Detachment Points</span>
+      </div>
+      <button class="btn-pro" onclick="unlockPro()">Unlock PRO — ₹799/mo →</button>
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goStep(2)">← Back</button>
+    </div>
+  </div>
+  <div class="step-panel" id="step4">
+    <div class="pro-gate">
+      <div class="pro-lock">🔒</div>
+      <h3>PRO Results Locked</h3>
+      <p>Unlock PRO to see tranche sizing output, attachment/detachment point schedule, and rating sensitivity analysis.</p>
+      <button class="btn-pro" onclick="unlockPro()">Unlock PRO — ₹799/mo →</button>
+    </div>
+  </div>
+</div>
+<script>
+var POOLS=[
+  {id:1,name:'HDFC Home Loan Pool',originator:'HDFC Ltd',type:'Home Loan',size:2500,wac:8.8,wam:204,psa:150,ce:12.5,delinq:0.8,rating:'AAA',spread:68},
+  {id:2,name:'SBI Home Loan Pool',originator:'State Bank of India',type:'Home Loan',size:4200,wac:8.4,wam:228,psa:120,ce:10.0,delinq:1.2,rating:'AAA',spread:62},
+  {id:3,name:'Bajaj Auto Finance Pool',originator:'Bajaj Auto Finance',type:'Auto Loan',size:800,wac:14.2,wam:36,psa:200,ce:15.0,delinq:2.1,rating:'AA',spread:145},
+  {id:4,name:'Mahindra Finance Auto Pool',originator:'Mahindra Finance',type:'Auto Loan',size:650,wac:15.4,wam:42,psa:220,ce:16.5,delinq:3.2,rating:'AA',spread:162},
+  {id:5,name:'Fullerton MFI Pool',originator:'Fullerton India',type:'Microfinance',size:350,wac:22.4,wam:18,psa:80,ce:22.0,delinq:4.8,rating:'A',spread:285},
+  {id:6,name:'Muthoot Gold Loan Pool',originator:'Muthoot Finance',type:'Gold Loan',size:1200,wac:18.2,wam:12,psa:300,ce:18.0,delinq:1.4,rating:'AA',spread:178},
+  {id:7,name:'L&T Finance LAP Pool',originator:'L&T Finance',type:'LAP',size:950,wac:12.8,wam:108,psa:140,ce:14.0,delinq:2.8,rating:'AA',spread:138},
+  {id:8,name:'PNB Housing Pool',originator:'PNB Housing Finance',type:'Home Loan',size:1800,wac:9.2,wam:192,psa:130,ce:11.5,delinq:1.6,rating:'AA',spread:88},
+  {id:9,name:'ICICI Bank Auto Pool',originator:'ICICI Bank',type:'Auto Loan',size:1100,wac:13.8,wam:48,psa:190,ce:13.0,delinq:1.8,rating:'AAA',spread:128},
+  {id:10,name:'Kotak LAP Pool',originator:'Kotak Mahindra Bank',type:'LAP',size:780,wac:11.4,wam:120,psa:120,ce:15.5,delinq:2.2,rating:'AA',spread:115},
+  {id:11,name:'HDB Financial CV Pool',originator:'HDB Financial Services',type:'Commercial Vehicle',size:600,wac:16.8,wam:54,psa:250,ce:18.0,delinq:3.6,rating:'AA',spread:185},
+  {id:12,name:'Cholamandalam Auto Pool',originator:'Cholamandalam Finance',type:'Auto Loan',size:720,wac:15.2,wam:48,psa:210,ce:17.0,delinq:3.0,rating:'AA',spread:165},
+  {id:13,name:'Shriram Transport CV Pool',originator:'Shriram Transport Finance',type:'Commercial Vehicle',size:1400,wac:18.4,wam:60,psa:240,ce:20.0,delinq:4.2,rating:'AA',spread:198},
+  {id:14,name:'Axis Bank Home Loan Pool',originator:'Axis Bank',type:'Home Loan',size:2200,wac:8.6,wam:216,psa:135,ce:11.0,delinq:0.9,rating:'AAA',spread:65},
+  {id:15,name:'Tata Capital Personal Loan Pool',originator:'Tata Capital',type:'Personal Loan',size:420,wac:19.8,wam:24,psa:180,ce:24.0,delinq:5.2,rating:'A',spread:295},
+  {id:16,name:'IIFL Affordable Housing Pool',originator:'IIFL Home Finance',type:'Affordable Housing',size:580,wac:13.4,wam:156,psa:110,ce:16.0,delinq:3.4,rating:'A',spread:165},
+  {id:17,name:'Aditya Birla LAP Pool',originator:'Aditya Birla Finance',type:'LAP',size:820,wac:12.2,wam:96,psa:115,ce:15.0,delinq:2.6,rating:'AA',spread:128},
+  {id:18,name:'Bajaj Housing Finance Pool',originator:'Bajaj Housing Finance',type:'Home Loan',size:1650,wac:8.9,wam:210,psa:125,ce:10.5,delinq:0.7,rating:'AAA',spread:70},
+  {id:19,name:'Sundaram Finance CV Pool',originator:'Sundaram Finance',type:'Commercial Vehicle',size:480,wac:16.2,wam:48,psa:230,ce:18.5,delinq:2.8,rating:'AA',spread:178},
+  {id:20,name:'RBL Bank MFI Pool',originator:'RBL Bank',type:'Microfinance',size:280,wac:23.8,wam:15,psa:70,ce:25.0,delinq:6.2,rating:'BBB',spread:345},
+  {id:21,name:'LIC Housing Finance Pool',originator:'LIC Housing Finance',type:'Home Loan',size:3200,wac:8.2,wam:240,psa:110,ce:9.5,delinq:1.1,rating:'AAA',spread:58},
+  {id:22,name:'Hero FinCorp Two-Wheeler Pool',originator:'Hero FinCorp',type:'Two-Wheeler Loan',size:390,wac:20.4,wam:30,psa:280,ce:22.0,delinq:4.4,rating:'A',spread:268},
+  {id:23,name:'IDFC First Bank Auto Pool',originator:'IDFC First Bank',type:'Auto Loan',size:560,wac:14.4,wam:42,psa:195,ce:14.5,delinq:2.4,rating:'AA',spread:152},
+  {id:24,name:'Can Fin Homes Pool',originator:'Can Fin Homes',type:'Home Loan',size:880,wac:9.4,wam:186,psa:120,ce:11.0,delinq:1.4,rating:'AA',spread:82},
+  {id:25,name:'AU Small Finance MSME Pool',originator:'AU Small Finance Bank',type:'Secured MSME',size:340,wac:17.2,wam:72,psa:150,ce:20.0,delinq:3.8,rating:'A',spread:215},
+  {id:26,name:'Manappuram Gold Loan Pool',originator:'Manappuram Finance',type:'Gold Loan',size:680,wac:19.4,wam:10,psa:320,ce:20.0,delinq:1.8,rating:'AA',spread:195},
+  {id:27,name:'Piramal Housing Finance Pool',originator:'Piramal Capital',type:'Home Loan',size:1100,wac:11.2,wam:144,psa:100,ce:18.0,delinq:4.8,rating:'A',spread:148},
+  {id:28,name:'Repco Affordable Housing Pool',originator:'Repco Home Finance',type:'Affordable Housing',size:350,wac:12.8,wam:168,psa:105,ce:15.5,delinq:3.2,rating:'A',spread:162},
+  {id:29,name:'Magma Fincorp CV Pool',originator:'Magma Fincorp',type:'Commercial Vehicle',size:440,wac:17.6,wam:54,psa:260,ce:21.0,delinq:4.6,rating:'A',spread:228},
+  {id:30,name:'HDFC Bank Trade Finance Pool',originator:'HDFC Bank',type:'Trade Finance',size:920,wac:10.4,wam:12,psa:180,ce:12.0,delinq:0.6,rating:'AAA',spread:95}
+];
+var selected=null;
+function ratingClass(r){if(r==='AAA')return 'aaa';if(r==='AA')return 'aa';if(r==='A')return 'a';return 'bbb';}
+function renderPools(list){
+  var g=document.getElementById('poolGrid');
+  if(!list.length){g.innerHTML='<p style="color:var(--muted);font-size:13px;padding:8px">No pools found.</p>';return;}
+  g.innerHTML=list.map(function(p){
+    var rc=ratingClass(p.rating);
+    var sel=(selected&&selected.id===p.id)?'selected':'';
+    return '<div class="pool-card '+sel+'" onclick="selectPool('+p.id+')" id="pc'+p.id+'">'+
+      '<div class="pool-name">'+p.name+'</div><div class="pool-orig">'+p.originator+'</div>'+
+      '<div class="pool-chips"><span class="pool-chip '+rc+'">'+p.rating+'</span><span class="pool-chip">'+p.type+'</span><span class="pool-chip">₹'+p.size+'Cr</span><span class="pool-chip">CE '+p.ce+'%</span></div></div>';
+  }).join('');
+}
+function filterPools(){
+  var q=document.getElementById('poolSearch').value.toLowerCase();
+  renderPools(POOLS.filter(function(p){return p.name.toLowerCase().indexOf(q)>-1||p.originator.toLowerCase().indexOf(q)>-1||p.type.toLowerCase().indexOf(q)>-1;}));
+}
+function selectPool(id){
+  selected=POOLS.find(function(p){return p.id===id;});
+  filterPools();
+  setTimeout(function(){goStep(2);},180);
+}
+function buildContext(){
+  var p=selected;
+  document.getElementById('ctxStats').innerHTML=
+    '<div class="ctx-stat"><div class="ctx-stat-val">'+p.delinq+'%</div><div class="ctx-stat-lbl">90D Delinquency</div></div>'+
+    '<div class="ctx-stat"><div class="ctx-stat-val">'+p.ce+'%</div><div class="ctx-stat-lbl">Credit Enhancement</div></div>'+
+    '<div class="ctx-stat"><div class="ctx-stat-val">'+p.rating+'</div><div class="ctx-stat-lbl">Pool Rating</div></div>'+
+    '<div class="ctx-stat"><div class="ctx-stat-val">'+p.size+'Cr</div><div class="ctx-stat-lbl">Pool Size (₹Cr)</div></div>';
+}
+function goStep(n){
+  [1,2,3,4].forEach(function(i){
+    document.getElementById('step'+i).classList.toggle('active',i===n);
+    var t=document.getElementById('tab'+i);
+    t.classList.remove('active','done','locked');
+    if(i<n) t.classList.add('done');
+    else if(i===n) t.classList.add('active');
+    else t.classList.add('locked');
+  });
+  if(n===2&&selected) buildContext();
+}
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+renderPools(POOLS);
+</script>
+</body>
+</html>

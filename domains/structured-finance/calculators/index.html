@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Structured Finance Calculators · ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
+  --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;
+  --accent:#0d9488;--accent-bg:#f0fdfa;--accent-border:#99f6e4;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
+.nav{display:flex;align-items:center;gap:8px;padding:14px 24px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.nav a{font-size:13px;color:var(--muted);text-decoration:none}.nav a:hover{color:var(--text)}
+.nav-sep{color:var(--border);font-size:13px}
+.nav-cur{font-size:13px;font-weight:600}
+
+.page-hd{padding:36px 24px 28px;max-width:960px;margin:0 auto}
+.page-hd h1{font-size:28px;font-weight:900;margin-bottom:6px}
+.page-hd p{font-size:15px;color:var(--muted)}
+
+.section{max-width:960px;margin:0 auto;padding:0 24px 48px}
+.section-hd{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.section-hd span{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2px 8px;font-size:11px}
+
+.calc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:32px}
+.calc-card{border:1px solid var(--border);border-radius:12px;padding:20px 20px 16px;text-decoration:none;color:inherit;display:block;transition:all .15s;position:relative}
+.calc-card:hover{border-color:var(--accent);box-shadow:0 4px 16px rgba(13,148,136,.1);transform:translateY(-1px)}
+.calc-tag{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;margin-bottom:10px}
+.tag-free{background:#dcfce7;color:#16a34a}
+.tag-pro{background:var(--accent-bg);color:var(--accent)}
+.calc-icon{font-size:24px;margin-bottom:8px}
+.calc-name{font-size:15px;font-weight:700;margin-bottom:4px}
+.calc-desc{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:12px}
+.calc-meta{display:flex;gap:6px;flex-wrap:wrap}
+.calc-pill{font-size:10px;font-weight:600;background:var(--card);border:1px solid var(--border);color:var(--muted);padding:2px 8px;border-radius:10px}
+
+.banner{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:12px;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:32px}
+.banner p{font-size:14px;color:var(--text);font-weight:500}
+.banner span{color:var(--muted);font-weight:400}
+.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block;white-space:nowrap}
+
+@media(max-width:600px){
+  .page-hd{padding:24px 16px 20px}
+  .section{padding:0 16px 36px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/valuation-toolkit/">ValuationDesk</a>
+  <span class="nav-sep">›</span>
+  <a href="/valuation-toolkit/domains/structured-finance/">Structured Finance</a>
+  <span class="nav-sep">›</span>
+  <span class="nav-cur">Calculators</span>
+</nav>
+
+<div class="page-hd">
+  <h1>Structured Finance Calculators</h1>
+  <p>Securitisation waterfalls, tranche sizing, ABS cash flows, prepayment models — India's structured credit toolkit.</p>
+</div>
+
+<div class="section">
+  <div class="banner">
+    <p>1 free calculator · <span>6 PRO calculators unlock with ValuationDesk PRO — ₹799/month</span></p>
+    <a href="#" onclick="alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');return false;" class="btn-primary">Unlock PRO →</a>
+  </div>
+
+  <div class="section-hd">Free <span>1 of 7</span></div>
+  <div class="calc-grid">
+    <a href="/valuation-toolkit/domains/structured-finance/calculators/waterfall-model.html" class="calc-card">
+      <div><span class="calc-tag tag-free">✓ FREE</span></div>
+      <div class="calc-icon">🌊</div>
+      <div class="calc-name">Waterfall Model</div>
+      <div class="calc-desc">Model ABS/MBS cash flow waterfalls — senior, mezzanine, and equity tranche distributions from an Indian loan pool.</div>
+      <div class="calc-meta">
+        <span class="calc-pill">Senior / Mezz / Equity</span>
+        <span class="calc-pill">Cash Flow Waterfall</span>
+        <span class="calc-pill">PTC Structure</span>
+      </div>
+    </a>
+  </div>
+
+  <div class="section-hd">PRO <span>6 of 7</span></div>
+  <div class="calc-grid">
+    <a href="/valuation-toolkit/domains/structured-finance/calculators/tranche-sizer.html" class="calc-card">
+      <div><span class="calc-tag tag-pro">🔒 PRO</span></div>
+      <div class="calc-icon">📐</div>
+      <div class="calc-name">Tranche Sizer</div>
+      <div class="calc-desc">Size senior, mezzanine, and equity tranches based on pool loss distribution, target ratings, and attachment/detachment points.</div>
+      <div class="calc-meta">
+        <span class="calc-pill">Attachment Points</span>
+        <span class="calc-pill">Loss Distribution</span>
+        <span class="calc-pill">Target Ratings</span>
+      </div>
+    </a>
+    <a href="/valuation-toolkit/domains/structured-finance/calculators/abs-cashflows.html" class="calc-card">
+      <div><span class="calc-tag tag-pro">🔒 PRO</span></div>
+      <div class="calc-icon">📅</div>
+      <div class="calc-name">ABS Cash Flows</div>
+      <div class="calc-desc">Month-by-month ABS/PTC cash flow schedule with PSA prepayment model, scheduled principal, interest, and WAL calculation.</div>
+      <div class="calc-meta">
+        <span class="calc-pill">PSA Model</span>
+        <span class="calc-pill">Monthly Schedule</span>
+        <span class="calc-pill">WAL</span>
+      </div>
+    </a>
+    <a href="/valuation-toolkit/domains/structured-finance/calculators/credit-enhancement.html" class="calc-card">
+      <div><span class="calc-tag tag-pro">🔒 PRO</span></div>
+      <div class="calc-icon">🛡️</div>
+      <div class="calc-name">Credit Enhancement</div>
+      <div class="calc-desc">Size overcollateralisation, cash reserve, subordination, and excess spread to achieve target ratings on each tranche.</div>
+      <div class="calc-meta">
+        <span class="calc-pill">OC Sizing</span>
+        <span class="calc-pill">Reserve Account</span>
+        <span class="calc-pill">Excess Spread</span>
+      </div>
+    </a>
+    <a href="/valuation-toolkit/domains/structured-finance/calculators/cdo-pricer.html" class="calc-card">
+      <div><span class="calc-tag tag-pro">🔒 PRO</span></div>
+      <div class="calc-icon">🏗️</div>
+      <div class="calc-name">CDO / CLO Pricer</div>
+      <div class="calc-desc">CLO/CDO waterfall test modelling — IC/OC coverage tests, WAS vs. WAC, net interest margin, and tranche NAV analysis.</div>
+      <div class="calc-meta">
+        <span class="calc-pill">IC / OC Tests</span>
+        <span class="calc-pill">WAS vs WAC</span>
+        <span class="calc-pill">Tranche NAV</span>
+      </div>
+    </a>
+    <a href="/valuation-toolkit/domains/structured-finance/calculators/prepayment-model.html" class="calc-card">
+      <div><span class="calc-tag tag-pro">🔒 PRO</span></div>
+      <div class="calc-icon">⚡</div>
+      <div class="calc-name">Prepayment Model</div>
+      <div class="calc-desc">PSA prepayment model with CPR/SMM conversion, balance amortisation curve, and weighted average life (WAL) under multiple speeds.</div>
+      <div class="calc-meta">
+        <span class="calc-pill">PSA / CPR / SMM</span>
+        <span class="calc-pill">Balance Curve</span>
+        <span class="calc-pill">Multi-Speed WAL</span>
+      </div>
+    </a>
+    <a href="/valuation-toolkit/domains/structured-finance/calculators/spread-analyser.html" class="calc-card">
+      <div><span class="calc-tag tag-pro">🔒 PRO</span></div>
+      <div class="calc-icon">📊</div>
+      <div class="calc-name">Spread Analyser</div>
+      <div class="calc-desc">Z-spread, discount margin, and relative value analysis for ABS tranches vs. corporate bonds and G-Sec at equivalent ratings.</div>
+      <div class="calc-meta">
+        <span class="calc-pill">Z-Spread</span>
+        <span class="calc-pill">Discount Margin</span>
+        <span class="calc-pill">Relative Value</span>
+      </div>
+    </a>
+  </div>
+</div>
+
+</body>
+</html>

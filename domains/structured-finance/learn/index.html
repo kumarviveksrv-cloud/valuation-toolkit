@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Learn Structured Finance — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
+  --accent:#0d9488;--accent-bg:#f0fdfa;--accent-border:#99f6e4;
+  --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+a{color:inherit;text-decoration:none}
+
+/* NAV */
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg);z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:14px}
+.nav-logo{font-weight:800;font-size:16px;color:var(--accent)}
+.nav-sep{color:var(--border)}
+.nav-crumb{color:var(--muted)}
+.nav-crumb a:hover{color:var(--text)}
+
+/* HERO */
+.hero{background:var(--accent-bg);border-bottom:1px solid var(--accent-border);padding:40px 24px 32px}
+.hero-inner{max-width:860px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:16px;letter-spacing:.4px}
+.hero h1{font-size:clamp(24px,4vw,36px);font-weight:900;line-height:1.15;margin-bottom:10px}
+.hero p{color:var(--muted);font-size:15px;max-width:560px;line-height:1.6;margin-bottom:24px}
+.progress-bar-wrap{background:#fff;border:1px solid var(--accent-border);border-radius:10px;padding:16px 20px}
+.progress-bar-label{font-size:13px;font-weight:600;margin-bottom:10px;display:flex;justify-content:space-between}
+.progress-bar-label span{color:var(--accent);font-family:'JetBrains Mono',monospace}
+.progress-track{background:var(--border);border-radius:20px;height:8px;overflow:hidden}
+.progress-fill{background:var(--accent);height:100%;border-radius:20px;transition:width .5s ease;width:0%}
+
+/* MAIN */
+.main{max-width:860px;margin:0 auto;padding:32px 24px}
+
+/* MODULE */
+.module{border:1px solid var(--border);border-radius:14px;margin-bottom:16px;overflow:hidden;transition:box-shadow .2s}
+.module:hover{box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.module-header{padding:20px 24px;cursor:pointer;display:flex;align-items:center;gap:16px;background:var(--bg);transition:background .2s;user-select:none}
+.module-header:hover{background:var(--card)}
+.module.open .module-header{background:var(--accent-bg);border-bottom:1px solid var(--accent-border)}
+.module-icon{font-size:24px;flex-shrink:0}
+.module-title-wrap{flex:1}
+.module-num{font-size:11px;font-weight:600;color:var(--muted);margin-bottom:2px;letter-spacing:.4px;text-transform:uppercase}
+.module-title{font-size:16px;font-weight:800}
+.module-meta{font-size:12px;color:var(--muted);margin-top:4px}
+.module-chevron{font-size:18px;color:var(--muted);transition:transform .3s;flex-shrink:0}
+.module.open .module-chevron{transform:rotate(90deg)}
+.module-done-badge{font-size:10px;font-weight:700;background:var(--green);color:#fff;padding:2px 8px;border-radius:10px;flex-shrink:0}
+.module-body{display:none;padding:24px}
+.module.open .module-body{display:block}
+
+/* CONTENT BLOCKS */
+.content-section{margin-bottom:28px}
+.content-section h3{font-size:14px;font-weight:700;margin-bottom:12px;color:var(--text);display:flex;align-items:center;gap:6px}
+.content-section p{font-size:13px;color:var(--muted);line-height:1.8;margin-bottom:10px}
+.content-section code{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--card);border:1px solid var(--border);padding:1px 6px;border-radius:4px;color:var(--blue)}
+.key-terms{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:12px 0}
+.term-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px}
+.term-card dt{font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px;font-family:'JetBrains Mono',monospace}
+.term-card dd{font-size:11px;color:var(--muted);line-height:1.6}
+.flow-steps{display:flex;flex-direction:column;gap:8px;margin:12px 0}
+.flow-step{display:flex;align-items:flex-start;gap:12px;padding:10px 14px;background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:8px}
+.flow-step .step-num{background:var(--accent);color:#fff;width:22px;height:22px;border-radius:50%;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.flow-step p{font-size:12px;color:var(--text);line-height:1.6}
+.flow-step strong{font-weight:700}
+.info-box{background:var(--card);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;padding:12px 16px;margin:12px 0}
+.info-box p{font-size:12px;color:var(--muted);line-height:1.7;margin:0}
+.info-box strong{color:var(--text)}
+
+/* QUIZ */
+.quiz-section{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-top:20px}
+.quiz-section h4{font-size:13px;font-weight:700;margin-bottom:16px;display:flex;align-items:center;gap:6px}
+.quiz-q{margin-bottom:16px}
+.quiz-q .q-text{font-size:13px;font-weight:600;margin-bottom:10px}
+.quiz-options{display:flex;flex-direction:column;gap:6px}
+.quiz-opt{padding:9px 14px;border:1px solid var(--border);border-radius:8px;font-size:12px;cursor:pointer;transition:all .2s;background:var(--bg);display:flex;align-items:center;gap:8px}
+.quiz-opt:hover{border-color:var(--accent);background:var(--accent-bg)}
+.quiz-opt.correct{border-color:var(--green);background:#f0fdf4;color:var(--green)}
+.quiz-opt.wrong{border-color:var(--red);background:#fef2f2;color:var(--red)}
+.quiz-opt.locked{pointer-events:none;opacity:.6}
+.quiz-opt .opt-letter{width:20px;height:20px;border-radius:50%;background:var(--border);color:var(--muted);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.quiz-opt.correct .opt-letter{background:var(--green);color:#fff}
+.quiz-opt.wrong .opt-letter{background:var(--red);color:#fff}
+.quiz-feedback{font-size:11px;margin-top:6px;padding:6px 10px;border-radius:6px;display:none}
+.quiz-feedback.show{display:block}
+.quiz-feedback.good{background:#f0fdf4;color:var(--green);border:1px solid #bbf7d0}
+.quiz-feedback.bad{background:#fef2f2;color:var(--red);border:1px solid #fecaca}
+.module-complete-btn{margin-top:18px;padding:10px 20px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:background .2s;display:none}
+.module-complete-btn:hover{background:#0f766e}
+.module-complete-btn.show{display:inline-flex;align-items:center;gap:6px}
+
+/* SECTION BREAK */
+.section-divider{display:flex;align-items:center;gap:12px;margin:20px 0}
+.section-divider:before,.section-divider:after{content:'';flex:1;height:1px;background:var(--border)}
+.section-divider span{font-size:11px;color:var(--muted);font-weight:500;white-space:nowrap}
+
+/* CTA */
+.cta-section{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:14px;padding:28px;text-align:center;margin-top:32px}
+.cta-section h3{font-size:18px;font-weight:800;margin-bottom:8px}
+.cta-section p{font-size:13px;color:var(--muted);margin-bottom:20px}
+.cta-btns{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.btn{padding:11px 22px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .2s;display:inline-flex;align-items:center;gap:6px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#0f766e}
+.btn-ghost{background:#fff;color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+@media(max-width:640px){
+  .key-terms{grid-template-columns:1fr}
+  .cta-btns{flex-direction:column;align-items:stretch}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <span class="nav-logo">ValuationDesk</span>
+    <span class="nav-sep">›</span>
+    <span class="nav-crumb"><a href="/valuation-toolkit/domains/structured-finance/">Structured Finance</a></span>
+    <span class="nav-sep">›</span>
+    <span class="nav-crumb">Learn</span>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">📚 Domain 15 of 15 · 4 Modules</div>
+    <h1>Structured Finance Fundamentals</h1>
+    <p>From securitisation mechanics to SEBI PTC guidelines — master the building blocks of India's ABS and MBS markets through structured, practical modules.</p>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-label">Your Progress <span id="progressLabel">0 / 4 modules complete</span></div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- MODULE 1: SECURITISATION MECHANICS -->
+  <div class="module" id="module1">
+    <div class="module-header" onclick="toggleModule(1)">
+      <span class="module-icon">🏗</span>
+      <div class="module-title-wrap">
+        <div class="module-num">Module 1</div>
+        <div class="module-title">Securitisation Mechanics</div>
+        <div class="module-meta">How assets become securities · SPV structure · True sale doctrine · 6 concepts · Quiz</div>
+      </div>
+      <span class="module-done-badge" id="done1" style="display:none">✓ Done</span>
+      <span class="module-chevron">›</span>
+    </div>
+    <div class="module-body">
+      <div class="content-section">
+        <h3>🔗 What is Securitisation?</h3>
+        <p>Securitisation is the process of pooling illiquid financial assets (loans, receivables) and converting them into tradeable securities backed by those cash flows. The originator transfers assets to a Special Purpose Vehicle (SPV), which issues securities to capital market investors.</p>
+        <p>India's securitisation market operates primarily through <strong>Pass-Through Certificates (PTCs)</strong> — where all cash flows are passed directly to investors — and <strong>Direct Assignment</strong> — bilateral transfers without PTC issuance. SEBI regulates public issuances; RBI governs private placements by banks and NBFCs.</p>
+      </div>
+
+      <div class="content-section">
+        <h3>🏛 The SPV Structure</h3>
+        <div class="flow-steps">
+          <div class="flow-step"><div class="step-num">1</div><p><strong>Originator</strong> (HDFC, Bajaj Finance etc.) originates loans and pools receivables meeting eligibility criteria (LTV, seasoning, geography, delinquency).</p></div>
+          <div class="flow-step"><div class="step-num">2</div><p><strong>True Sale</strong> transfers the pool to an SPV — a bankruptcy-remote entity. True sale ensures the assets are off-balance-sheet and ringfenced from the originator's insolvency.</p></div>
+          <div class="flow-step"><div class="step-num">3</div><p><strong>SPV</strong> (typically a trust in India) issues PTCs in multiple tranches (senior, subordinate). A Rating Agency rates the senior tranche, often AAA.</p></div>
+          <div class="flow-step"><div class="step-num">4</div><p><strong>Servicer</strong> (usually the originator itself) collects monthly instalments, deposits them in an escrow account, and remits to the trustee.</p></div>
+          <div class="flow-step"><div class="step-num">5</div><p><strong>Trustee</strong> (SBICAP Trustees, Axis Trustee etc.) distributes collections to PTC holders per the waterfall, after deducting servicing fees.</p></div>
+          <div class="flow-step"><div class="step-num">6</div><p><strong>Investors</strong> (MFs, insurance cos, banks) receive periodic cash flows — principal + interest — proportional to their tranche holding.</p></div>
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>📖 Key Terms</h3>
+        <div class="key-terms">
+          <dl class="term-card"><dt>True Sale</dt><dd>Legal transfer of assets to SPV such that they are beyond reach of the originator's creditors. SARFAESI provisions apply in India.</dd></dl>
+          <dl class="term-card"><dt>Bankruptcy Remote</dt><dd>SPV is structured so its assets cannot be consolidated with the originator's estate in insolvency proceedings.</dd></dl>
+          <dl class="term-card"><dt>PTC (Pass-Through Cert.)</dt><dd>Certificate representing an undivided beneficial interest in the pool's cash flows. Regulated by SEBI (AIF Regulations for private placement).</dd></dl>
+          <dl class="term-card"><dt>Direct Assignment</dt><dd>Bilateral transfer of pool from originator to a single buyer (usually a bank) without SPV or public rating. Popular for regulatory capital treatment.</dd></dl>
+          <dl class="term-card"><dt>Minimum Retention Requirement</dt><dd>SEBI/RBI require originators to retain at least 10% of pool (by value) to align incentives and prevent adverse selection.</dd></dl>
+          <dl class="term-card"><dt>Sequential Pay</dt><dd>Waterfall structure where senior tranches receive all principal payments first; subordinate tranches absorb losses from the bottom up.</dd></dl>
+        </div>
+      </div>
+
+      <div class="info-box">
+        <p><strong>India context:</strong> RBI's 2021 Master Directions on Securitisation govern bank-originated pools. SEBI's ILDS/AIF regulations cover public and private PTC markets. The RBI requires a minimum six-month seasoning before securitisation for retail loan pools, with MRR (Minimum Retention Requirement) of 5–10% depending on original maturity.</p>
+      </div>
+
+      <!-- QUIZ -->
+      <div class="section-divider"><span>Module 1 Quiz</span></div>
+      <div class="quiz-section">
+        <h4>🧠 Check Your Understanding</h4>
+
+        <div class="quiz-q" id="q1-1">
+          <div class="q-text">1. What is the primary purpose of creating a bankruptcy-remote SPV in securitisation?</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answer('q1-1','a','b')"><span class="opt-letter">A</span>To allow the originator to retain all risks</div>
+            <div class="quiz-opt" onclick="answer('q1-1','b','b')"><span class="opt-letter">B</span>To ringfence pool assets from the originator's insolvency</div>
+            <div class="quiz-opt" onclick="answer('q1-1','c','b')"><span class="opt-letter">C</span>To avoid paying taxes on interest income</div>
+            <div class="quiz-opt" onclick="answer('q1-1','d','b')"><span class="opt-letter">D</span>To lower the originator's capital requirements automatically</div>
+          </div>
+          <div class="quiz-feedback" id="fb-q1-1-good">✓ Correct. SPV bankruptcy remoteness ensures investors have first claim on pool assets regardless of originator's financial condition.</div>
+          <div class="quiz-feedback" id="fb-q1-1-bad">✗ The SPV's bankruptcy remoteness isolates pool assets from the originator's estate — protecting investor cash flows if the originator fails.</div>
+        </div>
+
+        <div class="quiz-q" id="q1-2">
+          <div class="q-text">2. India's RBI Minimum Retention Requirement (MRR) for securitisation is primarily designed to:</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answer('q1-2','a','c')"><span class="opt-letter">A</span>Ensure banks always hold AAA-rated tranches</div>
+            <div class="quiz-opt" onclick="answer('q1-2','b','c')"><span class="opt-letter">B</span>Limit the total size of any single pool</div>
+            <div class="quiz-opt" onclick="answer('q1-2','c','c')"><span class="opt-letter">C</span>Align originator incentives and prevent adverse selection</div>
+            <div class="quiz-opt" onclick="answer('q1-2','d','c')"><span class="opt-letter">D</span>Set the maximum WAM allowed for PTC pools</div>
+          </div>
+          <div class="quiz-feedback" id="fb-q1-2-good">✓ Correct. By retaining skin-in-the-game, the MRR forces originators to maintain underwriting standards.</div>
+          <div class="quiz-feedback" id="fb-q1-2-bad">✗ The MRR requires originators to keep a portion of the pool on their own books, ensuring they share in credit losses and maintain quality standards.</div>
+        </div>
+
+        <button class="module-complete-btn" id="complete1" onclick="completeModule(1)">✓ Mark Module 1 Complete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 2: ABS/MBS STRUCTURES -->
+  <div class="module" id="module2">
+    <div class="module-header" onclick="toggleModule(2)">
+      <span class="module-icon">🧱</span>
+      <div class="module-title-wrap">
+        <div class="module-num">Module 2</div>
+        <div class="module-title">ABS / MBS Structures</div>
+        <div class="module-meta">Tranche types · Prepayment risk · Credit enhancement · PSA model · Quiz</div>
+      </div>
+      <span class="module-done-badge" id="done2" style="display:none">✓ Done</span>
+      <span class="module-chevron">›</span>
+    </div>
+    <div class="module-body">
+      <div class="content-section">
+        <h3>🧩 Tranche Structure</h3>
+        <p>Structured finance creates multiple risk/return layers from a single asset pool by assigning priority (seniority) in the payment waterfall. Each tranche absorbs losses differently:</p>
+        <div class="key-terms">
+          <dl class="term-card"><dt>Senior Tranche (AAA)</dt><dd>First in line for principal and interest. Last to bear losses. Lowest yield — typically G-Sec + 60–100 bps for Indian home loan pools.</dd></dl>
+          <dl class="term-card"><dt>Mezzanine (AA/A)</dt><dd>Middle layer. Bears losses after equity is wiped out but before senior is impaired. Pays a premium spread — typically 130–200 bps over benchmark.</dd></dl>
+          <dl class="term-card"><dt>Equity / First Loss</dt><dd>Junior-most tranche, first to absorb defaults. Retained by the originator (MRR). Earns excess spread — residual after all senior/mezz claims.</dd></dl>
+          <dl class="term-card"><dt>Credit Enhancement</dt><dd>Over-collateralisation, reserve funds, subordination, and excess spread that protect senior tranches from pool credit losses.</dd></dl>
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>⏱ Prepayment Risk — PSA Model</h3>
+        <p>Prepayment risk is the uncertainty of principal return timing. Borrowers prepay when rates fall (refinancing) or through lump-sum payments. The PSA (Public Securities Association) model is the standard prepayment benchmark:</p>
+        <div class="info-box">
+          <p>At <strong>100 PSA</strong>: monthly CPR ramps from 0.2% in month 1 to 6% by month 30, then holds at 6%. At <strong>150 PSA</strong>, all CPRs are multiplied by 1.5. CPR converts to monthly SMM via: <code>SMM = 1 − (1 − CPR)^(1/12)</code>.</p>
+        </div>
+        <p>High PSA speeds (>200 PSA): fast paydown — WAL contracts, but investors face reinvestment risk. Low PSA speeds (<100 PSA): extension risk — duration extends beyond expectations, exposing investors to rate changes.</p>
+      </div>
+
+      <div class="content-section">
+        <h3>📊 Indian ABS Asset Classes</h3>
+        <div class="key-terms">
+          <dl class="term-card"><dt>Home Loan PTCs</dt><dd>Long-duration (15–20yr WAM), low PSA (110–150), AAA rated. Dominate Indian securitisation by value. Major originators: HDFC, SBI, LIC HFC.</dd></dl>
+          <dl class="term-card"><dt>Auto / CV Loans</dt><dd>Medium duration (3–5yr WAM), moderate-to-high PSA (180–260). Typically AA rated. Cholamandalam, Shriram, HDB dominate.</dd></dl>
+          <dl class="term-card"><dt>Microfinance (MFI)</dt><dd>Short duration (<24 months), low PSA (70–90). Single-A to BBB rated — high default volatility but high WAC (22–24%). Fullerton, Arohan.</dd></dl>
+          <dl class="term-card"><dt>Gold Loans</dt><dd>Very short duration (10–14 months), very high PSA (300–350). AA rated. Liquid collateral (gold) makes loss given default minimal. Muthoot, Manappuram.</dd></dl>
+        </div>
+      </div>
+
+      <!-- QUIZ -->
+      <div class="section-divider"><span>Module 2 Quiz</span></div>
+      <div class="quiz-section">
+        <h4>🧠 Check Your Understanding</h4>
+
+        <div class="quiz-q" id="q2-1">
+          <div class="q-text">1. A pool is priced at 180 PSA. What does this mean for its CPR in steady state (month 30+)?</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answer('q2-1','a','c')"><span class="opt-letter">A</span>CPR = 1.8% per month</div>
+            <div class="quiz-opt" onclick="answer('q2-1','b','c')"><span class="opt-letter">B</span>CPR = 18% per year</div>
+            <div class="quiz-opt" onclick="answer('q2-1','c','c')"><span class="opt-letter">C</span>CPR = 10.8% per year (6% × 1.8)</div>
+            <div class="quiz-opt" onclick="answer('q2-1','d','c')"><span class="opt-letter">D</span>CPR = 6% regardless of PSA speed</div>
+          </div>
+          <div class="quiz-feedback" id="fb-q2-1-good">✓ Correct. At 100 PSA steady state, CPR = 6%. At 180 PSA, CPR = 6% × 1.8 = 10.8% per year.</div>
+          <div class="quiz-feedback" id="fb-q2-1-bad">✗ PSA is a multiplier on the standard 6% steady-state CPR. 180 PSA means CPR = 6% × 1.8 = 10.8% annually.</div>
+        </div>
+
+        <div class="quiz-q" id="q2-2">
+          <div class="q-text">2. Which Indian ABS asset class typically has the shortest WAM and highest PSA speed?</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answer('q2-2','a','b')"><span class="opt-letter">A</span>Home loans</div>
+            <div class="quiz-opt" onclick="answer('q2-2','b','b')"><span class="opt-letter">B</span>Gold loans</div>
+            <div class="quiz-opt" onclick="answer('q2-2','c','b')"><span class="opt-letter">C</span>Commercial vehicle loans</div>
+            <div class="quiz-opt" onclick="answer('q2-2','d','b')"><span class="opt-letter">D</span>LAP (Loan Against Property)</div>
+          </div>
+          <div class="quiz-feedback" id="fb-q2-2-good">✓ Correct. Gold loans have WAMs of 10–14 months and PSA speeds of 300–350, reflecting rapid bullet-type repayment cycles.</div>
+          <div class="quiz-feedback" id="fb-q2-2-bad">✗ Gold loans have the shortest WAM (10–14 months) and highest PSA speeds (300–350) in India's ABS market due to their short, bullet repayment structure.</div>
+        </div>
+
+        <button class="module-complete-btn" id="complete2" onclick="completeModule(2)">✓ Mark Module 2 Complete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 3: CDO / CLO MARKETS -->
+  <div class="module" id="module3">
+    <div class="module-header" onclick="toggleModule(3)">
+      <span class="module-icon">🏦</span>
+      <div class="module-title-wrap">
+        <div class="module-num">Module 3</div>
+        <div class="module-title">CDO / CLO Markets</div>
+        <div class="module-meta">IC/OC tests · WAS vs WAC · Manager fees · NIM · India context · Quiz</div>
+      </div>
+      <span class="module-done-badge" id="done3" style="display:none">✓ Done</span>
+      <span class="module-chevron">›</span>
+    </div>
+    <div class="module-body">
+      <div class="content-section">
+        <h3>📦 CDOs and CLOs Defined</h3>
+        <p>A <strong>CDO (Collateralised Debt Obligation)</strong> pools credit instruments (bonds, loans, ABS) and issues tranches backed by the portfolio's cash flows. A <strong>CLO (Collateralised Loan Obligation)</strong> is a CDO backed specifically by leveraged loans — the dominant structure globally ($1T+ outstanding in the US).</p>
+        <p>In India, CDO-style structures are nascent. The closest analogues are <strong>Securitisation of MFI loan pools</strong> and <strong>structured credit tranching for wholesale NBFCs</strong>. SEBI's AIF Category III framework allows hedge-fund-like structures that can own ABS tranches.</p>
+      </div>
+
+      <div class="content-section">
+        <h3>🧪 IC and OC Coverage Tests</h3>
+        <p>CLO indentures include coverage tests that redirect cash flows away from equity if the portfolio deteriorates:</p>
+        <div class="key-terms">
+          <dl class="term-card"><dt>OC Test (Over-Collateralisation)</dt><dd>OC Ratio = Portfolio Par Value / Tranche Notional. If this falls below trigger (e.g. 120%), excess cash flows are diverted to deleverage senior tranches.</dd></dl>
+          <dl class="term-card"><dt>IC Test (Interest Coverage)</dt><dd>IC Ratio = Interest Income on Assets / Interest Due on Liabilities. If IC falls below trigger (e.g. 120%), interest is redirected to senior tranches. Managers must reinvest to restore ratio.</dd></dl>
+          <dl class="term-card"><dt>WAS (Weighted Avg. Spread)</dt><dd>Portfolio yield minus benchmark rate — the gross income of the CLO. Must exceed WAC (cost of liabilities) plus fees to generate positive NIM.</dd></dl>
+          <dl class="term-card"><dt>NIM (Net Interest Margin)</dt><dd>NIM = WAS − WAC. Positive NIM funds manager fees and equity distributions. If NIM compresses (rising rates, spread tightening), equity returns collapse first.</dd></dl>
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>💰 Manager Fees and Equity Waterfall</h3>
+        <div class="flow-steps">
+          <div class="flow-step"><div class="step-num">1</div><p><strong>Senior Fees:</strong> Trustee, admin and rating agency fees paid first (typically 5–15 bps of portfolio).</p></div>
+          <div class="flow-step"><div class="step-num">2</div><p><strong>Senior Note Interest:</strong> AAA/AA tranche coupons paid — these are the safest obligations.</p></div>
+          <div class="flow-step"><div class="step-num">3</div><p><strong>OC/IC Test Diversion:</strong> If tests fail, cash flows are redirected to repay senior principal rather than continuing down the waterfall.</p></div>
+          <div class="flow-step"><div class="step-num">4</div><p><strong>Subordinate Note Interest:</strong> Mezz tranches receive interest only if coverage tests pass.</p></div>
+          <div class="flow-step"><div class="step-num">5</div><p><strong>Subordinate Manager Fee:</strong> Incentive fee for the CLO manager (20% of equity distributions above a hurdle IRR).</p></div>
+          <div class="flow-step"><div class="step-num">6</div><p><strong>Equity Residual:</strong> Everything remaining goes to equity — the first loss, highest upside tranche.</p></div>
+        </div>
+      </div>
+
+      <!-- QUIZ -->
+      <div class="section-divider"><span>Module 3 Quiz</span></div>
+      <div class="quiz-section">
+        <h4>🧠 Check Your Understanding</h4>
+
+        <div class="quiz-q" id="q3-1">
+          <div class="q-text">1. A CLO's OC Ratio drops below trigger level. What happens?</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answer('q3-1','a','b')"><span class="opt-letter">A</span>The equity tranche receives more distributions</div>
+            <div class="quiz-opt" onclick="answer('q3-1','b','b')"><span class="opt-letter">B</span>Cash flows divert to repay senior principal, bypassing junior tranches</div>
+            <div class="quiz-opt" onclick="answer('q3-1','c','b')"><span class="opt-letter">C</span>The manager is replaced immediately</div>
+            <div class="quiz-opt" onclick="answer('q3-1','d','b')"><span class="opt-letter">D</span>All interest payments are suspended</div>
+          </div>
+          <div class="quiz-feedback" id="fb-q3-1-good">✓ Correct. OC test failure triggers a cash diversion mechanism — excess interest waterfall payments accelerate senior principal repayment.</div>
+          <div class="quiz-feedback" id="fb-q3-1-bad">✗ OC test failure diverts cash flows to de-lever the senior tranches by repaying their principal, protecting senior noteholders at the expense of equity.</div>
+        </div>
+
+        <div class="quiz-q" id="q3-2">
+          <div class="q-text">2. CLO Net Interest Margin (NIM) = ?</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answer('q3-2','a','c')"><span class="opt-letter">A</span>Senior note coupon minus equity yield</div>
+            <div class="quiz-opt" onclick="answer('q3-2','b','c')"><span class="opt-letter">B</span>Portfolio WAC minus benchmark rate</div>
+            <div class="quiz-opt" onclick="answer('q3-2','c','c')"><span class="opt-letter">C</span>WAS (asset spread) minus WAC (liability cost)</div>
+            <div class="quiz-opt" onclick="answer('q3-2','d','c')"><span class="opt-letter">D</span>IC ratio minus OC ratio</div>
+          </div>
+          <div class="quiz-feedback" id="fb-q3-2-good">✓ Correct. NIM = WAS − WAC. Positive NIM is what generates excess spread to cover fees and equity distributions.</div>
+          <div class="quiz-feedback" id="fb-q3-2-bad">✗ NIM = WAS (weighted average spread earned on assets) minus WAC (weighted average cost of liabilities). This difference is the gross profit pool for the CLO.</div>
+        </div>
+
+        <button class="module-complete-btn" id="complete3" onclick="completeModule(3)">✓ Mark Module 3 Complete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULE 4: SEBI PTC FRAMEWORK -->
+  <div class="module" id="module4">
+    <div class="module-header" onclick="toggleModule(4)">
+      <span class="module-icon">📋</span>
+      <div class="module-title-wrap">
+        <div class="module-num">Module 4</div>
+        <div class="module-title">SEBI PTC Framework</div>
+        <div class="module-meta">SEBI / RBI regulations · Listing requirements · MRR rules · Rating standards · Quiz</div>
+      </div>
+      <span class="module-done-badge" id="done4" style="display:none">✓ Done</span>
+      <span class="module-chevron">›</span>
+    </div>
+    <div class="module-body">
+      <div class="content-section">
+        <h3>🇮🇳 Indian Regulatory Landscape</h3>
+        <p>India's securitisation market operates under a dual regulatory regime: <strong>RBI</strong> governs bank and NBFC-originated pools (Master Direction on Transfer of Loan Exposures, 2021), while <strong>SEBI</strong> governs publicly listed PTCs under the ILDS (Issue and Listing of Debt Securities) Regulations and the AIF framework for privately placed structures.</p>
+        <div class="info-box">
+          <p><strong>Key regulatory milestone:</strong> SEBI's 2013 PTC framework introduced mandatory credit rating for all publicly offered PTCs. SEBI's 2022 amendment introduced REITs and InvITs as eligible PTC investors, expanding the institutional investor base significantly.</p>
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>📐 RBI Master Direction (2021) — Key Rules</h3>
+        <div class="flow-steps">
+          <div class="flow-step"><div class="step-num">1</div><p><strong>Minimum Holding Period (MHP):</strong> Loans must be held on the originator's books for a minimum period before securitisation — 6 months for retail pools; 12 months for commercial mortgage pools. Prevents originate-to-distribute abuse.</p></div>
+          <div class="flow-step"><div class="step-num">2</div><p><strong>Minimum Retention Requirement (MRR):</strong> 5% for pools with original maturity >24 months; 10% for pools with maturity up to 24 months. Must be retained on originator's books, not transferred to subsidiaries.</p></div>
+          <div class="flow-step"><div class="step-num">3</div><p><strong>True Sale Conditions:</strong> SPV must be bankruptcy remote; no recourse to originator except through credit enhancement; SARFAESI Act allows enforcement of security interest for ABS transactions.</p></div>
+          <div class="flow-step"><div class="step-num">4</div><p><strong>Capital Relief:</strong> Banks may derecognise securitised assets and reduce risk-weighted assets only if true sale conditions are met. RBI has aligned treatment with Basel III securitisation framework.</p></div>
+          <div class="flow-step"><div class="step-num">5</div><p><strong>Liquidity Support:</strong> Originator may provide liquidity facilities (not credit enhancement) not exceeding 10% of pool par. Prevents moral hazard while allowing operational smoothing.</p></div>
+        </div>
+      </div>
+
+      <div class="content-section">
+        <h3>🏷 Rating Standards for Indian PTCs</h3>
+        <div class="key-terms">
+          <dl class="term-card"><dt>Rating Required</dt><dd>All publicly offered PTCs require a credit rating from a SEBI-registered CRA (CRISIL, ICRA, CARE, India Ratings). Minimum investment grade for public placement.</dd></dl>
+          <dl class="term-card"><dt>Credit Enhancement Sizing</dt><dd>Rating agencies require CE to cover expected losses plus a stress scenario. AAA typically needs 3–5× expected credit loss as CE. MFI pools need 20–25% CE for A rating.</dd></dl>
+          <dl class="term-card"><dt>Pool Eligibility</dt><dd>Minimum pool age (seasoning), maximum delinquency thresholds, geographic diversity, and LTV caps. CRISIL/ICRA have published pool eligibility criteria for each asset class.</dd></dl>
+          <dl class="term-card"><dt>Monitoring</dt><dd>Monthly pool performance reporting — delinquency, prepayments, collections — filed with trustee and rating agency. Trigger-based downgrade if performance deteriorates.</dd></dl>
+        </div>
+      </div>
+
+      <!-- QUIZ -->
+      <div class="section-divider"><span>Module 4 Quiz</span></div>
+      <div class="quiz-section">
+        <h4>🧠 Check Your Understanding</h4>
+
+        <div class="quiz-q" id="q4-1">
+          <div class="q-text">1. Under RBI's 2021 Master Direction, what is the Minimum Holding Period for retail loan pools before securitisation?</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answer('q4-1','a','b')"><span class="opt-letter">A</span>3 months</div>
+            <div class="quiz-opt" onclick="answer('q4-1','b','b')"><span class="opt-letter">B</span>6 months</div>
+            <div class="quiz-opt" onclick="answer('q4-1','c','b')"><span class="opt-letter">C</span>12 months</div>
+            <div class="quiz-opt" onclick="answer('q4-1','d','b')"><span class="opt-letter">D</span>24 months</div>
+          </div>
+          <div class="quiz-feedback" id="fb-q4-1-good">✓ Correct. Retail loan pools require a 6-month MHP. Commercial mortgage pools require 12 months under RBI's 2021 Direction.</div>
+          <div class="quiz-feedback" id="fb-q4-1-bad">✗ Under RBI's 2021 Master Direction, retail pools need 6 months on the originator's books before transfer. Commercial/CRE pools need 12 months.</div>
+        </div>
+
+        <div class="quiz-q" id="q4-2">
+          <div class="q-text">2. A bank wants capital relief from securitising an auto loan pool. What condition MUST be met?</div>
+          <div class="quiz-options">
+            <div class="quiz-opt" onclick="answer('q4-2','a','d')"><span class="opt-letter">A</span>Pool must be rated AAA by two rating agencies</div>
+            <div class="quiz-opt" onclick="answer('q4-2','b','d')"><span class="opt-letter">C</span>The pool must be listed on NSE or BSE</div>
+            <div class="quiz-opt" onclick="answer('q4-2','c','d')"><span class="opt-letter">C</span>All tranches must be sold to insurance companies</div>
+            <div class="quiz-opt" onclick="answer('q4-2','d','d')"><span class="opt-letter">D</span>True sale conditions must be met and assets derecognised</div>
+          </div>
+          <div class="quiz-feedback" id="fb-q4-2-good">✓ Correct. Capital relief requires true sale — the assets must be legally transferred and derecognised from the bank's balance sheet, meeting all RBI true-sale conditions.</div>
+          <div class="quiz-feedback" id="fb-q4-2-bad">✗ Capital relief is only available when assets are genuinely transferred (true sale) and derecognised per Basel III and RBI standards. Without true sale, the RWA exposure remains.</div>
+        </div>
+
+        <button class="module-complete-btn" id="complete4" onclick="completeModule(4)">✓ Mark Module 4 Complete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <h3>Ready to Apply These Concepts?</h3>
+    <p>Use our structured finance calculators to model real Indian ABS pools — from securitisation waterfalls to Z-spread analysis.</p>
+    <div class="cta-btns">
+      <a href="/valuation-toolkit/domains/structured-finance/calculators/waterfall-model.html" class="btn btn-primary">🌊 Try Waterfall Model (Free)</a>
+      <a href="/valuation-toolkit/domains/structured-finance/calculators/" class="btn btn-ghost">📊 All Calculators</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// Progress tracking via localStorage
+var STORAGE_KEY='sf-learn-progress';
+var completed={};
+
+function loadProgress(){
+  try{
+    var stored=localStorage.getItem(STORAGE_KEY);
+    if(stored) completed=JSON.parse(stored);
+  } catch(e){completed={};}
+  updateProgressBar();
+  // Show done badges for completed modules
+  [1,2,3,4].forEach(function(i){
+    if(completed['m'+i]){
+      var badge=document.getElementById('done'+i);
+      if(badge) badge.style.display='inline-flex';
+    }
+  });
+}
+
+function saveProgress(){
+  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(completed));}catch(e){}
+}
+
+function updateProgressBar(){
+  var count=0;
+  [1,2,3,4].forEach(function(i){if(completed['m'+i]) count++;});
+  var pct=Math.round(count/4*100);
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressLabel').textContent=count+' / 4 modules complete';
+}
+
+function toggleModule(n){
+  var mod=document.getElementById('module'+n);
+  var isOpen=mod.classList.contains('open');
+  // Close all
+  [1,2,3,4].forEach(function(i){
+    document.getElementById('module'+i).classList.remove('open');
+  });
+  if(!isOpen) mod.classList.add('open');
+}
+
+// Answer handler
+var answered={};
+function answer(qId,choice,correct){
+  if(answered[qId]) return;
+  answered[qId]=true;
+  var qDiv=document.getElementById(qId);
+  var opts=qDiv.querySelectorAll('.quiz-opt');
+  var isCorrect=(choice===correct);
+  opts.forEach(function(o){o.classList.add('locked');});
+  var chosenIdx=['a','b','c','d'].indexOf(choice);
+  var correctIdx=['a','b','c','d'].indexOf(correct);
+  if(opts[chosenIdx]) opts[chosenIdx].classList.add(isCorrect?'correct':'wrong');
+  if(!isCorrect && opts[correctIdx]) opts[correctIdx].classList.add('correct');
+  var goodFb=document.getElementById('fb-'+qId+'-good');
+  var badFb=document.getElementById('fb-'+qId+'-bad');
+  if(isCorrect){if(goodFb){goodFb.classList.add('show','good');}}
+  else{if(badFb){badFb.classList.add('show','bad');}}
+  // Check if all qs in this module are answered
+  checkModuleReady(qId.charAt(1));
+}
+
+function checkModuleReady(moduleNum){
+  var prefixes={'1':['q1-1','q1-2'],'2':['q2-1','q2-2'],'3':['q3-1','q3-2'],'4':['q4-1','q4-2']};
+  var qs=prefixes[moduleNum];
+  if(!qs) return;
+  var allAnswered=qs.every(function(q){return answered[q];});
+  if(allAnswered){
+    var btn=document.getElementById('complete'+moduleNum);
+    if(btn) btn.classList.add('show');
+  }
+}
+
+function completeModule(n){
+  completed['m'+n]=true;
+  saveProgress();
+  updateProgressBar();
+  var badge=document.getElementById('done'+n);
+  if(badge) badge.style.display='inline-flex';
+  var btn=document.getElementById('complete'+n);
+  if(btn){btn.textContent='✓ Module '+n+' Complete!';btn.style.background='var(--green)';btn.disabled=true;}
+}
+
+loadProgress();
+</script>
+</body>
+</html>

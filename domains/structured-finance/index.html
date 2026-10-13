@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Structured Finance · ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
+  --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;
+  --accent:#0d9488;--accent-bg:#f0fdfa;--accent-border:#99f6e4;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
+.nav{display:flex;align-items:center;gap:8px;padding:14px 24px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.nav a{font-size:13px;color:var(--muted);text-decoration:none}.nav a:hover{color:var(--text)}
+.nav-sep{color:var(--border);font-size:13px}
+.nav-cur{font-size:13px;font-weight:600}
+
+.hero{padding:48px 24px 40px;max-width:960px;margin:0 auto;display:grid;grid-template-columns:1fr auto;gap:32px;align-items:center}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:var(--accent);margin-bottom:14px;letter-spacing:.04em}
+.hero h1{font-size:clamp(28px,5vw,44px);font-weight:900;line-height:1.15;margin-bottom:12px}
+.hero h1 span{color:var(--accent)}
+.hero-sub{font-size:16px;color:var(--muted);max-width:480px;line-height:1.7;margin-bottom:24px}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap}
+.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block;transition:opacity .15s}
+.btn-primary:hover{opacity:.88}
+.btn-secondary{background:var(--bg);color:var(--text);border:1.5px solid var(--border);border-radius:8px;padding:11px 22px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block;transition:border-color .15s}
+.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+.hero-stat-box{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:16px;padding:28px;min-width:200px;text-align:center}
+.hero-stat-num{font-size:42px;font-weight:900;color:var(--accent);font-family:'JetBrains Mono',monospace;line-height:1}
+.hero-stat-label{font-size:12px;color:var(--muted);font-weight:600;margin-top:6px;text-transform:uppercase;letter-spacing:.06em}
+.hero-stat-sub{font-size:12px;color:var(--muted);margin-top:4px}
+
+.section{max-width:960px;margin:0 auto;padding:0 24px 48px}
+.section-hd{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:18px}
+
+.calc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:40px}
+.calc-card{border:1px solid var(--border);border-radius:12px;padding:20px;text-decoration:none;color:inherit;display:block;transition:all .15s;position:relative}
+.calc-card:hover{border-color:var(--accent);box-shadow:0 4px 16px rgba(13,148,136,.1);transform:translateY(-1px)}
+.calc-tag{position:absolute;top:14px;right:14px;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.tag-free{background:#dcfce7;color:#16a34a}
+.tag-pro{background:var(--accent-bg);color:var(--accent)}
+.calc-icon{font-size:24px;margin-bottom:10px}
+.calc-name{font-size:15px;font-weight:700;margin-bottom:4px}
+.calc-desc{font-size:13px;color:var(--muted);line-height:1.5}
+
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:40px}
+.concept-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+.c-icon{font-size:22px;margin-bottom:10px}
+.c-title{font-size:14px;font-weight:700;margin-bottom:6px}
+.c-body{font-size:13px;color:var(--muted);line-height:1.6}
+
+.learn-cta{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:16px;padding:32px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:40px}
+.learn-cta-text h3{font-size:18px;font-weight:800;margin-bottom:6px}
+.learn-cta-text p{font-size:14px;color:var(--muted)}
+.learn-modules{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.learn-pill{font-size:11px;font-weight:600;background:#fff;border:1px solid var(--accent-border);color:var(--accent);padding:3px 10px;border-radius:12px}
+
+@media(max-width:700px){
+  .hero{grid-template-columns:1fr;padding:28px 16px 24px}
+  .hero-stat-box{display:none}
+  .section{padding:0 16px 36px}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/valuation-toolkit/">ValuationDesk</a>
+  <span class="nav-sep">›</span>
+  <span class="nav-cur">Structured Finance</span>
+</nav>
+
+<div class="hero">
+  <div>
+    <div class="hero-badge">🧩 Domain 15 of 15 · Finance Track</div>
+    <h1>Structured <span>Finance</span></h1>
+    <p class="hero-sub">Securitization waterfall modelling, tranche sizing, ABS/MBS cash flows, prepayment models, and credit enhancement — the toolkit of India's structured credit desk.</p>
+    <div class="hero-actions">
+      <a href="/valuation-toolkit/domains/structured-finance/calculators/" class="btn-primary">Open Calculators →</a>
+      <a href="/valuation-toolkit/domains/structured-finance/learn/" class="btn-secondary">Learn Concepts</a>
+    </div>
+  </div>
+  <div class="hero-stat-box">
+    <div class="hero-stat-num">7</div>
+    <div class="hero-stat-label">Calculators</div>
+    <div class="hero-stat-sub">1 free · 6 PRO</div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-hd">Calculators</div>
+  <div class="calc-grid">
+    <a href="/valuation-toolkit/domains/structured-finance/calculators/waterfall-model.html" class="calc-card">
+      <span class="calc-tag tag-free">FREE</span>
+      <div class="calc-icon">🌊</div>
+      <div class="calc-name">Waterfall Model</div>
+      <div class="calc-desc">Model ABS/MBS cash flow waterfalls — senior, mezzanine, and equity tranche distributions from an Indian loan pool.</div>
+    </a>
+    <a href="/valuation-toolkit/domains/structured-finance/calculators/tranche-sizer.html" class="calc-card">
+      <span class="calc-tag tag-pro">PRO</span>
+      <div class="calc-icon">📐</div>
+      <div class="calc-name">Tranche Sizer</div>
+      <div class="calc-desc">Size senior, mezzanine, and equity tranches based on pool loss distribution, target ratings, and attachment/detachment points.</div>
+    </a>
+    <a href="/valuation-toolkit/domains/structured-finance/calculators/abs-cashflows.html" class="calc-card">
+      <span class="calc-tag tag-pro">PRO</span>
+      <div class="calc-icon">📅</div>
+      <div class="calc-name">ABS Cash Flows</div>
+      <div class="calc-desc">Month-by-month ABS/PTC cash flow schedule with PSA prepayment model, scheduled principal, interest, and WAL calculation.</div>
+    </a>
+    <a href="/valuation-toolkit/domains/structured-finance/calculators/credit-enhancement.html" class="calc-card">
+      <span class="calc-tag tag-pro">PRO</span>
+      <div class="calc-icon">🛡️</div>
+      <div class="calc-name">Credit Enhancement</div>
+      <div class="calc-desc">Size overcollateralisation, cash reserve, subordination, and excess spread to achieve target ratings on each tranche.</div>
+    </a>
+    <a href="/valuation-toolkit/domains/structured-finance/calculators/cdo-pricer.html" class="calc-card">
+      <span class="calc-tag tag-pro">PRO</span>
+      <div class="calc-icon">🏗️</div>
+      <div class="calc-name">CDO / CLO Pricer</div>
+      <div class="calc-desc">CLO/CDO waterfall test modelling — IC/OC coverage tests, WAS vs. WAC, net interest margin, and tranche NAV analysis.</div>
+    </a>
+    <a href="/valuation-toolkit/domains/structured-finance/calculators/prepayment-model.html" class="calc-card">
+      <span class="calc-tag tag-pro">PRO</span>
+      <div class="calc-icon">⚡</div>
+      <div class="calc-name">Prepayment Model</div>
+      <div class="calc-desc">PSA prepayment model with CPR/SMM conversion, balance amortisation curve, and weighted average life (WAL) under multiple speeds.</div>
+    </a>
+    <a href="/valuation-toolkit/domains/structured-finance/calculators/spread-analyser.html" class="calc-card">
+      <span class="calc-tag tag-pro">PRO</span>
+      <div class="calc-icon">📊</div>
+      <div class="calc-name">Spread Analyser</div>
+      <div class="calc-desc">Z-spread, discount margin, and relative value analysis for ABS tranches vs. corporate bonds and G-Sec at equivalent ratings.</div>
+    </a>
+  </div>
+
+  <div class="section-hd">Core Concepts</div>
+  <div class="concept-grid">
+    <div class="concept-card">
+      <div class="c-icon">🔄</div>
+      <div class="c-title">Securitisation</div>
+      <div class="c-body">Converting illiquid loan pools into tradeable securities. Originator sells pool to SPV, SPV issues PTCs (Pass Through Certificates) to investors. Removes assets from bank balance sheet, frees regulatory capital.</div>
+    </div>
+    <div class="concept-card">
+      <div class="c-icon">🏛️</div>
+      <div class="c-title">Waterfall Priority</div>
+      <div class="c-body">Senior tranche gets paid first (lowest risk, lowest yield). Mezzanine next. Equity/first-loss tranche absorbs losses first, receives residual cash flows. Sequential pay creates the "waterfall" structure.</div>
+    </div>
+    <div class="concept-card">
+      <div class="c-icon">🛡️</div>
+      <div class="c-title">Credit Enhancement</div>
+      <div class="c-body">Mechanisms protecting senior investors: overcollateralisation (OC), cash reserve accounts, excess spread, subordination, and third-party guarantees. Sized by rating agencies to support target credit ratings.</div>
+    </div>
+    <div class="concept-card">
+      <div class="c-icon">⚡</div>
+      <div class="c-title">Prepayment Risk</div>
+      <div class="c-body">Borrowers repay early, shortening the asset life. Measured via PSA speed (% of standard prepayment model). High PSA = fast prepayment = shorter WAL. Reinvestment risk for investors when rates are falling.</div>
+    </div>
+  </div>
+
+  <div class="learn-cta">
+    <div class="learn-cta-text">
+      <h3>Learn Structured Finance</h3>
+      <p>Four modules covering securitisation mechanics, ABS/MBS structures, CDO/CLO markets, and SEBI PTC regulations.</p>
+      <div class="learn-modules">
+        <span class="learn-pill">Securitisation Mechanics</span>
+        <span class="learn-pill">ABS / MBS Structures</span>
+        <span class="learn-pill">CDO / CLO Markets</span>
+        <span class="learn-pill">SEBI PTC Framework</span>
+      </div>
+    </div>
+    <a href="/valuation-toolkit/domains/structured-finance/learn/" class="btn-primary">Start Learning →</a>
+  </div>
+</div>
+
+</body>
+</html>

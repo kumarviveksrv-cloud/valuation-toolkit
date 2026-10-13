@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ABS Spread Analyser — Structured Finance | ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
+  --accent:#0d9488;--accent-bg:#f0fdfa;--accent-border:#99f6e4;
+  --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+a{color:inherit;text-decoration:none}
+
+/* NAV */
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg);z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:14px}
+.nav-logo{font-weight:800;font-size:16px;color:var(--accent)}
+.nav-sep{color:var(--border)}
+.nav-crumb{color:var(--muted)}
+.nav-crumb a:hover{color:var(--text)}
+.pro-badge{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;letter-spacing:.5px}
+
+/* HERO */
+.hero{background:var(--accent-bg);border-bottom:1px solid var(--accent-border);padding:40px 24px 32px}
+.hero-inner{max-width:900px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px;margin-bottom:16px;letter-spacing:.4px}
+.hero h1{font-size:clamp(24px,4vw,36px);font-weight:900;line-height:1.15;margin-bottom:10px}
+.hero p{color:var(--muted);font-size:15px;max-width:580px;line-height:1.6}
+.hero-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+.meta-pill{background:#fff;border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:500;color:var(--muted)}
+.meta-pill span{color:var(--text);font-weight:600}
+
+/* STEPPER */
+.stepper{border-bottom:1px solid var(--border);padding:0 24px;display:flex;overflow-x:auto;background:var(--bg);gap:0}
+.tab{display:flex;align-items:center;gap:8px;padding:14px 20px;font-size:13px;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;white-space:nowrap;cursor:pointer;transition:all .2s}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab.done{color:var(--green)}
+.tab.locked{color:var(--muted);opacity:.5;cursor:default}
+.tab-num{width:22px;height:22px;border-radius:50%;background:var(--border);color:var(--muted);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tab.active .tab-num{background:var(--accent);color:#fff}
+.tab.done .tab-num{background:var(--green);color:#fff}
+
+/* STEPS */
+.step{display:none;max-width:900px;margin:0 auto;padding:32px 24px}
+.step.active{display:block}
+
+/* POOL PICKER */
+.search-bar{position:relative;margin-bottom:20px}
+.search-bar input{width:100%;padding:12px 16px 12px 44px;border:1px solid var(--border);border-radius:10px;font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border .2s}
+.search-bar input:focus{border-color:var(--accent)}
+.search-bar .ico{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px}
+.pool-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.pool-card{border:2px solid var(--border);border-radius:12px;padding:16px;cursor:pointer;transition:all .2s;background:var(--bg)}
+.pool-card:hover{border-color:var(--accent);box-shadow:0 4px 12px rgba(13,148,136,.1)}
+.pool-card.selected{border-color:var(--accent);background:var(--accent-bg)}
+.pool-name{font-size:13px;font-weight:700;margin-bottom:4px}
+.pool-orig{font-size:11px;color:var(--muted);margin-bottom:10px}
+.pool-chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;font-family:'JetBrains Mono',monospace}
+.chip.aaa{background:#dcfce7;color:#15803d}
+.chip.aa{background:#dbeafe;color:#1d4ed8}
+.chip.a{background:#fef9c3;color:#92400e}
+.chip.bbb{background:#fee2e2;color:#991b1b}
+.chip.type{background:var(--card);color:var(--muted);border:1px solid var(--border)}
+.chip.spread{background:#f3e8ff;color:#7c3aed}
+.chip.size{background:var(--accent-bg);color:var(--accent)}
+
+/* STEP NAV */
+.step-nav{margin-top:28px;display:flex;gap:10px;align-items:center}
+.btn{padding:11px 22px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .2s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#0f766e}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-ghost{background:var(--card);color:var(--text);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.selected-hint{font-size:13px;color:var(--muted)}
+
+/* CONTEXT */
+.ctx-hero{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:14px;padding:24px;margin-bottom:24px}
+.ctx-pool-name{font-size:18px;font-weight:800;margin-bottom:4px}
+.ctx-pool-sub{font-size:13px;color:var(--muted)}
+.ctx-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:20px}
+.ctx-stat{background:#fff;border:1px solid var(--accent-border);border-radius:10px;padding:14px;text-align:center}
+.ctx-stat .val{font-size:20px;font-weight:800;color:var(--accent);font-family:'JetBrains Mono',monospace}
+.ctx-stat .lbl{font-size:11px;color:var(--muted);margin-top:3px;font-weight:500}
+.ctx-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:24px}
+.ctx-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px}
+.ctx-card h4{font-size:13px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.ctx-card p{font-size:12px;color:var(--muted);line-height:1.7}
+.ctx-card code{font-family:'JetBrains Mono',monospace;font-size:11px;background:#fff;border:1px solid var(--border);padding:1px 5px;border-radius:4px;color:var(--blue)}
+
+/* SPREAD STACK VISUAL */
+.spread-stack{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:24px}
+.spread-stack h4{font-size:13px;font-weight:700;margin-bottom:14px}
+.spread-layers{display:flex;flex-direction:column;gap:6px}
+.spread-layer{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;border:1px solid transparent}
+.spread-layer .layer-label{font-size:12px;font-weight:700;min-width:130px}
+.spread-layer .layer-bar{flex:1;height:14px;border-radius:4px;position:relative}
+.spread-layer .layer-val{font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;min-width:70px;text-align:right}
+.sl-zspread{background:#f0fdfa;border-color:var(--accent-border)}
+.sl-zspread .layer-label{color:var(--accent)}
+.sl-zspread .layer-bar{background:var(--accent)}
+.sl-dm{background:#eff6ff;border-color:#bfdbfe}
+.sl-dm .layer-label{color:var(--blue)}
+.sl-dm .layer-bar{background:var(--blue)}
+.sl-oas{background:#fef3c7;border-color:#fcd34d}
+.sl-oas .layer-label{color:var(--amber)}
+.sl-oas .layer-bar{background:var(--amber)}
+.sl-benchmark{background:var(--card);border-color:var(--border)}
+.sl-benchmark .layer-label{color:var(--muted)}
+.sl-benchmark .layer-bar{background:var(--muted);opacity:.5}
+
+/* PRO GATE */
+.pro-gate{border:2px dashed var(--border);border-radius:14px;padding:40px 24px;text-align:center;margin-top:8px}
+.pro-gate .lock{font-size:36px;margin-bottom:12px}
+.pro-gate h3{font-size:18px;font-weight:800;margin-bottom:8px}
+.pro-gate p{font-size:13px;color:var(--muted);margin-bottom:20px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.6}
+.feature-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:24px}
+.feature-pill{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:500;color:var(--text)}
+.btn-pro{background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:none;font-family:'Inter',sans-serif;transition:all .2s}
+.btn-pro:hover{opacity:.9;transform:translateY(-1px)}
+.pro-note{font-size:12px;color:var(--muted);margin-top:12px}
+
+@media(max-width:640px){
+  .ctx-stats{grid-template-columns:repeat(2,1fr)}
+  .ctx-cards{grid-template-columns:1fr}
+  .pool-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <span class="nav-logo">ValuationDesk</span>
+    <span class="nav-sep">›</span>
+    <span class="nav-crumb"><a href="/valuation-toolkit/domains/structured-finance/">Structured Finance</a></span>
+    <span class="nav-sep">›</span>
+    <span class="nav-crumb">Spread Analyser</span>
+  </div>
+  <span class="pro-badge">PRO</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">📉 PRO Calculator · Domain 15 of 15</div>
+    <h1>ABS Spread Analyser</h1>
+    <p>Compute Z-spread, discount margin, and OAS for Indian ABS tranches. Compare relative value across pools using spread-to-benchmark decomposition and credit-adjusted pricing.</p>
+    <div class="hero-meta">
+      <div class="meta-pill"><span>Metric</span> Z-Spread / DM / OAS</div>
+      <div class="meta-pill"><span>Benchmark</span> G-Sec / MIBOR</div>
+      <div class="meta-pill"><span>Output</span> Relative Value</div>
+      <div class="meta-pill"><span>Pools</span> 30 Indian ABS</div>
+    </div>
+  </div>
+</div>
+
+<div class="stepper">
+  <div class="tab active" id="tab1"><div class="tab-num">1</div>Pick Pool</div>
+  <div class="tab locked" id="tab2"><div class="tab-num">2</div>Spread Context</div>
+  <div class="tab locked" id="tab3"><div class="tab-num">3</div>Pricing Inputs</div>
+  <div class="tab locked" id="tab4"><div class="tab-num">4</div>Spread Output</div>
+</div>
+
+<!-- STEP 1: POOL PICKER -->
+<div class="step active" id="step1">
+  <div class="search-bar">
+    <span class="ico">🔍</span>
+    <input type="text" id="searchInput" placeholder="Search pools by name, originator or type…" oninput="filterPools(this.value)">
+  </div>
+  <div class="pool-grid" id="poolGrid"></div>
+  <div class="step-nav">
+    <button class="btn btn-primary" id="nextBtn1" onclick="goStep(2)" disabled>Continue to Context →</button>
+    <span class="selected-hint" id="hint1">Select a pool to continue</span>
+  </div>
+</div>
+
+<!-- STEP 2: CONTEXT -->
+<div class="step" id="step2">
+  <div class="ctx-hero">
+    <div class="ctx-pool-name" id="ctx-name"></div>
+    <div class="ctx-pool-sub" id="ctx-sub"></div>
+    <div class="ctx-stats">
+      <div class="ctx-stat"><div class="val" id="ctx-spread"></div><div class="lbl">Pool Spread (bps)</div></div>
+      <div class="ctx-stat"><div class="val" id="ctx-wac"></div><div class="lbl">WAC (%)</div></div>
+      <div class="ctx-stat"><div class="val" id="ctx-rating"></div><div class="lbl">Pool Rating</div></div>
+      <div class="ctx-stat"><div class="val" id="ctx-size"></div><div class="lbl">Pool Size (₹ Cr)</div></div>
+    </div>
+  </div>
+
+  <!-- SPREAD STACK VISUAL -->
+  <div class="spread-stack">
+    <h4>📐 Spread Decomposition Framework</h4>
+    <div class="spread-layers">
+      <div class="spread-layer sl-benchmark">
+        <div class="layer-label">Risk-Free (G-Sec)</div>
+        <div class="layer-bar" style="width:40%"></div>
+        <div class="layer-val" id="ss-rf">~7.0%</div>
+      </div>
+      <div class="spread-layer sl-zspread">
+        <div class="layer-label">Z-Spread</div>
+        <div class="layer-bar" id="ss-zbar" style="width:30%"></div>
+        <div class="layer-val" id="ss-z">— bps</div>
+      </div>
+      <div class="spread-layer sl-dm">
+        <div class="layer-label">Discount Margin</div>
+        <div class="layer-bar" id="ss-dmbar" style="width:25%"></div>
+        <div class="layer-val" id="ss-dm">— bps</div>
+      </div>
+      <div class="spread-layer sl-oas">
+        <div class="layer-label">OAS (Option-Adj.)</div>
+        <div class="layer-bar" id="ss-oasbar" style="width:20%"></div>
+        <div class="layer-val" id="ss-oas">— bps</div>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin-top:12px">OAS = Z-Spread minus embedded option cost (prepayment optionality). Illustrative only — unlock PRO for live computation.</p>
+  </div>
+
+  <div class="ctx-cards">
+    <div class="ctx-card">
+      <h4>📊 Z-Spread Defined</h4>
+      <p>The Z-spread (zero-volatility spread) is the constant spread added to every point on the risk-free spot curve that equates a bond's cash flows to its market price. Unlike a nominal spread, Z-spread accounts for the entire yield curve shape. For Indian ABS: <code>Price = Σ CF_t / (1 + r_t + Z)^t</code> where r_t are spot G-Sec rates.</p>
+    </div>
+    <div class="ctx-card">
+      <h4>📐 Discount Margin</h4>
+      <p>DM is the spread over the floating reference rate (MIBOR / SOFR equivalent) that equates projected cash flows to market price. Used for floating-rate ABS tranches. DM interpretation: a DM of <code>150 bps</code> means you earn MIBOR + 1.50% on an annual basis, adjusted for projected prepayments and defaults.</p>
+    </div>
+    <div class="ctx-card">
+      <h4>🎯 OAS — Option-Adjusted Spread</h4>
+      <p>OAS strips out the value of the embedded prepayment option. Because ABS pools can prepay early (borrowers refinance), investors bear extension/contraction risk. OAS removes this optionality: <code>OAS = Z-Spread − Option Cost</code>. Higher option cost (volatile rates, high PSA dispersion) means lower OAS for same Z-spread.</p>
+    </div>
+    <div class="ctx-card">
+      <h4>🇮🇳 Indian ABS Relative Value</h4>
+      <p>Indian ABS spreads are quoted over the 5yr G-Sec for long-duration pools (home loans) and 1yr T-bill for short pools (gold, microfinance). AAA-rated home loan PTCs typically trade at <code>60–100 bps</code> over G-Sec. Single-A MFI pools can reach <code>250–350 bps</code>. Credit spread pickup vs corporate bonds of equivalent rating averages <code>20–40 bps</code>.</p>
+    </div>
+  </div>
+
+  <div class="step-nav">
+    <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
+    <button class="btn btn-primary" onclick="goStep(3)">Continue to Inputs →</button>
+  </div>
+</div>
+
+<!-- STEP 3: PRO GATE -->
+<div class="step" id="step3">
+  <div class="pro-gate">
+    <div class="lock">🔒</div>
+    <h3>Pricing Inputs — PRO</h3>
+    <p>Enter market price, benchmark curve, prepayment assumption, and scenario spread shocks to compute live Z-spread, DM, and OAS.</p>
+    <div class="feature-pills">
+      <div class="feature-pill">📊 Z-Spread Calculator</div>
+      <div class="feature-pill">📐 Discount Margin</div>
+      <div class="feature-pill">🎯 OAS Pricing</div>
+      <div class="feature-pill">📈 Benchmark Curve</div>
+      <div class="feature-pill">🔀 Spread Scenarios</div>
+      <div class="feature-pill">⚖️ Relative Value vs Corporates</div>
+    </div>
+    <button class="btn-pro" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    <div class="pro-note">Monthly only · Cancel anytime · All 15 domains included</div>
+  </div>
+  <div class="step-nav">
+    <button class="btn btn-ghost" onclick="goStep(2)">← Back</button>
+  </div>
+</div>
+
+<!-- STEP 4: PRO GATE -->
+<div class="step" id="step4">
+  <div class="pro-gate">
+    <div class="lock">🔒</div>
+    <h3>Spread Output &amp; Relative Value — PRO</h3>
+    <p>Full Z-spread / DM / OAS computation with yield curve overlay, relative value matrix vs comparables, and spread duration calculation.</p>
+    <div class="feature-pills">
+      <div class="feature-pill">📉 Z-Spread vs DM vs OAS</div>
+      <div class="feature-pill">📊 Yield Curve Overlay</div>
+      <div class="feature-pill">⚖️ Peer Comparison Matrix</div>
+      <div class="feature-pill">⏱ Spread Duration</div>
+      <div class="feature-pill">💹 Price / Spread Sensitivity</div>
+      <div class="feature-pill">📈 Rich / Cheap Signal</div>
+    </div>
+    <button class="btn-pro" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    <div class="pro-note">Monthly only · Cancel anytime · All 15 domains included</div>
+  </div>
+  <div class="step-nav">
+    <button class="btn btn-ghost" onclick="goStep(3)">← Back</button>
+  </div>
+</div>
+
+<script>
+var POOLS=[
+  {id:1,name:'HDFC Home Loan Pool',originator:'HDFC Ltd',type:'Home Loan',size:2500,wac:8.8,wam:204,psa:150,ce:12.5,delinq:0.8,rating:'AAA',spread:68},
+  {id:2,name:'SBI Home Loan Pool',originator:'State Bank of India',type:'Home Loan',size:4200,wac:8.4,wam:228,psa:120,ce:10.0,delinq:1.2,rating:'AAA',spread:62},
+  {id:3,name:'Bajaj Auto Finance Pool',originator:'Bajaj Auto Finance',type:'Auto Loan',size:800,wac:14.2,wam:36,psa:200,ce:15.0,delinq:2.1,rating:'AA',spread:145},
+  {id:4,name:'Mahindra Finance Auto Pool',originator:'Mahindra Finance',type:'Auto Loan',size:650,wac:15.4,wam:42,psa:220,ce:16.5,delinq:3.2,rating:'AA',spread:162},
+  {id:5,name:'Fullerton MFI Pool',originator:'Fullerton India',type:'Microfinance',size:350,wac:22.4,wam:18,psa:80,ce:22.0,delinq:4.8,rating:'A',spread:285},
+  {id:6,name:'Muthoot Gold Loan Pool',originator:'Muthoot Finance',type:'Gold Loan',size:1200,wac:18.2,wam:12,psa:300,ce:18.0,delinq:1.4,rating:'AA',spread:178},
+  {id:7,name:'L&T Finance LAP Pool',originator:'L&T Finance',type:'LAP',size:950,wac:12.8,wam:108,psa:140,ce:14.0,delinq:2.8,rating:'AA',spread:138},
+  {id:8,name:'PNB Housing Pool',originator:'PNB Housing Finance',type:'Home Loan',size:1800,wac:9.2,wam:192,psa:130,ce:11.5,delinq:1.6,rating:'AA',spread:88},
+  {id:9,name:'ICICI Bank Auto Pool',originator:'ICICI Bank',type:'Auto Loan',size:1100,wac:13.8,wam:48,psa:190,ce:13.0,delinq:1.8,rating:'AAA',spread:128},
+  {id:10,name:'Kotak LAP Pool',originator:'Kotak Mahindra Bank',type:'LAP',size:780,wac:11.4,wam:120,psa:120,ce:15.5,delinq:2.2,rating:'AA',spread:115},
+  {id:11,name:'HDB Financial CV Pool',originator:'HDB Financial Services',type:'Commercial Vehicle',size:600,wac:16.8,wam:54,psa:250,ce:18.0,delinq:3.6,rating:'AA',spread:185},
+  {id:12,name:'Cholamandalam Auto Pool',originator:'Cholamandalam Finance',type:'Auto Loan',size:720,wac:15.2,wam:48,psa:210,ce:17.0,delinq:3.0,rating:'AA',spread:165},
+  {id:13,name:'Shriram Transport CV Pool',originator:'Shriram Transport Finance',type:'Commercial Vehicle',size:1400,wac:18.4,wam:60,psa:240,ce:20.0,delinq:4.2,rating:'AA',spread:198},
+  {id:14,name:'Axis Bank Home Loan Pool',originator:'Axis Bank',type:'Home Loan',size:2200,wac:8.6,wam:216,psa:135,ce:11.0,delinq:0.9,rating:'AAA',spread:65},
+  {id:15,name:'Tata Capital Personal Loan Pool',originator:'Tata Capital',type:'Personal Loan',size:420,wac:19.8,wam:24,psa:180,ce:24.0,delinq:5.2,rating:'A',spread:295},
+  {id:16,name:'IIFL Affordable Housing Pool',originator:'IIFL Home Finance',type:'Affordable Housing',size:580,wac:13.4,wam:156,psa:110,ce:16.0,delinq:3.4,rating:'A',spread:165},
+  {id:17,name:'Aditya Birla LAP Pool',originator:'Aditya Birla Finance',type:'LAP',size:820,wac:12.2,wam:96,psa:115,ce:15.0,delinq:2.6,rating:'AA',spread:128},
+  {id:18,name:'Bajaj Housing Finance Pool',originator:'Bajaj Housing Finance',type:'Home Loan',size:1650,wac:8.9,wam:210,psa:125,ce:10.5,delinq:0.7,rating:'AAA',spread:70},
+  {id:19,name:'Sundaram Finance CV Pool',originator:'Sundaram Finance',type:'Commercial Vehicle',size:480,wac:16.2,wam:48,psa:230,ce:18.5,delinq:2.8,rating:'AA',spread:178},
+  {id:20,name:'RBL Bank MFI Pool',originator:'RBL Bank',type:'Microfinance',size:280,wac:23.8,wam:15,psa:70,ce:25.0,delinq:6.2,rating:'BBB',spread:345},
+  {id:21,name:'LIC Housing Finance Pool',originator:'LIC Housing Finance',type:'Home Loan',size:3200,wac:8.2,wam:240,psa:110,ce:9.5,delinq:1.1,rating:'AAA',spread:58},
+  {id:22,name:'Hero FinCorp Two-Wheeler Pool',originator:'Hero FinCorp',type:'Two-Wheeler Loan',size:390,wac:20.4,wam:30,psa:280,ce:22.0,delinq:4.4,rating:'A',spread:268},
+  {id:23,name:'IDFC First Bank Auto Pool',originator:'IDFC First Bank',type:'Auto Loan',size:560,wac:14.4,wam:42,psa:195,ce:14.5,delinq:2.4,rating:'AA',spread:152},
+  {id:24,name:'Can Fin Homes Pool',originator:'Can Fin Homes',type:'Home Loan',size:880,wac:9.4,wam:186,psa:120,ce:11.0,delinq:1.4,rating:'AA',spread:82},
+  {id:25,name:'AU Small Finance MSME Pool',originator:'AU Small Finance Bank',type:'Secured MSME',size:340,wac:17.2,wam:72,psa:150,ce:20.0,delinq:3.8,rating:'A',spread:215},
+  {id:26,name:'Manappuram Gold Loan Pool',originator:'Manappuram Finance',type:'Gold Loan',size:680,wac:19.4,wam:10,psa:320,ce:20.0,delinq:1.8,rating:'AA',spread:195},
+  {id:27,name:'Piramal Housing Finance Pool',originator:'Piramal Capital',type:'Home Loan',size:1100,wac:11.2,wam:144,psa:100,ce:18.0,delinq:4.8,rating:'A',spread:148},
+  {id:28,name:'Repco Affordable Housing Pool',originator:'Repco Home Finance',type:'Affordable Housing',size:350,wac:12.8,wam:168,psa:105,ce:15.5,delinq:3.2,rating:'A',spread:162},
+  {id:29,name:'Magma Fincorp CV Pool',originator:'Magma Fincorp',type:'Commercial Vehicle',size:440,wac:17.6,wam:54,psa:260,ce:21.0,delinq:4.6,rating:'A',spread:228},
+  {id:30,name:'HDFC Bank Trade Finance Pool',originator:'HDFC Bank',type:'Trade Finance',size:920,wac:10.4,wam:12,psa:180,ce:12.0,delinq:0.6,rating:'AAA',spread:95}
+];
+
+var selected=null;
+
+function ratingClass(r){
+  if(r==='AAA') return 'aaa';
+  if(r==='AA') return 'aa';
+  if(r==='A') return 'a';
+  return 'bbb';
+}
+
+function renderPools(list){
+  var g=document.getElementById('poolGrid');
+  if(list.length===0){g.innerHTML='<p style="color:var(--muted);font-size:14px;padding:20px 0">No pools match your search.</p>';return;}
+  g.innerHTML=list.map(function(p){
+    var rc=ratingClass(p.rating);
+    var isSelected=(selected&&selected.id===p.id);
+    var selClass=isSelected?' selected':'';
+    return '<div class="pool-card'+selClass+'" onclick="selectPool('+p.id+')">'
+      +'<div class="pool-name">'+p.name+'</div>'
+      +'<div class="pool-orig">'+p.originator+'</div>'
+      +'<div class="pool-chips">'
+      +'<span class="chip '+rc+'">'+p.rating+'</span>'
+      +'<span class="chip type">'+p.type+'</span>'
+      +'<span class="chip spread">'+p.spread+' bps</span>'
+      +'<span class="chip size">₹'+p.size+' Cr</span>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+}
+
+function filterPools(q){
+  var lower=q.toLowerCase();
+  var filtered=POOLS.filter(function(p){
+    return p.name.toLowerCase().indexOf(lower)>-1
+      ||p.originator.toLowerCase().indexOf(lower)>-1
+      ||p.type.toLowerCase().indexOf(lower)>-1;
+  });
+  renderPools(filtered);
+}
+
+function selectPool(id){
+  selected=POOLS.find(function(p){return p.id===id;});
+  renderPools(POOLS);
+  document.getElementById('nextBtn1').disabled=false;
+  document.getElementById('hint1').textContent=selected.name+' selected';
+}
+
+function buildContext(){
+  if(!selected) return;
+  var p=selected;
+  document.getElementById('ctx-name').textContent=p.name;
+  document.getElementById('ctx-sub').textContent=p.originator+' · '+p.type+' · '+p.rating;
+  document.getElementById('ctx-spread').textContent=p.spread;
+  document.getElementById('ctx-wac').textContent=p.wac+'%';
+  document.getElementById('ctx-rating').textContent=p.rating;
+  document.getElementById('ctx-size').textContent='₹'+p.size;
+
+  // Spread stack illustrative widths
+  var zPct=Math.min(90,Math.round(p.spread/4));
+  var dmPct=Math.max(10,zPct-8);
+  var oasPct=Math.max(5,dmPct-6);
+  document.getElementById('ss-z').textContent=p.spread+' bps';
+  document.getElementById('ss-dm').textContent=Math.round(p.spread*0.95)+' bps';
+  document.getElementById('ss-oas').textContent=Math.round(p.spread*0.82)+' bps';
+  document.getElementById('ss-zbar').style.width=zPct+'%';
+  document.getElementById('ss-dmbar').style.width=dmPct+'%';
+  document.getElementById('ss-oasbar').style.width=oasPct+'%';
+}
+
+function goStep(n){
+  [1,2,3,4].forEach(function(i){
+    document.getElementById('step'+i).classList.toggle('active',i===n);
+    var t=document.getElementById('tab'+i);
+    t.classList.remove('active','done','locked');
+    if(i<n) t.classList.add('done');
+    else if(i===n) t.classList.add('active');
+    else t.classList.add('locked');
+  });
+  if(n===2&&selected) buildContext();
+}
+
+function unlockPro(){
+  alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');
+}
+
+renderPools(POOLS);
+</script>
+</body>
+</html>
