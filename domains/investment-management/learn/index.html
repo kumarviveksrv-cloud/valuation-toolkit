@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Investment Management Learning Hub — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--accent:#7c3aed;--accent-bg:#f5f3ff;--accent-border:#ddd6fe}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-pro{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+.hero{background:#0a0a0a;color:#fff;padding:36px 24px 32px}
+.hero-inner{max-width:780px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:#a78bfa;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;margin-bottom:14px;letter-spacing:.04em}
+.hero h1{font-size:clamp(20px,3vw,30px);font-weight:900;letter-spacing:-.02em;margin-bottom:8px}
+.hero p{font-size:13px;color:#9ca3af;line-height:1.65;max-width:520px}
+.main{max-width:780px;margin:0 auto;padding:40px 24px 80px}
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:20px}
+.module{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px}
+.module-header{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;cursor:pointer;transition:background .15s;gap:12px}
+.module-header:hover{background:var(--card)}
+.module-header.open{border-bottom:1px solid var(--border)}
+.module-left{display:flex;align-items:center;gap:14px}
+.module-num{font-size:11px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--muted);min-width:24px}
+.module-title{font-size:15px;font-weight:800}
+.module-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.module-chevron{font-size:14px;color:var(--muted);transition:transform .2s}
+.module-chevron.open{transform:rotate(180deg)}
+.module-body{padding:20px 24px;display:none}
+.module-body.open{display:block}
+.module-body p{font-size:14px;line-height:1.75;color:var(--muted);margin-bottom:16px}
+.module-body h4{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin:20px 0 10px}
+.formula-block{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:16px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.8;white-space:pre-wrap;color:var(--text)}
+.key-point{display:flex;gap:10px;margin-bottom:10px;padding:10px 14px;background:var(--accent-bg);border-left:3px solid var(--accent);border-radius:0 6px 6px 0}
+.key-point-dot{font-size:14px;flex-shrink:0;margin-top:1px}
+.key-point-text{font-size:13px;color:var(--text);line-height:1.55}
+.glossary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:24px}
+.glossary-item{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+.glossary-term{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--accent);margin-bottom:6px}
+.glossary-def{font-size:13px;color:var(--muted);line-height:1.6}
+.cta-bar{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:10px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:40px}
+.cta-bar h3{font-size:15px;font-weight:800;margin-bottom:4px}
+.cta-bar p{font-size:13px;color:var(--muted)}
+.cta-btn{background:var(--accent);color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700;white-space:nowrap;transition:opacity .15s}
+.cta-btn:hover{opacity:.9}
+footer{border-top:1px solid var(--border);padding:24px;text-align:center;font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-left">
+    <a href="/valuation-toolkit/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">/</span>
+    <a href="/valuation-toolkit/domains/investment-management/">Investment Management</a>
+    <span class="nav-sep">/</span>
+    <span>Learn</span>
+  </div>
+  <button class="nav-pro" onclick="unlockPro()">Unlock Pro — ₹799/mo</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">📚 Learning Hub · Domain 12</div>
+    <h1>Investment Management — 3 Modules</h1>
+    <p>From portfolio construction to attribution to goal-based frameworks — the mental models professional fund managers use every day, built around Indian equity markets.</p>
+  </div>
+</div>
+
+<div class="main">
+  <p class="section-label">Learning Modules</p>
+
+  <!-- MODULE 1 -->
+  <div class="module">
+    <div class="module-header" onclick="toggleModule('m1')">
+      <div class="module-left">
+        <span class="module-num">01</span>
+        <div>
+          <div class="module-title">Portfolio Construction &amp; Rebalancing</div>
+          <div class="module-meta">Strategic allocation · Drift thresholds · Trade generation</div>
+        </div>
+      </div>
+      <span class="module-chevron" id="chev-m1">▼</span>
+    </div>
+    <div class="module-body" id="body-m1">
+      <p>Portfolio construction is the act of combining individual securities into a portfolio that achieves a specific risk-return objective. The first decision — strategic asset allocation — sets target weights across asset classes (equities, debt, cash) based on the investor's time horizon, risk tolerance, and goals. Every other decision flows from this policy portfolio.</p>
+
+      <h4>Strategic vs Tactical Allocation</h4>
+      <p>Strategic Asset Allocation (SAA) is the long-run policy. A typical balanced Indian investor might target 65% equity / 30% debt / 5% cash. Tactical Asset Allocation (TAA) makes deliberate short-term deviations from SAA to capture market inefficiencies — overweighting IT when valuations are depressed, underweighting FMCG when earnings growth decelerates. TAA bets should be small (±5–10% from SAA) and time-limited. Most retail investors should stay at SAA.</p>
+
+      <div class="formula-block">Target Return = w_eq × R_eq + w_debt × R_debt + w_cash × R_cash
+Example: 65% × 14% + 30% × 7.2% + 5% × 6.5% = 11.58%</div>
+
+      <h4>How Drift Happens</h4>
+      <p>Markets move continuously, pushing actual weights away from target weights. A portfolio that starts at 65/30/5 after a strong equity rally might drift to 72/24/4 — taking more risk than intended without any active decision. Drift management is not optional; it is what keeps the portfolio anchored to the original risk mandate.</p>
+
+      <div class="key-point"><span class="key-point-dot">⚖️</span><span class="key-point-text">Absolute drift threshold: rebalance when any asset class weight deviates more than ±5% from target. E.g. equity drifts from 65% target to 71% — trigger.</span></div>
+      <div class="key-point"><span class="key-point-dot">📊</span><span class="key-point-text">Relative drift threshold: rebalance when deviation exceeds ±25% of the target weight. 65% target × 25% = ±16.25pp. Higher tolerance, less frequent trading.</span></div>
+      <div class="key-point"><span class="key-point-dot">📅</span><span class="key-point-text">Calendar rebalancing: rebalance at fixed intervals (monthly/quarterly/annually). Simpler but less tax-efficient — you trade even when drift is minimal.</span></div>
+
+      <h4>Trade Generation Formula</h4>
+      <div class="formula-block">Trade Amount_i = (Target Weight_i - Current Weight_i) × Portfolio Value
+
+If equity target = 65%, current = 72%, portfolio = ₹10,00,000
+Trade = (0.65 - 0.72) × 10,00,000 = -₹70,000 (SELL ₹70,000 of equity)</div>
+
+      <div class="key-point"><span class="key-point-dot">💡</span><span class="key-point-text">Tax-efficient rebalancing: prefer directing new contributions to underweight assets before selling overweight ones. Avoids triggering capital gains on appreciated positions.</span></div>
+      <div class="key-point"><span class="key-point-dot">🔄</span><span class="key-point-text">Threshold-based rebalancing empirically outperforms calendar-based by 0.3–0.5% per annum after transaction costs, because you only trade when it matters.</span></div>
+    </div>
+  </div>
+
+  <!-- MODULE 2 -->
+  <div class="module">
+    <div class="module-header" onclick="toggleModule('m2')">
+      <div class="module-left">
+        <span class="module-num">02</span>
+        <div>
+          <div class="module-title">Performance Attribution — The Brinson Model</div>
+          <div class="module-meta">Allocation effect · Selection effect · Interaction effect</div>
+        </div>
+      </div>
+      <span class="module-chevron" id="chev-m2">▼</span>
+    </div>
+    <div class="module-body" id="body-m2">
+      <p>Attribution answers the PM's most important question: "I beat the index by 4% — but was that because I was in the right sectors, or because I picked better stocks within those sectors?" The Brinson-Hood-Beebower (BHB) model, published in 1986, is the industry standard for decomposing active return at sector level.</p>
+
+      <h4>The Three Effects</h4>
+      <div class="formula-block">For each sector i:
+
+Allocation Effect_i = (w_p_i - w_b_i) × (R_b_i - R_b)
+  = Active weight × (Sector benchmark return - Total benchmark return)
+
+Selection Effect_i = w_b_i × (R_p_i - R_b_i)
+  = Benchmark weight × (Portfolio sector return - Benchmark sector return)
+
+Interaction Effect_i = (w_p_i - w_b_i) × (R_p_i - R_b_i)
+  = Active weight × (Portfolio - Benchmark sector return)
+
+Active Return = Σ(Allocation_i + Selection_i + Interaction_i)</div>
+
+      <h4>What Each Effect Means in Practice</h4>
+      <div class="key-point"><span class="key-point-dot">📍</span><span class="key-point-text">Allocation effect: "I overweighted IT (active weight +5%), and IT beat the benchmark by +8%. My allocation decision contributed +0.4% to active return." This is a top-down, macro-driven bet.</span></div>
+      <div class="key-point"><span class="key-point-dot">🎯</span><span class="key-point-text">Selection effect: "Within Banking, I picked ICICI over HDFC Bank (which had lower weights). ICICI returned 24.8% vs the Banking sector average of 18%. My stock picking added +0.6% in Banking alone." This is bottom-up, fundamental research.</span></div>
+      <div class="key-point"><span class="key-point-dot">✖️</span><span class="key-point-text">Interaction effect: "I both overweighted IT AND picked better IT stocks." You get credit for both. If you underweighted a sector and picked badly within it, the interaction is doubly negative. It is often small and sometimes dropped in simplified attribution.</span></div>
+
+      <h4>Jensen's Alpha vs Active Return</h4>
+      <div class="formula-block">Active Return = Portfolio Return - Benchmark Return (simple, not risk-adjusted)
+Example: 20% - 16% = +4% active return
+
+Jensen's Alpha = Portfolio Return - CAPM Required Return
+CAPM Required = Rf + β × (Rm - Rf)
+             = 6.5% + 1.1 × (16% - 6.5%) = 17.0%
+Alpha = 20% - 17.0% = +3.0%</div>
+
+      <div class="key-point"><span class="key-point-dot">⚡</span><span class="key-point-text">A PM who beats the benchmark by 4% while running a beta of 1.5 has not added value — they simply took more market risk. Jensen's alpha penalises for leverage. Active return does not.</span></div>
+      <div class="key-point"><span class="key-point-dot">📉</span><span class="key-point-text">Tracking error = annualised standard deviation of active return. A PM with 2% TE and 1% active return has an Information Ratio of 0.5 — the active return version of Sharpe. Anything above 0.5 is considered skillful over a full market cycle.</span></div>
+    </div>
+  </div>
+
+  <!-- MODULE 3 -->
+  <div class="module">
+    <div class="module-header" onclick="toggleModule('m3')">
+      <div class="module-left">
+        <span class="module-num">03</span>
+        <div>
+          <div class="module-title">Goal-Based Investing &amp; MVO</div>
+          <div class="module-meta">Corpus planning · Mean-variance optimisation · Efficient frontier</div>
+        </div>
+      </div>
+      <span class="module-chevron" id="chev-m3">▼</span>
+    </div>
+    <div class="module-body" id="body-m3">
+      <p>Traditional portfolio management maximises risk-adjusted return in the abstract. Goal-based investing flips the problem: it starts with a specific liability (retire at 60 with ₹5 Cr, fund child's MBA in 12 years) and works backward to determine what allocation, savings rate, and return target are required to meet it with acceptable probability.</p>
+
+      <h4>Goal Prioritisation Framework</h4>
+      <div class="key-point"><span class="key-point-dot">🛡️</span><span class="key-point-text">Safety bucket (0-2 years): emergency reserve, insurance premiums, fixed short-term liabilities. Allocation: 80-100% cash and liquid debt. No equity. Cannot afford drawdowns.</span></div>
+      <div class="key-point"><span class="key-point-dot">⚖️</span><span class="key-point-text">Stability bucket (3-7 years): child's education, home down payment, car replacement. Allocation: 40-60% equity. Enough time to recover from a bear market but not unlimited.</span></div>
+      <div class="key-point"><span class="key-point-dot">🚀</span><span class="key-point-text">Growth bucket (8+ years): retirement corpus, generational wealth. Allocation: 70-100% equity. Compounding time absorbs volatility. This is where Nifty's long-run 14% CAGR does the heavy lifting.</span></div>
+
+      <h4>Corpus Accumulation Formula</h4>
+      <div class="formula-block">SIP Corpus = PMT × [(1 + r)^n - 1] / r
+
+Where:
+  PMT = monthly SIP amount
+  r   = monthly return = annual return / 12
+  n   = total months = years × 12
+
+Example: ₹50,000/mo for 10 years at 12% p.a.
+  r = 0.12/12 = 0.01
+  n = 120
+  Corpus = 50000 × [(1.01)^120 - 1] / 0.01 = ₹1.16 Cr</div>
+
+      <h4>Mean-Variance Optimisation — Markowitz (1952)</h4>
+      <p>MVO finds the portfolio that, for a given level of expected return, minimises variance (risk). The set of all such optimal portfolios traces the efficient frontier. Above the frontier = impossible. Below it = sub-optimal (you could have done better for the same risk).</p>
+
+      <div class="formula-block">Portfolio Return:  E[Rp] = Σ w_i × E[R_i]
+
+Portfolio Variance: σ²_p = Σ_i Σ_j w_i × w_j × σ_i × σ_j × ρ_ij
+                        = w' × Σ × w   (matrix form)
+
+Sharpe Ratio:      S = (E[Rp] - Rf) / σ_p
+
+Tangency Portfolio = arg max(S)  subject to  Σw_i = 1, w_i ≥ 0</div>
+
+      <div class="key-point"><span class="key-point-dot">🔗</span><span class="key-point-text">Diversification works when correlation ρ &lt; 1. Two assets with ρ = 0 cut portfolio volatility by ~30% at 50/50 weight vs holding either alone. Two assets with ρ = 1 provide zero diversification — they are the same risk.</span></div>
+      <div class="key-point"><span class="key-point-dot">⚠️</span><span class="key-point-text">MVO's core flaw: it requires precise estimates of expected returns — the hardest input in finance. A 1% error in expected return can change the optimal weight by 30%. Black-Litterman blends market equilibrium returns with the PM's views to reduce this sensitivity.</span></div>
+      <div class="key-point"><span class="key-point-dot">📌</span><span class="key-point-text">Capital Market Line: a straight line from the risk-free rate (Rf = 6.5% in India) tangent to the efficient frontier. Any portfolio on the CML dominates every portfolio below it. The tangency point is the Sharpe-maximising portfolio — also called the market portfolio under CAPM.</span></div>
+    </div>
+  </div>
+
+  <!-- GLOSSARY -->
+  <p class="section-label" style="margin-top:48px">Key Terms — Investment Management</p>
+  <div class="glossary-grid">
+    <div class="glossary-item"><div class="glossary-term">Active Return</div><div class="glossary-def">Portfolio return minus benchmark return. Raw measure of outperformance before adjusting for risk taken. Also called alpha in loose usage.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Allocation Effect</div><div class="glossary-def">The portion of active return explained by sector weight decisions (overweighting/underweighting) vs the benchmark, independent of stock selection within those sectors.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Benchmark</div><div class="glossary-def">The reference portfolio against which active management performance is measured. For Indian large-cap funds, typically Nifty 50 or BSE Sensex.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Covariance Matrix</div><div class="glossary-def">An N×N matrix capturing pairwise return covariances for N assets. The key input to mean-variance optimisation. Estimation error here drives most MVO instability.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Efficient Frontier</div><div class="glossary-def">The set of portfolios that maximise expected return for each level of portfolio variance. Portfolios below the frontier are sub-optimal — dominated by frontier portfolios.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Information Ratio (IR)</div><div class="glossary-def">Active return divided by tracking error. Measures skill per unit of active risk. IR above 0.5 sustained over a cycle is considered strong active management.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Jensen's Alpha</div><div class="glossary-def">Actual return minus CAPM-required return. Risk-adjusted outperformance. Positive alpha means the fund earned more than its beta warranted, indicating skill rather than leverage.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Portfolio Drift</div><div class="glossary-def">The gradual deviation of actual asset weights from target weights as market prices change. Left unmanaged, drift increases portfolio risk beyond the original mandate.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Rebalancing</div><div class="glossary-def">Selling outperformers and buying underperformers to restore target weights. Mechanically enforces "buy low, sell high" and controls risk exposure over time.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Selection Effect</div><div class="glossary-def">The portion of active return from picking stocks within each sector that outperform the sector's benchmark return. Pure bottom-up, stock-specific contribution.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Tracking Error</div><div class="glossary-def">Annualised standard deviation of the difference between portfolio returns and benchmark returns. Measures consistency of active positioning. High TE = more active bets taken.</div></div>
+    <div class="glossary-item"><div class="glossary-term">Tangency Portfolio</div><div class="glossary-def">The portfolio on the efficient frontier where the Capital Market Line is tangent — the Sharpe-maximising combination of risky assets. Every investor should hold this, levered or delevered to taste.</div></div>
+  </div>
+
+  <div class="cta-bar">
+    <div>
+      <h3>Ready to apply these concepts?</h3>
+      <p>5 calculators — rebalancing, risk-return matrix, attribution, goal-based allocation, and MVO optimiser.</p>
+    </div>
+    <a href="../calculators/" class="cta-btn">Open Calculator Suite →</a>
+  </div>
+</div>
+
+<footer>ValuationDesk · Investment Management · Domain 12 of 15 · <a href="/valuation-toolkit/" style="color:var(--accent)">← All Domains</a></footer>
+
+<script>
+function toggleModule(id){
+  var body=document.getElementById('body-'+id);
+  var chev=document.getElementById('chev-'+id);
+  var hdr=body.previousElementSibling;
+  var isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  chev.classList.toggle('open',!isOpen);
+  hdr.classList.toggle('open',!isOpen);
+}
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+</script>
+</body>
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Risk-Return Matrix — Investment Management — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--accent:#7c3aed;--accent-bg:#f5f3ff;--accent-border:#ddd6fe}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-pro{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+.hero{background:#0a0a0a;color:#fff;padding:32px 24px 28px}
+.hero-inner{max-width:780px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:#a78bfa;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;margin-bottom:14px;letter-spacing:.04em}
+.hero h1{font-size:clamp(20px,3vw,30px);font-weight:900;letter-spacing:-.02em;margin-bottom:6px}
+.hero h1 span{color:#a78bfa}
+.hero p{font-size:13px;color:#9ca3af;line-height:1.6}
+.step-bar{background:#111;border-bottom:1px solid #222;padding:0 24px}
+.step-bar-inner{max-width:780px;margin:0 auto;display:flex;gap:0}
+.step-tab{padding:14px 20px;font-size:12px;font-weight:700;color:#4b5563;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.step-tab.active{color:#a78bfa;border-bottom-color:#7c3aed}
+.main{max-width:780px;margin:0 auto;padding:32px 24px 80px}
+.step{display:none}
+.step.active{display:block}
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:14px}
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:24px}
+.company-card{border:1px solid var(--border);border-radius:8px;padding:14px 16px;cursor:pointer;transition:all .15s;background:#fff}
+.company-card:hover{border-color:var(--accent);background:var(--accent-bg)}
+.company-card.selected{border-color:var(--accent);background:var(--accent-bg);box-shadow:0 0 0 3px rgba(124,58,237,.15)}
+.company-name{font-size:14px;font-weight:800;margin-bottom:2px}
+.company-sub{font-size:11px;color:var(--muted)}
+.company-meta{font-size:11px;color:var(--muted);margin-top:6px;font-family:'JetBrains Mono',monospace}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .15s;font-family:'Inter',sans-serif}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{opacity:.9}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{color:var(--text);border-color:#aaa}
+.btn-row{display:flex;gap:10px;align-items:center;margin-top:24px}
+.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.metric-box{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+.metric-label{font-size:11px;color:var(--muted);margin-bottom:4px}
+.metric-value{font-size:20px;font-weight:900;font-family:'JetBrains Mono',monospace}
+.metric-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.pos{color:var(--green)}
+.neg{color:var(--red)}
+.teach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:24px}
+.teach-card{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:8px;padding:14px 16px}
+.teach-card h4{font-size:12px;font-weight:800;margin-bottom:6px;color:var(--accent)}
+.teach-card p{font-size:12px;color:#374151;line-height:1.6}
+.qa-block{margin-bottom:16px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px}
+.qa-q{font-size:13px;font-weight:700;margin-bottom:8px}
+.qa-a{font-size:13px;color:#374151;line-height:1.6}
+.divider{border:none;border-top:1px solid var(--border);margin:24px 0}
+/* PRO gate */
+.pro-gate{border:2px dashed var(--border);border-radius:12px;padding:32px;text-align:center;background:var(--card)}
+.pro-gate-icon{font-size:32px;margin-bottom:12px}
+.pro-gate h3{font-size:18px;font-weight:800;margin-bottom:8px}
+.pro-gate p{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6}
+.pro-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:24px}
+.pro-pill{background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);font-size:12px;font-weight:700;padding:6px 14px;border-radius:20px}
+.btn-pro{background:var(--accent);color:#fff;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:800;cursor:pointer;border:none;font-family:'Inter',sans-serif}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-left">
+    <a href="/valuation-toolkit/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">/</span>
+    <a href="/valuation-toolkit/domains/investment-management/">Investment Management</a>
+    <span class="nav-sep">/</span>
+    <span>Risk-Return Matrix</span>
+  </div>
+  <button class="nav-pro" onclick="unlockPro()">Unlock Pro — ₹799/mo</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">📐 Calculator 02 · Investment Management</div>
+    <h1>Risk-<span>Return</span> Matrix</h1>
+    <p>Plot your stock on the risk-return plane against Nifty peers. Identify efficient positions, dominant choices, and where active management adds value.</p>
+  </div>
+</div>
+
+<div class="step-bar">
+  <div class="step-bar-inner">
+    <div class="step-tab active" id="tab-1">1 · Pick Stock</div>
+    <div class="step-tab" id="tab-2">2 · Context</div>
+    <div class="step-tab" id="tab-3">3 · Matrix 🔒</div>
+    <div class="step-tab" id="tab-4">4 · Frontier 🔒</div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- STEP 1 -->
+<div class="step active" id="step-1">
+  <p class="section-label">Choose a stock to analyse</p>
+  <div class="company-grid" id="company-grid"></div>
+  <div class="btn-row">
+    <button class="btn btn-primary" id="next-1" onclick="goStep(2)" disabled>View Risk-Return Context →</button>
+  </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="step" id="step-2">
+  <div id="context-content"></div>
+</div>
+
+<!-- STEP 3 — PRO -->
+<div class="step" id="step-3">
+  <div class="pro-gate">
+    <div class="pro-gate-icon">🔒</div>
+    <h3>Risk-Return Positioning — Pro Feature</h3>
+    <p>See where your stock plots on the risk-return plane against 10 Nifty peers. Identify dominated positions, efficient alternatives, and the capital market line intercept.</p>
+    <div class="pro-pills">
+      <span class="pro-pill">Risk-Return Plot</span>
+      <span class="pro-pill">Peer Comparison Table</span>
+      <span class="pro-pill">Sharpe Ranking</span>
+      <span class="pro-pill">CML Position</span>
+      <span class="pro-pill">Dominant / Dominated Flag</span>
+      <span class="pro-pill">Sector Efficiency Score</span>
+    </div>
+    <button class="btn-pro" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+  </div>
+</div>
+
+<!-- STEP 4 — PRO -->
+<div class="step" id="step-4">
+  <div class="pro-gate">
+    <div class="pro-gate-icon">🔒</div>
+    <h3>Efficient Frontier Analysis — Pro Feature</h3>
+    <p>Build a two-asset efficient frontier combining your selected stock with Nifty. Find the minimum-variance portfolio, the tangency portfolio, and optimal allocation bands for different risk budgets.</p>
+    <div class="pro-pills">
+      <span class="pro-pill">Efficient Frontier Curve</span>
+      <span class="pro-pill">Min-Variance Portfolio</span>
+      <span class="pro-pill">Tangency Portfolio Weights</span>
+      <span class="pro-pill">Risk Budget Allocations</span>
+      <span class="pro-pill">Correlation Impact</span>
+      <span class="pro-pill">Diversification Benefit</span>
+    </div>
+    <button class="btn-pro" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+var STOCKS=[
+  {id:1,name:'Reliance Industries',sector:'Oil & Gas',marketCap:2010000,pe:24.8,beta:0.95,divYield:0.4,ret1y:8.2,ret3y:15.8,ret5y:22.4,vol:18.2,weight:9.8,price:2840},
+  {id:2,name:'HDFC Bank',sector:'Banking',marketCap:1285000,pe:18.2,beta:0.88,divYield:1.1,ret1y:12.4,ret3y:11.2,ret5y:16.8,vol:16.4,weight:7.2,price:1720},
+  {id:3,name:'Infosys',sector:'IT',marketCap:720000,pe:22.4,beta:0.82,divYield:2.4,ret1y:18.6,ret3y:14.8,ret5y:19.2,vol:19.8,weight:5.8,price:1840},
+  {id:4,name:'ICICI Bank',sector:'Banking',marketCap:890000,pe:17.6,beta:1.12,divYield:0.8,ret1y:24.8,ret3y:28.4,ret5y:31.2,vol:20.4,weight:5.2,price:1240},
+  {id:5,name:'TCS',sector:'IT',marketCap:1420000,pe:26.8,beta:0.72,divYield:3.2,ret1y:6.8,ret3y:10.4,ret5y:18.6,vol:15.6,weight:5.8,price:3980},
+  {id:6,name:'Bharti Airtel',sector:'Telecom',marketCap:920000,pe:48.2,beta:0.78,divYield:0.4,ret1y:42.4,ret3y:35.8,ret5y:28.4,vol:22.4,weight:4.2,price:1580},
+  {id:7,name:'Kotak Mahindra Bank',sector:'Banking',marketCap:380000,pe:19.4,beta:0.94,divYield:0.1,ret1y:8.4,ret3y:8.8,ret5y:18.2,vol:18.8,weight:3.2,price:1840},
+  {id:8,name:'L&T',sector:'Capital Goods',marketCap:590000,pe:34.2,beta:1.24,divYield:0.9,ret1y:28.4,ret3y:32.8,ret5y:26.4,vol:24.8,weight:3.8,price:3640},
+  {id:9,name:'Axis Bank',sector:'Banking',marketCap:360000,pe:14.8,beta:1.18,divYield:0.1,ret1y:16.4,ret3y:22.4,ret5y:20.8,vol:22.8,weight:2.8,price:1180},
+  {id:10,name:'Maruti Suzuki',sector:'Auto',marketCap:440000,pe:28.4,beta:0.84,divYield:1.2,ret1y:14.2,ret3y:24.8,ret5y:18.4,vol:21.2,weight:2.4,price:12400},
+  {id:11,name:'Sun Pharmaceutical',sector:'Pharma',marketCap:410000,pe:38.4,beta:0.64,divYield:0.8,ret1y:32.4,ret3y:28.8,ret5y:22.4,vol:17.4,weight:2.4,price:1720},
+  {id:12,name:'HUL',sector:'FMCG',marketCap:530000,pe:52.4,beta:0.42,divYield:1.8,ret1y:2.4,ret3y:4.8,ret5y:10.4,vol:14.2,weight:2.4,price:2480},
+  {id:13,name:'ITC',sector:'FMCG',marketCap:590000,pe:24.8,beta:0.58,divYield:3.2,ret1y:12.4,ret3y:38.8,ret5y:22.4,vol:16.8,weight:3.2,price:468},
+  {id:14,name:'Asian Paints',sector:'Materials',marketCap:290000,pe:58.4,beta:0.48,divYield:1.2,ret1y:-14.2,ret3y:4.2,ret5y:12.8,vol:19.4,weight:1.8,price:2780},
+  {id:15,name:'Bajaj Finance',sector:'NBFC',marketCap:410000,pe:34.8,beta:1.42,divYield:0.1,ret1y:8.4,ret3y:14.8,ret5y:28.4,vol:26.4,weight:2.2,price:7240},
+  {id:16,name:'Wipro',sector:'IT',marketCap:280000,pe:20.8,beta:0.88,divYield:0.1,ret1y:6.4,ret3y:4.8,ret5y:12.4,vol:22.8,weight:1.6,price:580},
+  {id:17,name:'NTPC',sector:'Power',marketCap:380000,pe:18.4,beta:0.74,divYield:2.4,ret1y:32.4,ret3y:28.8,ret5y:22.4,vol:20.4,weight:2.2,price:384},
+  {id:18,name:'Power Grid',sector:'Power',marketCap:280000,pe:20.4,beta:0.68,divYield:3.4,ret1y:28.4,ret3y:22.4,ret5y:18.4,vol:18.4,weight:1.6,price:328},
+  {id:19,name:'Titan',sector:'Consumer',marketCap:320000,pe:84.2,beta:0.82,divYield:0.4,ret1y:4.2,ret3y:18.4,ret5y:28.4,vol:24.8,weight:1.8,price:3640},
+  {id:20,name:'UltraTech Cement',sector:'Materials',marketCap:340000,pe:42.4,beta:0.94,divYield:0.4,ret1y:8.4,ret3y:14.8,ret5y:18.4,vol:22.4,weight:1.8,price:11240},
+  {id:21,name:'HCL Technologies',sector:'IT',marketCap:450000,pe:24.8,beta:0.78,divYield:4.8,ret1y:22.4,ret3y:16.8,ret5y:18.4,vol:20.4,weight:2.2,price:1680},
+  {id:22,name:'M&M',sector:'Auto',marketCap:320000,pe:28.4,beta:1.08,divYield:0.8,ret1y:42.8,ret3y:48.4,ret5y:34.8,vol:26.4,weight:2.2,price:2940},
+  {id:23,name:'JSW Steel',sector:'Materials',marketCap:230000,pe:22.4,beta:1.48,divYield:0.8,ret1y:4.8,ret3y:18.4,ret5y:24.8,vol:28.8,weight:1.4,price:980},
+  {id:24,name:'Adani Ports',sector:'Infrastructure',marketCap:280000,pe:32.4,beta:1.28,divYield:0.4,ret1y:24.4,ret3y:28.4,ret5y:32.4,vol:26.4,weight:1.4,price:1380},
+  {id:25,name:'Tata Motors',sector:'Auto',marketCap:360000,pe:8.4,beta:1.58,divYield:0.0,ret1y:24.4,ret3y:58.4,ret5y:28.4,vol:32.4,weight:1.8,price:980},
+  {id:26,name:'HDFC Life',sector:'Insurance',marketCap:160000,pe:72.4,beta:0.72,divYield:0.2,ret1y:8.4,ret3y:12.4,ret5y:14.8,vol:18.4,weight:1.2,price:680},
+  {id:27,name:'SBI',sector:'Banking',marketCap:720000,pe:10.8,beta:1.32,divYield:1.2,ret1y:28.4,ret3y:48.4,ret5y:28.4,vol:26.4,weight:2.4,price:840},
+  {id:28,name:'Tech Mahindra',sector:'IT',marketCap:140000,pe:38.4,beta:0.98,divYield:2.8,ret1y:8.4,ret3y:-4.8,ret5y:8.4,vol:26.4,weight:0.8,price:1480},
+  {id:29,name:'Nestle India',sector:'FMCG',marketCap:220000,pe:68.4,beta:0.38,divYield:1.4,ret1y:-4.8,ret3y:8.4,ret5y:18.4,vol:16.4,weight:1.2,price:24800},
+  {id:30,name:'Cipla',sector:'Pharma',marketCap:175000,pe:28.4,beta:0.68,divYield:0.8,ret1y:18.4,ret3y:22.4,ret5y:18.4,vol:18.8,weight:1.2,price:1540}
+];
+var NIFTY={ret1y:16.0,ret3y:12.8,ret5y:14.2,vol:14.8};
+var selected=null;
+
+function fmtPct(v){return (v>0?'+':'')+v.toFixed(1)+'%';}
+
+function buildGrid(){
+  var el=document.getElementById('company-grid');
+  var html='';
+  STOCKS.forEach(function(s){
+    html+='<div class="company-card" id="card-'+s.id+'" onclick="selectCompany('+s.id+')">';
+    html+='<div class="company-name">'+s.name+'</div>';
+    html+='<div class="company-sub">'+s.sector+'</div>';
+    html+='<div class="company-meta">Vol: '+s.vol.toFixed(1)+'% · Ret: '+fmtPct(s.ret1y)+'</div>';
+    html+='</div>';
+  });
+  el.innerHTML=html;
+}
+
+function selectCompany(id){
+  selected=STOCKS.find(function(s){return s.id===id;});
+  document.querySelectorAll('.company-card').forEach(function(c){c.classList.remove('selected');});
+  document.getElementById('card-'+id).classList.add('selected');
+  document.getElementById('next-1').disabled=false;
+}
+
+function buildContext(){
+  var c=selected;
+  var sharpe=(c.ret1y-6.5)/c.vol;
+  var niftySharpe=(NIFTY.ret1y-6.5)/NIFTY.vol;
+  var excessSharpe=sharpe-niftySharpe;
+  var efficiencyLabel = sharpe>niftySharpe ? 'Efficient vs Nifty' : 'Below Nifty efficiency';
+  var positionLabel = c.ret1y>NIFTY.ret1y && c.vol<NIFTY.vol ? 'Dominant position' : (c.ret1y<NIFTY.ret1y && c.vol>NIFTY.vol ? 'Dominated position' : 'Mixed risk-return');
+
+  var html='';
+  html+='<p class="section-label">Risk-return context — '+c.name+'</p>';
+  html+='<div class="metric-grid">';
+  html+='<div class="metric-box"><div class="metric-label">1Y Return</div><div class="metric-value '+(c.ret1y>NIFTY.ret1y?'pos':'neg')+'">'+fmtPct(c.ret1y)+'</div><div class="metric-sub">Nifty: '+fmtPct(NIFTY.ret1y)+'</div></div>';
+  html+='<div class="metric-box"><div class="metric-label">Volatility</div><div class="metric-value '+(c.vol<NIFTY.vol?'pos':'neg')+'">'+c.vol.toFixed(1)+'%</div><div class="metric-sub">Nifty: '+NIFTY.vol.toFixed(1)+'%</div></div>';
+  html+='<div class="metric-box"><div class="metric-label">Sharpe Ratio</div><div class="metric-value '+(sharpe>niftySharpe?'pos':'neg')+'">'+sharpe.toFixed(2)+'</div><div class="metric-sub">Nifty: '+niftySharpe.toFixed(2)+'</div></div>';
+  html+='<div class="metric-box"><div class="metric-label">Beta</div><div class="metric-value">'+c.beta.toFixed(2)+'</div><div class="metric-sub">'+c.sector+'</div></div>';
+  html+='<div class="metric-box"><div class="metric-label">Efficiency</div><div class="metric-value" style="font-size:13px;margin-top:4px;font-family:Inter,sans-serif;font-weight:800">'+efficiencyLabel+'</div><div class="metric-sub">Excess Sharpe: '+(excessSharpe>0?'+':'')+excessSharpe.toFixed(2)+'</div></div>';
+  html+='<div class="metric-box"><div class="metric-label">Position Type</div><div class="metric-value" style="font-size:12px;margin-top:4px;font-family:Inter,sans-serif;font-weight:800">'+positionLabel+'</div><div class="metric-sub">vs Nifty benchmark</div></div>';
+  html+='</div>';
+
+  html+='<div class="divider"></div>';
+  html+='<p class="section-label">The risk-return framework</p>';
+  html+='<div class="teach-grid">';
+  html+='<div class="teach-card"><h4>The Risk-Return Plane</h4><p>Every security can be plotted with annualised return on the Y-axis and annualised volatility on the X-axis. Securities in the upper-left quadrant relative to a benchmark deliver more return per unit of risk — these are "efficient" positions.</p></div>';
+  html+='<div class="teach-card"><h4>Dominant vs Dominated</h4><p>Security A dominates B if A offers higher return at equal or lower risk. A dominated security is one where there exists a peer with better risk-return — you should hold the dominant option unless you have a specific thesis for the dominated one.</p></div>';
+  html+='<div class="teach-card"><h4>The Capital Market Line</h4><p>The CML connects the risk-free rate to the tangency portfolio. Securities above the CML add Sharpe versus a leveraged Nifty position — those below destroy risk-adjusted value. The CML slope is the market Sharpe ratio.</p></div>';
+  html+='<div class="teach-card"><h4>Volatility vs Risk</h4><p>Volatility measures price noise, not fundamental risk. A business with stable cash flows trading at 40x earnings can be low-volatility but extremely high-risk if growth disappoints. Quantitative risk-return analysis complements, never replaces, fundamental analysis.</p></div>';
+  html+='</div>';
+
+  html+='<div class="divider"></div>';
+  html+='<p class="section-label">Q&A — risk-return context</p>';
+  html+='<div class="qa-block"><div class="qa-q">Is '+c.name+' efficiently positioned on the risk-return plane?</div><div class="qa-a">With a 1Y return of '+fmtPct(c.ret1y)+' and volatility of '+c.vol.toFixed(1)+'%, '+c.name+'\'s Sharpe ratio of '+sharpe.toFixed(2)+' is <b>'+(sharpe>niftySharpe?'above':'below')+' the Nifty\'s '+niftySharpe.toFixed(2)+'</b>. This places it in the <b>'+(sharpe>niftySharpe?'efficient zone — delivering superior risk-adjusted return':'inefficient zone — the benchmark delivered better return per unit of risk taken')+'</b>. That said, one year is a short window; 3Y and 5Y Sharpe ratios change the picture.</div></div>';
+  html+='<div class="qa-block"><div class="qa-q">How does beta relate to the risk-return position?</div><div class="qa-a">Beta of '+c.beta.toFixed(2)+' means '+c.name+' moves '+(c.beta>1?c.beta.toFixed(2)+'x the market — amplifying both gains and drawdowns':c.beta.toFixed(2)+'x the market — dampening swings in both directions')+'. In the CAPM framework, beta determines expected return: '+c.name+'\'s required return = 6.5% (risk-free) + '+c.beta.toFixed(2)+' × (16% market premium) = <b>'+((6.5+c.beta*(NIFTY.ret1y-6.5)).toFixed(1))+'%</b>. Against actual return of '+fmtPct(c.ret1y)+', Jensen\'s alpha = <b>'+((c.ret1y-(6.5+c.beta*(NIFTY.ret1y-6.5))).toFixed(1))+'%</b>.</div></div>';
+
+  html+='<div class="btn-row"><button class="btn btn-ghost" onclick="goStep(1)">← Back</button><button class="btn btn-primary" onclick="goStep(3)">View Matrix 🔒</button></div>';
+  document.getElementById('context-content').innerHTML=html;
+}
+
+function goStep(n){
+  document.querySelectorAll('.step').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.step-tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('step-'+n).classList.add('active');
+  document.getElementById('tab-'+n).classList.add('active');
+  window.scrollTo(0,0);
+  if(n===2) buildContext();
+}
+
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+buildGrid();
+</script>
+</body>
+</html>

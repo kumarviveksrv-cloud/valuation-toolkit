@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portfolio Optimizer — Investment Management — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--accent:#7c3aed;--accent-bg:#f5f3ff;--accent-border:#ddd6fe}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-pro{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+.hero{background:#0a0a0a;color:#fff;padding:28px 24px 24px}
+.hero-inner{max-width:760px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:#a78bfa;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;margin-bottom:12px;letter-spacing:.04em}
+.hero h1{font-size:clamp(18px,3vw,26px);font-weight:900;letter-spacing:-.02em;margin-bottom:6px}
+.hero p{font-size:13px;color:#9ca3af}
+.main{max-width:760px;margin:0 auto;padding:32px 24px 80px}
+.steps{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:32px;overflow-x:auto}
+.step-tab{padding:12px 20px;font-size:12px;font-weight:700;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:all .15s}
+.step-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.step-tab:hover:not(.active){color:var(--text)}
+.step-panel{display:none}
+.step-panel.active{display:block}
+.search-wrap{position:relative;margin-bottom:20px}
+.search-wrap input{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 16px 10px 40px;font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border .15s}
+.search-wrap input:focus{border-color:var(--accent)}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px}
+.stock-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;max-height:420px;overflow-y:auto;padding-right:4px}
+.stock-card{border:1px solid var(--border);border-radius:8px;padding:14px 16px;cursor:pointer;transition:all .15s}
+.stock-card:hover{border-color:var(--accent);background:var(--accent-bg)}
+.stock-card.selected{border-color:var(--accent);background:var(--accent-bg)}
+.stock-name{font-size:13px;font-weight:800;margin-bottom:4px}
+.stock-meta{font-size:11px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap}
+.stock-ret{font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.ret-pos{color:var(--green)}
+.ret-neg{color:var(--red)}
+.btn-primary{background:var(--accent);color:#fff;border:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.btn-primary:hover{opacity:.9}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed}
+.btn-row{display:flex;justify-content:flex-end;margin-top:20px}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.metric-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+.metric-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+.metric-val{font-size:20px;font-weight:900;font-family:'JetBrains Mono',monospace;letter-spacing:-.02em}
+.metric-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.teach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:24px}
+.teach-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px}
+.teach-card h4{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin-bottom:8px}
+.teach-card p{font-size:13px;color:var(--muted);line-height:1.65}
+.qa-block{margin-bottom:16px;padding:16px;background:var(--card);border-radius:8px}
+.qa-q{font-size:13px;font-weight:700;margin-bottom:8px}
+.qa-a{font-size:13px;color:var(--muted);line-height:1.65}
+.pro-gate{border:2px dashed var(--border);border-radius:10px;padding:40px 32px;text-align:center}
+.pro-gate-icon{font-size:32px;margin-bottom:12px}
+.pro-gate h3{font-size:18px;font-weight:900;margin-bottom:8px}
+.pro-gate p{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6}
+.pro-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:24px}
+.pro-pill{background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px}
+.btn-unlock{background:var(--accent);color:#fff;border:none;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.btn-unlock:hover{opacity:.9}
+.weight-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:8px}
+.weight-name{font-size:13px;font-weight:700;flex:1}
+.weight-bar-wrap{flex:2;background:var(--border);border-radius:4px;height:8px;overflow:hidden}
+.weight-bar{height:8px;background:var(--accent);border-radius:4px}
+.weight-pct{font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--accent);min-width:44px;text-align:right}
+.weight-sharpe{font-size:11px;color:var(--muted);min-width:60px;text-align:right}
+footer{border-top:1px solid var(--border);padding:24px;text-align:center;font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-left">
+    <a href="/valuation-toolkit/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">/</span>
+    <a href="/valuation-toolkit/domains/investment-management/">Investment Management</a>
+    <span class="nav-sep">/</span>
+    <a href="/valuation-toolkit/domains/investment-management/calculators/">Calculators</a>
+    <span class="nav-sep">/</span>
+    <span>Portfolio Optimizer</span>
+  </div>
+  <button class="nav-pro" onclick="unlockPro()">Unlock Pro — ₹799/mo</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">⚡ Calculator 05 · Investment Management</div>
+    <h1>Portfolio Optimizer</h1>
+    <p>Mean-variance optimisation — compute Sharpe-maximising weights for a peer group anchored on your selected stock, with sector and concentration constraints.</p>
+  </div>
+</div>
+
+<div class="main">
+  <div class="steps">
+    <div class="step-tab active" id="tab-1" onclick="goStep(1)">1 · Pick Stock</div>
+    <div class="step-tab" id="tab-2" onclick="goStep(2)">2 · Context</div>
+    <div class="step-tab" id="tab-3" onclick="goStep(3)">3 · Optimizer 🔒</div>
+    <div class="step-tab" id="tab-4" onclick="goStep(4)">4 · Frontier 🔒</div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step-panel active" id="panel-1">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search" placeholder="Search Nifty 50 stocks…" oninput="filterStocks(this.value)">
+    </div>
+    <div class="stock-grid" id="stock-grid"></div>
+    <div class="btn-row">
+      <button class="btn-primary" id="next-1" disabled onclick="goStep(2)">View Optimisation Context →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step-panel" id="panel-2">
+    <div id="context-area"></div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="goStep(3)">Run Optimiser →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3 — PRO GATE -->
+  <div class="step-panel" id="panel-3">
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <h3>Portfolio Optimiser — Pro</h3>
+      <p>Full mean-variance optimisation on your sector peer group. Set max position size, sector caps, and long-only constraints. Get the Sharpe-maximising weight vector with full attribution.</p>
+      <div class="pro-pills">
+        <span class="pro-pill">Sharpe-Max Weights</span>
+        <span class="pro-pill">Min-Variance Portfolio</span>
+        <span class="pro-pill">Max Return Portfolio</span>
+        <span class="pro-pill">Position Size Constraints</span>
+        <span class="pro-pill">Sector Concentration Cap</span>
+        <span class="pro-pill">Marginal Contribution to Risk</span>
+      </div>
+      <button class="btn-unlock" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4 — PRO GATE -->
+  <div class="step-panel" id="panel-4">
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <h3>Efficient Frontier — Pro</h3>
+      <p>Interactive efficient frontier curve — plot every feasible portfolio, highlight the tangency portfolio (Sharpe-max) and capital market line. Compare your current portfolio to optimal.</p>
+      <div class="pro-pills">
+        <span class="pro-pill">Efficient Frontier Curve</span>
+        <span class="pro-pill">Tangency Portfolio</span>
+        <span class="pro-pill">Capital Market Line</span>
+        <span class="pro-pill">Risk Contribution Chart</span>
+        <span class="pro-pill">Diversification Ratio</span>
+        <span class="pro-pill">Current vs Optimal Gap</span>
+      </div>
+      <button class="btn-unlock" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    </div>
+  </div>
+</div>
+
+<footer>ValuationDesk · Investment Management · <a href="/valuation-toolkit/" style="color:var(--accent)">← All Domains</a></footer>
+
+<script>
+var STOCKS=[
+  {id:1,name:'Reliance Industries',sector:'Oil & Gas',marketCap:2010000,pe:24.8,beta:0.95,divYield:0.4,ret1y:8.2,ret3y:15.8,ret5y:22.4,vol:18.2,weight:9.8,price:2840},
+  {id:2,name:'HDFC Bank',sector:'Banking',marketCap:1285000,pe:18.2,beta:0.88,divYield:1.1,ret1y:12.4,ret3y:11.2,ret5y:16.8,vol:16.4,weight:7.2,price:1720},
+  {id:3,name:'Infosys',sector:'IT',marketCap:720000,pe:22.4,beta:0.82,divYield:2.4,ret1y:18.6,ret3y:14.8,ret5y:19.2,vol:19.8,weight:5.8,price:1840},
+  {id:4,name:'ICICI Bank',sector:'Banking',marketCap:890000,pe:17.6,beta:1.12,divYield:0.8,ret1y:24.8,ret3y:28.4,ret5y:31.2,vol:20.4,weight:5.2,price:1240},
+  {id:5,name:'TCS',sector:'IT',marketCap:1420000,pe:26.8,beta:0.72,divYield:3.2,ret1y:6.8,ret3y:10.4,ret5y:18.6,vol:15.6,weight:5.8,price:3980},
+  {id:6,name:'Bharti Airtel',sector:'Telecom',marketCap:920000,pe:48.2,beta:0.78,divYield:0.4,ret1y:42.4,ret3y:35.8,ret5y:28.4,vol:22.4,weight:4.2,price:1580},
+  {id:7,name:'Kotak Mahindra Bank',sector:'Banking',marketCap:380000,pe:19.4,beta:0.94,divYield:0.1,ret1y:8.4,ret3y:8.8,ret5y:18.2,vol:18.8,weight:3.2,price:1840},
+  {id:8,name:'L&T',sector:'Capital Goods',marketCap:590000,pe:34.2,beta:1.24,divYield:0.9,ret1y:28.4,ret3y:32.8,ret5y:26.4,vol:24.8,weight:3.8,price:3640},
+  {id:9,name:'Axis Bank',sector:'Banking',marketCap:360000,pe:14.8,beta:1.18,divYield:0.1,ret1y:16.4,ret3y:22.4,ret5y:20.8,vol:22.8,weight:2.8,price:1180},
+  {id:10,name:'Maruti Suzuki',sector:'Auto',marketCap:440000,pe:28.4,beta:0.84,divYield:1.2,ret1y:14.2,ret3y:24.8,ret5y:18.4,vol:21.2,weight:2.4,price:12400},
+  {id:11,name:'Sun Pharmaceutical',sector:'Pharma',marketCap:410000,pe:38.4,beta:0.64,divYield:0.8,ret1y:32.4,ret3y:28.8,ret5y:22.4,vol:17.4,weight:2.4,price:1720},
+  {id:12,name:'HUL',sector:'FMCG',marketCap:530000,pe:52.4,beta:0.42,divYield:1.8,ret1y:2.4,ret3y:4.8,ret5y:10.4,vol:14.2,weight:2.4,price:2480},
+  {id:13,name:'ITC',sector:'FMCG',marketCap:590000,pe:24.8,beta:0.58,divYield:3.2,ret1y:12.4,ret3y:38.8,ret5y:22.4,vol:16.8,weight:3.2,price:468},
+  {id:14,name:'Asian Paints',sector:'Materials',marketCap:290000,pe:58.4,beta:0.48,divYield:1.2,ret1y:-14.2,ret3y:4.2,ret5y:12.8,vol:19.4,weight:1.8,price:2780},
+  {id:15,name:'Bajaj Finance',sector:'NBFC',marketCap:410000,pe:34.8,beta:1.42,divYield:0.1,ret1y:8.4,ret3y:14.8,ret5y:28.4,vol:26.4,weight:2.2,price:7240},
+  {id:16,name:'Wipro',sector:'IT',marketCap:280000,pe:20.8,beta:0.88,divYield:0.1,ret1y:6.4,ret3y:4.8,ret5y:12.4,vol:22.8,weight:1.6,price:580},
+  {id:17,name:'NTPC',sector:'Power',marketCap:380000,pe:18.4,beta:0.74,divYield:2.4,ret1y:32.4,ret3y:28.8,ret5y:22.4,vol:20.4,weight:2.2,price:384},
+  {id:18,name:'Power Grid',sector:'Power',marketCap:280000,pe:20.4,beta:0.68,divYield:3.4,ret1y:28.4,ret3y:22.4,ret5y:18.4,vol:18.4,weight:1.6,price:328},
+  {id:19,name:'Titan',sector:'Consumer',marketCap:320000,pe:84.2,beta:0.82,divYield:0.4,ret1y:4.2,ret3y:18.4,ret5y:28.4,vol:24.8,weight:1.8,price:3640},
+  {id:20,name:'UltraTech Cement',sector:'Materials',marketCap:340000,pe:42.4,beta:0.94,divYield:0.4,ret1y:8.4,ret3y:14.8,ret5y:18.4,vol:22.4,weight:1.8,price:11240},
+  {id:21,name:'HCL Technologies',sector:'IT',marketCap:450000,pe:24.8,beta:0.78,divYield:4.8,ret1y:22.4,ret3y:16.8,ret5y:18.4,vol:20.4,weight:2.2,price:1680},
+  {id:22,name:'M&M',sector:'Auto',marketCap:320000,pe:28.4,beta:1.08,divYield:0.8,ret1y:42.8,ret3y:48.4,ret5y:34.8,vol:26.4,weight:2.2,price:2940},
+  {id:23,name:'JSW Steel',sector:'Materials',marketCap:230000,pe:22.4,beta:1.48,divYield:0.8,ret1y:4.8,ret3y:18.4,ret5y:24.8,vol:28.8,weight:1.4,price:980},
+  {id:24,name:'Adani Ports',sector:'Infrastructure',marketCap:280000,pe:32.4,beta:1.28,divYield:0.4,ret1y:24.4,ret3y:28.4,ret5y:32.4,vol:26.4,weight:1.4,price:1380},
+  {id:25,name:'Tata Motors',sector:'Auto',marketCap:360000,pe:8.4,beta:1.58,divYield:0.0,ret1y:24.4,ret3y:58.4,ret5y:28.4,vol:32.4,weight:1.8,price:980},
+  {id:26,name:'HDFC Life',sector:'Insurance',marketCap:160000,pe:72.4,beta:0.72,divYield:0.2,ret1y:8.4,ret3y:12.4,ret5y:14.8,vol:18.4,weight:1.2,price:680},
+  {id:27,name:'SBI',sector:'Banking',marketCap:720000,pe:10.8,beta:1.32,divYield:1.2,ret1y:28.4,ret3y:48.4,ret5y:28.4,vol:26.4,weight:2.4,price:840},
+  {id:28,name:'Tech Mahindra',sector:'IT',marketCap:140000,pe:38.4,beta:0.98,divYield:2.8,ret1y:8.4,ret3y:-4.8,ret5y:8.4,vol:26.4,weight:0.8,price:1480},
+  {id:29,name:'Nestle India',sector:'FMCG',marketCap:220000,pe:68.4,beta:0.38,divYield:1.4,ret1y:-4.8,ret3y:8.4,ret5y:18.4,vol:16.4,weight:1.2,price:24800},
+  {id:30,name:'Cipla',sector:'Pharma',marketCap:175000,pe:28.4,beta:0.68,divYield:0.8,ret1y:18.4,ret3y:22.4,ret5y:18.4,vol:18.8,weight:1.2,price:1540}
+];
+var NIFTY={ret1y:16.0,ret3y:12.8,ret5y:14.2,vol:14.8};
+var RF=6.5;
+var selected=null;
+
+function fmtPct(v,d){
+  var dec=(d===undefined)?1:d;
+  var sign=v>0?'+':'';
+  return sign+v.toFixed(dec)+'%';
+}
+
+function buildGrid(){
+  var html='';
+  STOCKS.forEach(function(s){
+    var retCls=s.ret1y>=0?'ret-pos':'ret-neg';
+    var retStr=fmtPct(s.ret1y);
+    html+='<div class="stock-card" id="card-'+s.id+'" onclick="selectCompany('+s.id+')">';
+    html+='<div class="stock-name">'+s.name+'</div>';
+    html+='<div class="stock-meta"><span>'+s.sector+'</span><span>Beta '+s.beta.toFixed(2)+'</span></div>';
+    html+='<div class="stock-ret '+retCls+'">'+retStr+' 1Y</div>';
+    html+='</div>';
+  });
+  document.getElementById('stock-grid').innerHTML=html;
+}
+
+function filterStocks(q){
+  var lq=q.toLowerCase();
+  STOCKS.forEach(function(s){
+    var card=document.getElementById('card-'+s.id);
+    if(!card) return;
+    var match=s.name.toLowerCase().indexOf(lq)>=0||s.sector.toLowerCase().indexOf(lq)>=0;
+    card.style.display=match?'':'none';
+  });
+}
+
+function selectCompany(id){
+  selected=STOCKS.find(function(s){return s.id===id;});
+  STOCKS.forEach(function(s){
+    var card=document.getElementById('card-'+s.id);
+    if(card) card.classList.remove('selected');
+  });
+  var picked=document.getElementById('card-'+id);
+  if(picked) picked.classList.add('selected');
+  document.getElementById('next-1').disabled=false;
+}
+
+function buildContext(){
+  var c=selected;
+  var sharpe=(c.ret1y-RF)/c.vol;
+  var niftySharpe=(NIFTY.ret1y-RF)/NIFTY.vol;
+  var required=RF+c.beta*(NIFTY.ret1y-RF);
+  var alpha=c.ret1y-required;
+
+  // Sector peers — compute naive equal-weight portfolio
+  var peers=STOCKS.filter(function(s){return s.sector===c.sector;});
+  var eqWtPeerRet=peers.reduce(function(sum,s){return sum+s.ret1y;},0)/peers.length;
+  var eqWtPeerVol=peers.reduce(function(sum,s){return sum+s.vol;},0)/peers.length;
+  var eqWtSharpe=(eqWtPeerRet-RF)/eqWtPeerVol;
+
+  // Sort peers by Sharpe for naive ranking
+  var sortedPeers=peers.slice().sort(function(a,b){
+    var sa=(a.ret1y-RF)/a.vol;
+    var sb=(b.ret1y-RF)/b.vol;
+    return sb-sa;
+  });
+
+  var sharpeStr=sharpe.toFixed(2);
+  var niftySharpeStr=niftySharpe.toFixed(2);
+  var alphaStr=fmtPct(alpha);
+  var alphaCls=alpha>=0?'ret-pos':'ret-neg';
+  var sharpeVsNiftyIsHigh=sharpe>niftySharpe;
+  var sharpeCls=sharpeVsNiftyIsHigh?'ret-pos':'ret-neg';
+  var sharpeRelStr=sharpeVsNiftyIsHigh?'above Nifty':'below Nifty';
+
+  var volLabel=c.vol>22?'high':'(c.vol<16?low:moderate)';
+  var volIsHigh=c.vol>22;
+  var volIsLow=c.vol<16;
+  var volDesc=volIsHigh?'high — this stock adds meaningful volatility to any portfolio':volIsLow?'low — a strong diversifier that dampens overall portfolio risk':'moderate — typical large-cap equity range';
+
+  var html='';
+  html+='<div class="metric-grid">';
+  html+='<div class="metric-card"><div class="metric-label">Sharpe Ratio</div><div class="metric-val '+sharpeCls+'">'+sharpeStr+'</div><div class="metric-sub">Nifty: '+niftySharpeStr+' ('+sharpeRelStr+')</div></div>';
+  html+='<div class="metric-card"><div class="metric-label">1Y Return</div><div class="metric-val '+(c.ret1y>=0?'ret-pos':'ret-neg')+'">'+c.ret1y.toFixed(1)+'%</div><div class="metric-sub">vs Nifty '+NIFTY.ret1y+'%</div></div>';
+  html+='<div class="metric-card"><div class="metric-label">Volatility</div><div class="metric-val">'+c.vol.toFixed(1)+'%</div><div class="metric-sub">Annual std deviation</div></div>';
+  html+='<div class="metric-card"><div class="metric-label">Jensen\'s Alpha</div><div class="metric-val '+alphaCls+'">'+alphaStr+'</div><div class="metric-sub">CAPM-required: '+required.toFixed(1)+'%</div></div>';
+  html+='<div class="metric-card"><div class="metric-label">Peer Eq-Wt Sharpe</div><div class="metric-val">'+eqWtSharpe.toFixed(2)+'</div><div class="metric-sub">Naive '+c.sector+' portfolio</div></div>';
+  html+='<div class="metric-card"><div class="metric-label">Sector Peers</div><div class="metric-val">'+peers.length+'</div><div class="metric-sub">Stocks in '+c.sector+'</div></div>';
+  html+='</div>';
+
+  html+='<div class="teach-grid">';
+  html+='<div class="teach-card"><h4>What Mean-Variance Optimisation Does</h4><p>Markowitz (1952) showed that for any set of assets, there is a combination of weights that maximises expected return per unit of risk. The Sharpe-maximising portfolio — the tangency portfolio — is where the capital market line touches the efficient frontier. Every other portfolio on the frontier is either taking unnecessary risk or leaving return on the table.</p></div>';
+  html+='<div class="teach-card"><h4>Sharpe Ratio as the Objective</h4><p>The Sharpe ratio for '+c.name+' is '+sharpeStr+' — '+sharpeRelStr+' efficiency of '+niftySharpeStr+'. When building a portfolio, the optimiser assigns higher weights to stocks with better risk-adjusted returns, subject to constraints. But Sharpe alone is not enough: correlation matters. A lower-Sharpe stock that moves independently of others can still improve the portfolio\'s overall Sharpe.</p></div>';
+  html+='<div class="teach-card"><h4>Correlation and Diversification</h4><p>'+c.name+'\'s beta of '+c.beta.toFixed(2)+' captures market correlation but not peer correlation. Two stocks with the same beta can have very different pairwise correlations. The optimiser uses the full covariance matrix. A stock with '+volDesc+'. In the Pro optimiser, you will see how '+c.name+'\'s correlation with its '+peers.length+' sector peers affects its optimal weight.</p></div>';
+  html+='<div class="teach-card"><h4>Constraints in Practice</h4><p>Unconstrained optimisation often concentrates weight in one or two stocks — impractical for real portfolios. The Pro optimiser lets you set a max position size (e.g. 30%), a sector cap (e.g. no single sector above 40%), and long-only constraints. These constraints push the solution away from the theoretical tangency point but toward a portfolio you can actually hold and rebalance.</p></div>';
+  html+='</div>';
+
+  // Peer ranking by Sharpe
+  html+='<p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:14px">'+c.sector+' Peers — Ranked by Sharpe Ratio</p>';
+  sortedPeers.forEach(function(s){
+    var sSharpe=(s.ret1y-RF)/s.vol;
+    var barPct=Math.max(0,Math.min(100,(sSharpe/2)*100));
+    var isCurrent=s.id===c.id;
+    var nameDisplay=isCurrent?'<strong>'+s.name+'</strong>':s.name;
+    var sharpeLabel=sSharpe.toFixed(2);
+    var retLbl=s.ret1y.toFixed(1)+'%';
+    html+='<div class="weight-row">';
+    html+='<div class="weight-name">'+nameDisplay+'</div>';
+    html+='<div class="weight-bar-wrap"><div class="weight-bar" style="width:'+barPct+'%"></div></div>';
+    html+='<div class="weight-sharpe">Sharpe '+sharpeLabel+'</div>';
+    html+='<div class="weight-pct">'+retLbl+'</div>';
+    html+='</div>';
+  });
+
+  html+='<div class="qa-block" style="margin-top:20px"><div class="qa-q">If I just equal-weight all '+c.sector+' stocks, what Sharpe do I get?</div>';
+  html+='<div class="qa-a">An equal-weight portfolio of all '+peers.length+' '+c.sector+' stocks returns '+eqWtPeerRet.toFixed(1)+'% with estimated volatility of ~'+eqWtPeerVol.toFixed(1)+'%, giving a Sharpe of '+eqWtSharpe.toFixed(2)+'. That compares to '+c.name+'\'s standalone Sharpe of '+sharpeStr+'. Equal-weighting is naive but widely used — it avoids estimation error in expected returns, which plagues classical optimisation. The Pro optimiser lets you compare equal-weight, market-cap weight, and Sharpe-maximising weights side by side.</div></div>';
+
+  html+='<div class="qa-block"><div class="qa-q">Why does MVO often concentrate in just one or two stocks?</div>';
+  html+='<div class="qa-a">Unconstrained MVO is famously unstable. Small changes in expected return inputs produce wildly different weight vectors. The optimiser "doubles down" on stocks with slightly better estimated Sharpes, even if the difference is noise. This is why real PMs use constraints (max position size), regularisation (Black-Litterman blending), or resampling. The Pro optimiser applies a 30% max-weight cap by default and shows how much the Sharpe degrades when you tighten or loosen it.</div></div>';
+
+  document.getElementById('context-area').innerHTML=html;
+}
+
+function goStep(n){
+  for(var i=1;i<=4;i++){
+    document.getElementById('panel-'+i).classList.remove('active');
+    document.getElementById('tab-'+i).classList.remove('active');
+  }
+  document.getElementById('panel-'+n).classList.add('active');
+  document.getElementById('tab-'+n).classList.add('active');
+  if(n===2 && selected) buildContext();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+
+buildGrid();
+</script>
+</body>
+</html>

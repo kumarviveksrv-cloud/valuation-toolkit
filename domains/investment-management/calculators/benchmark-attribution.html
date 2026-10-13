@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Benchmark Attribution — Investment Management — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--accent:#7c3aed;--accent-bg:#f5f3ff;--accent-border:#ddd6fe}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-pro{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+.hero{background:#0a0a0a;color:#fff;padding:28px 24px 24px}
+.hero-inner{max-width:760px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:#a78bfa;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;margin-bottom:12px;letter-spacing:.04em}
+.hero h1{font-size:clamp(18px,3vw,26px);font-weight:900;letter-spacing:-.02em;margin-bottom:6px}
+.hero p{font-size:13px;color:#9ca3af}
+.main{max-width:760px;margin:0 auto;padding:32px 24px 80px}
+.steps{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:32px;overflow-x:auto}
+.step-tab{padding:12px 20px;font-size:12px;font-weight:700;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:all .15s}
+.step-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.step-tab:hover:not(.active){color:var(--text)}
+.step-panel{display:none}
+.step-panel.active{display:block}
+.search-wrap{position:relative;margin-bottom:20px}
+.search-wrap input{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 16px 10px 40px;font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border .15s}
+.search-wrap input:focus{border-color:var(--accent)}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:14px}
+.stock-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;max-height:420px;overflow-y:auto;padding-right:4px}
+.stock-card{border:1px solid var(--border);border-radius:8px;padding:14px 16px;cursor:pointer;transition:all .15s}
+.stock-card:hover{border-color:var(--accent);background:var(--accent-bg)}
+.stock-card.selected{border-color:var(--accent);background:var(--accent-bg)}
+.stock-name{font-size:13px;font-weight:800;margin-bottom:4px}
+.stock-meta{font-size:11px;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap}
+.stock-ret{font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.ret-pos{color:var(--green)}
+.ret-neg{color:var(--red)}
+.btn-primary{background:var(--accent);color:#fff;border:none;padding:12px 24px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.btn-primary:hover{opacity:.9}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed}
+.btn-row{display:flex;justify-content:flex-end;margin-top:20px}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:24px}
+.metric-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+.metric-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+.metric-val{font-size:20px;font-weight:900;font-family:'JetBrains Mono',monospace;letter-spacing:-.02em}
+.metric-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.teach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:24px}
+.teach-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px}
+.teach-card h4{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--accent);margin-bottom:8px}
+.teach-card p{font-size:13px;color:var(--muted);line-height:1.65}
+.qa-block{margin-bottom:16px;padding:16px;background:var(--card);border-radius:8px}
+.qa-q{font-size:13px;font-weight:700;margin-bottom:8px}
+.qa-a{font-size:13px;color:var(--muted);line-height:1.65}
+.pro-gate{border:2px dashed var(--border);border-radius:10px;padding:40px 32px;text-align:center}
+.pro-gate-icon{font-size:32px;margin-bottom:12px}
+.pro-gate h3{font-size:18px;font-weight:900;margin-bottom:8px}
+.pro-gate p{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6}
+.pro-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:24px}
+.pro-pill{background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px}
+.btn-unlock{background:var(--accent);color:#fff;border:none;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.btn-unlock:hover{opacity:.9}
+.attr-table{width:100%;border-collapse:collapse;font-size:13px}
+.attr-table th{text-align:left;padding:8px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:2px solid var(--border)}
+.attr-table td{padding:10px 12px;border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:12px}
+.attr-table .col-label{font-family:'Inter',sans-serif;font-weight:700;font-size:13px}
+.effect-pos{color:var(--green)}
+.effect-neg{color:var(--red)}
+.effect-neutral{color:var(--muted)}
+.summary-bar{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px 24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin-bottom:24px}
+.summary-item{text-align:center;min-width:80px}
+.summary-num{font-size:20px;font-weight:900;font-family:'JetBrains Mono',monospace}
+.summary-lbl{font-size:11px;color:var(--muted);margin-top:3px}
+footer{border-top:1px solid var(--border);padding:24px;text-align:center;font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-left">
+    <a href="/valuation-toolkit/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">/</span>
+    <a href="/valuation-toolkit/domains/investment-management/">Investment Management</a>
+    <span class="nav-sep">/</span>
+    <a href="/valuation-toolkit/domains/investment-management/calculators/">Calculators</a>
+    <span class="nav-sep">/</span>
+    <span>Benchmark Attribution</span>
+  </div>
+  <button class="nav-pro" onclick="unlockPro()">Unlock Pro — ₹799/mo</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">📊 Calculator 03 · Investment Management</div>
+    <h1>Benchmark Attribution</h1>
+    <p>Decompose active return into allocation effect, selection effect, and interaction — the Brinson model explained with Indian equities.</p>
+  </div>
+</div>
+
+<div class="main">
+  <div class="steps">
+    <div class="step-tab active" id="tab-1" onclick="goStep(1)">1 · Pick Stock</div>
+    <div class="step-tab" id="tab-2" onclick="goStep(2)">2 · Context</div>
+    <div class="step-tab" id="tab-3" onclick="goStep(3)">3 · Attribution 🔒</div>
+    <div class="step-tab" id="tab-4" onclick="goStep(4)">4 · Active Return 🔒</div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step-panel active" id="panel-1">
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="search" placeholder="Search Nifty 50 stocks…" oninput="filterStocks(this.value)">
+    </div>
+    <div class="stock-grid" id="stock-grid"></div>
+    <div class="btn-row">
+      <button class="btn-primary" id="next-1" disabled onclick="goStep(2)">View Attribution Context →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step-panel" id="panel-2">
+    <div id="context-area"></div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="goStep(3)">See Attribution Breakdown →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3 — PRO GATE -->
+  <div class="step-panel" id="panel-3">
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <h3>Attribution Breakdown — Pro</h3>
+      <p>Full Brinson-Hood-Beebower sector attribution model. See exactly where your active return came from and which bets paid off.</p>
+      <div class="pro-pills">
+        <span class="pro-pill">Sector Allocation Effect</span>
+        <span class="pro-pill">Stock Selection Effect</span>
+        <span class="pro-pill">Interaction Effect</span>
+        <span class="pro-pill">Active Weight Table</span>
+        <span class="pro-pill">Brinson Decomposition</span>
+        <span class="pro-pill">Sector-Level P&amp;L</span>
+      </div>
+      <button class="btn-unlock" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4 — PRO GATE -->
+  <div class="step-panel" id="panel-4">
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <h3>Active Return Analysis — Pro</h3>
+      <p>Cumulative active return waterfall, sector contribution ranking, and attribution consistency score across 1Y, 3Y, and 5Y horizons.</p>
+      <div class="pro-pills">
+        <span class="pro-pill">Active Return Waterfall</span>
+        <span class="pro-pill">Sector Contribution Rank</span>
+        <span class="pro-pill">Attribution Consistency</span>
+        <span class="pro-pill">Information Ratio</span>
+        <span class="pro-pill">Allocation vs Selection Split</span>
+        <span class="pro-pill">Multi-Period Attribution</span>
+      </div>
+      <button class="btn-unlock" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    </div>
+  </div>
+</div>
+
+<footer>ValuationDesk · Investment Management · <a href="/valuation-toolkit/" style="color:var(--accent)">← All Domains</a></footer>
+
+<script>
+var STOCKS=[
+  {id:1,name:'Reliance Industries',sector:'Oil & Gas',marketCap:2010000,pe:24.8,beta:0.95,divYield:0.4,ret1y:8.2,ret3y:15.8,ret5y:22.4,vol:18.2,weight:9.8,price:2840},
+  {id:2,name:'HDFC Bank',sector:'Banking',marketCap:1285000,pe:18.2,beta:0.88,divYield:1.1,ret1y:12.4,ret3y:11.2,ret5y:16.8,vol:16.4,weight:7.2,price:1720},
+  {id:3,name:'Infosys',sector:'IT',marketCap:720000,pe:22.4,beta:0.82,divYield:2.4,ret1y:18.6,ret3y:14.8,ret5y:19.2,vol:19.8,weight:5.8,price:1840},
+  {id:4,name:'ICICI Bank',sector:'Banking',marketCap:890000,pe:17.6,beta:1.12,divYield:0.8,ret1y:24.8,ret3y:28.4,ret5y:31.2,vol:20.4,weight:5.2,price:1240},
+  {id:5,name:'TCS',sector:'IT',marketCap:1420000,pe:26.8,beta:0.72,divYield:3.2,ret1y:6.8,ret3y:10.4,ret5y:18.6,vol:15.6,weight:5.8,price:3980},
+  {id:6,name:'Bharti Airtel',sector:'Telecom',marketCap:920000,pe:48.2,beta:0.78,divYield:0.4,ret1y:42.4,ret3y:35.8,ret5y:28.4,vol:22.4,weight:4.2,price:1580},
+  {id:7,name:'Kotak Mahindra Bank',sector:'Banking',marketCap:380000,pe:19.4,beta:0.94,divYield:0.1,ret1y:8.4,ret3y:8.8,ret5y:18.2,vol:18.8,weight:3.2,price:1840},
+  {id:8,name:'L&T',sector:'Capital Goods',marketCap:590000,pe:34.2,beta:1.24,divYield:0.9,ret1y:28.4,ret3y:32.8,ret5y:26.4,vol:24.8,weight:3.8,price:3640},
+  {id:9,name:'Axis Bank',sector:'Banking',marketCap:360000,pe:14.8,beta:1.18,divYield:0.1,ret1y:16.4,ret3y:22.4,ret5y:20.8,vol:22.8,weight:2.8,price:1180},
+  {id:10,name:'Maruti Suzuki',sector:'Auto',marketCap:440000,pe:28.4,beta:0.84,divYield:1.2,ret1y:14.2,ret3y:24.8,ret5y:18.4,vol:21.2,weight:2.4,price:12400},
+  {id:11,name:'Sun Pharmaceutical',sector:'Pharma',marketCap:410000,pe:38.4,beta:0.64,divYield:0.8,ret1y:32.4,ret3y:28.8,ret5y:22.4,vol:17.4,weight:2.4,price:1720},
+  {id:12,name:'HUL',sector:'FMCG',marketCap:530000,pe:52.4,beta:0.42,divYield:1.8,ret1y:2.4,ret3y:4.8,ret5y:10.4,vol:14.2,weight:2.4,price:2480},
+  {id:13,name:'ITC',sector:'FMCG',marketCap:590000,pe:24.8,beta:0.58,divYield:3.2,ret1y:12.4,ret3y:38.8,ret5y:22.4,vol:16.8,weight:3.2,price:468},
+  {id:14,name:'Asian Paints',sector:'Materials',marketCap:290000,pe:58.4,beta:0.48,divYield:1.2,ret1y:-14.2,ret3y:4.2,ret5y:12.8,vol:19.4,weight:1.8,price:2780},
+  {id:15,name:'Bajaj Finance',sector:'NBFC',marketCap:410000,pe:34.8,beta:1.42,divYield:0.1,ret1y:8.4,ret3y:14.8,ret5y:28.4,vol:26.4,weight:2.2,price:7240},
+  {id:16,name:'Wipro',sector:'IT',marketCap:280000,pe:20.8,beta:0.88,divYield:0.1,ret1y:6.4,ret3y:4.8,ret5y:12.4,vol:22.8,weight:1.6,price:580},
+  {id:17,name:'NTPC',sector:'Power',marketCap:380000,pe:18.4,beta:0.74,divYield:2.4,ret1y:32.4,ret3y:28.8,ret5y:22.4,vol:20.4,weight:2.2,price:384},
+  {id:18,name:'Power Grid',sector:'Power',marketCap:280000,pe:20.4,beta:0.68,divYield:3.4,ret1y:28.4,ret3y:22.4,ret5y:18.4,vol:18.4,weight:1.6,price:328},
+  {id:19,name:'Titan',sector:'Consumer',marketCap:320000,pe:84.2,beta:0.82,divYield:0.4,ret1y:4.2,ret3y:18.4,ret5y:28.4,vol:24.8,weight:1.8,price:3640},
+  {id:20,name:'UltraTech Cement',sector:'Materials',marketCap:340000,pe:42.4,beta:0.94,divYield:0.4,ret1y:8.4,ret3y:14.8,ret5y:18.4,vol:22.4,weight:1.8,price:11240},
+  {id:21,name:'HCL Technologies',sector:'IT',marketCap:450000,pe:24.8,beta:0.78,divYield:4.8,ret1y:22.4,ret3y:16.8,ret5y:18.4,vol:20.4,weight:2.2,price:1680},
+  {id:22,name:'M&M',sector:'Auto',marketCap:320000,pe:28.4,beta:1.08,divYield:0.8,ret1y:42.8,ret3y:48.4,ret5y:34.8,vol:26.4,weight:2.2,price:2940},
+  {id:23,name:'JSW Steel',sector:'Materials',marketCap:230000,pe:22.4,beta:1.48,divYield:0.8,ret1y:4.8,ret3y:18.4,ret5y:24.8,vol:28.8,weight:1.4,price:980},
+  {id:24,name:'Adani Ports',sector:'Infrastructure',marketCap:280000,pe:32.4,beta:1.28,divYield:0.4,ret1y:24.4,ret3y:28.4,ret5y:32.4,vol:26.4,weight:1.4,price:1380},
+  {id:25,name:'Tata Motors',sector:'Auto',marketCap:360000,pe:8.4,beta:1.58,divYield:0.0,ret1y:24.4,ret3y:58.4,ret5y:28.4,vol:32.4,weight:1.8,price:980},
+  {id:26,name:'HDFC Life',sector:'Insurance',marketCap:160000,pe:72.4,beta:0.72,divYield:0.2,ret1y:8.4,ret3y:12.4,ret5y:14.8,vol:18.4,weight:1.2,price:680},
+  {id:27,name:'SBI',sector:'Banking',marketCap:720000,pe:10.8,beta:1.32,divYield:1.2,ret1y:28.4,ret3y:48.4,ret5y:28.4,vol:26.4,weight:2.4,price:840},
+  {id:28,name:'Tech Mahindra',sector:'IT',marketCap:140000,pe:38.4,beta:0.98,divYield:2.8,ret1y:8.4,ret3y:-4.8,ret5y:8.4,vol:26.4,weight:0.8,price:1480},
+  {id:29,name:'Nestle India',sector:'FMCG',marketCap:220000,pe:68.4,beta:0.38,divYield:1.4,ret1y:-4.8,ret3y:8.4,ret5y:18.4,vol:16.4,weight:1.2,price:24800},
+  {id:30,name:'Cipla',sector:'Pharma',marketCap:175000,pe:28.4,beta:0.68,divYield:0.8,ret1y:18.4,ret3y:22.4,ret5y:18.4,vol:18.8,weight:1.2,price:1540}
+];
+var NIFTY={ret1y:16.0,ret3y:12.8,ret5y:14.2,vol:14.8};
+var selected=null;
+
+function fmtPct(v,d){
+  var dec=(d===undefined)?1:d;
+  var sign=v>0?'+':'';
+  return sign+v.toFixed(dec)+'%';
+}
+
+function buildGrid(){
+  var html='';
+  STOCKS.forEach(function(s){
+    var retCls=s.ret1y>=0?'ret-pos':'ret-neg';
+    var retStr=fmtPct(s.ret1y);
+    html+='<div class="stock-card" id="card-'+s.id+'" onclick="selectCompany('+s.id+')">';
+    html+='<div class="stock-name">'+s.name+'</div>';
+    html+='<div class="stock-meta"><span>'+s.sector+'</span><span>Beta '+s.beta.toFixed(2)+'</span></div>';
+    html+='<div class="stock-ret '+retCls+'">'+retStr+' 1Y</div>';
+    html+='</div>';
+  });
+  document.getElementById('stock-grid').innerHTML=html;
+}
+
+function filterStocks(q){
+  var lq=q.toLowerCase();
+  STOCKS.forEach(function(s){
+    var card=document.getElementById('card-'+s.id);
+    if(!card) return;
+    var match=s.name.toLowerCase().indexOf(lq)>=0||s.sector.toLowerCase().indexOf(lq)>=0;
+    card.style.display=match?'':'none';
+  });
+}
+
+function selectCompany(id){
+  selected=STOCKS.find(function(s){return s.id===id;});
+  STOCKS.forEach(function(s){
+    var card=document.getElementById('card-'+s.id);
+    if(card) card.classList.remove('selected');
+  });
+  var picked=document.getElementById('card-'+id);
+  if(picked) picked.classList.add('selected');
+  document.getElementById('next-1').disabled=false;
+}
+
+function buildContext(){
+  var c=selected;
+
+  // Sector peers
+  var peers=STOCKS.filter(function(s){return s.sector===c.sector && s.id!==c.id;});
+  var allSector=STOCKS.filter(function(s){return s.sector===c.sector;});
+
+  // Compute sector-level benchmark weight and return
+  var totalWeight=0;
+  STOCKS.forEach(function(s){totalWeight+=s.weight;});
+  var sectorWeight=0;
+  var sectorWeightedReturn=0;
+  allSector.forEach(function(s){
+    sectorWeight+=s.weight;
+    sectorWeightedReturn+=s.weight*s.ret1y;
+  });
+  var sectorAvgRet=sectorWeightedReturn/sectorWeight;
+  var sectorBenchWt=(sectorWeight/totalWeight)*100;
+
+  // Attribution basics
+  var activeRet=c.ret1y-NIFTY.ret1y;
+  var sectorVsNifty=sectorAvgRet-NIFTY.ret1y;
+  var stockVsSector=c.ret1y-sectorAvgRet;
+
+  // Alpha
+  var required=6.5+c.beta*(NIFTY.ret1y-6.5);
+  var alpha=c.ret1y-required;
+
+  var activeRetStr=fmtPct(activeRet);
+  var activeRetCls=activeRet>=0?'ret-pos':'ret-neg';
+  var sectorVsNiftyStr=fmtPct(sectorVsNifty);
+  var sectorVsNiftyCls=sectorVsNifty>=0?'ret-pos':'ret-neg';
+  var stockVsSectorStr=fmtPct(stockVsSector);
+  var stockVsSectorCls=stockVsSector>=0?'ret-pos':'ret-neg';
+  var alphaStr=fmtPct(alpha);
+  var alphaCls=alpha>=0?'ret-pos':'ret-neg';
+
+  var sectorBetaLabel=c.beta>1.2?'Aggressive':'(c.beta<0.7?Defensive:Moderate)';
+  var betaIsHigh=c.beta>1.2;
+  var betaIsLow=c.beta<0.7;
+  var sectorBetaDesc=betaIsHigh?'aggressive (amplifies market moves)':betaIsLow?'defensive (cushions market moves)':'moderate (moves roughly with market)';
+
+  var activeRetDirection=activeRet>=0?'outperformed':'underperformed';
+
+  var sectorOutperforms=sectorVsNifty>=0;
+  var stockOutperformsSector=stockVsSector>=0;
+  var sectorSignalWord=sectorOutperforms?'tailwind':'headwind';
+
+  var html='';
+
+  html+='<div class="metric-grid">';
+  html+='<div class="metric-card"><div class="metric-label">1Y Return</div><div class="metric-val '+activeRetCls+'">'+c.ret1y.toFixed(1)+'%</div><div class="metric-sub">Nifty: '+NIFTY.ret1y+'%</div></div>';
+  html+='<div class="metric-card"><div class="metric-label">Active Return</div><div class="metric-val '+activeRetCls+'">'+activeRetStr+'</div><div class="metric-sub">vs Nifty 50 benchmark</div></div>';
+  html+='<div class="metric-card"><div class="metric-label">Sector ('+c.sector+')</div><div class="metric-val '+sectorVsNiftyCls+'">'+sectorAvgRet.toFixed(1)+'%</div><div class="metric-sub">Bmark wt: '+sectorBenchWt.toFixed(1)+'%</div></div>';
+  html+='<div class="metric-card"><div class="metric-label">Stock vs Sector</div><div class="metric-val '+stockVsSectorCls+'">'+stockVsSectorStr+'</div><div class="metric-sub">Selection contribution</div></div>';
+  html+='<div class="metric-card"><div class="metric-label">Jensen\'s Alpha</div><div class="metric-val '+alphaCls+'">'+alphaStr+'</div><div class="metric-sub">CAPM-adj: '+required.toFixed(1)+'% reqd</div></div>';
+  html+='<div class="metric-card"><div class="metric-label">Beta</div><div class="metric-val">'+c.beta.toFixed(2)+'</div><div class="metric-sub">'+sectorBetaDesc+'</div></div>';
+  html+='</div>';
+
+  html+='<div class="teach-grid">';
+  html+='<div class="teach-card"><h4>What Is Benchmark Attribution?</h4><p>Attribution decomposes "I beat the index by 4%" into what part came from being in the right sectors (allocation) and what part from picking the right stocks within those sectors (selection). The Brinson-Hood-Beebower model does this at sector level for every portfolio.</p></div>';
+  html+='<div class="teach-card"><h4>Allocation vs Selection</h4><p>Allocation effect = you overweighted '+c.sector+', and '+c.sector+' as a sector '+activeRetDirection+' the index by '+sectorVsNiftyStr+'. That sector '+sectorSignalWord+' worked in your favour when the sector did better than the benchmark. Selection effect = '+c.name+' '+activeRetDirection+' its own sector peers by '+stockVsSectorStr+' — the stock-picking contribution.</p></div>';
+  html+='<div class="teach-card"><h4>Active Return = A + S + I</h4><p>Active return = Allocation effect + Selection effect + Interaction effect. Interaction captures the combined benefit of both being in the right sector AND picking the right stock. '+c.name+'\'s total active return of '+activeRetStr+' is the sum of all three components — which the Pro attribution table breaks out precisely.</p></div>';
+  html+='<div class="teach-card"><h4>Jensen\'s Alpha vs Active Return</h4><p>Active return is raw outperformance vs benchmark. Jensen\'s alpha is risk-adjusted: it asks whether you earned more than the market expected given your beta. '+c.name+'\'s beta of '+c.beta.toFixed(2)+' implies a required return of '+required.toFixed(1)+'%. Its actual return of '+c.ret1y.toFixed(1)+'% gives alpha of '+alphaStr+' — a cleaner measure of true skill.</p></div>';
+  html+='</div>';
+
+  // Peers QA
+  var peerNames=peers.slice(0,3).map(function(p){return p.name;}).join(', ');
+  html+='<div class="qa-block"><div class="qa-q">How does '+c.name+' compare to its '+c.sector+' sector peers?</div>';
+  html+='<div class="qa-a">Within '+c.sector+', key peers include '+peerNames+'. The sector averaged '+sectorAvgRet.toFixed(1)+'% over 1 year vs Nifty\'s '+NIFTY.ret1y+'%. '+c.name+' returned '+c.ret1y.toFixed(1)+'%, '+( stockVsSector>=0?'beating':'lagging')+' sector peers by '+stockVsSectorStr+'. In attribution terms, this is the selection effect — and it is the part most attributable to actual stock-picking skill rather than macro or sector tailwinds.</div></div>';
+
+  html+='<div class="qa-block"><div class="qa-q">Is '+c.sector+' an allocation bet worth making against the Nifty benchmark?</div>';
+  html+='<div class="qa-a">'+c.sector+' carries a benchmark weight of '+sectorBenchWt.toFixed(1)+'% in the Nifty. If you held '+c.sector+' at exactly that weight, your allocation effect would be zero. Overweighting creates a positive allocation effect only when the sector outperforms the total benchmark (which it did by '+sectorVsNiftyStr+' this year). Underweighting has the opposite effect — the Pro attribution table lets you see the full sector-by-sector breakdown for a synthetic portfolio anchored on '+c.name+'.</div></div>';
+
+  document.getElementById('context-area').innerHTML=html;
+}
+
+function goStep(n){
+  for(var i=1;i<=4;i++){
+    document.getElementById('panel-'+i).classList.remove('active');
+    document.getElementById('tab-'+i).classList.remove('active');
+  }
+  document.getElementById('panel-'+n).classList.add('active');
+  document.getElementById('tab-'+n).classList.add('active');
+  if(n===2 && selected) buildContext();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+
+buildGrid();
+</script>
+</body>
+</html>

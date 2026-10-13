@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portfolio Rebalancing — Investment Management — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--accent:#7c3aed;--accent-bg:#f5f3ff;--accent-border:#ddd6fe}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-pro{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+.hero{background:#0a0a0a;color:#fff;padding:32px 24px 28px}
+.hero-inner{max-width:780px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:#a78bfa;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;margin-bottom:14px;letter-spacing:.04em}
+.hero h1{font-size:clamp(20px,3vw,30px);font-weight:900;letter-spacing:-.02em;margin-bottom:6px}
+.hero h1 span{color:#a78bfa}
+.hero p{font-size:13px;color:#9ca3af;line-height:1.6}
+.step-bar{background:#111;border-bottom:1px solid #222;padding:0 24px}
+.step-bar-inner{max-width:780px;margin:0 auto;display:flex;gap:0}
+.step-tab{padding:14px 20px;font-size:12px;font-weight:700;color:#4b5563;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.step-tab.active{color:#a78bfa;border-bottom-color:#7c3aed}
+.main{max-width:780px;margin:0 auto;padding:32px 24px 80px}
+.step{display:none}
+.step.active{display:block}
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:14px}
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:24px}
+.company-card{border:1px solid var(--border);border-radius:8px;padding:14px 16px;cursor:pointer;transition:all .15s;background:#fff}
+.company-card:hover{border-color:var(--accent);background:var(--accent-bg)}
+.company-card.selected{border-color:var(--accent);background:var(--accent-bg);box-shadow:0 0 0 3px rgba(124,58,237,.15)}
+.company-name{font-size:14px;font-weight:800;margin-bottom:2px}
+.company-sub{font-size:11px;color:var(--muted)}
+.company-meta{font-size:11px;color:var(--muted);margin-top:6px;font-family:'JetBrains Mono',monospace}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .15s;font-family:'Inter',sans-serif}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{opacity:.9}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{color:var(--text);border-color:#aaa}
+.btn-row{display:flex;gap:10px;align-items:center;margin-top:24px}
+.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.metric-box{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+.metric-label{font-size:11px;color:var(--muted);margin-bottom:4px}
+.metric-value{font-size:20px;font-weight:900;font-family:'JetBrains Mono',monospace}
+.metric-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.pos{color:var(--green)}
+.neg{color:var(--red)}
+.teach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:24px}
+.teach-card{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:8px;padding:14px 16px}
+.teach-card h4{font-size:12px;font-weight:800;margin-bottom:6px;color:var(--accent)}
+.teach-card p{font-size:12px;color:#374151;line-height:1.6}
+.qa-block{margin-bottom:16px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px}
+.qa-q{font-size:13px;font-weight:700;margin-bottom:8px}
+.qa-a{font-size:13px;color:#374151;line-height:1.6}
+.divider{border:none;border-top:1px solid var(--border);margin:24px 0}
+.loading-bar{background:var(--border);border-radius:4px;height:4px;overflow:hidden;margin-bottom:8px}
+.loading-fill{height:100%;background:var(--accent);border-radius:4px;transition:width .5s}
+.loading-text{font-size:12px;color:var(--muted);margin-bottom:24px}
+/* Rebalancing specific */
+.alloc-table{width:100%;border-collapse:collapse;margin-bottom:24px;font-size:13px}
+.alloc-table th{text-align:left;padding:10px 14px;border-bottom:2px solid var(--border);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.alloc-table td{padding:12px 14px;border-bottom:1px solid var(--border)}
+.alloc-table tr:last-child td{border-bottom:none}
+.drift-pill{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.drift-ok{background:#dcfce7;color:#16a34a}
+.drift-warn{background:#fef3c7;color:#d97706}
+.drift-red{background:#fee2e2;color:#dc2626}
+.trade-box{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px 20px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.trade-box-left h4{font-size:14px;font-weight:800;margin-bottom:3px}
+.trade-box-left p{font-size:12px;color:var(--muted)}
+.trade-action{font-size:12px;font-weight:800;padding:4px 12px;border-radius:6px}
+.trade-buy{background:#dcfce7;color:#16a34a}
+.trade-sell{background:#fee2e2;color:#dc2626}
+.trade-hold{background:var(--card);color:var(--muted);border:1px solid var(--border)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-left">
+    <a href="/valuation-toolkit/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">/</span>
+    <a href="/valuation-toolkit/domains/investment-management/">Investment Management</a>
+    <span class="nav-sep">/</span>
+    <span>Portfolio Rebalancing</span>
+  </div>
+  <button class="nav-pro" onclick="unlockPro()">Unlock Pro — ₹799/mo</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">🔄 Calculator 01 · Investment Management</div>
+    <h1>Portfolio <span>Rebalancing</span></h1>
+    <p>Select a portfolio anchor, learn what triggers a rebalance, then run a live drift and trade analysis on a 5-asset allocation.</p>
+  </div>
+</div>
+
+<div class="step-bar">
+  <div class="step-bar-inner">
+    <div class="step-tab active" id="tab-1">1 · Pick Stock</div>
+    <div class="step-tab" id="tab-2">2 · Context</div>
+    <div class="step-tab" id="tab-3">3 · Drift Analysis</div>
+    <div class="step-tab" id="tab-4">4 · Trade List</div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- STEP 1 -->
+<div class="step active" id="step-1">
+  <p class="section-label">Choose a portfolio anchor stock</p>
+  <div class="company-grid" id="company-grid"></div>
+  <div class="btn-row">
+    <button class="btn btn-primary" id="next-1" onclick="startLoading()" disabled>Analyse Portfolio →</button>
+  </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="step" id="step-2">
+  <div id="loading-section">
+    <p class="section-label">Loading portfolio data</p>
+    <div class="loading-bar"><div class="loading-fill" id="loading-fill" style="width:0%"></div></div>
+    <div class="loading-text" id="loading-text">Fetching market prices...</div>
+  </div>
+  <div id="context-content" style="display:none"></div>
+</div>
+
+<!-- STEP 3 -->
+<div class="step" id="step-3">
+  <div id="drift-content"></div>
+</div>
+
+<!-- STEP 4 -->
+<div class="step" id="step-4">
+  <div id="trade-content"></div>
+</div>
+
+</div>
+
+<script>
+var STOCKS=[
+  {id:1,name:'Reliance Industries',sector:'Oil & Gas',marketCap:2010000,pe:24.8,beta:0.95,divYield:0.4,ret1y:8.2,ret3y:15.8,ret5y:22.4,vol:18.2,weight:9.8,price:2840},
+  {id:2,name:'HDFC Bank',sector:'Banking',marketCap:1285000,pe:18.2,beta:0.88,divYield:1.1,ret1y:12.4,ret3y:11.2,ret5y:16.8,vol:16.4,weight:7.2,price:1720},
+  {id:3,name:'Infosys',sector:'IT',marketCap:720000,pe:22.4,beta:0.82,divYield:2.4,ret1y:18.6,ret3y:14.8,ret5y:19.2,vol:19.8,weight:5.8,price:1840},
+  {id:4,name:'ICICI Bank',sector:'Banking',marketCap:890000,pe:17.6,beta:1.12,divYield:0.8,ret1y:24.8,ret3y:28.4,ret5y:31.2,vol:20.4,weight:5.2,price:1240},
+  {id:5,name:'TCS',sector:'IT',marketCap:1420000,pe:26.8,beta:0.72,divYield:3.2,ret1y:6.8,ret3y:10.4,ret5y:18.6,vol:15.6,weight:5.8,price:3980},
+  {id:6,name:'Bharti Airtel',sector:'Telecom',marketCap:920000,pe:48.2,beta:0.78,divYield:0.4,ret1y:42.4,ret3y:35.8,ret5y:28.4,vol:22.4,weight:4.2,price:1580},
+  {id:7,name:'Kotak Mahindra Bank',sector:'Banking',marketCap:380000,pe:19.4,beta:0.94,divYield:0.1,ret1y:8.4,ret3y:8.8,ret5y:18.2,vol:18.8,weight:3.2,price:1840},
+  {id:8,name:'L&T',sector:'Capital Goods',marketCap:590000,pe:34.2,beta:1.24,divYield:0.9,ret1y:28.4,ret3y:32.8,ret5y:26.4,vol:24.8,weight:3.8,price:3640},
+  {id:9,name:'Axis Bank',sector:'Banking',marketCap:360000,pe:14.8,beta:1.18,divYield:0.1,ret1y:16.4,ret3y:22.4,ret5y:20.8,vol:22.8,weight:2.8,price:1180},
+  {id:10,name:'Maruti Suzuki',sector:'Auto',marketCap:440000,pe:28.4,beta:0.84,divYield:1.2,ret1y:14.2,ret3y:24.8,ret5y:18.4,vol:21.2,weight:2.4,price:12400},
+  {id:11,name:'Sun Pharmaceutical',sector:'Pharma',marketCap:410000,pe:38.4,beta:0.64,divYield:0.8,ret1y:32.4,ret3y:28.8,ret5y:22.4,vol:17.4,weight:2.4,price:1720},
+  {id:12,name:'HUL',sector:'FMCG',marketCap:530000,pe:52.4,beta:0.42,divYield:1.8,ret1y:2.4,ret3y:4.8,ret5y:10.4,vol:14.2,weight:2.4,price:2480},
+  {id:13,name:'ITC',sector:'FMCG',marketCap:590000,pe:24.8,beta:0.58,divYield:3.2,ret1y:12.4,ret3y:38.8,ret5y:22.4,vol:16.8,weight:3.2,price:468},
+  {id:14,name:'Asian Paints',sector:'Materials',marketCap:290000,pe:58.4,beta:0.48,divYield:1.2,ret1y:-14.2,ret3y:4.2,ret5y:12.8,vol:19.4,weight:1.8,price:2780},
+  {id:15,name:'Bajaj Finance',sector:'NBFC',marketCap:410000,pe:34.8,beta:1.42,divYield:0.1,ret1y:8.4,ret3y:14.8,ret5y:28.4,vol:26.4,weight:2.2,price:7240},
+  {id:16,name:'Wipro',sector:'IT',marketCap:280000,pe:20.8,beta:0.88,divYield:0.1,ret1y:6.4,ret3y:4.8,ret5y:12.4,vol:22.8,weight:1.6,price:580},
+  {id:17,name:'NTPC',sector:'Power',marketCap:380000,pe:18.4,beta:0.74,divYield:2.4,ret1y:32.4,ret3y:28.8,ret5y:22.4,vol:20.4,weight:2.2,price:384},
+  {id:18,name:'Power Grid',sector:'Power',marketCap:280000,pe:20.4,beta:0.68,divYield:3.4,ret1y:28.4,ret3y:22.4,ret5y:18.4,vol:18.4,weight:1.6,price:328},
+  {id:19,name:'Titan',sector:'Consumer',marketCap:320000,pe:84.2,beta:0.82,divYield:0.4,ret1y:4.2,ret3y:18.4,ret5y:28.4,vol:24.8,weight:1.8,price:3640},
+  {id:20,name:'UltraTech Cement',sector:'Materials',marketCap:340000,pe:42.4,beta:0.94,divYield:0.4,ret1y:8.4,ret3y:14.8,ret5y:18.4,vol:22.4,weight:1.8,price:11240},
+  {id:21,name:'HCL Technologies',sector:'IT',marketCap:450000,pe:24.8,beta:0.78,divYield:4.8,ret1y:22.4,ret3y:16.8,ret5y:18.4,vol:20.4,weight:2.2,price:1680},
+  {id:22,name:'M&M',sector:'Auto',marketCap:320000,pe:28.4,beta:1.08,divYield:0.8,ret1y:42.8,ret3y:48.4,ret5y:34.8,vol:26.4,weight:2.2,price:2940},
+  {id:23,name:'JSW Steel',sector:'Materials',marketCap:230000,pe:22.4,beta:1.48,divYield:0.8,ret1y:4.8,ret3y:18.4,ret5y:24.8,vol:28.8,weight:1.4,price:980},
+  {id:24,name:'Adani Ports',sector:'Infrastructure',marketCap:280000,pe:32.4,beta:1.28,divYield:0.4,ret1y:24.4,ret3y:28.4,ret5y:32.4,vol:26.4,weight:1.4,price:1380},
+  {id:25,name:'Tata Motors',sector:'Auto',marketCap:360000,pe:8.4,beta:1.58,divYield:0.0,ret1y:24.4,ret3y:58.4,ret5y:28.4,vol:32.4,weight:1.8,price:980},
+  {id:26,name:'HDFC Life',sector:'Insurance',marketCap:160000,pe:72.4,beta:0.72,divYield:0.2,ret1y:8.4,ret3y:12.4,ret5y:14.8,vol:18.4,weight:1.2,price:680},
+  {id:27,name:'SBI',sector:'Banking',marketCap:720000,pe:10.8,beta:1.32,divYield:1.2,ret1y:28.4,ret3y:48.4,ret5y:28.4,vol:26.4,weight:2.4,price:840},
+  {id:28,name:'Tech Mahindra',sector:'IT',marketCap:140000,pe:38.4,beta:0.98,divYield:2.8,ret1y:8.4,ret3y:-4.8,ret5y:8.4,vol:26.4,weight:0.8,price:1480},
+  {id:29,name:'Nestle India',sector:'FMCG',marketCap:220000,pe:68.4,beta:0.38,divYield:1.4,ret1y:-4.8,ret3y:8.4,ret5y:18.4,vol:16.4,weight:1.2,price:24800},
+  {id:30,name:'Cipla',sector:'Pharma',marketCap:175000,pe:28.4,beta:0.68,divYield:0.8,ret1y:18.4,ret3y:22.4,ret5y:18.4,vol:18.8,weight:1.2,price:1540}
+];
+
+var NIFTY={ret1y:16.0,ret3y:12.8,ret5y:14.2,vol:14.8};
+
+var selected=null;
+var loadTimer=null;
+
+function fmtPct(v,decimals){
+  var d=decimals===undefined?1:decimals;
+  return (v>0?'+':'')+v.toFixed(d)+'%';
+}
+function fmtCr(n){
+  if(n>=100000) return '₹'+(n/100000).toFixed(1)+'L Cr';
+  if(n>=1000) return '₹'+(n/1000).toFixed(0)+'K Cr';
+  return '₹'+n+'Cr';
+}
+
+function buildGrid(){
+  var el=document.getElementById('company-grid');
+  var html='';
+  STOCKS.forEach(function(s){
+    html+='<div class="company-card" id="card-'+s.id+'" onclick="selectCompany('+s.id+')">';
+    html+='<div class="company-name">'+s.name+'</div>';
+    html+='<div class="company-sub">'+s.sector+'</div>';
+    html+='<div class="company-meta">1Y: '+fmtPct(s.ret1y)+' · Beta: '+s.beta.toFixed(2)+'</div>';
+    html+='</div>';
+  });
+  el.innerHTML=html;
+}
+
+function selectCompany(id){
+  selected=STOCKS.find(function(s){return s.id===id;});
+  document.querySelectorAll('.company-card').forEach(function(c){c.classList.remove('selected');});
+  document.getElementById('card-'+id).classList.add('selected');
+  document.getElementById('next-1').disabled=false;
+}
+
+function startLoading(){
+  document.getElementById('step-1').classList.remove('active');
+  document.getElementById('step-2').classList.add('active');
+  document.getElementById('tab-1').classList.remove('active');
+  document.getElementById('tab-2').classList.add('active');
+  window.scrollTo(0,0);
+
+  var steps=[
+    {pct:20,text:'Fetching market prices...'},
+    {pct:45,text:'Computing portfolio weights...'},
+    {pct:70,text:'Running drift analysis...'},
+    {pct:90,text:'Generating rebalancing signals...'},
+    {pct:100,text:'Ready.'}
+  ];
+  var i=0;
+  var bar=document.getElementById('loading-fill');
+  var txt=document.getElementById('loading-text');
+
+  function tick(){
+    if(i>=steps.length){
+      clearInterval(loadTimer);
+      setTimeout(function(){
+        document.getElementById('loading-section').style.display='none';
+        document.getElementById('context-content').style.display='block';
+        buildContext();
+      },400);
+      return;
+    }
+    bar.style.width=steps[i].pct+'%';
+    txt.textContent=steps[i].text;
+    i++;
+  }
+  tick();
+  loadTimer=setInterval(tick,900);
+}
+
+function buildContext(){
+  var c=selected;
+  var activeRet=c.ret1y-NIFTY.ret1y;
+  var driftEst=Math.abs(activeRet)*0.4;
+  var betaLabel = c.beta>1.2 ? 'High' : (c.beta>0.8 ? 'Moderate' : 'Low');
+
+  var html='';
+  html+='<p class="section-label">Portfolio context — '+c.name+'</p>';
+  html+='<div class="metric-grid">';
+  html+='<div class="metric-box"><div class="metric-label">1Y Return</div><div class="metric-value '+(c.ret1y>NIFTY.ret1y?'pos':'neg')+'">'+fmtPct(c.ret1y)+'</div><div class="metric-sub">Nifty: '+fmtPct(NIFTY.ret1y)+'</div></div>';
+  html+='<div class="metric-box"><div class="metric-label">Beta</div><div class="metric-value">'+c.beta.toFixed(2)+'</div><div class="metric-sub">'+betaLabel+' market sensitivity</div></div>';
+  html+='<div class="metric-box"><div class="metric-label">Volatility</div><div class="metric-value">'+c.vol.toFixed(1)+'%</div><div class="metric-sub">Annualised std dev</div></div>';
+  html+='<div class="metric-box"><div class="metric-label">Div Yield</div><div class="metric-value">'+c.divYield.toFixed(1)+'%</div><div class="metric-sub">'+c.sector+' stock</div></div>';
+  html+='<div class="metric-box"><div class="metric-label">Active Return</div><div class="metric-value '+(activeRet>0?'pos':'neg')+'">'+fmtPct(activeRet)+'</div><div class="metric-sub">vs Nifty benchmark</div></div>';
+  html+='<div class="metric-box"><div class="metric-label">Est. Drift</div><div class="metric-value">'+driftEst.toFixed(1)+'%</div><div class="metric-sub">Weight drift indicator</div></div>';
+  html+='</div>';
+
+  html+='<div class="divider"></div>';
+  html+='<p class="section-label">What rebalancing actually is</p>';
+  html+='<div class="teach-grid">';
+  html+='<div class="teach-card"><h4>Why Portfolios Drift</h4><p>If equities outperform bonds by 20% in a year, a 60/40 portfolio drifts to 65/35 or more without any trades. This is not a problem — until the risk profile of the portfolio no longer matches the investor\'s risk tolerance.</p></div>';
+  html+='<div class="teach-card"><h4>Threshold vs Calendar</h4><p>Calendar rebalancing (quarterly/annual) is simple but often triggers unnecessary trades. Threshold-based rebalancing (±5% from target) trades only when drift crosses a meaningful level — lower costs, better tax efficiency.</p></div>';
+  html+='<div class="teach-card"><h4>The Rebalancing Bonus</h4><p>Systematic rebalancing forces you to sell what ran up and buy what lagged — a structured form of buy-low/sell-high. Research shows this adds 0.2-0.4% annual return over no-rebalance portfolios over a full cycle.</p></div>';
+  html+='<div class="teach-card"><h4>Tax-Smart Rebalancing</h4><p>In India, LTCG kicks in after 1 year. Smart rebalancing uses new cash inflows first, then sells only positions past the 12-month mark. This defers tax liability while restoring target weights.</p></div>';
+  html+='</div>';
+
+  html+='<div class="divider"></div>';
+  html+='<p class="section-label">Q&A — rebalancing context</p>';
+  var triggerWord = c.ret1y>NIFTY.ret1y ? 'outperformed the index, so it has likely become overweight in a diversified portfolio — a classic sell-trim candidate' : 'underperformed the index, so it may have drifted underweight — a potential buy-top-up candidate';
+  html+='<div class="qa-block"><div class="qa-q">How does '+c.name+'\'s performance affect its portfolio weight?</div><div class="qa-a">'+c.name+' has '+triggerWord+'. A stock\'s portfolio weight shifts in proportion to its relative return versus the rest of the portfolio. With 1Y return of '+fmtPct(c.ret1y)+' against Nifty at '+fmtPct(NIFTY.ret1y)+', expect weight drift of roughly '+driftEst.toFixed(1)+'% from starting position.</div></div>';
+  html+='<div class="qa-block"><div class="qa-q">What threshold triggers a real portfolio rebalance?</div><div class="qa-a">Most institutional PMs use a ±5% absolute deviation from target weight as the primary trigger, combined with a ±25% relative deviation (e.g. a 20% target that drifts past 25% or below 15%). For '+c.name+' with its beta of '+c.beta.toFixed(2)+', a '+driftEst.toFixed(1)+'% drift estimate '+((driftEst>=5)?'<b>meets</b>':'does not yet meet')+'  the 5% absolute threshold on its own — but in combination with other positions, the portfolio-level drift likely triggers a review.</div></div>';
+
+  html+='<div class="btn-row"><button class="btn btn-primary" onclick="buildDrift()">Run Drift Analysis →</button></div>';
+
+  document.getElementById('context-content').innerHTML=html;
+}
+
+/* Build a synthetic 5-stock portfolio anchored on selected stock */
+function buildDrift(){
+  var c=selected;
+  /* 5-position portfolio: anchor at ~30%, 4 others at varying weights */
+  var portfolio=[
+    {name:c.name,sector:c.sector,target:30,current:30+(c.ret1y-NIFTY.ret1y)*0.4,ret1y:c.ret1y,vol:c.vol},
+    {name:'HDFC Bank',sector:'Banking',target:20,current:20-(c.ret1y-12.4)*0.2,ret1y:12.4,vol:16.4},
+    {name:'Infosys',sector:'IT',target:20,current:20+(18.6-c.ret1y)*0.15,ret1y:18.6,vol:19.8},
+    {name:'ITC',sector:'FMCG',target:15,current:15+(12.4-c.ret1y)*0.1,ret1y:12.4,vol:16.8},
+    {name:'NTPC',sector:'Power',target:15,current:15+(32.4-c.ret1y)*0.12,ret1y:32.4,vol:20.4}
+  ];
+
+  /* Normalise current weights to 100 */
+  var totalCurrent=portfolio.reduce(function(s,p){return s+p.current;},0);
+  portfolio.forEach(function(p){p.current=p.current/totalCurrent*100;});
+  portfolio.forEach(function(p){
+    p.drift=p.current-p.target;
+    var absDrift=Math.abs(p.drift);
+    p.status = absDrift>=5 ? 'red' : (absDrift>=2.5 ? 'warn' : 'ok');
+  });
+
+  var html='';
+  html+='<p class="section-label">Portfolio drift analysis</p>';
+  html+='<table class="alloc-table">';
+  html+='<thead><tr><th>Security</th><th>Sector</th><th>Target %</th><th>Current %</th><th>Drift</th><th>Signal</th></tr></thead><tbody>';
+  portfolio.forEach(function(p){
+    var driftSign=p.drift>0?'+':'';
+    var pillClass=p.status==='red'?'drift-red':p.status==='warn'?'drift-warn':'drift-ok';
+    var signalText=p.status==='red'?'Rebalance':'';
+    if(p.status==='warn') signalText='Watch';
+    if(p.status==='ok') signalText='On Track';
+    html+='<tr>';
+    html+='<td style="font-weight:700">'+p.name+'</td>';
+    html+='<td style="color:var(--muted)">'+p.sector+'</td>';
+    html+='<td style="font-family:JetBrains Mono,monospace">'+p.target.toFixed(1)+'%</td>';
+    html+='<td style="font-family:JetBrains Mono,monospace">'+p.current.toFixed(1)+'%</td>';
+    html+='<td style="font-family:JetBrains Mono,monospace;color:'+(p.drift>0?'var(--red)':'var(--green)')+'">'+driftSign+p.drift.toFixed(1)+'%</td>';
+    html+='<td><span class="drift-pill '+pillClass+'">'+signalText+'</span></td>';
+    html+='</tr>';
+  });
+  html+='</tbody></table>';
+
+  var portVol=Math.sqrt(portfolio.reduce(function(s,p){return s+(p.current/100)*(p.current/100)*p.vol*p.vol;},0));
+  html+='<div class="metric-grid">';
+  html+='<div class="metric-box"><div class="metric-label">Max Drift</div><div class="metric-value neg">'+portfolio.reduce(function(m,p){return Math.max(m,Math.abs(p.drift));},0).toFixed(1)+'%</div><div class="metric-sub">Largest single position</div></div>';
+  html+='<div class="metric-box"><div class="metric-label">Triggers</div><div class="metric-value" style="color:var(--accent)">'+portfolio.filter(function(p){return p.status==='red';}).length+'</div><div class="metric-sub">Positions needing action</div></div>';
+  html+='<div class="metric-box"><div class="metric-label">Est Port Vol</div><div class="metric-value">'+portVol.toFixed(1)+'%</div><div class="metric-sub">Simplified estimate</div></div>';
+  html+='</div>';
+
+  html+='<div class="btn-row"><button class="btn btn-ghost" onclick="goStep(2)">← Back</button><button class="btn btn-primary" onclick="buildTrades('+JSON.stringify(portfolio).replace(/"/g,"'")+')">Generate Trade List →</button></div>';
+
+  document.getElementById('drift-content').innerHTML=html;
+  goStep(3);
+}
+
+function buildTrades(portfolio){
+  /* portfolio is already computed */
+  var portfolioValue=1000000; /* assume ₹10L portfolio */
+  var html='';
+  html+='<p class="section-label">Rebalancing trade list (₹10L portfolio)</p>';
+
+  portfolio.forEach(function(p){
+    var tradeVal=(p.target-p.current)/100*portfolioValue;
+    var absDrift=Math.abs(p.drift);
+    var actionClass='trade-hold';
+    var actionText='Hold';
+    if(tradeVal>0){actionClass='trade-buy';actionText='BUY';}
+    else if(tradeVal<0){actionClass='trade-sell';actionText='SELL';}
+    if(absDrift<1){actionText='Hold';actionClass='trade-hold';}
+    html+='<div class="trade-box"><div class="trade-box-left"><h4>'+p.name+'</h4><p>Target '+p.target.toFixed(1)+'% vs Current '+p.current.toFixed(1)+'% · Drift: '+(p.drift>0?'+':'')+p.drift.toFixed(1)+'%</p></div>';
+    html+='<div style="text-align:right"><span class="trade-action '+actionClass+'">'+actionText+'</span>';
+    if(actionText!=='Hold') html+='<div style="font-size:11px;color:var(--muted);margin-top:4px;font-family:JetBrains Mono,monospace">₹'+Math.abs(tradeVal).toLocaleString('en-IN',{maximumFractionDigits:0})+'</div>';
+    html+='</div></div>';
+  });
+
+  var totalBuy=portfolio.reduce(function(s,p){var v=(p.target-p.current)/100*portfolioValue;return s+(v>0?v:0);},0);
+  var totalSell=portfolio.reduce(function(s,p){var v=(p.target-p.current)/100*portfolioValue;return s+(v<0?Math.abs(v):0);},0);
+
+  html+='<div class="metric-grid" style="margin-top:16px">';
+  html+='<div class="metric-box"><div class="metric-label">Total Buy</div><div class="metric-value pos">₹'+totalBuy.toLocaleString('en-IN',{maximumFractionDigits:0})+'</div><div class="metric-sub">Capital to deploy</div></div>';
+  html+='<div class="metric-box"><div class="metric-label">Total Sell</div><div class="metric-value neg">₹'+totalSell.toLocaleString('en-IN',{maximumFractionDigits:0})+'</div><div class="metric-sub">Capital to redeploy</div></div>';
+  html+='<div class="metric-box"><div class="metric-label">Net Position</div><div class="metric-value">₹'+(totalBuy-totalSell).toLocaleString('en-IN',{maximumFractionDigits:0})+'</div><div class="metric-sub">New cash needed</div></div>';
+  html+='</div>';
+
+  html+='<div class="qa-block" style="margin-top:20px"><div class="qa-q">When should I execute these trades?</div><div class="qa-a">If any position has held for less than 12 months, the proceeds attract STCG at 20%. Prioritise selling the oldest positions first. If you have new SIP contributions arriving this month, use them to buy the underweight positions before selling any existing holdings — this reduces the number of taxable events significantly.</div></div>';
+
+  html+='<div class="btn-row"><button class="btn btn-ghost" onclick="goStep(3)">← Back</button><a href="risk-return-matrix.html" class="btn btn-primary">Next: Risk-Return Matrix →</a></div>';
+
+  document.getElementById('trade-content').innerHTML=html;
+  goStep(4);
+}
+
+function goStep(n){
+  document.querySelectorAll('.step').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.step-tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('step-'+n).classList.add('active');
+  document.getElementById('tab-'+n).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+buildGrid();
+</script>
+</body>
+</html>

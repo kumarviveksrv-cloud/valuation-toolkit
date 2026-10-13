@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Investment Management Calculators — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--accent:#7c3aed;--accent-bg:#f5f3ff;--accent-border:#ddd6fe}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-pro{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+.hero{background:#0a0a0a;color:#fff;padding:32px 24px 28px}
+.hero-inner{max-width:780px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:#a78bfa;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;margin-bottom:14px;letter-spacing:.04em}
+.hero h1{font-size:clamp(20px,3vw,28px);font-weight:900;letter-spacing:-.02em;margin-bottom:6px}
+.hero p{font-size:13px;color:#9ca3af}
+.main{max-width:780px;margin:0 auto;padding:40px 24px 80px}
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:16px}
+.calc-list{display:flex;flex-direction:column;gap:10px;margin-bottom:40px}
+.calc-row{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);border-radius:10px;padding:16px 20px;transition:all .15s;gap:16px}
+.calc-row:hover{border-color:var(--accent);background:var(--accent-bg)}
+.calc-row-left{display:flex;align-items:center;gap:14px}
+.calc-num{font-size:11px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--muted);min-width:24px}
+.calc-info h3{font-size:14px;font-weight:800;margin-bottom:3px}
+.calc-info p{font-size:12px;color:var(--muted)}
+.calc-badge{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:4px}
+.badge-free{background:#dcfce7;color:#16a34a}
+.badge-pro{background:var(--accent-bg);color:var(--accent)}
+.calc-arrow{font-size:16px;color:var(--muted)}
+footer{border-top:1px solid var(--border);padding:24px;text-align:center;font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-left">
+    <a href="/valuation-toolkit/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">/</span>
+    <a href="/valuation-toolkit/domains/investment-management/">Investment Management</a>
+    <span class="nav-sep">/</span>
+    <span>Calculators</span>
+  </div>
+  <button class="nav-pro" onclick="unlockPro()">Unlock Pro — ₹799/mo</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">📊 Domain 12 · Investment Management</div>
+    <h1>Investment Management Calculators</h1>
+    <p>5 tools covering rebalancing, risk-return positioning, attribution, goal-based allocation, and portfolio optimisation.</p>
+  </div>
+</div>
+
+<div class="main">
+  <p class="section-label">All Calculators</p>
+  <div class="calc-list">
+    <a href="portfolio-rebalancing.html" class="calc-row">
+      <div class="calc-row-left">
+        <span class="calc-num">01</span>
+        <div class="calc-info">
+          <h3>Portfolio Rebalancing</h3>
+          <p>Analyse drift, compute threshold triggers, and generate rebalancing trade list</p>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="calc-badge badge-free">Free</span>
+        <span class="calc-arrow">→</span>
+      </div>
+    </a>
+    <a href="risk-return-matrix.html" class="calc-row">
+      <div class="calc-row-left">
+        <span class="calc-num">02</span>
+        <div class="calc-info">
+          <h3>Risk-Return Matrix</h3>
+          <p>Plot securities on risk-return plane, identify efficient and inefficient positions</p>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="calc-badge badge-pro">Pro</span>
+        <span class="calc-arrow">→</span>
+      </div>
+    </a>
+    <a href="benchmark-attribution.html" class="calc-row">
+      <div class="calc-row-left">
+        <span class="calc-num">03</span>
+        <div class="calc-info">
+          <h3>Benchmark Attribution</h3>
+          <p>Decompose active return into allocation effect and selection effect</p>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="calc-badge badge-pro">Pro</span>
+        <span class="calc-arrow">→</span>
+      </div>
+    </a>
+    <a href="goal-based-allocation.html" class="calc-row">
+      <div class="calc-row-left">
+        <span class="calc-num">04</span>
+        <div class="calc-info">
+          <h3>Goal-Based Allocation</h3>
+          <p>Align asset allocation to financial goals — corpus, time horizon, savings rate</p>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="calc-badge badge-pro">Pro</span>
+        <span class="calc-arrow">→</span>
+      </div>
+    </a>
+    <a href="portfolio-optimizer.html" class="calc-row">
+      <div class="calc-row-left">
+        <span class="calc-num">05</span>
+        <div class="calc-info">
+          <h3>Portfolio Optimizer</h3>
+          <p>Mean-variance optimisation — find Sharpe-maximising weights within constraints</p>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="calc-badge badge-pro">Pro</span>
+        <span class="calc-arrow">→</span>
+      </div>
+    </a>
+  </div>
+
+  <p class="section-label">Also in this domain</p>
+  <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <a href="../learn/" style="border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:13px;font-weight:600;color:var(--muted);transition:all .15s" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">📖 Learning Modules →</a>
+    <a href="../" style="border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:13px;font-weight:600;color:var(--muted);transition:all .15s" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--text)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">🏠 Domain Overview →</a>
+  </div>
+</div>
+
+<footer>ValuationDesk · Investment Management · <a href="/valuation-toolkit/" style="color:var(--accent)">← All Domains</a></footer>
+
+<script>function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}</script>
+</body>
+</html>
