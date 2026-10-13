@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Breakeven & CVP Analysis — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+a{color:inherit;text-decoration:none}
+
+/* NAV */
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-pro{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+
+/* HERO */
+.hero{padding:40px 24px 32px;max-width:860px;margin:0 auto}
+.hero-eyebrow{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.hero h1{font-size:clamp(22px,3.5vw,30px);font-weight:900;letter-spacing:-.02em;line-height:1.15;margin-bottom:10px}
+.hero p{font-size:14px;color:var(--muted);line-height:1.6;max-width:560px}
+.free-tag{display:inline-block;background:#dcfce7;color:#15803d;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:4px;margin-bottom:12px}
+.pro-tag{display:inline-block;background:#fef3c7;color:#92400e;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:4px;margin-bottom:12px}
+
+/* STEPS */
+.steps-wrap{max-width:860px;margin:0 auto;padding:0 24px 80px}
+.step{display:none}
+.step.active{display:block}
+
+/* STEP HEADER */
+.step-header{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--text);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-title{font-size:15px;font-weight:700}
+.step-sub{font-size:12px;color:var(--muted);margin-top:1px}
+
+/* SEARCH + FILTER */
+.search-bar{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;font-family:'Inter',sans-serif;outline:none;margin-bottom:14px}
+.search-bar:focus{border-color:var(--text)}
+.filter-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.pill{padding:5px 12px;border-radius:20px;border:1px solid var(--border);font-size:12px;font-weight:500;cursor:pointer;background:#fff;transition:all .15s}
+.pill.active,.pill:hover{background:var(--text);color:#fff;border-color:var(--text)}
+
+/* COMPANY GRID */
+.co-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:24px}
+.co-card{border:1.5px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;transition:all .15s;background:#fff}
+.co-card:hover{border-color:#aaa;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.co-card.selected{border-color:var(--text);background:#f9fafb}
+.co-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.co-meta{font-size:11px;color:var(--muted)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:11px 22px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .15s;font-family:'Inter',sans-serif}
+.btn-primary{background:var(--text);color:#fff}
+.btn-primary:hover{opacity:.88}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:#aaa;color:var(--text)}
+.btn-row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+
+/* CONTEXT CARD */
+.ctx-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px}
+.ctx-title{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px;color:var(--muted)}
+.ctx-insight{font-size:14px;line-height:1.65;color:var(--text);margin-bottom:20px}
+
+/* FORMULA BOX */
+.formula-box{background:#0a0a0a;color:#f1f5f9;border-radius:8px;padding:18px 20px;font-family:'JetBrains Mono',monospace;font-size:13px;margin-bottom:20px;line-height:1.8}
+.formula-box .f-comment{color:#6b7280;font-size:12px}
+.formula-box .f-label{color:#94a3b8;font-size:12px}
+.formula-box .f-val{color:#67e8f9}
+.formula-box .f-eq{color:#fbbf24}
+
+/* STAT BOXES */
+.stat-boxes{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.stat-box{border:1px solid var(--border);border-radius:8px;padding:14px;background:#fff}
+.stat-label{font-size:11px;color:var(--muted);font-weight:500;margin-bottom:4px}
+.stat-value{font-size:18px;font-weight:800;letter-spacing:-.01em}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:3px}
+
+/* CM SCALE */
+.cm-scale{border:1px solid var(--border);border-radius:8px;padding:16px;background:#fff;margin-bottom:20px}
+.cm-scale-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px}
+.cm-bar{height:10px;border-radius:5px;background:linear-gradient(to right,#fca5a5,#fcd34d,#86efac,#34d399);margin-bottom:8px;position:relative}
+.cm-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--muted)}
+.cm-bands{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:12px}
+.cm-band{border-radius:6px;padding:8px 10px;font-size:11px}
+.cm-band .band-label{font-weight:700;margin-bottom:2px}
+.cm-band .band-range{color:var(--muted);font-size:10px}
+.band-low{background:#fef2f2;color:#991b1b}
+.band-mod{background:#fffbeb;color:#92400e}
+.band-high{background:#f0fdf4;color:#15803d}
+.band-very{background:#ecfdf5;color:#065f46}
+
+/* SECTOR TABLE */
+.sec-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px}
+.sec-table th{background:var(--card);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+.sec-table td{padding:10px 12px;border-bottom:1px solid var(--border)}
+.sec-table tr:last-child td{border-bottom:none}
+.sec-table tr.highlighted{background:#f0fdf4}
+.sec-table .td-sec{font-weight:600}
+.td-neg{color:var(--green);font-weight:700}
+
+/* PRO GATE */
+.pro-gate{border:2px dashed var(--border);border-radius:12px;padding:36px;text-align:center;margin-top:8px}
+.pro-gate-icon{font-size:32px;margin-bottom:12px}
+.pro-gate-title{font-size:17px;font-weight:800;margin-bottom:8px}
+.pro-gate-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:18px;max-width:440px;margin-left:auto;margin-right:auto}
+.pro-gate-features{list-style:none;text-align:left;display:inline-block;margin-bottom:22px}
+.pro-gate-features li{font-size:13px;padding:5px 0;color:var(--text)}
+.pro-gate-btn{background:var(--text);color:#fff;border:none;border-radius:8px;padding:13px 28px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:10px;width:100%;max-width:340px}
+.pro-gate-btn:hover{opacity:.88}
+.pro-gate-note{font-size:11px;color:var(--muted)}
+
+/* BREADCRUMB BACK */
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);margin-bottom:24px;cursor:pointer}
+.back-link:hover{color:var(--text)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <a href="/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">›</span>
+    <a href="/domains/corporate-finance/">Corporate Finance</a>
+    <span class="nav-sep">›</span>
+    <span>Breakeven & CVP</span>
+  </div>
+  <button class="nav-pro" onclick="unlockPro()">Go Pro — ₹799/mo</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow">Corporate Finance · Calculator</div>
+  <span class="pro-tag">Pro Calculator</span>
+  <h1>Breakeven & CVP Analysis</h1>
+  <p>Cost-Volume-Profit analysis reveals the revenue threshold where your business stops losing money. Steps 1–2 are free — see your sector's CM ratio benchmarks and breakeven dynamics. Pro unlocks full CVP modeling.</p>
+</div>
+
+<div class="steps-wrap">
+
+  <!-- STEP 1 -->
+  <div class="step active" id="step1">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Pick a company to analyse</div>
+        <div class="step-sub">30 companies across Indian and global markets</div>
+      </div>
+    </div>
+    <input class="search-bar" id="searchInput" placeholder="Search by name or ticker…" oninput="filterCompanies()">
+    <div class="filter-pills" id="filterPills"></div>
+    <div class="co-grid" id="coGrid"></div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="step1Btn" onclick="goStep2()" disabled>See CVP Context →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step" id="step2">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">CVP Framework — <span id="s2CoName"></span></div>
+        <div class="step-sub">Contribution margin and breakeven benchmarks for this sector</div>
+      </div>
+    </div>
+
+    <div class="ctx-card">
+      <div class="ctx-title">Sector Context</div>
+      <div class="ctx-insight" id="s2Insight"></div>
+
+      <div class="formula-box">
+        <div><span class="f-eq">CM per Unit</span> <span class="f-label">= Price − Variable Cost per Unit</span></div>
+        <div><span class="f-eq">CM Ratio</span>    <span class="f-label">= CM per Unit ÷ Price</span></div>
+        <div class="f-comment">─────────────────────────────────────</div>
+        <div><span class="f-eq">BEP (Units)</span>    <span class="f-label">= Fixed Costs ÷ CM per Unit</span></div>
+        <div><span class="f-eq">BEP (Revenue)</span>  <span class="f-label">= Fixed Costs ÷ CM Ratio</span></div>
+        <div class="f-comment">─────────────────────────────────────</div>
+        <div><span class="f-eq">Margin of Safety</span> <span class="f-label">= (Revenue − BEP) ÷ Revenue</span></div>
+        <div><span class="f-eq">Target Profit Rev</span> <span class="f-label">= (Fixed Costs + Target Profit) ÷ CM Ratio</span></div>
+      </div>
+    </div>
+
+    <div class="stat-boxes">
+      <div class="stat-box">
+        <div class="stat-label">Typical CM Ratio</div>
+        <div class="stat-value" id="s2CmRatio">—</div>
+        <div class="stat-sub">Revenue retained after variable costs</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Fixed Cost % of Revenue</div>
+        <div class="stat-value" id="s2FixedCost">—</div>
+        <div class="stat-sub">Operating leverage driver</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Breakeven Profile</div>
+        <div class="stat-value" id="s2BEP">—</div>
+        <div class="stat-sub">Ease of reaching profitability</div>
+      </div>
+    </div>
+
+    <div class="cm-scale">
+      <div class="cm-scale-title">Contribution Margin Ratio — Sector Comparison</div>
+      <div class="cm-bar"></div>
+      <div class="cm-labels"><span>0%</span><span>25%</span><span>50%</span><span>75%+</span></div>
+      <div class="cm-bands">
+        <div class="cm-band band-low"><div class="band-label">Below 20%</div><div class="band-range">Auto, Infra, Energy</div></div>
+        <div class="cm-band band-mod"><div class="band-label">20–40%</div><div class="band-range">FMCG, Consumer</div></div>
+        <div class="cm-band band-high"><div class="band-label">40–65%</div><div class="band-range">Pharma, Telecom</div></div>
+        <div class="cm-band band-very"><div class="band-label">65%+</div><div class="band-range">SaaS, Tech</div></div>
+      </div>
+    </div>
+
+    <div class="ctx-card" style="padding:0;overflow:hidden">
+      <div class="ctx-title" style="padding:16px 20px 0">Sector CVP Benchmarks</div>
+      <table class="sec-table">
+        <thead><tr><th>Sector</th><th>CM Ratio</th><th>Fixed Cost %</th><th>Breakeven Profile</th></tr></thead>
+        <tbody>
+          <tr><td class="td-sec">Technology (SaaS/IT Services)</td><td>65–75%</td><td>55–65%</td><td>Moderate — high scale leverage</td></tr>
+          <tr><td class="td-sec">Pharma (Branded)</td><td>60–72%</td><td>40–55%</td><td>Moderate — post-R&D amortization</td></tr>
+          <tr><td class="td-sec">Telecom</td><td>45–60%</td><td>55–70%</td><td>Hard — spectrum & network capex</td></tr>
+          <tr><td class="td-sec">Consumer (Premium)</td><td>40–55%</td><td>30–45%</td><td>Moderate — brand premium helps</td></tr>
+          <tr><td class="td-sec">FMCG</td><td>30–45%</td><td>20–35%</td><td>Easy — low fixed base, high volume</td></tr>
+          <tr><td class="td-sec">Auto</td><td>12–22%</td><td>30–45%</td><td>Hard — high fixed manufacturing</td></tr>
+          <tr><td class="td-sec">Infrastructure</td><td>15–28%</td><td>40–60%</td><td>Very Hard — long asset payback</td></tr>
+          <tr><td class="td-sec">Energy</td><td>10–25%</td><td>25–40%</td><td>Cyclical — commodity dependent</td></tr>
+          <tr><td class="td-sec">Banking/NBFC</td><td colspan="3" style="color:var(--muted);font-style:italic">Net Interest Margin used instead — standard CVP not applicable</td></tr>
+          <tr><td class="td-sec">Conglomerate</td><td colspan="3" style="color:var(--muted);font-style:italic">Segment-level analysis required — aggregates are misleading</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goStep3()">Run CVP Analysis →</button>
+      <button class="btn btn-ghost" onclick="resetToStep1()">← Change Company</button>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step" id="step3">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">CVP Analysis — <span id="s3CoName"></span></div>
+        <div class="step-sub">Full breakeven and contribution margin modeling</div>
+      </div>
+    </div>
+
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <div class="pro-gate-title">Pro Feature</div>
+      <p class="pro-gate-desc">Enter revenue, price, variable costs and fixed costs to model your exact breakeven point, CVP curve, and target profit scenarios.</p>
+      <ul class="pro-gate-features">
+        <li>→ Breakeven units and revenue with live calculation</li>
+        <li>→ CVP sensitivity chart across volume ranges</li>
+        <li>→ Margin of safety gauge (current vs breakeven)</li>
+        <li>→ Target profit revenue modeler</li>
+        <li>→ Price vs volume trade-off scenarios</li>
+        <li>→ Fixed cost reduction impact on BEP</li>
+        <li>→ Export analysis to Vault</li>
+      </ul>
+      <button class="pro-gate-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+      <div class="pro-gate-note">Monthly only · Cancel anytime · All 15 domains included</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="goStep2()">← Back to Context</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const COMPANIES = [
+  {name:'Reliance Industries',ticker:'RIL',sector:'Energy',market:'NSE'},
+  {name:'TCS',ticker:'TCS',sector:'Technology',market:'NSE'},
+  {name:'HDFC Bank',ticker:'HDFCBANK',sector:'Banking',market:'NSE'},
+  {name:'Infosys',ticker:'INFY',sector:'Technology',market:'NSE'},
+  {name:'ICICI Bank',ticker:'ICICIBANK',sector:'Banking',market:'NSE'},
+  {name:'Hindustan Unilever',ticker:'HINDUNILVR',sector:'FMCG',market:'NSE'},
+  {name:'ITC',ticker:'ITC',sector:'FMCG',market:'NSE'},
+  {name:'Bajaj Finance',ticker:'BAJFINANCE',sector:'NBFC',market:'NSE'},
+  {name:'Bharti Airtel',ticker:'BHARTIARTL',sector:'Telecom',market:'NSE'},
+  {name:'Wipro',ticker:'WIPRO',sector:'Technology',market:'NSE'},
+  {name:'Asian Paints',ticker:'ASIANPAINT',sector:'Consumer',market:'NSE'},
+  {name:'Maruti Suzuki',ticker:'MARUTI',sector:'Auto',market:'NSE'},
+  {name:'Sun Pharma',ticker:'SUNPHARMA',sector:'Pharma',market:'NSE'},
+  {name:'Larsen & Toubro',ticker:'LT',sector:'Infrastructure',market:'NSE'},
+  {name:'Tata Motors',ticker:'TATAMOTORS',sector:'Auto',market:'NSE'},
+  {name:'Apple',ticker:'AAPL',sector:'Technology',market:'NASDAQ'},
+  {name:'Microsoft',ticker:'MSFT',sector:'Technology',market:'NASDAQ'},
+  {name:'Alphabet',ticker:'GOOGL',sector:'Technology',market:'NASDAQ'},
+  {name:'Amazon',ticker:'AMZN',sector:'Technology',market:'NASDAQ'},
+  {name:'Meta Platforms',ticker:'META',sector:'Technology',market:'NASDAQ'},
+  {name:'JPMorgan Chase',ticker:'JPM',sector:'Banking',market:'NYSE'},
+  {name:'Johnson & Johnson',ticker:'JNJ',sector:'Pharma',market:'NYSE'},
+  {name:'Procter & Gamble',ticker:'PG',sector:'FMCG',market:'NYSE'},
+  {name:'Berkshire Hathaway',ticker:'BRK.B',sector:'Conglomerate',market:'NYSE'},
+  {name:'ExxonMobil',ticker:'XOM',sector:'Energy',market:'NYSE'},
+  {name:'Tesla',ticker:'TSLA',sector:'Auto',market:'NASDAQ'},
+  {name:'LVMH',ticker:'MC',sector:'Consumer',market:'EPA'},
+  {name:'Toyota',ticker:'TM',sector:'Auto',market:'NYSE'},
+  {name:'Samsung',ticker:'005930',sector:'Technology',market:'KRX'},
+  {name:'Nestlé',ticker:'NESN',sector:'FMCG',market:'SIX'},
+];
+
+const SECTOR_CONTEXT = {
+  Technology:{
+    cmRatio:'65–75%',
+    fixedCost:'55–65% of revenue',
+    bep:'Moderate — once scale kicks in, operating leverage amplifies profits rapidly',
+    insight:'Software and IT services have near-zero marginal cost per unit delivered — once the product is built, each incremental customer adds almost pure contribution. TCS and Infosys sit around 65–70% CM ratios; pure-play SaaS (not listed in India at scale yet) often exceeds 75%. The risk is that high fixed R&D and headcount means breakeven revenue is substantial — but once crossed, profit growth outpaces revenue growth significantly.'
+  },
+  Banking:{
+    cmRatio:'N/A (NIM-based)',
+    fixedCost:'N/A',
+    bep:'Net Interest Margin used instead',
+    insight:'Standard CVP analysis does not apply to banking. The "contribution margin" equivalent is Net Interest Margin (NIM) — the spread between lending and borrowing rates. HDFC Bank's NIM of ~4% vs ICICI Bank's ~3.8% reflects their respective deposit franchise strength. For banks, the breakeven equivalent is the cost-income ratio: the minimum lending volume needed to cover operating and credit costs.'
+  },
+  NBFC:{
+    cmRatio:'N/A (spread-based)',
+    fixedCost:'N/A',
+    bep:'Interest spread model',
+    insight:'NBFCs like Bajaj Finance operate on interest spreads, not product margins. Their "contribution" is the net interest income after cost of funds. Bajaj Finance achieves superior spreads (~9–10%) through product mix and customer selection. The breakeven concept translates to AUM thresholds: minimum AUM required to cover fixed operating costs given the net interest spread.'
+  },
+  FMCG:{
+    cmRatio:'30–45%',
+    fixedCost:'20–35% of revenue',
+    bep:'Easy — volume-driven, relatively low fixed base',
+    insight:'HUL and ITC operate in a regime of moderate CM ratios but extremely high volumes. HUL\'s CM ratio sits around 40–45% (gross margin minus distribution variable costs); ITC\'s cigarettes segment is significantly higher (~60%) due to tax-included pricing power. FMCG businesses reach breakeven relatively quickly because fixed overhead is manageable — the challenge is maintaining shelf space and distribution, which are semi-fixed costs.'
+  },
+  Auto:{
+    cmRatio:'12–22%',
+    fixedCost:'30–45% of revenue',
+    bep:'Hard — manufacturing-heavy with high fixed overhead',
+    insight:'Auto OEMs face the classic capital-intensive CVP problem: massive fixed costs (plant, tooling, R&D) with relatively thin contribution margins. Maruti Suzuki achieves ~18–20% CM ratio through scale and localisation; Tata Motors\' passenger vehicle segment targets similar levels, but the CV business has higher variability. The entire industry watches utilisation rates closely — the breakeven usually sits around 75–80% plant utilisation.'
+  },
+  Pharma:{
+    cmRatio:'60–72%',
+    fixedCost:'40–55% of revenue',
+    bep:'Moderate — high CM offset by significant R&D fixed costs',
+    insight:'Sun Pharma\'s branded generics command 60–70% gross CM ratios — the API and formulation variable costs are low once the product is registered and scaled. However, the fixed cost base is substantial: R&D for new molecules, regulatory compliance, quality infrastructure. Post-approval, the CVP economics are extremely favourable as each incremental unit sold nearly fully contributes to profit. The breakeven battle is fought during the investment phase, not once at scale.'
+  },
+  Infrastructure:{
+    cmRatio:'15–28%',
+    fixedCost:'40–60% of revenue',
+    bep:'Very Hard — long asset payback cycles',
+    insight:'L&T\'s engineering and construction projects have modest CM ratios (18–25%) with high fixed overhead: equipment depreciation, project management, specialised workforce. The "breakeven" in infrastructure is measured over project lifecycles rather than accounting periods. The business model relies on high order book visibility rather than high margins — a healthy order book provides fixed cost absorption certainty over 2–3 year execution windows.'
+  },
+  Energy:{
+    cmRatio:'10–25%',
+    fixedCost:'25–40% of revenue',
+    bep:'Cyclical — breakeven moves with commodity prices',
+    insight:'Reliance Industries\' refining and petrochemicals segment has CM ratios that vary sharply with crude and product price differentials — the famous GRM (Gross Refining Margin) is essentially their CM per barrel. When GRMs compress, the breakeven throughput rises significantly. The Jio segment, by contrast, behaves more like telecom with higher CM ratios but massive fixed network costs. Multi-segment analysis is essential here.'
+  },
+  Telecom:{
+    cmRatio:'45–60%',
+    fixedCost:'55–70% of revenue',
+    bep:'Hard — spectrum debt and network capex compress margins',
+    insight:'Bharti Airtel has structurally improved its CVP profile post-consolidation: CM ratios have risen to ~55% as variable costs (interconnect, content) declined relative to ARPU. However, the fixed cost burden — annual spectrum payments, 5G capex amortisation — keeps the breakeven revenue very high. The industry\'s operating leverage is significant: every ₹1 of ARPU increase across 350M+ subscribers flows almost entirely to EBITDA once variable costs are absorbed.'
+  },
+  Consumer:{
+    cmRatio:'40–55%',
+    fixedCost:'30–45% of revenue',
+    bep:'Moderate — brand premium creates pricing power',
+    insight:'Asian Paints and LVMH represent premium consumer brands where the CM ratio reflects genuine pricing power. Asian Paints operates at ~45–50% CM (decorative paints), with raw material costs (titanium dioxide) as the primary variable cost driver. LVMH\'s luxury goods average 65–70% GM but significantly lower contribution after distribution and brand marketing. The CVP for consumer brands is heavily influenced by the proportion of fixed brand-building investment.'
+  },
+  Conglomerate:{
+    cmRatio:'Segment-dependent',
+    fixedCost:'Varies by mix',
+    bep:'Misleading at group level',
+    insight:'Berkshire Hathaway\'s aggregate CVP metrics are meaningless — the insurance float, energy utilities, manufacturing, and consumer brands all have entirely different contribution structures. Segment-level analysis is essential. Similarly, Indian conglomerates require decomposition by business unit. The consolidated CM ratio represents a weighted average that obscures whether individual businesses are capital-efficient. Focus on the ROIC of each segment instead.'
+  },
+  default:{
+    cmRatio:'30–50%',
+    fixedCost:'25–45% of revenue',
+    bep:'Moderate',
+    insight:'Contribution margin analysis helps identify how efficiently a business converts revenue into profit after covering variable costs. Higher CM ratios give businesses more cushion to cover fixed costs and reach profitability at lower revenue levels — but high fixed costs can still push the breakeven point up significantly. The relationship between CM ratio and fixed cost base determines operating leverage.'
+  }
+};
+
+let selectedCo = null;
+let activeFilter = 'All';
+
+const sectors = ['All',...new Set(COMPANIES.map(c=>c.sector))];
+
+function renderGrid(list){
+  const g = document.getElementById('coGrid');
+  g.innerHTML = list.map(c=>`
+    <div class="co-card${selectedCo===c.ticker?' selected':''}" onclick="selectCo('${c.ticker}')">
+      <div class="co-name">${c.name}</div>
+      <div class="co-meta">${c.ticker} · ${c.sector} · ${c.market}</div>
+    </div>`).join('');
+}
+
+function buildPills(){
+  const wrap = document.getElementById('filterPills');
+  wrap.innerHTML = sectors.map(s=>`
+    <div class="pill${s===activeFilter?' active':''}" onclick="setFilter('${s}',this)">${s}</div>`).join('');
+}
+
+function filterCompanies(){
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const list = COMPANIES.filter(c=>{
+    const matchSector = activeFilter==='All'||c.sector===activeFilter;
+    const matchQ = !q||c.name.toLowerCase().includes(q)||c.ticker.toLowerCase().includes(q);
+    return matchSector && matchQ;
+  });
+  renderGrid(list);
+}
+
+function setFilter(f,el){
+  activeFilter = f;
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  filterCompanies();
+}
+
+function selectCo(ticker){
+  selectedCo = ticker;
+  filterCompanies();
+  document.getElementById('step1Btn').disabled = false;
+}
+
+function goStep2(){
+  if(!selectedCo) return;
+  const co = COMPANIES.find(c=>c.ticker===selectedCo);
+  const ctx = SECTOR_CONTEXT[co.sector]||SECTOR_CONTEXT.default;
+  document.getElementById('s2CoName').textContent = co.name;
+  document.getElementById('s2Insight').textContent = ctx.insight;
+  document.getElementById('s2CmRatio').textContent = ctx.cmRatio;
+  document.getElementById('s2FixedCost').textContent = ctx.fixedCost;
+  document.getElementById('s2BEP').textContent = ctx.bep.split('—')[0].trim();
+  showStep('step2');
+}
+
+function goStep3(){
+  const co = COMPANIES.find(c=>c.ticker===selectedCo);
+  document.getElementById('s3CoName').textContent = co.name;
+  showStep('step3');
+}
+
+function resetToStep1(){ showStep('step1'); }
+
+function showStep(id){
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function unlockPro(){
+  alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');
+}
+
+buildPills();
+renderGrid(COMPANIES);
+</script>
+</body>
+</html>

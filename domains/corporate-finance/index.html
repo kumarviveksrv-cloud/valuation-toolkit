@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Corporate Finance · ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
+  a{color:inherit;text-decoration:none}
+  .top-nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between}
+  .nav-left{display:flex;align-items:center;gap:12px}
+  .nav-logo{font-weight:800;font-size:16px;letter-spacing:-0.5px}
+  .nav-sep{color:var(--border);font-size:18px}
+  .nav-domain{font-size:13px;color:var(--muted);font-weight:500}
+  .nav-right{display:flex;align-items:center;gap:8px}
+  .nav-btn{padding:6px 14px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:none}
+  .nav-btn-ghost{background:none;color:var(--muted)}
+  .nav-btn-ghost:hover{color:var(--text)}
+  .nav-btn-pro{background:var(--text);color:#fff}
+  .domain-nav{background:var(--card);border-bottom:1px solid var(--border);padding:0 20px;display:flex;gap:0;overflow-x:auto}
+  .domain-nav a{padding:10px 16px;font-size:13px;font-weight:500;color:var(--muted);white-space:nowrap;border-bottom:2px solid transparent}
+  .domain-nav a:hover{color:var(--text)}
+  .domain-nav a.active{color:var(--text);border-bottom-color:var(--text);font-weight:600}
+  .hero{background:var(--text);color:#fff;padding:48px 20px}
+  .hero-inner{max-width:780px;margin:0 auto}
+  .hero-tag{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:rgba(255,255,255,0.5);margin-bottom:12px}
+  .hero h1{font-size:34px;font-weight:900;letter-spacing:-1px;line-height:1.1;margin-bottom:12px}
+  .hero p{color:rgba(255,255,255,0.7);font-size:16px;max-width:520px;line-height:1.7}
+  .hero-stats{display:flex;gap:32px;margin-top:28px;flex-wrap:wrap}
+  .hero-stat-val{font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;margin-bottom:2px}
+  .hero-stat-label{font-size:12px;color:rgba(255,255,255,0.5);font-weight:500}
+  .free-banner{background:#f0fdf4;border-bottom:1px solid #86efac;padding:12px 20px;text-align:center;font-size:14px;font-weight:600;color:var(--green)}
+  .page-wrap{max-width:780px;margin:0 auto;padding:40px 20px 80px}
+  .section-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:16px}
+  .calc-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:40px}
+  .calc-tile{border:1px solid var(--border);border-radius:12px;padding:20px;background:#fff;cursor:pointer;transition:all 0.15s;display:flex;flex-direction:column;gap:8px}
+  .calc-tile:hover{border-color:#999;box-shadow:0 2px 8px rgba(0,0,0,0.06)}
+  .calc-tile-header{display:flex;align-items:center;justify-content:space-between}
+  .calc-icon{font-size:20px}
+  .badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;letter-spacing:0.5px;text-transform:uppercase}
+  .badge-free{background:#f0fdf4;color:var(--green);border:1px solid #86efac}
+  .badge-pro{background:#fef9c3;color:#854d0e;border:1px solid #fde68a}
+  .calc-name{font-size:15px;font-weight:700}
+  .calc-desc{font-size:13px;color:var(--muted);line-height:1.5}
+  .learn-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:40px}
+  .learn-card{border:1px solid var(--border);border-radius:12px;padding:20px;background:#fff}
+  .learn-num{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:6px}
+  .learn-title{font-size:15px;font-weight:700;margin-bottom:6px}
+  .learn-desc{font-size:13px;color:var(--muted);line-height:1.5}
+  .cta-strip{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .cta-strip h3{font-size:16px;font-weight:700;margin-bottom:4px}
+  .cta-strip p{font-size:13px;color:var(--muted)}
+  .cta-btn{padding:11px 22px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap}
+  .wacc-note{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:16px 18px;margin-bottom:40px;font-size:14px;color:#1d4ed8;display:flex;align-items:flex-start;gap:10px}
+  @media(max-width:600px){.calc-grid,.learn-grid{grid-template-columns:1fr}.hero-stats{gap:20px}}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <div class="nav-left">
+    <span class="nav-logo">ValuationDesk</span>
+    <span class="nav-sep">/</span>
+    <span class="nav-domain">Corporate Finance</span>
+  </div>
+  <div class="nav-right">
+    <button class="nav-btn nav-btn-ghost" onclick="window.location.href='../../index.html'">← All Domains</button>
+    <button class="nav-btn nav-btn-pro">Unlock Pro ₹799</button>
+  </div>
+</nav>
+<div class="domain-nav">
+  <a href="index.html" class="active">Overview</a>
+  <a href="learn/index.html">Learn</a>
+  <a href="calculators/index.html">Calculators</a>
+  <a href="#">My Vault</a>
+</div>
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">Domain 3 of 15 · Phase 1</div>
+    <h1>Corporate Finance</h1>
+    <p>How CFOs actually make decisions — capital allocation, returns, cost structure, and the mechanics of creating or destroying shareholder value.</p>
+    <div class="hero-stats">
+      <div><div class="hero-stat-val">8</div><div class="hero-stat-label">Calculators</div></div>
+      <div><div class="hero-stat-val">30</div><div class="hero-stat-label">Companies</div></div>
+      <div><div class="hero-stat-val">4</div><div class="hero-stat-label">Modules</div></div>
+      <div><div class="hero-stat-val">1</div><div class="hero-stat-label">Free forever</div></div>
+      <div><div class="hero-stat-val">₹799</div><div class="hero-stat-label">Unlocks all</div></div>
+    </div>
+  </div>
+</div>
+<div class="free-banner">✅ IRR / NPV Calculator is free — no account needed. Pro unlocks 7 more.</div>
+<div class="page-wrap">
+  <div class="section-label">Calculators</div>
+  <div class="calc-grid">
+    <div class="calc-tile" onclick="window.location.href='calculators/irr-npv.html'">
+      <div class="calc-tile-header"><span class="calc-icon">📈</span><span class="badge badge-free">Free</span></div>
+      <div class="calc-name">IRR / NPV Calculator</div>
+      <div class="calc-desc">Model project cash flows, calculate IRR vs hurdle rate, and get a clear go/no-go verdict. The universal capital budgeting tool.</div>
+    </div>
+    <div class="calc-tile" onclick="window.location.href='calculators/capital-structure.html'">
+      <div class="calc-tile-header"><span class="calc-icon">⚖️</span><span class="badge badge-pro">Pro</span></div>
+      <div class="calc-name">Capital Structure Optimizer</div>
+      <div class="calc-desc">Model debt/equity tradeoffs, tax shield benefits, and find the capital structure that minimizes cost of capital for your sector.</div>
+    </div>
+    <div class="calc-tile" onclick="window.location.href='calculators/dividend-policy.html'">
+      <div class="calc-tile-header"><span class="calc-icon">💰</span><span class="badge badge-pro">Pro</span></div>
+      <div class="calc-name">Dividend Policy Analyzer</div>
+      <div class="calc-desc">Compare dividend vs buyback vs retained earnings. Model Gordon Growth, payout ratio, and shareholder return across scenarios.</div>
+    </div>
+    <div class="calc-tile" onclick="window.location.href='calculators/working-capital.html'">
+      <div class="calc-tile-header"><span class="calc-icon">🔄</span><span class="badge badge-pro">Pro</span></div>
+      <div class="calc-name">Working Capital Analyzer</div>
+      <div class="calc-desc">Cash conversion cycle, days metrics, and working capital efficiency. Understand why profitable companies run out of cash.</div>
+    </div>
+    <div class="calc-tile" onclick="window.location.href='calculators/dupont.html'">
+      <div class="calc-tile-header"><span class="calc-icon">🔬</span><span class="badge badge-pro">Pro</span></div>
+      <div class="calc-name">DuPont ROE Decomposition</div>
+      <div class="calc-desc">Break ROE into net margin × asset turnover × financial leverage. Identify which lever is driving or dragging returns.</div>
+    </div>
+    <div class="calc-tile" onclick="window.location.href='calculators/operating-leverage.html'">
+      <div class="calc-tile-header"><span class="calc-icon">📊</span><span class="badge badge-pro">Pro</span></div>
+      <div class="calc-name">Operating Leverage Calculator</div>
+      <div class="calc-desc">Degree of Operating Leverage, combined leverage, and sensitivity of EPS to revenue changes. Fixed vs variable cost structure analysis.</div>
+    </div>
+    <div class="calc-tile" onclick="window.location.href='calculators/breakeven-cvp.html'">
+      <div class="calc-tile-header"><span class="calc-icon">📉</span><span class="badge badge-pro">Pro</span></div>
+      <div class="calc-name">Breakeven / CVP Analysis</div>
+      <div class="calc-desc">Breakeven in units and revenue, contribution margin, margin of safety, and the target profit required for a given return.</div>
+    </div>
+    <div class="calc-tile" onclick="window.location.href='calculators/roic-eva.html'">
+      <div class="calc-tile-header"><span class="calc-icon">🏆</span><span class="badge badge-pro">Pro</span></div>
+      <div class="calc-name">ROIC / EVA Calculator</div>
+      <div class="calc-desc">Return on Invested Capital vs WACC spread, Economic Value Added. The definitive measure of whether a company creates or destroys value.</div>
+    </div>
+  </div>
+
+  <div class="wacc-note">
+    <span style="font-size:18px">🔗</span>
+    <div><strong>WACC Calculator</strong> — Available in the Valuation Advisory domain (free). Corporate Finance uses WACC as an input; you can model it there and bring the output here. <a href="../valuation-advisory/calculators/wacc.html" style="font-weight:700;text-decoration:underline">Open WACC Calculator →</a></div>
+  </div>
+
+  <div class="section-label">Learning Modules</div>
+  <div class="learn-grid">
+    <div class="learn-card">
+      <div class="learn-num">Module 1</div>
+      <div class="learn-title">Capital Structure: The CFO's Core Trade-off</div>
+      <div class="learn-desc">Modigliani-Miller, the debt tax shield, financial distress costs, and what actually determines optimal leverage in Indian companies.</div>
+    </div>
+    <div class="learn-card">
+      <div class="learn-num">Module 2</div>
+      <div class="learn-title">How Returns Are Created: ROIC, EVA &amp; DuPont</div>
+      <div class="learn-desc">What separates value-creating from value-destroying companies. ROIC vs WACC spread, economic profit, and DuPont decomposition.</div>
+    </div>
+    <div class="learn-card">
+      <div class="learn-num">Module 3</div>
+      <div class="learn-title">Working Capital: The Hidden Cash Flow Driver</div>
+      <div class="learn-desc">Why profitable companies go bankrupt, the cash conversion cycle, and how working capital efficiency is a durable competitive moat.</div>
+    </div>
+    <div class="learn-card">
+      <div class="learn-num">Module 4</div>
+      <div class="learn-title">Capital Budgeting: How CFOs Decide What to Build</div>
+      <div class="learn-desc">IRR vs NPV debate, hurdle rates, real options thinking, and how Indian conglomerates and MNC subsidiaries evaluate capex.</div>
+    </div>
+  </div>
+
+  <div class="cta-strip">
+    <div>
+      <h3>Unlock all 7 Pro calculators</h3>
+      <p>Capital structure, DuPont, ROIC/EVA, working capital, leverage, breakeven — plus all 15 domains.</p>
+    </div>
+    <button class="cta-btn">Unlock Pro — ₹799/mo →</button>
+  </div>
+</div>
+</body>
+</html>

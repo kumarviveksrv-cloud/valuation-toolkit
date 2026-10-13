@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Learn Corporate Finance — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+a{color:inherit;text-decoration:none}
+
+/* NAV */
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-pro{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+
+/* HERO */
+.hero{padding:48px 24px 36px;max-width:760px;margin:0 auto;text-align:center}
+.hero-eyebrow{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.hero h1{font-size:clamp(24px,4vw,36px);font-weight:900;letter-spacing:-.025em;line-height:1.1;margin-bottom:14px}
+.hero p{font-size:15px;color:var(--muted);line-height:1.65;max-width:520px;margin:0 auto}
+
+/* MODULE TABS */
+.module-tabs{display:flex;gap:0;border-bottom:2px solid var(--border);max-width:900px;margin:36px auto 0;padding:0 24px;overflow-x:auto}
+.tab{padding:10px 18px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:all .15s}
+.tab.active{color:var(--text);border-bottom-color:var(--text)}
+.tab:hover:not(.active){color:var(--text)}
+
+/* CONTENT */
+.content{max-width:900px;margin:0 auto;padding:0 24px 80px}
+.module{display:none;padding-top:36px}
+.module.active{display:block}
+
+/* MODULE HEADER */
+.mod-header{margin-bottom:32px}
+.mod-tag{display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:12px;text-transform:uppercase;letter-spacing:.06em}
+.mod-header h2{font-size:clamp(20px,3vw,26px);font-weight:900;letter-spacing:-.02em;margin-bottom:10px}
+.mod-header .mod-desc{font-size:15px;color:var(--muted);line-height:1.6;max-width:600px}
+
+/* SECTION */
+.section{margin-bottom:36px}
+.section h3{font-size:17px;font-weight:800;margin-bottom:12px;letter-spacing:-.01em}
+.section p{font-size:14px;line-height:1.7;color:var(--text);margin-bottom:12px}
+.section p:last-child{margin-bottom:0}
+
+/* CALLOUT */
+.callout{border-left:3px solid var(--text);padding:14px 18px;background:var(--card);border-radius:0 8px 8px 0;margin:16px 0;font-size:14px;line-height:1.65}
+.callout.green{border-left-color:var(--green);background:#f0fdf4}
+.callout.amber{border-left-color:var(--amber);background:#fffbeb}
+.callout.red{border-left-color:var(--red);background:#fef2f2}
+.callout .callout-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;margin-bottom:5px;color:var(--muted)}
+
+/* FORMULA */
+.formula-box{background:#0a0a0a;color:#f1f5f9;border-radius:8px;padding:18px 20px;font-family:'JetBrains Mono',monospace;font-size:13px;margin:16px 0;line-height:1.9}
+.f-eq{color:#fbbf24}
+.f-label{color:#94a3b8;font-size:12px}
+.f-comment{color:#6b7280;font-size:11px}
+.f-green{color:#4ade80}
+.f-red{color:#f87171}
+
+/* CONCEPT GRID */
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:16px 0}
+.concept-card{border:1px solid var(--border);border-radius:10px;padding:16px;background:#fff}
+.concept-icon{font-size:22px;margin-bottom:8px}
+.concept-title{font-size:13px;font-weight:800;margin-bottom:6px}
+.concept-body{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* COMPARISON TABLE */
+.cmp-table{width:100%;border-collapse:collapse;font-size:13px;margin:16px 0}
+.cmp-table th{background:var(--card);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:9px 14px;text-align:left;border-bottom:1px solid var(--border)}
+.cmp-table td{padding:11px 14px;border-bottom:1px solid var(--border);line-height:1.5}
+.cmp-table tr:last-child td{border-bottom:none}
+.cmp-table .td-h{font-weight:700}
+.cmp-pos{color:var(--green);font-weight:700}
+.cmp-neg{color:var(--red);font-weight:700}
+
+/* KEY INSIGHT */
+.key-insight{background:var(--text);color:#fff;border-radius:10px;padding:20px 22px;margin:24px 0}
+.key-insight .ki-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:#9ca3af;margin-bottom:8px}
+.key-insight p{font-size:14px;line-height:1.65;color:#f9fafb}
+
+/* QUIZ TEASER */
+.quiz-teaser{border:1px solid var(--border);border-radius:10px;padding:20px;margin-top:32px;display:flex;align-items:center;gap:16px;background:var(--card)}
+.quiz-icon{font-size:28px;flex-shrink:0}
+.quiz-text h4{font-size:14px;font-weight:800;margin-bottom:4px}
+.quiz-text p{font-size:13px;color:var(--muted)}
+.quiz-btn{margin-left:auto;background:var(--text);color:#fff;border:none;border-radius:7px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;flex-shrink:0}
+
+/* NEXT MODULE */
+.next-module{border:1px solid var(--border);border-radius:10px;padding:18px 20px;margin-top:28px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:all .15s}
+.next-module:hover{border-color:#aaa;background:var(--card)}
+.nm-label{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:3px}
+.nm-title{font-size:14px;font-weight:700}
+.nm-arrow{font-size:20px;color:var(--muted)}
+
+/* DIVIDER */
+.divider{border:none;border-top:1px solid var(--border);margin:28px 0}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <a href="/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">›</span>
+    <a href="/domains/corporate-finance/">Corporate Finance</a>
+    <span class="nav-sep">›</span>
+    <span>Learn</span>
+  </div>
+  <button class="nav-pro" onclick="alert('Pro unlock coming soon — ₹799/mo for all 15 domains.')">Go Pro — ₹799/mo</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow">Corporate Finance · Learning Modules</div>
+  <h1>How CFOs Think About Capital</h1>
+  <p>Four modules covering the frameworks every serious investor needs — from capital structure trade-offs to return on invested capital and cash conversion.</p>
+</div>
+
+<div class="module-tabs">
+  <div class="tab active" onclick="showModule(0,this)">1 · Capital Structure</div>
+  <div class="tab" onclick="showModule(1,this)">2 · ROIC, EVA & DuPont</div>
+  <div class="tab" onclick="showModule(2,this)">3 · Working Capital</div>
+  <div class="tab" onclick="showModule(3,this)">4 · Capital Budgeting</div>
+</div>
+
+<div class="content">
+
+  <!-- MODULE 1: CAPITAL STRUCTURE -->
+  <div class="module active" id="mod0">
+    <div class="mod-header">
+      <div class="mod-tag">📐 Module 1 of 4</div>
+      <h2>Capital Structure: The CFO's Core Trade-off</h2>
+      <p class="mod-desc">Every CFO must decide how to fund the business: equity, debt, or a blend. The answer shapes the company's risk profile, tax burden, and cost of capital for decades.</p>
+    </div>
+
+    <div class="section">
+      <h3>Why Capital Structure Matters</h3>
+      <p>A company with ₹1,000 Cr of assets can fund itself with ₹1,000 Cr of equity, ₹1,000 Cr of debt, or anything in between. This choice isn't just financial housekeeping — it fundamentally alters who bears risk, who controls the company, and how much each rupee of earnings is worth to shareholders.</p>
+      <p>Debt is cheaper than equity because lenders have priority claim on assets in bankruptcy, and because interest payments are tax-deductible. But too much debt increases financial distress risk and can trigger a spiral: rising leverage → credit downgrade → higher borrowing costs → more leverage pressure.</p>
+    </div>
+
+    <div class="callout">
+      <div class="callout-label">The Core Question</div>
+      Is there an "optimal" capital structure that minimises the weighted average cost of capital (WACC)? Modigliani and Miller famously said no — in a world without taxes or distress costs, capital structure is irrelevant. But the real world has both, which is why the answer is: yes, but it's sector-specific and company-specific.
+    </div>
+
+    <div class="section">
+      <h3>The Modigliani-Miller Framework</h3>
+      <p>Franco Modigliani and Merton Miller (MM) established in 1958 that in a frictionless world, the total value of a firm is independent of its capital structure. Their insight: you cannot create value simply by changing how you slice the pie between debt and equity.</p>
+      <p>The real-world extensions are what matter for investors. MM Proposition I with taxes says that because interest is tax-deductible, levered firms are worth more than unlevered firms by the present value of the debt tax shield: PV(Tax Shield) = Tax Rate × Debt. This suggests "borrow as much as possible" — which companies obviously don't do.</p>
+    </div>
+
+    <div class="formula-box">
+      <div><span class="f-eq">Value (Levered)</span> <span class="f-label">= Value (Unlevered) + PV of Tax Shield</span></div>
+      <div><span class="f-eq">PV Tax Shield</span>    <span class="f-label">= Tax Rate × Debt (for perpetual debt)</span></div>
+      <div class="f-comment">────────────────────────────────────────────</div>
+      <div><span class="f-eq">WACC</span> <span class="f-label">= (E/V) × Re + (D/V) × Rd × (1 − Tax Rate)</span></div>
+      <div><span class="f-eq">Re</span>   <span class="f-label">= Cost of Equity (CAPM: Rf + β × ERP)</span></div>
+      <div><span class="f-eq">Rd</span>   <span class="f-label">= Pre-tax Cost of Debt</span></div>
+    </div>
+
+    <div class="section">
+      <h3>The Trade-off Theory: Why Not 100% Debt?</h3>
+      <p>Financial distress costs counterbalance the tax shield benefit. As leverage rises, the probability and severity of financial distress increases — suppliers demand faster payment, customers worry about warranty, talented employees leave, and management spends time managing creditors rather than the business. These are real economic costs, not accounting entries.</p>
+      <p>The optimal capital structure balances the tax shield benefit against the present value of financial distress costs. It's the debt level where the marginal benefit of another rupee of debt (the tax shield) equals the marginal cost (increased distress risk).</p>
+    </div>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="concept-icon">💰</div>
+        <div class="concept-title">Debt Tax Shield</div>
+        <div class="concept-body">Interest payments reduce taxable income. For a company paying 30% tax, ₹100 of interest costs effectively ₹70 after tax. This makes debt cheaper and creates value vs. equity funding the same asset.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">⚠️</div>
+        <div class="concept-title">Financial Distress Costs</div>
+        <div class="concept-body">Direct costs: legal, admin fees in bankruptcy. Indirect costs: customers flee, suppliers tighten terms, employees leave. These costs can wipe out the tax shield benefit if leverage goes too high.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">📊</div>
+        <div class="concept-title">Optimal D/E Range</div>
+        <div class="concept-body">The sweet spot differs by sector. IT services: near-zero debt (no assets to collateralise, high earnings volatility risk). Infrastructure: 70–80% debt (stable cash flows from contracted revenues, hard assets).</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">📈</div>
+        <div class="concept-title">Interest Coverage</div>
+        <div class="concept-body">EBIT ÷ Interest Expense. A proxy for safety. Coverage below 2× signals distress risk. Investment-grade credit typically requires 3–4× or above. Watch this as rates rise — a 2019 coverage of 4× might be 2× in 2024.</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Sector-by-Sector Norms</h3>
+      <table class="cmp-table">
+        <thead><tr><th>Sector</th><th>Typical D/E</th><th>Why This Level</th></tr></thead>
+        <tbody>
+          <tr><td class="td-h">Technology (IT Services)</td><td class="cmp-pos">Near Zero</td><td>Volatile earnings, no hard assets, equity is abundant at good valuations</td></tr>
+          <tr><td class="td-h">FMCG</td><td class="cmp-pos">0.1–0.3×</td><td>Strong free cash flow, low distress risk, prefers operational flexibility</td></tr>
+          <tr><td class="td-h">Pharma</td><td class="cmp-pos">0.2–0.5×</td><td>R&D uncertainty makes high debt risky; patent cliffs are known unknowns</td></tr>
+          <tr><td class="td-h">Auto</td><td>0.5–1.5×</td><td>Capex-heavy but cyclical — moderate debt with conservative covenants</td></tr>
+          <tr><td class="td-h">Telecom</td><td class="cmp-neg">2–5×</td><td>Spectrum obligations and network capex force high leverage; stable subs revenues provide partial coverage</td></tr>
+          <tr><td class="td-h">Infrastructure</td><td class="cmp-neg">3–7×</td><td>Long-term contracted revenues make high debt sustainable; project finance typical</td></tr>
+          <tr><td class="td-h">Banking/NBFC</td><td colspan="2" style="color:var(--muted)">Leverage 7–15× by design — the balance sheet IS the business model</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="key-insight">
+      <div class="ki-label">The Investor's Takeaway</div>
+      <p>Capital structure analysis isn't about finding a magic D/E ratio — it's about assessing whether management is making rational trade-offs between the tax shield and distress risk given the business's cash flow stability and asset base. A software company with 3× debt is a red flag. An infrastructure concession with 3× debt might be perfectly prudent.</p>
+    </div>
+
+    <div class="next-module" onclick="showModule(1, document.querySelectorAll('.tab')[1])">
+      <div><div class="nm-label">Next module</div><div class="nm-title">How Returns Are Created: ROIC, EVA & DuPont</div></div>
+      <div class="nm-arrow">→</div>
+    </div>
+  </div>
+
+  <!-- MODULE 2: ROIC, EVA, DUPONT -->
+  <div class="module" id="mod1">
+    <div class="mod-header">
+      <div class="mod-tag">📊 Module 2 of 4</div>
+      <h2>How Returns Are Created: ROIC, EVA & DuPont</h2>
+      <p class="mod-desc">Three lenses that decompose business quality into its drivers — and reveal whether a company is genuinely creating shareholder value or just appearing to.</p>
+    </div>
+
+    <div class="section">
+      <h3>The Central Question: Are You Creating or Destroying Value?</h3>
+      <p>A company can report growing EPS, rising revenue, and expanding EBITDA — and still be destroying shareholder wealth. How? By earning returns on invested capital below the cost of that capital. Every rupee deployed into the business at below-WACC returns destroys economic value, even if accounting profits are positive.</p>
+      <p>ROIC vs WACC is the test. EVA puts a rupee figure on the gap. DuPont tells you which lever — margin, asset efficiency, or leverage — is driving the return.</p>
+    </div>
+
+    <div class="section">
+      <h3>ROIC: The Purest Measure of Business Quality</h3>
+      <p>Return on Invested Capital strips out the effects of financial structure and measures how efficiently management deploys the capital entrusted to them by both debt and equity holders.</p>
+    </div>
+
+    <div class="formula-box">
+      <div><span class="f-eq">NOPAT</span>          <span class="f-label">= EBIT × (1 − Tax Rate)</span></div>
+      <div><span class="f-eq">Invested Capital</span> <span class="f-label">= Equity + Debt − Cash (operating capital only)</span></div>
+      <div class="f-comment">────────────────────────────────────────────────────</div>
+      <div><span class="f-eq">ROIC</span>           <span class="f-label">= NOPAT ÷ Invested Capital</span></div>
+      <div class="f-comment">────────────────────────────────────────────────────</div>
+      <div><span class="f-green">ROIC &gt; WACC</span>  <span class="f-label">→ Value creation — every rupee invested returns more than it costs</span></div>
+      <div><span class="f-red">ROIC &lt; WACC</span>  <span class="f-label">→ Value destruction — growth makes it worse, not better</span></div>
+    </div>
+
+    <div class="callout green">
+      <div class="callout-label">Why This Matters More Than ROE</div>
+      ROE can be inflated by financial leverage without any improvement in operating performance. A company that borrows heavily to buy back shares will show rising ROE even as the business stagnates. ROIC strips out this distortion — it measures the returns generated by the operating business regardless of how it's funded.
+    </div>
+
+    <div class="section">
+      <h3>EVA: Putting a Rupee Value on Value Creation</h3>
+      <p>Economic Value Added (EVA) translates the ROIC vs WACC spread into an absolute rupee figure. It answers: by how many crores did this business create or destroy value this year?</p>
+    </div>
+
+    <div class="formula-box">
+      <div><span class="f-eq">EVA</span>  <span class="f-label">= NOPAT − (WACC × Invested Capital)</span></div>
+      <div>      <span class="f-label">= (ROIC − WACC) × Invested Capital</span></div>
+      <div class="f-comment">────────────────────────────────────────</div>
+      <div><span class="f-eq">Spread</span> <span class="f-label">= ROIC − WACC</span></div>
+      <div class="f-comment">────────────────────────────────────────</div>
+      <div class="f-comment">TCS example: ROIC ~38%, WACC ~12%, Spread ~26%</div>
+      <div class="f-comment">Invested Capital ~₹80,000 Cr → EVA ~₹20,800 Cr/year</div>
+    </div>
+
+    <div class="section">
+      <h3>DuPont: Decomposing Return on Equity</h3>
+      <p>The DuPont framework asks: what is driving the ROE, and is that driver sustainable? A high ROE can be manufactured through financial engineering (high leverage) or earned through genuine operational excellence (high margins, efficient asset use).</p>
+    </div>
+
+    <div class="formula-box">
+      <div><span class="f-comment">── 3-Factor DuPont ──────────────────────────</span></div>
+      <div><span class="f-eq">ROE</span> <span class="f-label">= Net Margin × Asset Turnover × Equity Multiplier</span></div>
+      <div>     <span class="f-label">= (Net Income/Revenue) × (Revenue/Assets) × (Assets/Equity)</span></div>
+      <div class="f-comment">── 5-Factor DuPont ──────────────────────────</span></div>
+      <div><span class="f-eq">ROE</span> <span class="f-label">= Tax Burden × Interest Burden × EBIT Margin × Asset Turnover × Leverage</span></div>
+      <div>     <span class="f-label">= (Net Inc/EBT) × (EBT/EBIT) × (EBIT/Revenue) × (Revenue/Assets) × (Assets/Equity)</span></div>
+    </div>
+
+    <table class="cmp-table">
+      <thead><tr><th>Driver</th><th>What it Measures</th><th>High = Good When</th><th>Warning Sign</th></tr></thead>
+      <tbody>
+        <tr><td class="td-h">Net Margin</td><td>Pricing power + cost efficiency</td><td>Business has moat or scale</td><td>Declining while revenue grows</td></tr>
+        <tr><td class="td-h">Asset Turnover</td><td>Capital efficiency</td><td>Asset-light business model</td><td>Falling = assets sitting idle</td></tr>
+        <tr><td class="td-h">Equity Multiplier</td><td>Financial leverage</td><td>Stable, contracted cash flows</td><td>Rising = borrowing to boost ROE</td></tr>
+        <tr><td class="td-h">Tax Burden</td><td>Effective tax rate impact</td><td>Tax credits or low-tax jurisdiction</td><td>One-time tax benefits masking trends</td></tr>
+        <tr><td class="td-h">Interest Burden</td><td>Debt cost drag on EBT</td><td>Low debt or favourable rates</td><td>Rising = leverage becoming costly</td></tr>
+      </tbody>
+    </table>
+
+    <div class="key-insight">
+      <div class="ki-label">Connecting the Frameworks</div>
+      <p>ROIC tells you whether value is being created. EVA tells you how much. DuPont tells you why. Use all three: a company might have excellent ROIC (ROIC/EVA screen) but its DuPont shows the margin is falling while leverage is rising — the foundation is weakening even as headline numbers look fine.</p>
+    </div>
+
+    <div class="next-module" onclick="showModule(2, document.querySelectorAll('.tab')[2])">
+      <div><div class="nm-label">Next module</div><div class="nm-title">Working Capital: The Hidden Cash Flow Driver</div></div>
+      <div class="nm-arrow">→</div>
+    </div>
+  </div>
+
+  <!-- MODULE 3: WORKING CAPITAL -->
+  <div class="module" id="mod2">
+    <div class="mod-header">
+      <div class="mod-tag">💧 Module 3 of 4</div>
+      <h2>Working Capital: The Hidden Cash Flow Driver</h2>
+      <p class="mod-desc">Accounting profits and cash flows diverge because of working capital. Understanding the Cash Conversion Cycle reveals whether a business generates or consumes cash as it grows.</p>
+    </div>
+
+    <div class="section">
+      <h3>Why Net Income Lies (Sometimes)</h3>
+      <p>A company can report ₹1,000 Cr of net profit and simultaneously watch its bank account shrink. How? If it sells on 90-day credit terms, pays suppliers in 30 days, and holds 60 days of inventory, it must finance 120 days of working capital for every rupee of revenue growth.</p>
+      <p>High-growth businesses are particularly vulnerable. As revenue expands, the working capital requirement expands in lockstep — but earnings hit the P&L before the cash arrives. This is why EBITDA and free cash flow can diverge dramatically, and why working capital analysis is critical before any valuation.</p>
+    </div>
+
+    <div class="formula-box">
+      <div><span class="f-eq">DIO</span> <span class="f-label">= (Inventory ÷ COGS) × 365       — Days Inventory Outstanding</span></div>
+      <div><span class="f-eq">DSO</span> <span class="f-label">= (Receivables ÷ Revenue) × 365    — Days Sales Outstanding</span></div>
+      <div><span class="f-eq">DPO</span> <span class="f-label">= (Payables ÷ COGS) × 365          — Days Payable Outstanding</span></div>
+      <div class="f-comment">────────────────────────────────────────────────────────</div>
+      <div><span class="f-eq">CCC</span> <span class="f-label">= DIO + DSO − DPO</span></div>
+      <div class="f-comment">────────────────────────────────────────────────────────</div>
+      <div><span class="f-green">Negative CCC</span> <span class="f-label">→ Customers fund your business (cash received before paid out)</span></div>
+      <div><span class="f-red">Positive CCC</span>  <span class="f-label">→ You fund your customers and suppliers (cash consumed)</span></div>
+    </div>
+
+    <div class="section">
+      <h3>The Holy Grail: Negative Working Capital</h3>
+      <p>The best businesses in the world get paid before they pay. Amazon collects from Prime members and marketplace sellers before it pays suppliers. HUL negotiates 90-day payment terms with distributors while paying suppliers in 30 days. Supermarkets collect cash at checkout and pay suppliers in 45 days.</p>
+      <p>A business with negative CCC is customer-funded — its suppliers and customers collectively finance its operations for free. As revenue grows, the working capital improvement actually provides cash. This is the structural advantage that allows high-growth businesses like Bajaj Finance (pre-AUM) to fund expansion without constant equity dilution.</p>
+    </div>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="concept-icon">📦</div>
+        <div class="concept-title">Inventory (DIO)</div>
+        <div class="concept-body">Lower is better — less cash tied up in goods that haven't sold. But too low risks stockouts. FMCG targets 30–45 days; auto OEMs often hold 45–60 days due to supply chain complexity.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">📬</div>
+        <div class="concept-title">Receivables (DSO)</div>
+        <div class="concept-body">Lower is better — faster collection. B2C businesses (retail, subscriptions) have near-zero DSO. B2B businesses often accept 45–90 days to win business. Rising DSO can signal customers struggling to pay.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">🧾</div>
+        <div class="concept-title">Payables (DPO)</div>
+        <div class="concept-body">Higher is better — longer to pay suppliers means suppliers are financing you. Strong brands with bargaining power can push DPO to 60–90 days. But extreme DPO (120+ days) strains suppliers and risks supply chain disruption.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">🔄</div>
+        <div class="concept-title">CCC Trend</div>
+        <div class="concept-body">More important than the absolute number. A rising CCC in a fast-growing business signals deteriorating working capital efficiency — often the early warning sign of a cash crisis before it shows in P&L.</div>
+      </div>
+    </div>
+
+    <div class="callout amber">
+      <div class="callout-label">The Growth Trap</div>
+      A company growing at 30% with a 90-day CCC needs to fund approximately 30% × 90/365 × Revenue in additional working capital every year — roughly 7.4% of revenue. This "working capital capex" never appears on the capex line but is just as real. Always compute free cash flow as: FCF = EBITDA − Tax − Capex − Change in Working Capital.
+    </div>
+
+    <div class="section">
+      <h3>Sector Working Capital Benchmarks</h3>
+      <table class="cmp-table">
+        <thead><tr><th>Sector</th><th>DIO (days)</th><th>DSO (days)</th><th>DPO (days)</th><th>CCC</th></tr></thead>
+        <tbody>
+          <tr><td class="td-h">FMCG</td><td>25–40</td><td>15–25</td><td>45–70</td><td class="cmp-pos">−10 to +5</td></tr>
+          <tr><td class="td-h">Retail / E-Commerce</td><td>20–35</td><td>0–5</td><td>30–60</td><td class="cmp-pos">−25 to +5</td></tr>
+          <tr><td class="td-h">Technology (IT Services)</td><td>N/A</td><td>60–80</td><td>20–40</td><td>+25 to +55</td></tr>
+          <tr><td class="td-h">Auto</td><td>20–40</td><td>10–20</td><td>50–80</td><td class="cmp-pos">−20 to +10</td></tr>
+          <tr><td class="td-h">Pharma</td><td>70–110</td><td>60–90</td><td>50–70</td><td>+70 to +130</td></tr>
+          <tr><td class="td-h">Infrastructure</td><td>N/A</td><td>60–120</td><td>30–60</td><td>+40 to +90</td></tr>
+          <tr><td class="td-h">Banking/NBFC</td><td colspan="4" style="color:var(--muted)">CCC not applicable — NIM and liquidity coverage ratio used instead</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="key-insight">
+      <div class="ki-label">One Metric That Predicts a Lot</div>
+      <p>A company with a structurally negative CCC is almost always a superior business. It means customers trust the brand enough to pay upfront (subscriptions, advance bookings) or the company has enough bargaining power to defer payments while collecting quickly. When evaluating two otherwise similar businesses, the one with the lower or more negative CCC will generate significantly more free cash flow per rupee of revenue growth — and should trade at a higher multiple.</p>
+    </div>
+
+    <div class="next-module" onclick="showModule(3, document.querySelectorAll('.tab')[3])">
+      <div><div class="nm-label">Next module</div><div class="nm-title">Capital Budgeting: How CFOs Decide What to Build</div></div>
+      <div class="nm-arrow">→</div>
+    </div>
+  </div>
+
+  <!-- MODULE 4: CAPITAL BUDGETING -->
+  <div class="module" id="mod3">
+    <div class="mod-header">
+      <div class="mod-tag">🏗️ Module 4 of 4</div>
+      <h2>Capital Budgeting: How CFOs Decide What to Build</h2>
+      <p class="mod-desc">Every major investment decision — a new plant, an acquisition, a new product line — goes through capital budgeting. The tools: IRR, NPV, payback, and the ROIC test that ties it all together.</p>
+    </div>
+
+    <div class="section">
+      <h3>The Allocation Problem</h3>
+      <p>Capital is finite. Every rupee spent on Project A cannot be spent on Project B. The CFO's most consequential job is allocating capital to projects that generate returns above the cost of capital — and having the discipline to reject projects that don't, no matter how strategically appealing they seem.</p>
+      <p>Poor capital allocation is the silent killer of shareholder value. A company that earns 15% ROIC on its existing business but then invests in a new division earning 8% ROIC is destroying value with every expansion rupee. The NPV/IRR framework exists to make this trade-off explicit.</p>
+    </div>
+
+    <div class="section">
+      <h3>Net Present Value (NPV): The Correct Framework</h3>
+      <p>NPV discounts all future cash flows of a project back to today's value using the cost of capital (WACC or a project-specific hurdle rate). If the present value of future cash flows exceeds the upfront investment, NPV is positive — the project creates value. If NPV is negative, the project destroys value even if it generates positive cash flows.</p>
+    </div>
+
+    <div class="formula-box">
+      <div><span class="f-eq">NPV</span> <span class="f-label">= −Initial Investment + Σ [CFₜ ÷ (1 + r)ᵗ]</span></div>
+      <div class="f-comment">where r = WACC (or project hurdle rate), t = year</div>
+      <div class="f-comment">────────────────────────────────────────────────</div>
+      <div><span class="f-green">NPV &gt; 0</span> <span class="f-label">→ Accept (project earns above WACC)</span></div>
+      <div><span class="f-red">NPV &lt; 0</span>  <span class="f-label">→ Reject (project earns below WACC)</span></div>
+      <div class="f-comment">────────────────────────────────────────────────</div>
+      <div><span class="f-eq">IRR</span> <span class="f-label">= Rate at which NPV = 0</span></div>
+      <div class="f-comment">Accept if IRR &gt; Hurdle Rate (WACC + risk premium)</div>
+    </div>
+
+    <div class="section">
+      <h3>IRR vs NPV: Which to Use?</h3>
+      <p>Finance textbooks are clear: NPV is the correct decision rule. IRR has a critical flaw — it implicitly assumes that all interim cash flows are reinvested at the IRR rate, which is almost never true. For two mutually exclusive projects with different scales, IRR can give the wrong answer by favouring a smaller project with higher percentage returns over a larger project that creates more absolute value.</p>
+    </div>
+
+    <table class="cmp-table">
+      <thead><tr><th>Criterion</th><th>NPV</th><th>IRR</th><th>Payback Period</th></tr></thead>
+      <tbody>
+        <tr><td class="td-h">Decision Rule</td><td>Accept if NPV &gt; 0</td><td>Accept if IRR &gt; Hurdle Rate</td><td>Accept if PBP &lt; target</td></tr>
+        <tr><td class="td-h">Considers Time Value</td><td class="cmp-pos">Yes</td><td class="cmp-pos">Yes</td><td class="cmp-neg">No (simple payback)</td></tr>
+        <tr><td class="td-h">Considers All Cash Flows</td><td class="cmp-pos">Yes</td><td class="cmp-pos">Yes</td><td class="cmp-neg">Only until payback</td></tr>
+        <tr><td class="td-h">Reinvestment Assumption</td><td class="cmp-pos">WACC (realistic)</td><td class="cmp-neg">IRR (often unrealistic)</td><td>Not applicable</td></tr>
+        <tr><td class="td-h">Best For</td><td>Ranking projects, M&A</td><td>Communicating returns to investors</td><td>Liquidity-constrained decisions</td></tr>
+        <tr><td class="td-h">Theoretical Correctness</td><td class="cmp-pos">Highest</td><td>Good</td><td class="cmp-neg">Lowest</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <div class="callout-label">The Hurdle Rate Problem</div>
+      Most companies use a single WACC as the hurdle rate for all projects. This is wrong. A low-risk project (expanding an existing, proven business line) should be evaluated at a lower hurdle rate. A high-risk project (entering a new geography with no track record) should use a higher hurdle rate. Using a flat WACC systematically over-invests in risky projects and under-invests in safe ones.
+    </div>
+
+    <div class="section">
+      <h3>Real-World Capital Allocation Signals</h3>
+      <p>When reading annual reports, look for signals of capital allocation discipline. Good signs: management explicitly ties new investment approvals to hurdle rates, discusses projects that were rejected (not just ones approved), and links executive compensation to ROIC targets. Bad signs: capex guidance given without return expectations, "strategic" justifications for below-hurdle investments, and management that never discusses capital returns.</p>
+    </div>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="concept-icon">✅</div>
+        <div class="concept-title">Green Flags</div>
+        <div class="concept-body">Explicit hurdle rates disclosed. ROIC targets tied to bonuses. Returns framework applied consistently. Management willing to return capital when no above-WACC projects exist.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">🚩</div>
+        <div class="concept-title">Red Flags</div>
+        <div class="concept-body">"Strategic rationale" used to justify acquisitions without return analysis. Capex growing faster than revenue for multiple years. CEO obsessed with market share at expense of returns. Serial acquirers with no post-merger ROIC disclosure.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">📐</div>
+        <div class="concept-title">The ROIC Test</div>
+        <div class="concept-body">Every capital budgeting decision is ultimately a bet on future ROIC. The best managements track incremental ROIC — the return on the most recent capital deployed — separately from blended historical ROIC. Declining incremental ROIC is the first sign of capital efficiency erosion.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">🔁</div>
+        <div class="concept-title">Capital Returns</div>
+        <div class="concept-body">When a company earns high ROIC but has no reinvestment opportunities, the right move is returning capital via dividends or buybacks. Companies that hoard cash despite below-WACC reinvestment opportunities are destroying value. Discipline in returning capital is as important as discipline in deploying it.</div>
+      </div>
+    </div>
+
+    <div class="key-insight">
+      <div class="ki-label">The Complete Corporate Finance Picture</div>
+      <p>Capital structure decides the cost of capital. ROIC determines whether the business earns above that cost. Working capital efficiency determines how much cash the business actually generates vs. how much the P&L shows. Capital budgeting decides where new capital goes. Together, these four frameworks answer the central question every serious investor must ask: is this business creating or destroying shareholder value, and at what rate?</p>
+    </div>
+
+    <div style="border:1px solid var(--border);border-radius:10px;padding:20px;margin-top:28px;background:var(--card)">
+      <div style="font-size:13px;font-weight:800;margin-bottom:8px">Continue to Calculators</div>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Apply these frameworks to real companies using the interactive calculators in this domain.</p>
+      <a href="/domains/corporate-finance/calculators/" style="display:inline-flex;align-items:center;gap:6px;background:var(--text);color:#fff;padding:10px 18px;border-radius:7px;font-size:13px;font-weight:700">Open Calculators →</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function showModule(idx, tabEl){
+  document.querySelectorAll('.module').forEach((m,i)=>{
+    m.classList.toggle('active', i===idx);
+  });
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  if(tabEl) tabEl.classList.add('active');
+  window.scrollTo({top:document.querySelector('.module-tabs').offsetTop - 60, behavior:'smooth'});
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ROIC & EVA Analysis — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+a{color:inherit;text-decoration:none}
+
+/* NAV */
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-pro{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+
+/* HERO */
+.hero{padding:40px 24px 32px;max-width:860px;margin:0 auto}
+.hero-eyebrow{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.hero h1{font-size:clamp(22px,3.5vw,30px);font-weight:900;letter-spacing:-.02em;line-height:1.15;margin-bottom:10px}
+.hero p{font-size:14px;color:var(--muted);line-height:1.6;max-width:560px}
+.pro-tag{display:inline-block;background:#fef3c7;color:#92400e;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:4px;margin-bottom:12px}
+
+/* STEPS */
+.steps-wrap{max-width:860px;margin:0 auto;padding:0 24px 80px}
+.step{display:none}
+.step.active{display:block}
+
+/* STEP HEADER */
+.step-header{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--text);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-title{font-size:15px;font-weight:700}
+.step-sub{font-size:12px;color:var(--muted);margin-top:1px}
+
+/* SEARCH + FILTER */
+.search-bar{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;font-family:'Inter',sans-serif;outline:none;margin-bottom:14px}
+.search-bar:focus{border-color:var(--text)}
+.filter-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.pill{padding:5px 12px;border-radius:20px;border:1px solid var(--border);font-size:12px;font-weight:500;cursor:pointer;background:#fff;transition:all .15s}
+.pill.active,.pill:hover{background:var(--text);color:#fff;border-color:var(--text)}
+
+/* COMPANY GRID */
+.co-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:24px}
+.co-card{border:1.5px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;transition:all .15s;background:#fff}
+.co-card:hover{border-color:#aaa;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.co-card.selected{border-color:var(--text);background:#f9fafb}
+.co-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.co-meta{font-size:11px;color:var(--muted)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:11px 22px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .15s;font-family:'Inter',sans-serif}
+.btn-primary{background:var(--text);color:#fff}
+.btn-primary:hover{opacity:.88}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:#aaa;color:var(--text)}
+.btn-row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+
+/* CONTEXT CARD */
+.ctx-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px}
+.ctx-title{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px;color:var(--muted)}
+.ctx-insight{font-size:14px;line-height:1.65;color:var(--text);margin-bottom:20px}
+
+/* FORMULA BOX */
+.formula-box{background:#0a0a0a;color:#f1f5f9;border-radius:8px;padding:18px 20px;font-family:'JetBrains Mono',monospace;font-size:13px;margin-bottom:20px;line-height:1.9}
+.formula-box .f-comment{color:#6b7280;font-size:12px}
+.formula-box .f-label{color:#94a3b8;font-size:12px}
+.formula-box .f-val{color:#67e8f9}
+.formula-box .f-eq{color:#fbbf24}
+.formula-box .f-green{color:#4ade80}
+.formula-box .f-red{color:#f87171}
+
+/* STAT BOXES */
+.stat-boxes{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.stat-box{border:1px solid var(--border);border-radius:8px;padding:14px;background:#fff}
+.stat-label{font-size:11px;color:var(--muted);font-weight:500;margin-bottom:4px}
+.stat-value{font-size:18px;font-weight:800;letter-spacing:-.01em}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:3px}
+
+/* SPREAD VISUAL */
+.spread-visual{border:1px solid var(--border);border-radius:8px;padding:16px;background:#fff;margin-bottom:20px}
+.spread-title{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px}
+.spread-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.spread-box{border-radius:6px;padding:14px;text-align:center}
+.spread-positive{background:#f0fdf4;border:1px solid #86efac}
+.spread-negative{background:#fef2f2;border:1px solid #fca5a5}
+.spread-box .s-label{font-size:11px;font-weight:600;margin-bottom:6px}
+.spread-box .s-value{font-size:20px;font-weight:900;letter-spacing:-.02em}
+.spread-box .s-sub{font-size:11px;color:var(--muted);margin-top:4px}
+.spread-positive .s-value{color:var(--green)}
+.spread-negative .s-value{color:var(--red)}
+
+/* SECTOR TABLE */
+.sec-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px}
+.sec-table th{background:var(--card);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+.sec-table td{padding:10px 12px;border-bottom:1px solid var(--border)}
+.sec-table tr:last-child td{border-bottom:none}
+.td-sec{font-weight:600}
+.td-pos{color:var(--green);font-weight:700}
+.td-neg{color:var(--red);font-weight:700}
+
+/* PRO GATE */
+.pro-gate{border:2px dashed var(--border);border-radius:12px;padding:36px;text-align:center;margin-top:8px}
+.pro-gate-icon{font-size:32px;margin-bottom:12px}
+.pro-gate-title{font-size:17px;font-weight:800;margin-bottom:8px}
+.pro-gate-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:18px;max-width:440px;margin-left:auto;margin-right:auto}
+.pro-gate-features{list-style:none;text-align:left;display:inline-block;margin-bottom:22px}
+.pro-gate-features li{font-size:13px;padding:5px 0;color:var(--text)}
+.pro-gate-btn{background:var(--text);color:#fff;border:none;border-radius:8px;padding:13px 28px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:10px;width:100%;max-width:340px}
+.pro-gate-btn:hover{opacity:.88}
+.pro-gate-note{font-size:11px;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <a href="/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">›</span>
+    <a href="/domains/corporate-finance/">Corporate Finance</a>
+    <span class="nav-sep">›</span>
+    <span>ROIC & EVA</span>
+  </div>
+  <button class="nav-pro" onclick="unlockPro()">Go Pro — ₹799/mo</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow">Corporate Finance · Calculator</div>
+  <span class="pro-tag">Pro Calculator</span>
+  <h1>ROIC & EVA Analysis</h1>
+  <p>Return on Invested Capital versus cost of capital is the single most important test of value creation. If ROIC exceeds WACC, the company is creating wealth. Steps 1–2 are free — see sector ROIC benchmarks. Pro unlocks full ROIC/EVA modeling.</p>
+</div>
+
+<div class="steps-wrap">
+
+  <!-- STEP 1 -->
+  <div class="step active" id="step1">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Pick a company to analyse</div>
+        <div class="step-sub">30 companies across Indian and global markets</div>
+      </div>
+    </div>
+    <input class="search-bar" id="searchInput" placeholder="Search by name or ticker…" oninput="filterCompanies()">
+    <div class="filter-pills" id="filterPills"></div>
+    <div class="co-grid" id="coGrid"></div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="step1Btn" onclick="goStep2()" disabled>See ROIC Context →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step" id="step2">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">ROIC/EVA Framework — <span id="s2CoName"></span></div>
+        <div class="step-sub">Sector benchmarks for value creation and destruction</div>
+      </div>
+    </div>
+
+    <div class="ctx-card">
+      <div class="ctx-title">Sector Context</div>
+      <div class="ctx-insight" id="s2Insight"></div>
+
+      <div class="formula-box">
+        <div><span class="f-eq">NOPAT</span>         <span class="f-label">= EBIT × (1 − Tax Rate)</span></div>
+        <div><span class="f-eq">Invested Capital</span> <span class="f-label">= Equity + Interest-bearing Debt − Cash</span></div>
+        <div class="f-comment">─────────────────────────────────────────</div>
+        <div><span class="f-eq">ROIC</span>           <span class="f-label">= NOPAT ÷ Invested Capital</span></div>
+        <div><span class="f-eq">Spread</span>         <span class="f-label">= ROIC − WACC</span></div>
+        <div class="f-comment">─────────────────────────────────────────</div>
+        <div><span class="f-eq">EVA</span>            <span class="f-label">= NOPAT − (WACC × Invested Capital)</span></div>
+        <div>                 <span class="f-label">= Spread × Invested Capital</span></div>
+        <div class="f-comment">─────────────────────────────────────────</div>
+        <div><span class="f-green">Positive Spread</span> <span class="f-label">→ Value Creation (grow capital)</span></div>
+        <div><span class="f-red">Negative Spread</span>  <span class="f-label">→ Value Destruction (shrink or fix)</span></div>
+      </div>
+    </div>
+
+    <div class="stat-boxes">
+      <div class="stat-box">
+        <div class="stat-label">Typical ROIC</div>
+        <div class="stat-value" id="s2Roic">—</div>
+        <div class="stat-sub">After-tax return on invested capital</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Typical WACC</div>
+        <div class="stat-value" id="s2Wacc">—</div>
+        <div class="stat-sub">Blended cost of equity + debt</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Spread Profile</div>
+        <div class="stat-value" id="s2Spread">—</div>
+        <div class="stat-sub">ROIC − WACC</div>
+      </div>
+    </div>
+
+    <div class="spread-visual">
+      <div class="spread-title">What the Spread Tells You</div>
+      <div class="spread-row">
+        <div class="spread-box spread-positive">
+          <div class="s-label">ROIC &gt; WACC</div>
+          <div class="s-value">+Spread</div>
+          <div class="s-sub">Every rupee of invested capital generates surplus returns. Grow aggressively. The stock deserves a premium to book value.</div>
+        </div>
+        <div class="spread-box spread-negative">
+          <div class="s-label">ROIC &lt; WACC</div>
+          <div class="s-value">−Spread</div>
+          <div class="s-sub">Capital is being destroyed. Each reinvestment cycle reduces shareholder wealth. Shrink the capital base or improve margins.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ctx-card" style="padding:0;overflow:hidden">
+      <div class="ctx-title" style="padding:16px 20px 0">Sector ROIC Benchmarks</div>
+      <table class="sec-table">
+        <thead><tr><th>Sector</th><th>Typical ROIC</th><th>WACC Range</th><th>Spread</th><th>Verdict</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="td-sec">Technology (IT Services)</td>
+            <td>30–45%</td><td>11–13%</td>
+            <td class="td-pos">+20–32%</td>
+            <td>Exceptional — asset-light, high NOPAT</td>
+          </tr>
+          <tr>
+            <td class="td-sec">FMCG</td>
+            <td>25–40%</td><td>10–12%</td>
+            <td class="td-pos">+15–28%</td>
+            <td>Strong — brand moats, negative NWC</td>
+          </tr>
+          <tr>
+            <td class="td-sec">Consumer (Premium)</td>
+            <td>20–35%</td><td>10–13%</td>
+            <td class="td-pos">+10–22%</td>
+            <td>Good — brand pricing power</td>
+          </tr>
+          <tr>
+            <td class="td-sec">Pharma (Branded)</td>
+            <td>18–28%</td><td>11–14%</td>
+            <td class="td-pos">+7–17%</td>
+            <td>Good — post-R&amp;D amortisation</td>
+          </tr>
+          <tr>
+            <td class="td-sec">NBFC</td>
+            <td>12–20%</td><td>12–15%</td>
+            <td class="td-pos">+0–8%</td>
+            <td>Thin — balance sheet intensive</td>
+          </tr>
+          <tr>
+            <td class="td-sec">Auto</td>
+            <td>10–18%</td><td>10–13%</td>
+            <td>−2% to +5%</td>
+            <td>Mixed — capex-heavy, cyclical</td>
+          </tr>
+          <tr>
+            <td class="td-sec">Conglomerate</td>
+            <td>8–15%</td><td>10–13%</td>
+            <td>−3% to +5%</td>
+            <td>Varies widely by portfolio mix</td>
+          </tr>
+          <tr>
+            <td class="td-sec">Energy</td>
+            <td>8–14%</td><td>10–13%</td>
+            <td>−4% to +3%</td>
+            <td>Cyclical — commodity price dependent</td>
+          </tr>
+          <tr>
+            <td class="td-sec">Infrastructure</td>
+            <td>6–12%</td><td>9–12%</td>
+            <td class="td-neg">−3% to +2%</td>
+            <td>Poor — long payback, asset-heavy</td>
+          </tr>
+          <tr>
+            <td class="td-sec">Telecom</td>
+            <td>5–10%</td><td>11–14%</td>
+            <td class="td-neg">−6% to −1%</td>
+            <td>Destroying value — massive 5G capex</td>
+          </tr>
+          <tr>
+            <td class="td-sec">Banking</td>
+            <td colspan="4" style="color:var(--muted);font-style:italic">Use ROE vs Cost of Equity — standard ROIC/IC framework doesn't apply to regulated balance sheets</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goStep3()">Calculate ROIC & EVA →</button>
+      <button class="btn btn-ghost" onclick="resetToStep1()">← Change Company</button>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step" id="step3">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">ROIC & EVA — <span id="s3CoName"></span></div>
+        <div class="step-sub">Full return on capital and economic value analysis</div>
+      </div>
+    </div>
+
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <div class="pro-gate-title">Pro Feature</div>
+      <p class="pro-gate-desc">Input EBIT, tax rate, equity, debt and cash to compute ROIC versus WACC, calculate EVA in absolute ₹ terms, and identify where value is created or destroyed.</p>
+      <ul class="pro-gate-features">
+        <li>→ ROIC vs WACC spread calculation with verdict</li>
+        <li>→ EVA in ₹Cr — absolute economic profit</li>
+        <li>→ Invested capital waterfall decomposition</li>
+        <li>→ Value creation / destruction sensitivity chart</li>
+        <li>→ NOPAT bridge: EBIT → Tax → NOPAT</li>
+        <li>→ 3-year ROIC trend modeler</li>
+        <li>→ Peer ROIC benchmarking by sector</li>
+        <li>→ Export analysis to Vault</li>
+      </ul>
+      <button class="pro-gate-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+      <div class="pro-gate-note">Monthly only · Cancel anytime · All 15 domains included</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="goStep2()">← Back to Context</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const COMPANIES = [
+  {name:'Reliance Industries',ticker:'RIL',sector:'Energy',market:'NSE'},
+  {name:'TCS',ticker:'TCS',sector:'Technology',market:'NSE'},
+  {name:'HDFC Bank',ticker:'HDFCBANK',sector:'Banking',market:'NSE'},
+  {name:'Infosys',ticker:'INFY',sector:'Technology',market:'NSE'},
+  {name:'ICICI Bank',ticker:'ICICIBANK',sector:'Banking',market:'NSE'},
+  {name:'Hindustan Unilever',ticker:'HINDUNILVR',sector:'FMCG',market:'NSE'},
+  {name:'ITC',ticker:'ITC',sector:'FMCG',market:'NSE'},
+  {name:'Bajaj Finance',ticker:'BAJFINANCE',sector:'NBFC',market:'NSE'},
+  {name:'Bharti Airtel',ticker:'BHARTIARTL',sector:'Telecom',market:'NSE'},
+  {name:'Wipro',ticker:'WIPRO',sector:'Technology',market:'NSE'},
+  {name:'Asian Paints',ticker:'ASIANPAINT',sector:'Consumer',market:'NSE'},
+  {name:'Maruti Suzuki',ticker:'MARUTI',sector:'Auto',market:'NSE'},
+  {name:'Sun Pharma',ticker:'SUNPHARMA',sector:'Pharma',market:'NSE'},
+  {name:'Larsen & Toubro',ticker:'LT',sector:'Infrastructure',market:'NSE'},
+  {name:'Tata Motors',ticker:'TATAMOTORS',sector:'Auto',market:'NSE'},
+  {name:'Apple',ticker:'AAPL',sector:'Technology',market:'NASDAQ'},
+  {name:'Microsoft',ticker:'MSFT',sector:'Technology',market:'NASDAQ'},
+  {name:'Alphabet',ticker:'GOOGL',sector:'Technology',market:'NASDAQ'},
+  {name:'Amazon',ticker:'AMZN',sector:'Technology',market:'NASDAQ'},
+  {name:'Meta Platforms',ticker:'META',sector:'Technology',market:'NASDAQ'},
+  {name:'JPMorgan Chase',ticker:'JPM',sector:'Banking',market:'NYSE'},
+  {name:'Johnson & Johnson',ticker:'JNJ',sector:'Pharma',market:'NYSE'},
+  {name:'Procter & Gamble',ticker:'PG',sector:'FMCG',market:'NYSE'},
+  {name:'Berkshire Hathaway',ticker:'BRK.B',sector:'Conglomerate',market:'NYSE'},
+  {name:'ExxonMobil',ticker:'XOM',sector:'Energy',market:'NYSE'},
+  {name:'Tesla',ticker:'TSLA',sector:'Auto',market:'NASDAQ'},
+  {name:'LVMH',ticker:'MC',sector:'Consumer',market:'EPA'},
+  {name:'Toyota',ticker:'TM',sector:'Auto',market:'NYSE'},
+  {name:'Samsung',ticker:'005930',sector:'Technology',market:'KRX'},
+  {name:'Nestlé',ticker:'NESN',sector:'FMCG',market:'SIX'},
+];
+
+const SECTOR_CONTEXT = {
+  Technology:{
+    roic:'30–45%',
+    wacc:'11–13%',
+    spread:'+20–32% (Exceptional)',
+    insight:'TCS and Infosys are among the most capital-efficient businesses globally. Their invested capital is primarily working capital and intangibles — there\'s almost no fixed asset base relative to the NOPAT they generate. TCS has consistently delivered 35–45% ROIC over the past decade, creating enormous EVA every year. Apple\'s ROIC exceeds 100% in recent years because buybacks have reduced book equity to near-zero while maintaining high NOPAT — a sign of exceptional capital allocation, not accounting distortion. Tech businesses that sustain ROIC above 25% over a decade deserve significant premium-to-book multiples.'
+  },
+  Banking:{
+    roic:'ROE-based model',
+    wacc:'Cost of Equity ~13–15%',
+    spread:'Use ROE vs CoE spread',
+    insight:'Standard ROIC analysis breaks down for banks because the balance sheet is fundamentally different — customer deposits are "liabilities" but are actually the core operating asset of a bank. HDFC Bank\'s ROE of ~17% versus its cost of equity of ~13–14% means it consistently creates shareholder value. The EVA equivalent is: Economic Profit = (ROE − Cost of Equity) × Book Value of Equity. ICICI Bank has dramatically improved this spread over the past 5 years as asset quality cleaned up and ROE recovered.'
+  },
+  NBFC:{
+    roic:'12–20%',
+    wacc:'12–15%',
+    spread:'+0% to +8% (Thin)',
+    insight:'NBFCs are balance-sheet-intensive by definition — Bajaj Finance\'s "invested capital" includes its entire loan book funded by borrowings. The ROIC framework works here: NOPAT = Net Interest Income × (1-Tax Rate) approximately, and Invested Capital = Net Worth + Borrowings. Bajaj Finance achieves ~18–20% ROIC through superior product mix and credit underwriting, which gives it a positive spread over its ~13% WACC. Most weaker NBFCs hover near or below WACC, which is why the sector has seen consolidation.'
+  },
+  FMCG:{
+    roic:'25–40%',
+    wacc:'10–12%',
+    spread:'+15–28% (Strong)',
+    insight:'HUL and Nestlé demonstrate the power of brand moats in capital returns. HUL\'s ROIC runs at 90–100%+ using strict invested capital definitions because it generates negative working capital (customers pay before suppliers) and requires minimal fixed assets. Using a more conservative definition that excludes goodwill, the ROIC is still 35–45%. P&G globally delivers similar metrics. These businesses destroy the notion that consumer goods companies are boring — they are extraordinary capital compounders masquerading as low-growth businesses.'
+  },
+  Auto:{
+    roic:'10–18%',
+    wacc:'10–13%',
+    spread:'−2% to +5% (Mixed)',
+    insight:'Maruti Suzuki is the outlier in Indian auto — it has historically delivered 18–25% ROIC through capital-light assembly and strong dealer network. Most global auto OEMs (Toyota, Tata Motors) struggle to consistently exceed their WACC because of the massive capex cycle required for each new platform. Tesla is the fascinating case: negative NOPAT for years, then suddenly positive ROIC as scale arrived. The EV transition makes ROIC analysis particularly important — it determines which OEMs will be value creators in the new paradigm.'
+  },
+  Pharma:{
+    roic:'18–28%',
+    wacc:'11–14%',
+    spread:'+7–17% (Good)',
+    insight:'Sun Pharma\'s ROIC reflects its branded generics business in India and the US — high CM ratio products with relatively light incremental capital requirements once manufacturing is established. The challenge is that R&D investment for new molecules is expensed (not capitalised under Indian GAAP), which understates invested capital and overstates ROIC. J&J\'s pharmaceutical segment delivers 30%+ ROIC on a clean basis. The sector\'s value creation is real, but R&D treatment makes comparisons across accounting regimes tricky.'
+  },
+  Infrastructure:{
+    roic:'6–12%',
+    wacc:'9–12%',
+    spread:'−3% to +2% (Poor)',
+    insight:'L&T occupies the better end of the infrastructure spectrum — its engineering services model requires less capital than pure concession businesses. Still, the long gestation of infrastructure projects, combined with high working capital from mobilisation advances and retention, compresses ROIC to 8–12%. Many Indian infrastructure companies have destroyed value for decades by investing in assets that earned below WACC. The discipline required: only bid projects where project-level IRR exceeds sector WACC by a meaningful buffer to account for execution risk.'
+  },
+  Energy:{
+    roic:'8–14%',
+    wacc:'10–13%',
+    spread:'−4% to +3% (Cyclical)',
+    insight:'Reliance Industries\' ROIC story is a tale of two businesses. The legacy O2C (refining + petrochemicals) segment earns a mid-cycle ROIC of 10–12% — barely above WACC. But Jio and Retail, which now dominate the group\'s capital allocation, are structurally higher-ROIC businesses (15–20%+ for Jio as it matures). ExxonMobil\'s ROIC swings dramatically with oil prices, which is why commodity businesses deserve lower multiples — you cannot reliably capitalise a spread that is fundamentally volatile.'
+  },
+  Telecom:{
+    roic:'5–10%',
+    wacc:'11–14%',
+    spread:'−6% to −1% (Value Destroying)',
+    insight:'Bharti Airtel is destroying economic value in the accounting sense — its 5G capex cycle, combined with spectrum debt obligations, pushes invested capital up faster than NOPAT grows. ROIC of 7–9% vs WACC of 12–13% means EVA is deeply negative in absolute terms. The bull case is that once 5G penetration matures and ARPU rises significantly, the incremental ROIC on marginal investments will be much higher. Telecom is a classic case where the stock can work even with negative current EVA if investors believe in a future where the spread turns positive.'
+  },
+  Consumer:{
+    roic:'20–35%',
+    wacc:'10–13%',
+    spread:'+10–22% (Good)',
+    insight:'Asian Paints delivers 25–30% ROIC through brand strength, dealer network depth, and efficient working capital management. LVMH\'s luxury goods earn 20–25% ROIC on tangible capital — though goodwill from acquisitions inflates the invested capital base significantly. Consumer brands with genuine pricing power consistently earn above-WACC returns because the intangible asset (the brand) is not fully reflected on the balance sheet, understating true ROIC. The invested capital calculation matters enormously in this sector.'
+  },
+  Conglomerate:{
+    roic:'8–15%',
+    wacc:'10–13%',
+    spread:'−3% to +5% (Mixed)',
+    insight:'Berkshire Hathaway\'s aggregate ROIC of 10–12% understates the quality of its insurance float business — it effectively gets paid to invest. The operating businesses (Burlington Northern, Berkshire Energy, manufacturing) collectively earn near WACC. Indian conglomerates like the Tata Group have been working to improve capital allocation discipline, divesting underperformers and focusing on core businesses. The critical metric for conglomerates is not aggregate ROIC but the distribution of ROICs across subsidiaries and the trend in capital reallocation.'
+  },
+  default:{
+    roic:'10–20%',
+    wacc:'10–13%',
+    spread:'Depends on sector dynamics',
+    insight:'ROIC vs WACC is the fundamental test of whether a business creates or destroys shareholder value. A company that consistently earns ROIC above WACC will trade at a premium to book value — the market rewards the expected stream of future EVA. A company below WACC should trade at a discount to book value. Most valuation frameworks (DCF, relative multiples) ultimately reflect this core economic truth: value is created only when returns exceed the cost of the capital deployed to generate them.'
+  }
+};
+
+let selectedCo = null;
+let activeFilter = 'All';
+
+const sectors = ['All',...new Set(COMPANIES.map(c=>c.sector))];
+
+function renderGrid(list){
+  const g = document.getElementById('coGrid');
+  g.innerHTML = list.map(c=>`
+    <div class="co-card${selectedCo===c.ticker?' selected':''}" onclick="selectCo('${c.ticker}')">
+      <div class="co-name">${c.name}</div>
+      <div class="co-meta">${c.ticker} · ${c.sector} · ${c.market}</div>
+    </div>`).join('');
+}
+
+function buildPills(){
+  const wrap = document.getElementById('filterPills');
+  wrap.innerHTML = sectors.map(s=>`
+    <div class="pill${s===activeFilter?' active':''}" onclick="setFilter('${s}',this)">${s}</div>`).join('');
+}
+
+function filterCompanies(){
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const list = COMPANIES.filter(c=>{
+    const matchSector = activeFilter==='All'||c.sector===activeFilter;
+    const matchQ = !q||c.name.toLowerCase().includes(q)||c.ticker.toLowerCase().includes(q);
+    return matchSector && matchQ;
+  });
+  renderGrid(list);
+}
+
+function setFilter(f,el){
+  activeFilter = f;
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  filterCompanies();
+}
+
+function selectCo(ticker){
+  selectedCo = ticker;
+  filterCompanies();
+  document.getElementById('step1Btn').disabled = false;
+}
+
+function goStep2(){
+  if(!selectedCo) return;
+  const co = COMPANIES.find(c=>c.ticker===selectedCo);
+  const ctx = SECTOR_CONTEXT[co.sector]||SECTOR_CONTEXT.default;
+  document.getElementById('s2CoName').textContent = co.name;
+  document.getElementById('s2Insight').textContent = ctx.insight;
+  document.getElementById('s2Roic').textContent = ctx.roic;
+  document.getElementById('s2Wacc').textContent = ctx.wacc;
+  document.getElementById('s2Spread').textContent = ctx.spread;
+  showStep('step2');
+}
+
+function goStep3(){
+  const co = COMPANIES.find(c=>c.ticker===selectedCo);
+  document.getElementById('s3CoName').textContent = co.name;
+  showStep('step3');
+}
+
+function resetToStep1(){ showStep('step1'); }
+
+function showStep(id){
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function unlockPro(){
+  alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');
+}
+
+buildPills();
+renderGrid(COMPANIES);
+</script>
+</body>
+</html>

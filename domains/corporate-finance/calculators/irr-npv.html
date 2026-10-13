@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IRR / NPV Calculator · Corporate Finance · ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
+  a{color:inherit;text-decoration:none}
+  .top-nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between}
+  .nav-left{display:flex;align-items:center;gap:12px}
+  .nav-logo{font-weight:800;font-size:16px;letter-spacing:-0.5px}
+  .nav-sep{color:var(--border);font-size:18px}
+  .nav-domain{font-size:13px;color:var(--muted);font-weight:500}
+  .nav-right{display:flex;align-items:center;gap:8px}
+  .nav-btn{padding:6px 14px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:none}
+  .nav-btn-ghost{background:none;color:var(--muted)}
+  .nav-btn-ghost:hover{color:var(--text)}
+  .nav-btn-pro{background:var(--text);color:#fff}
+  .domain-nav{background:var(--card);border-bottom:1px solid var(--border);padding:0 20px;display:flex;gap:0;overflow-x:auto}
+  .domain-nav a{padding:10px 16px;font-size:13px;font-weight:500;color:var(--muted);white-space:nowrap;border-bottom:2px solid transparent}
+  .domain-nav a:hover{color:var(--text)}
+  .domain-nav a.active{color:var(--text);border-bottom-color:var(--text);font-weight:600}
+  .page-wrap{max-width:720px;margin:0 auto;padding:32px 20px 80px}
+  .calc-header{margin-bottom:32px}
+  .calc-tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:12px}
+  .free-badge{background:#f0fdf4;color:var(--green);padding:2px 7px;border-radius:4px;font-size:10px;font-weight:700;letter-spacing:0.5px;border:1px solid #86efac}
+  .calc-header h1{font-size:26px;font-weight:800;letter-spacing:-0.5px;line-height:1.2;margin-bottom:8px}
+  .calc-header p{color:var(--muted);font-size:15px}
+  .steps-bar{display:flex;gap:0;margin-bottom:32px;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+  .step-pill{flex:1;padding:10px 8px;text-align:center;font-size:12px;font-weight:600;color:var(--muted);background:var(--card);border-right:1px solid var(--border);cursor:pointer;transition:background 0.15s}
+  .step-pill:last-child{border-right:none}
+  .step-pill.active{background:var(--text);color:#fff}
+  .step-pill.done{background:#f0fdf4;color:var(--green)}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px}
+  .card h2{font-size:16px;font-weight:700;margin-bottom:16px}
+  .search-wrap{position:relative;margin-bottom:16px}
+  .search-input{width:100%;padding:12px 16px 12px 40px;border:1px solid var(--border);border-radius:8px;font-size:15px;font-family:'Inter',sans-serif;outline:none;transition:border-color 0.15s}
+  .search-input:focus{border-color:var(--text)}
+  .search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px}
+  .filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .filter-pill{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid var(--border);cursor:pointer;background:#fff;transition:all 0.15s}
+  .filter-pill.active{background:var(--text);color:#fff;border-color:var(--text)}
+  .company-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:340px;overflow-y:auto;padding-right:4px}
+  .company-card{padding:12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all 0.15s;background:#fff}
+  .company-card:hover{border-color:#999}
+  .company-card.selected{border-color:var(--text);background:#f8f8f8}
+  .co-name{font-size:14px;font-weight:600;margin-bottom:2px}
+  .co-meta{font-size:12px;color:var(--muted)}
+  .co-ticker{font-family:'JetBrains Mono',monospace;font-size:11px;background:var(--border);padding:1px 6px;border-radius:3px;display:inline-block;margin-bottom:4px}
+  .context-block{background:#fff;border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:14px}
+  .context-block h3{font-size:14px;font-weight:700;margin-bottom:8px}
+  .context-block p{font-size:14px;color:var(--muted);line-height:1.7}
+  .stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}
+  .stat-box{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center}
+  .stat-val{font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;margin-bottom:4px}
+  .stat-label{font-size:11px;color:var(--muted);font-weight:500}
+  .input-group{margin-bottom:18px}
+  .input-label{font-size:13px;font-weight:600;margin-bottom:6px;display:block}
+  .input-sub{font-size:12px;color:var(--muted);margin-bottom:6px}
+  .input-field{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:7px;font-size:14px;font-family:'Inter',sans-serif;outline:none;transition:border-color 0.15s}
+  .input-field:focus{border-color:var(--text)}
+  .input-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .radio-group{display:grid;gap:8px}
+  .radio-opt{display:flex;align-items:flex-start;gap:10px;padding:12px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:#fff;transition:border-color 0.15s}
+  .radio-opt:hover{border-color:#999}
+  .radio-opt.selected{border-color:var(--text);background:var(--card)}
+  .radio-opt input{margin-top:2px}
+  .radio-label{font-size:14px;font-weight:600}
+  .radio-sub{font-size:12px;color:var(--muted)}
+  .cf-grid{display:grid;gap:8px;margin-bottom:12px}
+  .cf-row{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:center}
+  .cf-year-label{font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap;width:60px}
+  .cf-input{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:7px;font-size:14px;font-family:'JetBrains Mono',monospace;outline:none;transition:border-color 0.15s}
+  .cf-input:focus{border-color:var(--text)}
+  .cf-add-btn{background:none;border:1px dashed var(--border);border-radius:7px;padding:8px;font-size:13px;color:var(--muted);cursor:pointer;width:100%;font-family:'Inter',sans-serif}
+  .cf-add-btn:hover{border-color:#999;color:var(--text)}
+  .cta-btn{display:block;width:100%;padding:14px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;margin-top:20px;font-family:'Inter',sans-serif;transition:opacity 0.15s}
+  .cta-btn:hover{opacity:0.85}
+  .cta-btn:disabled{opacity:0.4;cursor:not-allowed}
+  .back-btn{background:none;border:1px solid var(--border);border-radius:8px;padding:10px 18px;font-size:14px;font-weight:600;cursor:pointer;color:var(--text);font-family:'Inter',sans-serif;margin-top:12px;display:block;width:100%}
+  .back-btn:hover{background:var(--card)}
+  .loading-wrap{padding:48px 24px;text-align:center}
+  .loading-step{font-size:14px;color:var(--muted);margin-bottom:8px;animation:fadeIn 0.4s ease}
+  .loading-step.active{color:var(--text);font-weight:600}
+  .loading-spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--text);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 24px}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .verdict-box{padding:22px 20px;border-radius:12px;text-align:center;margin-bottom:20px}
+  .verdict-go{background:#f0fdf4;border:1px solid #86efac}
+  .verdict-nogo{background:#fef2f2;border:1px solid #fca5a5}
+  .verdict-borderline{background:#fffbeb;border:1px solid #fde68a}
+  .verdict-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+  .verdict-text{font-size:20px;font-weight:800;margin-bottom:6px}
+  .verdict-sub{font-size:13px;color:var(--muted)}
+  .result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+  .result-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;text-align:center}
+  .result-val{font-size:20px;font-weight:800;font-family:'JetBrains Mono',monospace;margin-bottom:4px}
+  .result-label{font-size:12px;color:var(--muted);font-weight:500}
+  .cf-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px}
+  .cf-table th{text-align:left;padding:8px 10px;background:var(--card);border:1px solid var(--border);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted)}
+  .cf-table td{padding:9px 10px;border:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:12px}
+  .cf-table tr.cf-initial td{background:#fff3f3}
+  .cf-table tr.cf-positive td:last-child{color:var(--green)}
+  .cf-table tr.cf-negative td:last-child{color:var(--red)}
+  .bar-chart{margin-bottom:20px}
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .bar-label{font-size:12px;font-weight:600;width:80px;text-align:right;color:var(--muted);flex-shrink:0}
+  .bar-track{flex:1;height:20px;background:var(--border);border-radius:4px;position:relative;overflow:hidden}
+  .bar-fill{height:100%;border-radius:4px;display:flex;align-items:center;padding:0 8px;font-size:11px;font-weight:700;color:#fff;white-space:nowrap;transition:width 0.8s ease}
+  .bar-val{font-size:12px;font-family:'JetBrains Mono',monospace;font-weight:700;width:80px;flex-shrink:0}
+  .insight-strip{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:14px 16px;font-size:13px;color:#92400e;line-height:1.6;margin-bottom:20px}
+  .section-head{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);margin-bottom:10px}
+  .vault-btn{display:block;width:100%;padding:12px;background:#fff;border:1px solid var(--border);border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;color:var(--text);font-family:'Inter',sans-serif;margin-top:12px}
+  .vault-btn:hover{border-color:#999}
+  @media(max-width:600px){.company-grid,.input-row{grid-template-columns:1fr}.stat-row,.result-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <div class="nav-left">
+    <span class="nav-logo">ValuationDesk</span>
+    <span class="nav-sep">/</span>
+    <span class="nav-domain">Corporate Finance</span>
+  </div>
+  <div class="nav-right">
+    <button class="nav-btn nav-btn-ghost" onclick="window.location.href='../index.html'">← CF Home</button>
+    <button class="nav-btn nav-btn-pro" onclick="window.location.href='../../../index.html'">All Domains</button>
+  </div>
+</nav>
+<div class="domain-nav">
+  <a href="../index.html">Overview</a>
+  <a href="../learn/index.html">Learn</a>
+  <a href="index.html" class="active">Calculators</a>
+  <a href="#">My Vault</a>
+</div>
+<div class="page-wrap">
+  <div class="calc-header">
+    <div class="calc-tag">Corporate Finance · Calculator <span class="free-badge">Free</span></div>
+    <h1>IRR / NPV Calculator</h1>
+    <p>Model a project's cash flows, calculate Internal Rate of Return vs your hurdle rate, and get an unambiguous go/no-go verdict.</p>
+  </div>
+  <div class="steps-bar" id="stepsBar">
+    <div class="step-pill active" id="pill-1">1 · Company</div>
+    <div class="step-pill" id="pill-2">2 · Context</div>
+    <div class="step-pill" id="pill-3">3 · Cash Flows</div>
+    <div class="step-pill" id="pill-4">4 · Verdict</div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div id="step1">
+    <div class="card">
+      <h2>Pick a company</h2>
+      <div class="filter-row" id="filterRow">
+        <div class="filter-pill active" onclick="filterCo('all',this)">All</div>
+        <div class="filter-pill" onclick="filterCo('India',this)">India</div>
+        <div class="filter-pill" onclick="filterCo('Global',this)">Global</div>
+        <div class="filter-pill" onclick="filterCo('Technology',this)">Tech</div>
+        <div class="filter-pill" onclick="filterCo('Banking',this)">Banking</div>
+        <div class="filter-pill" onclick="filterCo('Consumer',this)">Consumer</div>
+      </div>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" type="text" id="searchInput" placeholder="Search company or ticker..." oninput="renderCompanies()">
+      </div>
+      <div class="company-grid" id="companyGrid"></div>
+    </div>
+    <button class="cta-btn" id="step1Btn" disabled onclick="goStep2()">Continue →</button>
+  </div>
+
+  <!-- STEP 2 -->
+  <div id="step2" style="display:none">
+    <div class="card">
+      <h2 id="ctx-heading">Capital Budgeting Context</h2>
+      <div class="context-block">
+        <h3>What IRR and NPV actually tell you</h3>
+        <p><strong>NPV (Net Present Value)</strong> discounts all project cash flows at your required return (hurdle rate) and tells you: does this project create value in today's money? Positive NPV means yes — the project returns more than your cost of capital.</p>
+        <p style="margin-top:8px"><strong>IRR (Internal Rate of Return)</strong> is the discount rate that makes NPV exactly zero. It's the project's own return. Compare it to your hurdle rate: if IRR &gt; hurdle rate, the project clears the bar. If not, it destroys value at your cost of capital.</p>
+      </div>
+      <div class="context-block">
+        <h3>When IRR and NPV disagree — and why NPV wins</h3>
+        <p>For mutually exclusive projects, IRR can mislead. A small project with 40% IRR may have a lower NPV than a larger project at 18% IRR, because NPV captures scale. In corporate practice: <strong>use IRR for screening</strong> (does it clear the hurdle?), <strong>use NPV for final decision</strong> (which option creates the most value). Both metrics appear in every capital budgeting approval worldwide.</p>
+      </div>
+      <div class="context-block" id="sector-context-npv">
+        <!-- Sector-specific content injected by JS -->
+      </div>
+      <div class="stat-row" id="npv-stats"><!-- JS --></div>
+    </div>
+    <button class="cta-btn" onclick="goStep3()">Enter cash flows →</button>
+    <button class="back-btn" onclick="goStep1()">← Change company</button>
+  </div>
+
+  <!-- STEP 3 -->
+  <div id="step3" style="display:none">
+    <div class="card">
+      <h2>Project cash flows</h2>
+      <div class="input-row">
+        <div class="input-group">
+          <label class="input-label">Project type</label>
+          <select class="input-field" id="projectType">
+            <option value="capex">Capital Expenditure (Capex)</option>
+            <option value="acquisition">Acquisition / M&A</option>
+            <option value="expansion">Business Expansion</option>
+            <option value="newline">New Product / Business Line</option>
+            <option value="infrastructure">Infrastructure / Infra Project</option>
+            <option value="rd">R&D / Technology Investment</option>
+          </select>
+        </div>
+        <div class="input-group">
+          <label class="input-label">Hurdle rate (%)</label>
+          <div class="input-sub" id="hurdleHint">Your company's required return / WACC</div>
+          <input class="input-field" type="number" id="hurdleRate" value="15" min="1" max="60" step="0.5">
+        </div>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Initial investment (₹ Cr)</label>
+        <input class="input-field" type="number" id="initialInvestment" placeholder="e.g. 500" min="0">
+      </div>
+      <div class="input-group">
+        <label class="input-label">Annual cash inflows (₹ Cr per year)</label>
+        <div class="input-sub">Year 0 is your investment (already entered above). Add each year's net cash inflow below.</div>
+        <div class="cf-grid" id="cfGrid"></div>
+        <button class="cf-add-btn" id="addYearBtn" onclick="addYear()">+ Add year</button>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Terminal / exit value (₹ Cr) — optional</label>
+        <div class="input-sub">Residual value at end of project. Leave 0 if not applicable.</div>
+        <input class="input-field" type="number" id="terminalValue" value="0" min="0">
+      </div>
+    </div>
+    <button class="cta-btn" onclick="runAnalysis()">Calculate IRR and NPV →</button>
+    <button class="back-btn" onclick="goStep2()">← Back to context</button>
+  </div>
+
+  <!-- STEP 4 -->
+  <div id="step4" style="display:none">
+    <div class="card" id="loadingCard">
+      <div class="loading-wrap">
+        <div class="loading-spinner"></div>
+        <div id="loadingSteps"></div>
+      </div>
+    </div>
+    <div id="revealCard" style="display:none">
+      <div class="card">
+        <div id="verdictBox"></div>
+        <div class="section-head">Key Metrics</div>
+        <div class="result-grid" id="keyMetrics"></div>
+        <div class="section-head">Year-by-Year Cash Flow Analysis</div>
+        <table class="cf-table" id="cfTable"></table>
+        <div class="section-head">NPV Sensitivity to Discount Rate</div>
+        <div class="bar-chart" id="npvSensitivity"></div>
+        <div class="insight-strip" id="insight"></div>
+        <button class="vault-btn" onclick="saveToVault()">📁 Save to My Vault</button>
+        <button class="back-btn" onclick="goStep1()">← New analysis</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const COMPANIES = [
+  {name:'Reliance Industries',ticker:'RELIANCE',sector:'Energy',mcap:'₹19.2L Cr',region:'India'},
+  {name:'HDFC Bank',ticker:'HDFCBANK',sector:'Banking',mcap:'₹12.8L Cr',region:'India'},
+  {name:'Infosys',ticker:'INFY',sector:'Technology',mcap:'₹7.6L Cr',region:'India'},
+  {name:'ICICI Bank',ticker:'ICICIBANK',sector:'Banking',mcap:'₹8.9L Cr',region:'India'},
+  {name:'Tata Consultancy Services',ticker:'TCS',sector:'Technology',mcap:'₹14.1L Cr',region:'India'},
+  {name:'Bharti Airtel',ticker:'BHARTIARTL',sector:'Telecom',mcap:'₹8.7L Cr',region:'India'},
+  {name:'Hindustan Unilever',ticker:'HINDUNILVR',sector:'FMCG',mcap:'₹5.8L Cr',region:'India'},
+  {name:'Adani Enterprises',ticker:'ADANIENT',sector:'Conglomerate',mcap:'₹3.2L Cr',region:'India'},
+  {name:'Wipro',ticker:'WIPRO',sector:'Technology',mcap:'₹2.6L Cr',region:'India'},
+  {name:'Bajaj Finance',ticker:'BAJFINANCE',sector:'NBFC',mcap:'₹5.1L Cr',region:'India'},
+  {name:'Asian Paints',ticker:'ASIANPAINT',sector:'Consumer',mcap:'₹2.4L Cr',region:'India'},
+  {name:'Maruti Suzuki',ticker:'MARUTI',sector:'Auto',mcap:'₹3.8L Cr',region:'India'},
+  {name:'Sun Pharmaceutical',ticker:'SUNPHARMA',sector:'Pharma',mcap:'₹3.9L Cr',region:'India'},
+  {name:'Larsen & Toubro',ticker:'LT',sector:'Infrastructure',mcap:'₹4.6L Cr',region:'India'},
+  {name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',sector:'Banking',mcap:'₹3.7L Cr',region:'India'},
+  {name:'Apple Inc.',ticker:'AAPL',sector:'Technology',mcap:'$3.5T',region:'Global'},
+  {name:'Microsoft',ticker:'MSFT',sector:'Technology',mcap:'$3.1T',region:'Global'},
+  {name:'Alphabet (Google)',ticker:'GOOGL',sector:'Technology',mcap:'$2.2T',region:'Global'},
+  {name:'Amazon',ticker:'AMZN',sector:'E-Commerce',mcap:'$2.0T',region:'Global'},
+  {name:'Meta Platforms',ticker:'META',sector:'Technology',mcap:'$1.4T',region:'Global'},
+  {name:'JPMorgan Chase',ticker:'JPM',sector:'Banking',mcap:'$680B',region:'Global'},
+  {name:'Tesla',ticker:'TSLA',sector:'Auto',mcap:'$820B',region:'Global'},
+  {name:'Berkshire Hathaway',ticker:'BRK.B',sector:'Conglomerate',mcap:'$950B',region:'Global'},
+  {name:'Visa Inc.',ticker:'V',sector:'Payments',mcap:'$590B',region:'Global'},
+  {name:'Johnson & Johnson',ticker:'JNJ',sector:'Pharma',mcap:'$380B',region:'Global'},
+  {name:'Samsung Electronics',ticker:'005930',sector:'Semiconductors',mcap:'$400B',region:'Global'},
+  {name:'TSMC',ticker:'TSM',sector:'Semiconductors',mcap:'$870B',region:'Global'},
+  {name:'Nestlé',ticker:'NESN',sector:'FMCG',mcap:'$290B',region:'Global'},
+  {name:'LVMH',ticker:'MC',sector:'Luxury',mcap:'$340B',region:'Global'},
+  {name:'ExxonMobil',ticker:'XOM',sector:'Energy',mcap:'$480B',region:'Global'},
+];
+
+const SECTOR_HURDLES = {
+  Technology:{hurdle:'14–18%',payback:'3–5 yr',note:'Tech capex typically has short payback cycles; software investments often exceed 25% IRR threshold.'},
+  Banking:{hurdle:'12–15%',payback:'4–7 yr',note:'Bank capital investments (core banking, branches) face regulatory capital constraints. ROE hurdle often 14–16%.'},
+  NBFC:{hurdle:'14–16%',payback:'4–6 yr',note:'NBFC capex tied to branch expansion and fintech integration. Higher hurdles than banks given credit risk.'},
+  FMCG:{hurdle:'16–22%',payback:'3–5 yr',note:'FMCG companies demand high returns from brand and distribution investments. Unilever India typically uses 15% real WACC.'},
+  Auto:{hurdle:'12–16%',payback:'5–8 yr',note:'Auto capex is capital-intensive with long payback. EV transition investments face higher risk and require strategic risk premium.'},
+  Pharma:{hurdle:'15–20%',payback:'6–12 yr',note:'Pharma R&D IRRs must compensate for pipeline failure risk. Drug development hurdles often 20%+ to offset failure rates.'},
+  Infrastructure:{hurdle:'10–14%',payback:'8–20 yr',note:'Infra projects accept lower IRRs due to stability of cash flows. Government-backed projects often at 12% IRR.'},
+  Energy:{hurdle:'12–16%',payback:'6–12 yr',note:'Oil/gas projects use 10–15% hurdle depending on commodity price assumptions. Renewables often at 10–12% given lower risk.'},
+  Telecom:{hurdle:'12–15%',payback:'6–10 yr',note:'Telecom capex (5G, fiber) has long payback periods. Airtel targets 15%+ IRR on new spectrum investments.'},
+  Conglomerate:{hurdle:'14–18%',payback:'5–8 yr',note:'Conglomerates use portfolio WACC as a floor; individual divisions have higher sector-specific hurdles.'},
+  Consumer:{hurdle:'16–22%',payback:'3–5 yr',note:'Consumer brands demand fast payback on innovation capex. Retail expansion projects typically target 18–22% IRR.'},
+  default:{hurdle:'14–18%',payback:'4–7 yr',note:'Standard corporate hurdle rates in India range 14–18%, reflecting cost of equity capital and India-specific risk premium.'},
+};
+
+let selectedCompany = null;
+let currentFilter = 'all';
+let cashFlows = [null]; // Year 0 is initial investment (negative), Years 1+ are inflows
+let yearCount = 5;
+
+function filterCo(region, el){
+  currentFilter = region;
+  document.querySelectorAll('.filter-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  renderCompanies();
+}
+
+function renderCompanies(){
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const grid = document.getElementById('companyGrid');
+  const filtered = COMPANIES.filter(c=>{
+    const matchRegion = currentFilter==='all' || c.region===currentFilter || c.sector===currentFilter;
+    const matchQ = !q || c.name.toLowerCase().includes(q) || c.ticker.toLowerCase().includes(q) || c.sector.toLowerCase().includes(q);
+    return matchRegion && matchQ;
+  });
+  grid.innerHTML = filtered.map(c=>`
+    <div class="company-card ${selectedCompany&&selectedCompany.ticker===c.ticker?'selected':''}" onclick="selectCo(this,'${c.ticker}')">
+      <div class="co-ticker">${c.ticker}</div>
+      <div class="co-name">${c.name}</div>
+      <div class="co-meta">${c.sector} · ${c.mcap}</div>
+    </div>
+  `).join('');
+}
+
+function selectCo(el, ticker){
+  selectedCompany = COMPANIES.find(c=>c.ticker===ticker);
+  document.querySelectorAll('.company-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('step1Btn').disabled = false;
+}
+
+function goStep2(){
+  if(!selectedCompany) return;
+  document.getElementById('step1').style.display='none';
+  document.getElementById('step2').style.display='block';
+  setPill(2);
+
+  const ctx = SECTOR_HURDLES[selectedCompany.sector] || SECTOR_HURDLES.default;
+  document.getElementById('ctx-heading').textContent = `Capital Budgeting: ${selectedCompany.sector} Sector Norms`;
+  document.getElementById('sector-context-npv').innerHTML = `
+    <h3>${selectedCompany.name} — Sector Hurdle Rates</h3>
+    <p>${ctx.note}</p>
+  `;
+  document.getElementById('npv-stats').innerHTML = `
+    <div class="stat-box"><div class="stat-val">${ctx.hurdle}</div><div class="stat-label">Typical IRR Hurdle</div></div>
+    <div class="stat-box"><div class="stat-val">${ctx.payback}</div><div class="stat-label">Typical Payback Period</div></div>
+    <div class="stat-box"><div class="stat-val">${selectedCompany.region==='India'?'INR':'USD'}</div><div class="stat-label">Reporting Currency</div></div>
+  `;
+
+  // Pre-fill hurdle rate
+  const hurdleMid = parseFloat(ctx.hurdle.split('–')[0]) + 1;
+  document.getElementById('hurdleRate').value = Math.round(hurdleMid);
+}
+
+function goStep3(){
+  document.getElementById('step2').style.display='none';
+  document.getElementById('step3').style.display='block';
+  setPill(3);
+  buildCFGrid();
+}
+
+function buildCFGrid(){
+  const grid = document.getElementById('cfGrid');
+  grid.innerHTML = '';
+  for(let i=1;i<=yearCount;i++){
+    const row = document.createElement('div');
+    row.className = 'cf-row';
+    row.innerHTML = `
+      <span class="cf-year-label">Year ${i}</span>
+      <input class="cf-input" type="number" id="cf_${i}" placeholder="e.g. ${Math.round(60+i*8)}" step="0.1">
+    `;
+    grid.appendChild(row);
+  }
+}
+
+function addYear(){
+  if(yearCount >= 20) return;
+  yearCount++;
+  buildCFGrid();
+  if(yearCount >= 20) document.getElementById('addYearBtn').style.display='none';
+}
+
+function goStep1(){
+  document.querySelectorAll('#step1,#step2,#step3,#step4').forEach(s=>s.style.display='none');
+  document.getElementById('step1').style.display='block';
+  document.getElementById('revealCard').style.display='none';
+  document.getElementById('loadingCard').style.display='block';
+  setPill(1);
+}
+
+function goStep2FromBack(){
+  document.getElementById('step3').style.display='none';
+  document.getElementById('step2').style.display='block';
+  setPill(2);
+}
+
+function setPill(n){
+  for(let i=1;i<=4;i++){
+    const p = document.getElementById('pill-'+i);
+    p.classList.remove('active','done');
+    if(i<n) p.classList.add('done');
+    if(i===n) p.classList.add('active');
+  }
+}
+
+// IRR calculation via bisection method
+function calcIRR(flows){
+  let lo=-0.999, hi=10, mid=0;
+  for(let iter=0;iter<1000;iter++){
+    mid=(lo+hi)/2;
+    const npv = calcNPV(flows, mid);
+    if(Math.abs(npv)<0.0001) return mid;
+    if(npv>0) lo=mid; else hi=mid;
+    if(hi-lo<0.00001) break;
+  }
+  return mid;
+}
+
+function calcNPV(flows, rate){
+  return flows.reduce((sum,cf,t)=>sum+cf/Math.pow(1+rate,t),0);
+}
+
+function runAnalysis(){
+  const investment = parseFloat(document.getElementById('initialInvestment').value);
+  const hurdle = parseFloat(document.getElementById('hurdleRate').value)/100;
+  const terminal = parseFloat(document.getElementById('terminalValue').value)||0;
+  if(!investment || investment<=0){ alert('Enter the initial investment amount.'); return; }
+
+  const flows = [-investment];
+  for(let i=1;i<=yearCount;i++){
+    const val = parseFloat(document.getElementById('cf_'+i).value)||0;
+    flows.push(val);
+  }
+  // Add terminal value to last year
+  flows[flows.length-1] += terminal;
+
+  // Check we have at least 1 positive inflow
+  const positiveFlows = flows.slice(1).filter(f=>f>0);
+  if(positiveFlows.length===0){ alert('Enter at least one positive cash inflow.'); return; }
+
+  document.getElementById('step3').style.display='none';
+  document.getElementById('step4').style.display='block';
+  document.getElementById('loadingCard').style.display='block';
+  document.getElementById('revealCard').style.display='none';
+  setPill(4);
+
+  const steps=['Mapping cash flow timeline...','Solving for IRR...','Discounting at hurdle rate...','Calculating payback period...','Running NPV sensitivity...','Verdict ready.'];
+  const delays=[600,900,700,600,900,300];
+  const stepsEl=document.getElementById('loadingSteps');
+  stepsEl.innerHTML=steps.map((s,i)=>`<div class="loading-step" id="ls${i}">${s}</div>`).join('');
+  let elapsed=0;
+  delays.forEach((d,i)=>{
+    elapsed+=d;
+    setTimeout(()=>{
+      document.querySelectorAll('.loading-step').forEach(el=>el.classList.remove('active'));
+      document.getElementById('ls'+i).classList.add('active');
+      if(i===steps.length-1){
+        setTimeout(()=>{
+          document.getElementById('loadingCard').style.display='none';
+          document.getElementById('revealCard').style.display='block';
+          renderReveal(flows,hurdle,investment,terminal);
+        },400);
+      }
+    },elapsed);
+  });
+}
+
+function renderReveal(flows, hurdle, investment, terminal){
+  const irr = calcIRR(flows);
+  const npv = calcNPV(flows, hurdle);
+  const hurdlePct = hurdle*100;
+
+  // Payback period
+  let cumulative=0, payback=-1;
+  for(let i=1;i<flows.length;i++){
+    cumulative+=flows[i];
+    if(cumulative>=investment && payback<0){
+      // interpolate
+      const prev=cumulative-flows[i];
+      const fraction=(investment-prev)/flows[i];
+      payback=(i-1)+fraction;
+    }
+  }
+
+  const irrPct=irr*100;
+  const margin=irrPct-hurdlePct;
+  const fmtCr=v=>{const abs=Math.abs(v);const s=v<0?'-':'';if(abs>=100)return s+'₹'+abs.toFixed(0)+' Cr';return s+'₹'+(abs*100).toFixed(0)+' L';};
+
+  // Verdict
+  let verdictClass, verdictLabel, verdictText, verdictSub;
+  if(irrPct>hurdlePct+5){
+    verdictClass='verdict-go'; verdictLabel='DECISION: GO';
+    verdictText='✅ Invest — IRR comfortably clears the hurdle';
+    verdictSub=`IRR of ${irrPct.toFixed(1)}% is ${margin.toFixed(1)}% above your ${hurdlePct.toFixed(1)}% hurdle. NPV is positive — the project creates value.`;
+  } else if(irrPct>hurdlePct){
+    verdictClass='verdict-borderline'; verdictLabel='DECISION: PROCEED WITH CAUTION';
+    verdictText='⚠️ Marginal — IRR barely clears the hurdle';
+    verdictSub=`IRR of ${irrPct.toFixed(1)}% clears your ${hurdlePct.toFixed(1)}% hurdle by only ${margin.toFixed(1)}%. Any downside in cash flows could flip this negative.`;
+  } else {
+    verdictClass='verdict-nogo'; verdictLabel='DECISION: NO-GO';
+    verdictText='❌ Pass — IRR falls below the hurdle rate';
+    verdictSub=`IRR of ${irrPct.toFixed(1)}% is ${Math.abs(margin).toFixed(1)}% below your ${hurdlePct.toFixed(1)}% hurdle. NPV is negative — the project destroys value at your cost of capital.`;
+  }
+
+  document.getElementById('verdictBox').innerHTML=`
+    <div class="verdict-box ${verdictClass}" style="margin-bottom:20px">
+      <div class="verdict-label" style="color:${irrPct>hurdlePct?'var(--green)':'var(--red)'}">${verdictLabel}</div>
+      <div class="verdict-text">${verdictText}</div>
+      <div class="verdict-sub">${verdictSub}</div>
+    </div>
+  `;
+
+  document.getElementById('keyMetrics').innerHTML=`
+    <div class="result-box">
+      <div class="result-val" style="color:${irrPct>hurdlePct?'var(--green)':'var(--red)'}">${irrPct.toFixed(1)}%</div>
+      <div class="result-label">IRR</div>
+    </div>
+    <div class="result-box">
+      <div class="result-val" style="color:${npv>=0?'var(--green)':'var(--red)'}">${fmtCr(npv)}</div>
+      <div class="result-label">NPV @ ${hurdlePct.toFixed(0)}%</div>
+    </div>
+    <div class="result-box">
+      <div class="result-val">${payback>0?payback.toFixed(1)+' yr':'N/A'}</div>
+      <div class="result-label">Payback Period</div>
+    </div>
+  `;
+
+  // CF Table
+  let cumCf=0;
+  let tableRows=`<thead><tr><th>Year</th><th>Cash Flow (₹Cr)</th><th>Cumulative (₹Cr)</th><th>PV @ ${hurdlePct.toFixed(0)}%</th></tr></thead><tbody>`;
+  flows.forEach((cf,t)=>{
+    cumCf+=cf;
+    const pv=cf/Math.pow(1+hurdle,t);
+    const rowClass=t===0?'cf-initial':cf>=0?'cf-positive':'cf-negative';
+    tableRows+=`<tr class="${rowClass}"><td>${t===0?'0 (Investment)':'Year '+t}</td><td>${fmtCr(cf)}</td><td>${fmtCr(cumCf)}</td><td>${fmtCr(pv)}</td></tr>`;
+  });
+  tableRows+='</tbody>';
+  document.getElementById('cfTable').innerHTML=tableRows;
+
+  // Sensitivity Chart
+  const rates=[hurdle*0.5,hurdle*0.75,hurdle,hurdle*1.25,hurdle*1.5,hurdle*2].map(r=>({r,npv:calcNPV(flows,r)}));
+  const maxAbsNPV=Math.max(...rates.map(x=>Math.abs(x.npv)));
+  document.getElementById('npvSensitivity').innerHTML=rates.map(x=>{
+    const pct=Math.min(Math.abs(x.npv)/maxAbsNPV*80,80);
+    const color=x.npv>=0?'var(--green)':'var(--red)';
+    return `<div class="bar-row">
+      <span class="bar-label">${(x.r*100).toFixed(0)}%</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color}">${fmtCr(x.npv)}</div></div>
+      <span class="bar-val" style="color:${color}">${(x.npv>=0?'+':'')}${fmtCr(x.npv)}</span>
+    </div>`;
+  }).join('');
+
+  const insightMap={
+    Technology:['Tech investments with IRR above 20% clear most corporate hurdles. Below 15%, rethink the cost structure or scale assumptions.','Software capex often generates higher IRR than hardware — check whether your cost model separates capex from opex correctly.'],
+    Banking:['Bank capital investments are measured against ROE hurdle, not just IRR. A 15% IRR project is attractive only if it doesn\'t dilute regulatory capital ratios.','Core banking transformation investments often have negative IRR in years 1-3 — the terminal value assumption is critical.'],
+    Infrastructure:['Infrastructure projects with 10-12% IRR are acceptable if backed by government contracts or regulated returns. Unregulated infra needs 14%+.','Factor in construction risk: most Indian infra projects overrun costs by 15-30%, which compresses actual IRR vs modeled IRR.'],
+    default:['Projects in the 15-20% IRR range clear most Indian corporate hurdle rates, which average 14-18% across sectors.','Sensitivity is key: a 10% revenue miss in Year 1-2 typically reduces IRR by 2-4 percentage points. Model the downside before approving.']
+  };
+  const sectorInsights=insightMap[selectedCompany?.sector]||insightMap.default;
+  document.getElementById('insight').textContent='💡 '+sectorInsights[Math.floor(Math.random()*sectorInsights.length)];
+}
+
+function saveToVault(){
+  const investment=document.getElementById('initialInvestment').value;
+  const hurdle=document.getElementById('hurdleRate').value;
+  const vault=JSON.parse(localStorage.getItem('vd_vault')||'[]');
+  vault.push({
+    id:Date.now(),type:'IRR/NPV Analysis',
+    company:selectedCompany?.name||'N/A',ticker:selectedCompany?.ticker||'N/A',
+    sector:selectedCompany?.sector||'N/A',date:new Date().toLocaleDateString('en-IN'),
+    domain:'Corporate Finance',summary:`IRR/NPV analysis — ₹${investment} Cr investment at ${hurdle}% hurdle`
+  });
+  localStorage.setItem('vd_vault',JSON.stringify(vault));
+  alert('Saved to Vault ✓');
+}
+
+renderCompanies();
+
+// Initialize CF grid
+document.addEventListener('DOMContentLoaded',()=>{
+  buildCFGrid();
+});
+setTimeout(buildCFGrid,100);
+</script>
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DuPont ROE Decomposition · Corporate Finance · ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
+a{color:inherit;text-decoration:none}
+.top-nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between}
+.nav-left{display:flex;align-items:center;gap:12px}
+.nav-logo{font-weight:800;font-size:16px;letter-spacing:-0.5px}
+.nav-sep{color:var(--border);font-size:18px}
+.nav-domain{font-size:13px;color:var(--muted);font-weight:500}
+.nav-right{display:flex;align-items:center;gap:8px}
+.nav-btn{padding:6px 14px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif}
+.nav-btn-ghost{background:none;color:var(--muted)}
+.nav-btn-ghost:hover{color:var(--text)}
+.nav-btn-pro{background:var(--text);color:#fff}
+.domain-nav{background:var(--card);border-bottom:1px solid var(--border);padding:0 20px;display:flex;gap:0;overflow-x:auto}
+.domain-nav a{padding:10px 16px;font-size:13px;font-weight:500;color:var(--muted);white-space:nowrap;border-bottom:2px solid transparent}
+.domain-nav a:hover{color:var(--text)}
+.domain-nav a.active{color:var(--text);border-bottom-color:var(--text);font-weight:600}
+.page-wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.calc-header{margin-bottom:28px}
+.calc-header h1{font-size:26px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px}
+.calc-header p{color:var(--muted);font-size:14px}
+.step{margin-bottom:32px}
+.step-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:10px}
+.step-title{font-size:19px;font-weight:700;margin-bottom:16px}
+.search-wrap{position:relative;margin-bottom:14px}
+.search-wrap input{width:100%;padding:12px 16px 12px 40px;border:1px solid var(--border);border-radius:10px;font-size:15px;font-family:'Inter',sans-serif;outline:none;transition:border-color 0.15s}
+.search-wrap input:focus{border-color:#999}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px}
+.filter-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.pill{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:#fff;color:var(--muted);transition:all 0.15s}
+.pill.active{background:var(--text);color:#fff;border-color:var(--text)}
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.co-card{border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all 0.15s;background:#fff}
+.co-card:hover{border-color:#999;background:var(--card)}
+.co-card.selected{border-color:var(--text);background:#f0f0f0}
+.co-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.co-meta{font-size:11px;color:var(--muted)}
+.btn-primary{padding:13px 28px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:opacity 0.15s}
+.btn-primary:hover{opacity:0.85}
+.btn-primary:disabled{opacity:0.4;cursor:not-allowed}
+.context-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:24px}
+.context-card h3{font-size:16px;font-weight:700;margin-bottom:12px}
+.context-body{font-size:14px;color:#374151;line-height:1.7;margin-bottom:16px}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.stat-box{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px}
+.stat-val{font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;margin-bottom:3px}
+.stat-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.3px}
+.insight-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px 16px;font-size:13px;color:#1d4ed8;line-height:1.6}
+.insight-box strong{font-weight:700}
+.formula-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px}
+.formula-cell{background:#fff;padding:16px;text-align:center}
+.formula-cell:nth-child(2){background:#f9fafb}
+.formula-name{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;color:var(--muted);margin-bottom:6px}
+.formula-val{font-size:15px;font-weight:700;font-family:'JetBrains Mono',monospace}
+.formula-op{display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:300;color:var(--muted);background:#fff;padding:16px 4px}
+.sector-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
+.sector-table th{text-align:left;padding:8px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;color:var(--muted);border-bottom:1px solid var(--border)}
+.sector-table td{padding:8px 12px;border-bottom:1px solid var(--border)}
+.sector-table tr:last-child td{border-bottom:none}
+.sector-table tr.highlight{background:#f9fafb}
+.pro-gate{border:2px dashed var(--border);border-radius:14px;padding:40px;text-align:center}
+.pro-gate-icon{font-size:32px;margin-bottom:12px}
+.pro-gate-title{font-size:20px;font-weight:800;margin-bottom:8px}
+.pro-gate-desc{font-size:14px;color:var(--muted);margin-bottom:20px;max-width:400px;margin-left:auto;margin-right:auto}
+.pro-gate-features{list-style:none;margin-bottom:24px;display:inline-block;text-align:left}
+.pro-gate-features li{font-size:14px;padding:5px 0;color:#374151;font-weight:500}
+.pro-gate-btn{padding:14px 32px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:10px}
+.pro-gate-note{font-size:12px;color:var(--muted)}
+.selected-co-bar{background:#f9fafb;border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;font-size:14px}
+.selected-co-bar strong{font-weight:700}
+.change-link{color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline}
+@media(max-width:600px){.stat-row,.formula-row{grid-template-columns:1fr}.company-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <div class="nav-left">
+    <span class="nav-logo">ValuationDesk</span>
+    <span class="nav-sep">/</span>
+    <span class="nav-domain">Corporate Finance</span>
+  </div>
+  <div class="nav-right">
+    <button class="nav-btn nav-btn-ghost" onclick="window.location.href='index.html'">← Calculators</button>
+    <button class="nav-btn nav-btn-pro">Unlock Pro ₹799</button>
+  </div>
+</nav>
+<div class="domain-nav">
+  <a href="../index.html">Overview</a>
+  <a href="../learn/index.html">Learn</a>
+  <a href="index.html" class="active">Calculators</a>
+  <a href="#">My Vault</a>
+</div>
+<div class="page-wrap">
+  <div class="calc-header">
+    <h1>🔬 DuPont ROE Decomposition</h1>
+    <p>3-factor and 5-factor DuPont analysis — identify which lever is driving or dragging returns.</p>
+  </div>
+
+  <div id="step1" class="step">
+    <div class="step-label">Step 1 of 4</div>
+    <div class="step-title">Pick a company to analyze</div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search by name or ticker…" oninput="filterCompanies()">
+    </div>
+    <div class="filter-pills">
+      <span class="pill active" onclick="setFilter('all',this)">All</span>
+      <span class="pill" onclick="setFilter('Technology',this)">Technology</span>
+      <span class="pill" onclick="setFilter('Banking',this)">Banking</span>
+      <span class="pill" onclick="setFilter('FMCG',this)">FMCG</span>
+      <span class="pill" onclick="setFilter('Auto',this)">Auto</span>
+      <span class="pill" onclick="setFilter('Pharma',this)">Pharma</span>
+      <span class="pill" onclick="setFilter('Energy',this)">Energy</span>
+    </div>
+    <div class="company-grid" id="companyGrid"></div>
+    <br>
+    <button class="btn-primary" id="step1Btn" onclick="goStep2()" disabled>Continue →</button>
+  </div>
+
+  <div id="step2" class="step" style="display:none">
+    <div class="step-label">Step 2 of 4 · Free</div>
+    <div class="selected-co-bar"><span><strong id="ctx-name"></strong> · <span id="ctx-sector"></span></span><span class="change-link" onclick="resetToStep1()">Change company</span></div>
+    <div class="context-card">
+      <h3>DuPont: Breaking ROE Into Its Drivers</h3>
+      <p class="context-body">Two companies can have the same 20% ROE through completely different paths. One might have a 20% net margin with low asset turnover (FMCG). Another might have a 3% margin with massive asset turnover (retail). The DuPont framework forces you to understand which lever is creating returns — and whether it's sustainable.</p>
+      <div class="formula-row">
+        <div class="formula-cell"><div class="formula-name">Net Margin</div><div class="formula-val">Net Income ÷ Revenue</div></div>
+        <div class="formula-op">×</div>
+        <div class="formula-cell"><div class="formula-name">Asset Turnover</div><div class="formula-val">Revenue ÷ Assets</div></div>
+        <div class="formula-op">×</div>
+        <div class="formula-cell"><div class="formula-name">Equity Multiplier</div><div class="formula-val">Assets ÷ Equity</div></div>
+      </div>
+      <div class="stat-row" id="sectorStats"></div>
+      <div class="insight-box" id="sectorInsight"></div>
+      <br>
+      <h3 style="margin-bottom:10px">DuPont Profiles by Sector</h3>
+      <table class="sector-table">
+        <thead><tr><th>Sector</th><th>Net Margin</th><th>Asset Turnover</th><th>Leverage</th><th>ROE Range</th></tr></thead>
+        <tbody>
+          <tr class="highlight"><td>IT Services</td><td>18–26%</td><td>0.8–1.2×</td><td>1.1–1.3×</td><td>25–40%</td></tr>
+          <tr><td>FMCG</td><td>12–20%</td><td>1.5–2.5×</td><td>1.2–1.8×</td><td>30–60%</td></tr>
+          <tr class="highlight"><td>Banking</td><td>15–25%</td><td>0.07–0.10×</td><td>8–12×</td><td>12–18%</td></tr>
+          <tr><td>Auto OEMs</td><td>3–8%</td><td>1.5–2.5×</td><td>1.5–2.5×</td><td>12–25%</td></tr>
+          <tr class="highlight"><td>Pharma</td><td>14–22%</td><td>0.5–0.8×</td><td>1.2–1.5×</td><td>10–20%</td></tr>
+          <tr><td>Infrastructure / EPC</td><td>4–8%</td><td>0.5–0.8×</td><td>3–5×</td><td>12–20%</td></tr>
+          <tr class="highlight"><td>Energy / Refining</td><td>4–10%</td><td>1.0–1.5×</td><td>1.5–2.5×</td><td>10–18%</td></tr>
+          <tr><td>Consumer Disc.</td><td>8–15%</td><td>1.0–1.5×</td><td>1.3–2.0×</td><td>12–25%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <button class="btn-primary" onclick="goStep3()">Run DuPont Decomposition →</button>
+  </div>
+
+  <div id="step3" class="step" style="display:none">
+    <div class="step-label">Step 3 of 4 · Pro</div>
+    <div class="selected-co-bar"><span><strong id="ctx-name3"></strong> · <span id="ctx-sector3"></span></span><span class="change-link" onclick="resetToStep1()">Change company</span></div>
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <div class="pro-gate-title">Pro Feature</div>
+      <p class="pro-gate-desc">Enter financials and decompose ROE into its three (or five) components</p>
+      <ul class="pro-gate-features">
+        <li>→ 3-factor DuPont: Margin × Turnover × Leverage</li>
+        <li>→ 5-factor DuPont: Tax × Interest × EBIT Margin × Turnover × Leverage</li>
+        <li>→ Factor contribution chart (which lever moves ROE most)</li>
+        <li>→ 3-year trend decomposition</li>
+        <li>→ Peer benchmark on each factor</li>
+        <li>→ "What if" ROE simulator</li>
+        <li>→ Export to Vault</li>
+      </ul>
+      <button class="pro-gate-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+      <div class="pro-gate-note">Monthly only · Cancel anytime · All 15 domains included</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const COMPANIES = [
+  {name:'Reliance Industries',ticker:'RIL',sector:'Energy',market:'NSE'},
+  {name:'TCS',ticker:'TCS',sector:'Technology',market:'NSE'},
+  {name:'HDFC Bank',ticker:'HDFCBANK',sector:'Banking',market:'NSE'},
+  {name:'Infosys',ticker:'INFY',sector:'Technology',market:'NSE'},
+  {name:'ICICI Bank',ticker:'ICICIBANK',sector:'Banking',market:'NSE'},
+  {name:'Hindustan Unilever',ticker:'HINDUNILVR',sector:'FMCG',market:'NSE'},
+  {name:'ITC',ticker:'ITC',sector:'FMCG',market:'NSE'},
+  {name:'Bajaj Finance',ticker:'BAJFINANCE',sector:'NBFC',market:'NSE'},
+  {name:'Bharti Airtel',ticker:'BHARTIARTL',sector:'Telecom',market:'NSE'},
+  {name:'Wipro',ticker:'WIPRO',sector:'Technology',market:'NSE'},
+  {name:'Asian Paints',ticker:'ASIANPAINT',sector:'Consumer',market:'NSE'},
+  {name:'Maruti Suzuki',ticker:'MARUTI',sector:'Auto',market:'NSE'},
+  {name:'Sun Pharma',ticker:'SUNPHARMA',sector:'Pharma',market:'NSE'},
+  {name:'Larsen & Toubro',ticker:'LT',sector:'Infrastructure',market:'NSE'},
+  {name:'Tata Motors',ticker:'TATAMOTORS',sector:'Auto',market:'NSE'},
+  {name:'Apple',ticker:'AAPL',sector:'Technology',market:'NASDAQ'},
+  {name:'Microsoft',ticker:'MSFT',sector:'Technology',market:'NASDAQ'},
+  {name:'Alphabet',ticker:'GOOGL',sector:'Technology',market:'NASDAQ'},
+  {name:'Amazon',ticker:'AMZN',sector:'Technology',market:'NASDAQ'},
+  {name:'Meta Platforms',ticker:'META',sector:'Technology',market:'NASDAQ'},
+  {name:'JPMorgan Chase',ticker:'JPM',sector:'Banking',market:'NYSE'},
+  {name:'Johnson & Johnson',ticker:'JNJ',sector:'Pharma',market:'NYSE'},
+  {name:'Procter & Gamble',ticker:'PG',sector:'FMCG',market:'NYSE'},
+  {name:'Berkshire Hathaway',ticker:'BRK.B',sector:'Conglomerate',market:'NYSE'},
+  {name:'ExxonMobil',ticker:'XOM',sector:'Energy',market:'NYSE'},
+  {name:'Tesla',ticker:'TSLA',sector:'Auto',market:'NASDAQ'},
+  {name:'LVMH',ticker:'MC',sector:'Consumer',market:'EPA'},
+  {name:'Toyota',ticker:'TM',sector:'Auto',market:'NYSE'},
+  {name:'Samsung',ticker:'005930',sector:'Technology',market:'KRX'},
+  {name:'Nestlé',ticker:'NESN',sector:'FMCG',market:'SIX'},
+];
+
+const SECTOR_CONTEXT = {
+  Technology:{margin:'18–26%',turnover:'0.8–1.2×',leverage:'1.1–1.3×',insight:'TCS and Infosys achieve 30–40% ROE almost entirely through margin — not through leverage or asset intensity. This is the highest-quality ROE profile because it doesn\'t require debt. Their asset turnover is moderate (revenue ~ assets) because cash and receivables are large. The DuPont signature of great IT companies: fat margin, moderate turnover, minimal leverage.'},
+  Banking:{margin:'15–25%',turnover:'0.07–0.10×',leverage:'8–12×',insight:'HDFC Bank\'s 16–18% ROE with massive leverage (10×+) is fundamentally different from TCS\'s 40% ROE with almost no leverage. A bank\'s DuPont: thin margin on total assets × very low asset turnover × very high equity multiplier. The leverage IS the business. That\'s why the 5-factor DuPont (which separates interest burden from EBIT margin) is more useful for banks.'},
+  NBFC:{margin:'20–30%',turnover:'0.15–0.25×',leverage:'4–6×',insight:'Bajaj Finance\'s DuPont: ~25% net margin × ~0.2× asset turnover × ~5× leverage = ~25% ROE. As leverage increases (lending more with borrowed funds), ROE improves — but so does risk. The 5-factor DuPont reveals that Bajaj\'s interest burden (NII/EBIT) is the critical swing factor.'},
+  FMCG:{margin:'12–20%',turnover:'1.5–2.5×',leverage:'1.2–1.8×',insight:'HUL\'s 50–60% ROE is driven by massive negative working capital creating huge effective asset turnover combined with strong margins. The equity multiplier is low (1.3×) — this is genuine high-quality ROE, not leverage-enhanced. Nestlé India similarly. P&G globally runs 50%+ ROE through the same playbook.'},
+  Auto:{margin:'3–8%',turnover:'1.5–2.5×',leverage:'1.5–2.5×',insight:'Maruti Suzuki\'s 18–22% ROE on thin margins (5–7%) is entirely driven by asset turnover (2×+). It sweats its plants hard — every rupee of assets generates ₹2 of revenue. When margins compress (input cost spikes), ROE drops fast. That\'s the fragility in auto DuPont profiles.'},
+  Pharma:{margin:'14–22%',turnover:'0.5–0.8×',leverage:'1.2–1.5×',insight:'Sun Pharma\'s DuPont shows the pharma paradox: high margins but low asset turnover (manufacturing plants + R&D capitalize slowly). The 5-factor DuPont is revealing for pharma — the tax burden factor shows how Section 80IC benefits for manufacturing plants in Baddi/Sikkim inflate reported net margins.'},
+  Infrastructure:{margin:'4–8%',turnover:'0.5–0.8×',leverage:'3–5×',insight:'L&T\'s 12–18% ROE comes primarily from leverage on low-margin, asset-heavy EPC work. As infrastructure projects get delayed (higher WIP), asset turnover drops and ROE suffers. The DuPont makes the leverage concentration visible — it\'s not a margin business.'},
+  Energy:{margin:'4–10%',turnover:'1.0–1.5×',leverage:'1.5–2.5×',insight:'Reliance\'s post-Jio DuPont has changed dramatically. What was once a refining-dominated profile (high asset turnover, thin margin, moderate leverage) is now a conglomerate profile where telecom\'s customer base drives very high revenue per rupee of Jio assets. RIL\'s aggregate DuPont blends oil/chemicals with retail and telecom — segment analysis is essential.'},
+  Consumer:{margin:'8–15%',turnover:'1.0–1.5×',leverage:'1.3–2.0×',insight:'Asian Paints\' DuPont is one of the cleanest in India: ~12% margin × 1.4× asset turnover × 1.4× leverage = ~24% ROE. Every factor is genuinely earning its keep — not too much of any one. LVMH compounds at 20%+ ROE through brand pricing power (margin) and efficient global distribution (turnover).'},
+  Conglomerate:{margin:'Varies',turnover:'Varies',leverage:'Varies',insight:'Berkshire Hathaway\'s DuPont is meaningless as a single number — it blends Geico, BNSF Railway, Apple stake, and manufacturing businesses. The 5-factor DuPont falls apart for conglomerates. Segment ROE is the only useful metric.'},
+  Telecom:{margin:'5–15%',turnover:'0.3–0.5×',leverage:'3–5×',insight:'Airtel\'s improving DuPont tells the Jio disruption story: EBITDA margins recovered to 50%+ but net margins are still suppressed by depreciation on massive capex (spectrum + towers). Asset turnover is low because the asset base is enormous. The ROE recovery story is all about whether margins can outrun depreciation.'},
+  default:{margin:'8–15%',turnover:'0.8–1.2×',leverage:'1.5–2.5×',insight:'The DuPont framework\'s power is that it stops the "but their ROE is high" argument cold. High ROE from leverage is very different from high ROE from margin or turnover — one means risk, the other means competitive advantage.'}
+};
+
+let selectedCo=null,activeFilter='all';
+
+function renderGrid(list){
+  document.getElementById('companyGrid').innerHTML=list.map(co=>`
+    <div class="co-card${selectedCo&&selectedCo.ticker===co.ticker?' selected':''}" onclick="selectCo('${co.ticker}')">
+      <div class="co-name">${co.name}</div>
+      <div class="co-meta">${co.ticker} · ${co.sector} · ${co.market}</div>
+    </div>`).join('');
+}
+
+function filterCompanies(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  renderGrid(COMPANIES.filter(c=>(activeFilter==='all'||c.sector===activeFilter)&&(c.name.toLowerCase().includes(q)||c.ticker.toLowerCase().includes(q))));
+}
+
+function setFilter(f,el){
+  activeFilter=f;
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  filterCompanies();
+}
+
+function selectCo(ticker){
+  selectedCo=COMPANIES.find(c=>c.ticker===ticker);
+  filterCompanies();
+  document.getElementById('step1Btn').disabled=false;
+}
+
+function goStep2(){
+  if(!selectedCo)return;
+  const ctx=SECTOR_CONTEXT[selectedCo.sector]||SECTOR_CONTEXT.default;
+  document.getElementById('ctx-name').textContent=selectedCo.name;
+  document.getElementById('ctx-sector').textContent=selectedCo.sector;
+  document.getElementById('sectorStats').innerHTML=`
+    <div class="stat-box"><div class="stat-val">${ctx.margin}</div><div class="stat-label">Net Margin</div></div>
+    <div class="stat-box"><div class="stat-val">${ctx.turnover}</div><div class="stat-label">Asset Turnover</div></div>
+    <div class="stat-box"><div class="stat-val">${ctx.leverage}</div><div class="stat-label">Equity Multiplier</div></div>`;
+  document.getElementById('sectorInsight').innerHTML=`<strong>${selectedCo.sector} DuPont Profile:</strong> ${ctx.insight}`;
+  document.getElementById('step1').style.display='none';
+  document.getElementById('step2').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goStep3(){
+  document.getElementById('ctx-name3').textContent=selectedCo.name;
+  document.getElementById('ctx-sector3').textContent=selectedCo.sector;
+  document.getElementById('step2').style.display='none';
+  document.getElementById('step3').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function resetToStep1(){
+  document.getElementById('step1').style.display='block';
+  document.getElementById('step2').style.display='none';
+  document.getElementById('step3').style.display='none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+
+renderGrid(COMPANIES);
+</script>
+</body>
+</html>

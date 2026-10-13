@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operating Leverage Calculator · Corporate Finance · ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
+a{color:inherit;text-decoration:none}
+.top-nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between}
+.nav-left{display:flex;align-items:center;gap:12px}
+.nav-logo{font-weight:800;font-size:16px;letter-spacing:-0.5px}
+.nav-sep{color:var(--border);font-size:18px}
+.nav-domain{font-size:13px;color:var(--muted);font-weight:500}
+.nav-right{display:flex;align-items:center;gap:8px}
+.nav-btn{padding:6px 14px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif}
+.nav-btn-ghost{background:none;color:var(--muted)}
+.nav-btn-ghost:hover{color:var(--text)}
+.nav-btn-pro{background:var(--text);color:#fff}
+.domain-nav{background:var(--card);border-bottom:1px solid var(--border);padding:0 20px;display:flex;gap:0;overflow-x:auto}
+.domain-nav a{padding:10px 16px;font-size:13px;font-weight:500;color:var(--muted);white-space:nowrap;border-bottom:2px solid transparent}
+.domain-nav a:hover{color:var(--text)}
+.domain-nav a.active{color:var(--text);border-bottom-color:var(--text);font-weight:600}
+.page-wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.calc-header{margin-bottom:28px}
+.calc-header h1{font-size:26px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px}
+.calc-header p{color:var(--muted);font-size:14px}
+.step{margin-bottom:32px}
+.step-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:10px}
+.step-title{font-size:19px;font-weight:700;margin-bottom:16px}
+.search-wrap{position:relative;margin-bottom:14px}
+.search-wrap input{width:100%;padding:12px 16px 12px 40px;border:1px solid var(--border);border-radius:10px;font-size:15px;font-family:'Inter',sans-serif;outline:none;transition:border-color 0.15s}
+.search-wrap input:focus{border-color:#999}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px}
+.filter-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.pill{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:#fff;color:var(--muted);transition:all 0.15s}
+.pill.active{background:var(--text);color:#fff;border-color:var(--text)}
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.co-card{border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all 0.15s;background:#fff}
+.co-card:hover{border-color:#999;background:var(--card)}
+.co-card.selected{border-color:var(--text);background:#f0f0f0}
+.co-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.co-meta{font-size:11px;color:var(--muted)}
+.btn-primary{padding:13px 28px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:opacity 0.15s}
+.btn-primary:hover{opacity:0.85}
+.btn-primary:disabled{opacity:0.4;cursor:not-allowed}
+.context-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:24px}
+.context-card h3{font-size:16px;font-weight:700;margin-bottom:12px}
+.context-body{font-size:14px;color:#374151;line-height:1.7;margin-bottom:16px}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.stat-box{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px}
+.stat-val{font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;margin-bottom:3px}
+.stat-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.3px}
+.insight-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px 16px;font-size:13px;color:#1d4ed8;line-height:1.6}
+.insight-box strong{font-weight:700}
+.formula-box{background:#f9fafb;border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:16px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.8}
+.dol-scale{display:flex;gap:0;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin:16px 0}
+.dol-band{flex:1;padding:12px;text-align:center}
+.dol-band:nth-child(1){background:#f0fdf4}
+.dol-band:nth-child(2){background:#fef9c3}
+.dol-band:nth-child(3){background:#fff7ed}
+.dol-band:nth-child(4){background:#fef2f2}
+.dol-band-val{font-size:14px;font-weight:800;font-family:'JetBrains Mono',monospace}
+.dol-band-label{font-size:11px;color:var(--muted);margin-top:3px}
+.sector-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
+.sector-table th{text-align:left;padding:8px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;color:var(--muted);border-bottom:1px solid var(--border)}
+.sector-table td{padding:8px 12px;border-bottom:1px solid var(--border)}
+.sector-table tr:last-child td{border-bottom:none}
+.sector-table tr.highlight{background:#f9fafb}
+.pro-gate{border:2px dashed var(--border);border-radius:14px;padding:40px;text-align:center}
+.pro-gate-icon{font-size:32px;margin-bottom:12px}
+.pro-gate-title{font-size:20px;font-weight:800;margin-bottom:8px}
+.pro-gate-desc{font-size:14px;color:var(--muted);margin-bottom:20px;max-width:400px;margin-left:auto;margin-right:auto}
+.pro-gate-features{list-style:none;margin-bottom:24px;display:inline-block;text-align:left}
+.pro-gate-features li{font-size:14px;padding:5px 0;color:#374151;font-weight:500}
+.pro-gate-btn{padding:14px 32px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:10px}
+.pro-gate-note{font-size:12px;color:var(--muted)}
+.selected-co-bar{background:#f9fafb;border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;font-size:14px}
+.selected-co-bar strong{font-weight:700}
+.change-link{color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline}
+@media(max-width:600px){.stat-row,.dol-scale{flex-direction:column}.company-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <div class="nav-left">
+    <span class="nav-logo">ValuationDesk</span>
+    <span class="nav-sep">/</span>
+    <span class="nav-domain">Corporate Finance</span>
+  </div>
+  <div class="nav-right">
+    <button class="nav-btn nav-btn-ghost" onclick="window.location.href='index.html'">← Calculators</button>
+    <button class="nav-btn nav-btn-pro">Unlock Pro ₹799</button>
+  </div>
+</nav>
+<div class="domain-nav">
+  <a href="../index.html">Overview</a>
+  <a href="../learn/index.html">Learn</a>
+  <a href="index.html" class="active">Calculators</a>
+  <a href="#">My Vault</a>
+</div>
+<div class="page-wrap">
+  <div class="calc-header">
+    <h1>📊 Operating Leverage Calculator</h1>
+    <p>Degree of Operating Leverage, combined leverage, and EPS sensitivity to revenue changes.</p>
+  </div>
+
+  <div id="step1" class="step">
+    <div class="step-label">Step 1 of 4</div>
+    <div class="step-title">Pick a company to analyze</div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search by name or ticker…" oninput="filterCompanies()">
+    </div>
+    <div class="filter-pills">
+      <span class="pill active" onclick="setFilter('all',this)">All</span>
+      <span class="pill" onclick="setFilter('Technology',this)">Technology</span>
+      <span class="pill" onclick="setFilter('Banking',this)">Banking</span>
+      <span class="pill" onclick="setFilter('FMCG',this)">FMCG</span>
+      <span class="pill" onclick="setFilter('Auto',this)">Auto</span>
+      <span class="pill" onclick="setFilter('Pharma',this)">Pharma</span>
+      <span class="pill" onclick="setFilter('Infrastructure',this)">Infrastructure</span>
+    </div>
+    <div class="company-grid" id="companyGrid"></div>
+    <br>
+    <button class="btn-primary" id="step1Btn" onclick="goStep2()" disabled>Continue →</button>
+  </div>
+
+  <div id="step2" class="step" style="display:none">
+    <div class="step-label">Step 2 of 4 · Free</div>
+    <div class="selected-co-bar"><span><strong id="ctx-name"></strong> · <span id="ctx-sector"></span></span><span class="change-link" onclick="resetToStep1()">Change company</span></div>
+    <div class="context-card">
+      <h3>Operating Leverage: The Double-Edged Sword</h3>
+      <p class="context-body">High fixed costs are a bet on volume. If revenue rises, profit rises disproportionately — operating leverage amplifies the upside. But if revenue falls, those fixed costs don't disappear, and the same leverage destroys earnings fast. The Degree of Operating Leverage (DOL) measures exactly this amplification.</p>
+      <div class="formula-box">
+        DOL = (Revenue − Variable Costs) ÷ EBIT  [= Contribution Margin ÷ EBIT]<br>
+        DFL = EBIT ÷ (EBIT − Interest)  [Degree of Financial Leverage]<br>
+        DTL = DOL × DFL  [Degree of Total/Combined Leverage]<br><br>
+        Interpretation: If DOL = 3×, a 10% revenue increase → ~30% EBIT increase
+      </div>
+      <div class="dol-scale">
+        <div class="dol-band"><div class="dol-band-val">1.0–1.5×</div><div class="dol-band-label">Low leverage</div></div>
+        <div class="dol-band"><div class="dol-band-val">1.5–2.5×</div><div class="dol-band-label">Moderate</div></div>
+        <div class="dol-band"><div class="dol-band-val">2.5–4.0×</div><div class="dol-band-label">High</div></div>
+        <div class="dol-band"><div class="dol-band-val">4.0×+</div><div class="dol-band-label">Very High</div></div>
+      </div>
+      <div class="stat-row" id="sectorStats"></div>
+      <div class="insight-box" id="sectorInsight"></div>
+      <br>
+      <h3 style="margin-bottom:10px">DOL by Sector</h3>
+      <table class="sector-table">
+        <thead><tr><th>Sector</th><th>Fixed Cost %</th><th>Typical DOL</th><th>Earnings Volatility</th></tr></thead>
+        <tbody>
+          <tr class="highlight"><td>Telecom</td><td>60–70%</td><td>3–6×</td><td>Very High</td></tr>
+          <tr><td>Airlines</td><td>55–65%</td><td>4–8×</td><td>Extreme</td></tr>
+          <tr class="highlight"><td>Infrastructure / Toll</td><td>50–60%</td><td>3–5×</td><td>High (but revenue stable)</td></tr>
+          <tr><td>Auto OEMs</td><td>40–55%</td><td>2.5–4×</td><td>High</td></tr>
+          <tr class="highlight"><td>Technology (SaaS)</td><td>35–50%</td><td>2–4×</td><td>Moderate-High</td></tr>
+          <tr><td>IT Services</td><td>25–35%</td><td>1.5–2.5×</td><td>Moderate</td></tr>
+          <tr class="highlight"><td>FMCG</td><td>20–35%</td><td>1.5–2.5×</td><td>Moderate</td></tr>
+          <tr><td>Pharma</td><td>25–40%</td><td>2–3×</td><td>Moderate</td></tr>
+          <tr class="highlight"><td>Retail / Distribution</td><td>15–25%</td><td>1.2–2×</td><td>Low</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <button class="btn-primary" onclick="goStep3()">Calculate Leverage Metrics →</button>
+  </div>
+
+  <div id="step3" class="step" style="display:none">
+    <div class="step-label">Step 3 of 4 · Pro</div>
+    <div class="selected-co-bar"><span><strong id="ctx-name3"></strong> · <span id="ctx-sector3"></span></span><span class="change-link" onclick="resetToStep1()">Change company</span></div>
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <div class="pro-gate-title">Pro Feature</div>
+      <p class="pro-gate-desc">Enter cost structure and see the full operating and financial leverage analysis</p>
+      <ul class="pro-gate-features">
+        <li>→ DOL, DFL, and DTL calculations</li>
+        <li>→ EPS sensitivity to revenue (±10%, ±20%, ±30%)</li>
+        <li>→ Fixed vs variable cost structure breakdown</li>
+        <li>→ Revenue sensitivity chart (EBIT at different volumes)</li>
+        <li>→ Breakeven comparison across cost structures</li>
+        <li>→ Peer leverage profile comparison</li>
+        <li>→ Export to Vault</li>
+      </ul>
+      <button class="pro-gate-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+      <div class="pro-gate-note">Monthly only · Cancel anytime · All 15 domains included</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const COMPANIES = [
+  {name:'Reliance Industries',ticker:'RIL',sector:'Energy',market:'NSE'},
+  {name:'TCS',ticker:'TCS',sector:'Technology',market:'NSE'},
+  {name:'HDFC Bank',ticker:'HDFCBANK',sector:'Banking',market:'NSE'},
+  {name:'Infosys',ticker:'INFY',sector:'Technology',market:'NSE'},
+  {name:'ICICI Bank',ticker:'ICICIBANK',sector:'Banking',market:'NSE'},
+  {name:'Hindustan Unilever',ticker:'HINDUNILVR',sector:'FMCG',market:'NSE'},
+  {name:'ITC',ticker:'ITC',sector:'FMCG',market:'NSE'},
+  {name:'Bajaj Finance',ticker:'BAJFINANCE',sector:'NBFC',market:'NSE'},
+  {name:'Bharti Airtel',ticker:'BHARTIARTL',sector:'Telecom',market:'NSE'},
+  {name:'Wipro',ticker:'WIPRO',sector:'Technology',market:'NSE'},
+  {name:'Asian Paints',ticker:'ASIANPAINT',sector:'Consumer',market:'NSE'},
+  {name:'Maruti Suzuki',ticker:'MARUTI',sector:'Auto',market:'NSE'},
+  {name:'Sun Pharma',ticker:'SUNPHARMA',sector:'Pharma',market:'NSE'},
+  {name:'Larsen & Toubro',ticker:'LT',sector:'Infrastructure',market:'NSE'},
+  {name:'Tata Motors',ticker:'TATAMOTORS',sector:'Auto',market:'NSE'},
+  {name:'Apple',ticker:'AAPL',sector:'Technology',market:'NASDAQ'},
+  {name:'Microsoft',ticker:'MSFT',sector:'Technology',market:'NASDAQ'},
+  {name:'Alphabet',ticker:'GOOGL',sector:'Technology',market:'NASDAQ'},
+  {name:'Amazon',ticker:'AMZN',sector:'Technology',market:'NASDAQ'},
+  {name:'Meta Platforms',ticker:'META',sector:'Technology',market:'NASDAQ'},
+  {name:'JPMorgan Chase',ticker:'JPM',sector:'Banking',market:'NYSE'},
+  {name:'Johnson & Johnson',ticker:'JNJ',sector:'Pharma',market:'NYSE'},
+  {name:'Procter & Gamble',ticker:'PG',sector:'FMCG',market:'NYSE'},
+  {name:'Berkshire Hathaway',ticker:'BRK.B',sector:'Conglomerate',market:'NYSE'},
+  {name:'ExxonMobil',ticker:'XOM',sector:'Energy',market:'NYSE'},
+  {name:'Tesla',ticker:'TSLA',sector:'Auto',market:'NASDAQ'},
+  {name:'LVMH',ticker:'MC',sector:'Consumer',market:'EPA'},
+  {name:'Toyota',ticker:'TM',sector:'Auto',market:'NYSE'},
+  {name:'Samsung',ticker:'005930',sector:'Technology',market:'KRX'},
+  {name:'Nestlé',ticker:'NESN',sector:'FMCG',market:'SIX'},
+];
+
+const SECTOR_CONTEXT = {
+  Technology:{fixedCost:'25–35%',dol:'1.5–2.5×',eps_vol:'Moderate',insight:'IT services companies like TCS and Infosys are often assumed to be highly leveraged — they\'re not. People costs are variable (you hire/fire with contracts). The real fixed costs are management, offices, and training infrastructure. A 10% revenue growth typically means 15–20% EBIT growth — moderate DOL.'},
+  Banking:{fixedCost:'Branch + staff overhead',dol:'N/A (NIM-based)',eps_vol:'Credit cycle driven',insight:'Operating leverage for banks is measured differently. Net Interest Income scales with balance sheet size (variable), but branch and technology costs are fixed. The key metric is Cost-to-Income ratio — HDFC Bank\'s 35–40% vs PSU bank 50%+ shows the efficiency gap.'},
+  NBFC:{fixedCost:'Operations & risk teams',dol:'Credit-cycle driven',eps_vol:'High — NPA sensitive',insight:'Bajaj Finance\'s operating leverage is primarily financial leverage (4-5× D/E) rather than operating leverage. The earnings volatility comes from NPA cycles — a 1% rise in GNPA with ₹3 lakh crore AUM = ₹3,000 crore additional credit cost, which impacts PAT by 50%+.'},
+  FMCG:{fixedCost:'20–35%',dol:'1.5–2.5×',eps_vol:'Moderate',insight:'HUL and ITC have moderate DOL — their manufacturing is mostly contracted out (third-party manufacturing) which shifts costs to variable. The real fixed cost is advertising (which they treat as operating expense). When input costs spike (palm oil, wheat), their variable cost ratio rises and DOL effectively drops.'},
+  Auto:{fixedCost:'40–55%',dol:'2.5–4×',eps_vol:'High',insight:'Maruti Suzuki\'s DOL is elevated because plant capacity costs are fixed but volume is volatile (COVID wiped out volume, fixed costs remained). When utilisation falls from 85% to 60%, EBIT margin can fall from 8% to 2%. Tesla\'s DOL has been extreme — every 10% volume increase drives 40%+ EBIT growth as fixed Giga-factory costs get spread.'},
+  Pharma:{fixedCost:'25–40%',dol:'2–3×',eps_vol:'Moderate',insight:'Pharma DOL is complicated by R&D capitalization/expensing policies. If R&D is expensed (as in India), it\'s a semi-fixed cost that makes DOL look higher. Sun Pharma\'s Specialty business has very high DOL — most costs are R&D and clinical trials, but once a drug is approved, incremental revenue has 70%+ contribution margins.'},
+  Infrastructure:{fixedCost:'50–60%',dol:'3–5×',eps_vol:'High',insight:'L&T\'s EPC business has high DOL — subcontractor and material costs are somewhat variable, but project management, engineering, and bid costs are fixed. Order book slippage (delayed projects) hits margins hard. Infrastructure companies with toll-road assets (NHAI-sponsored) have extreme DOL — if traffic falls 20%, PAT falls 60%+.'},
+  Energy:{fixedCost:'30–45%',dol:'2–3×',eps_vol:'Commodity-driven',insight:'Refiners like RIL have operating leverage tied to GRM (Gross Refining Margin) which is commodity-driven. The fixed cost base (plant O&M, depreciation) is large. When crude spreads narrow, the DOL amplifies the pain. RIL\'s diversification into telecom and retail was partly a strategy to reduce its aggregate operating leverage.'},
+  Consumer:{fixedCost:'25–35%',dol:'1.5–2.5×',eps_vol:'Brand-protected',insight:'Asian Paints has moderate DOL — distribution infrastructure and brand spending are semi-fixed, but raw materials (TiO2, resins) are variable. Luxury brands like LVMH have asymmetric DOL: fixed costs are high, but pricing power means revenue never falls as much as volume — the brand subsidizes margins.'},
+  Conglomerate:{fixedCost:'Varies',dol:'Blended',eps_vol:'Diversified',insight:'Conglomerates like Berkshire Hathaway benefit from natural diversification — a cyclical business\'s fixed cost headwinds are offset by another\'s tailwinds. The aggregate DOL is lower than any single business, which is one genuine (often underappreciated) benefit of conglomerate structures.'},
+  Telecom:{fixedCost:'60–70%',dol:'3–6×',eps_vol:'Very High',insight:'Telecom has extreme operating leverage — spectrum, tower costs, network maintenance, and corporate overheads are nearly entirely fixed. Airtel\'s EBITDA margin went from 36% (FY20) to 52% (FY25) almost entirely on subscriber revenue growth while fixed costs grew slowly. That\'s 3–4× DOL in action.'},
+  default:{fixedCost:'30–45%',dol:'2–3×',eps_vol:'Moderate-High',insight:'The fundamental insight of operating leverage: high fixed costs make you a riskier business when demand is uncertain, but a more profitable one when demand grows. The CFO\'s job is to match cost structure to demand predictability.'}
+};
+
+let selectedCo=null,activeFilter='all';
+
+function renderGrid(list){
+  document.getElementById('companyGrid').innerHTML=list.map(co=>`
+    <div class="co-card${selectedCo&&selectedCo.ticker===co.ticker?' selected':''}" onclick="selectCo('${co.ticker}')">
+      <div class="co-name">${co.name}</div>
+      <div class="co-meta">${co.ticker} · ${co.sector} · ${co.market}</div>
+    </div>`).join('');
+}
+
+function filterCompanies(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  renderGrid(COMPANIES.filter(c=>(activeFilter==='all'||c.sector===activeFilter)&&(c.name.toLowerCase().includes(q)||c.ticker.toLowerCase().includes(q))));
+}
+
+function setFilter(f,el){
+  activeFilter=f;
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  filterCompanies();
+}
+
+function selectCo(ticker){
+  selectedCo=COMPANIES.find(c=>c.ticker===ticker);
+  filterCompanies();
+  document.getElementById('step1Btn').disabled=false;
+}
+
+function goStep2(){
+  if(!selectedCo)return;
+  const ctx=SECTOR_CONTEXT[selectedCo.sector]||SECTOR_CONTEXT.default;
+  document.getElementById('ctx-name').textContent=selectedCo.name;
+  document.getElementById('ctx-sector').textContent=selectedCo.sector;
+  document.getElementById('sectorStats').innerHTML=`
+    <div class="stat-box"><div class="stat-val">${ctx.fixedCost}</div><div class="stat-label">Fixed Cost %</div></div>
+    <div class="stat-box"><div class="stat-val">${ctx.dol}</div><div class="stat-label">Typical DOL</div></div>
+    <div class="stat-box"><div class="stat-val">${ctx.eps_vol}</div><div class="stat-label">EPS Volatility</div></div>`;
+  document.getElementById('sectorInsight').innerHTML=`<strong>${selectedCo.sector} Operating Leverage:</strong> ${ctx.insight}`;
+  document.getElementById('step1').style.display='none';
+  document.getElementById('step2').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goStep3(){
+  document.getElementById('ctx-name3').textContent=selectedCo.name;
+  document.getElementById('ctx-sector3').textContent=selectedCo.sector;
+  document.getElementById('step2').style.display='none';
+  document.getElementById('step3').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function resetToStep1(){
+  document.getElementById('step1').style.display='block';
+  document.getElementById('step2').style.display='none';
+  document.getElementById('step3').style.display='none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+
+renderGrid(COMPANIES);
+</script>
+</body>
+</html>

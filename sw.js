@@ -1,8 +1,8 @@
-// ValuationDesk Service Worker v2.0
+// ValuationDesk Service Worker v3.0
 // Configured for GitHub Pages subfolder: /valuation-toolkit/
 
 const BASE = '/valuation-toolkit';
-const CACHE_NAME = 'valuationdesk-v2';
+const CACHE_NAME = 'valuationdesk-v3';
 
 const STATIC_ASSETS = [
   BASE + '/',
@@ -33,6 +33,17 @@ const STATIC_ASSETS = [
   BASE + '/domains/investment-banking/calculators/capital-raise.html',
   BASE + '/domains/investment-banking/calculators/fairness-opinion.html',
   BASE + '/domains/investment-banking/learn/index.html',
+  BASE + '/domains/corporate-finance/index.html',
+  BASE + '/domains/corporate-finance/calculators/index.html',
+  BASE + '/domains/corporate-finance/calculators/irr-npv.html',
+  BASE + '/domains/corporate-finance/calculators/capital-structure.html',
+  BASE + '/domains/corporate-finance/calculators/dividend-policy.html',
+  BASE + '/domains/corporate-finance/calculators/working-capital.html',
+  BASE + '/domains/corporate-finance/calculators/dupont.html',
+  BASE + '/domains/corporate-finance/calculators/operating-leverage.html',
+  BASE + '/domains/corporate-finance/calculators/breakeven-cvp.html',
+  BASE + '/domains/corporate-finance/calculators/roic-eva.html',
+  BASE + '/domains/corporate-finance/learn/index.html',
 ];
 
 // Install — cache all static assets

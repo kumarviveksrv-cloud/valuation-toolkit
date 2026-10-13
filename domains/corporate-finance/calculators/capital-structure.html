@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Capital Structure Optimizer · Corporate Finance · ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
+a{color:inherit;text-decoration:none}
+.top-nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between}
+.nav-left{display:flex;align-items:center;gap:12px}
+.nav-logo{font-weight:800;font-size:16px;letter-spacing:-0.5px}
+.nav-sep{color:var(--border);font-size:18px}
+.nav-domain{font-size:13px;color:var(--muted);font-weight:500}
+.nav-right{display:flex;align-items:center;gap:8px}
+.nav-btn{padding:6px 14px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:'Inter',sans-serif}
+.nav-btn-ghost{background:none;color:var(--muted)}
+.nav-btn-ghost:hover{color:var(--text)}
+.nav-btn-pro{background:var(--text);color:#fff}
+.domain-nav{background:var(--card);border-bottom:1px solid var(--border);padding:0 20px;display:flex;gap:0;overflow-x:auto}
+.domain-nav a{padding:10px 16px;font-size:13px;font-weight:500;color:var(--muted);white-space:nowrap;border-bottom:2px solid transparent}
+.domain-nav a:hover{color:var(--text)}
+.domain-nav a.active{color:var(--text);border-bottom-color:var(--text);font-weight:600}
+.page-wrap{max-width:820px;margin:0 auto;padding:32px 20px 80px}
+.calc-header{margin-bottom:28px}
+.calc-header h1{font-size:26px;font-weight:800;letter-spacing:-0.5px;margin-bottom:6px}
+.calc-header p{color:var(--muted);font-size:14px}
+.step{margin-bottom:32px}
+.step-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:10px}
+.step-title{font-size:19px;font-weight:700;margin-bottom:16px}
+.search-wrap{position:relative;margin-bottom:14px}
+.search-wrap input{width:100%;padding:12px 16px 12px 40px;border:1px solid var(--border);border-radius:10px;font-size:15px;font-family:'Inter',sans-serif;outline:none;transition:border-color 0.15s}
+.search-wrap input:focus{border-color:#999}
+.search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:16px}
+.filter-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.pill{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:#fff;color:var(--muted);transition:all 0.15s}
+.pill.active{background:var(--text);color:#fff;border-color:var(--text)}
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.co-card{border:1px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all 0.15s;background:#fff}
+.co-card:hover{border-color:#999;background:var(--card)}
+.co-card.selected{border-color:var(--text);background:#f0f0f0}
+.co-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.co-meta{font-size:11px;color:var(--muted)}
+.btn-primary{padding:13px 28px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:opacity 0.15s}
+.btn-primary:hover{opacity:0.85}
+.btn-primary:disabled{opacity:0.4;cursor:not-allowed}
+.context-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;margin-bottom:24px}
+.context-card h3{font-size:16px;font-weight:700;margin-bottom:12px}
+.context-body{font-size:14px;color:#374151;line-height:1.7;margin-bottom:16px}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px}
+.stat-box{background:#fff;border:1px solid var(--border);border-radius:10px;padding:14px}
+.stat-val{font-size:18px;font-weight:800;font-family:'JetBrains Mono',monospace;margin-bottom:3px}
+.stat-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:0.3px}
+.insight-box{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:14px 16px;font-size:13px;color:#1d4ed8;line-height:1.6}
+.insight-box strong{font-weight:700}
+.sector-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:12px}
+.sector-table th{text-align:left;padding:8px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.3px;color:var(--muted);border-bottom:1px solid var(--border)}
+.sector-table td{padding:8px 12px;border-bottom:1px solid var(--border)}
+.sector-table tr:last-child td{border-bottom:none}
+.sector-table tr.highlight{background:#f9fafb}
+.pro-gate{border:2px dashed var(--border);border-radius:14px;padding:40px;text-align:center}
+.pro-gate-icon{font-size:32px;margin-bottom:12px}
+.pro-gate-title{font-size:20px;font-weight:800;margin-bottom:8px}
+.pro-gate-desc{font-size:14px;color:var(--muted);margin-bottom:20px;max-width:400px;margin-left:auto;margin-right:auto}
+.pro-gate-features{list-style:none;margin-bottom:24px;display:inline-block;text-align:left}
+.pro-gate-features li{font-size:14px;padding:5px 0;color:#374151;font-weight:500}
+.pro-gate-btn{padding:14px 32px;background:var(--text);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:10px}
+.pro-gate-note{font-size:12px;color:var(--muted)}
+.selected-co-bar{background:#f9fafb;border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;font-size:14px}
+.selected-co-bar strong{font-weight:700}
+.change-link{color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline}
+@media(max-width:600px){.stat-row{grid-template-columns:repeat(2,1fr)}.company-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<nav class="top-nav">
+  <div class="nav-left">
+    <span class="nav-logo">ValuationDesk</span>
+    <span class="nav-sep">/</span>
+    <span class="nav-domain">Corporate Finance</span>
+  </div>
+  <div class="nav-right">
+    <button class="nav-btn nav-btn-ghost" onclick="window.location.href='index.html'">← Calculators</button>
+    <button class="nav-btn nav-btn-pro">Unlock Pro ₹799</button>
+  </div>
+</nav>
+<div class="domain-nav">
+  <a href="../index.html">Overview</a>
+  <a href="../learn/index.html">Learn</a>
+  <a href="index.html" class="active">Calculators</a>
+  <a href="#">My Vault</a>
+</div>
+<div class="page-wrap">
+  <div class="calc-header">
+    <h1>⚖️ Capital Structure Optimizer</h1>
+    <p>Model debt/equity tradeoffs, tax shield, and find the leverage ratio that minimizes your cost of capital.</p>
+  </div>
+
+  <!-- STEP 1: Company Picker -->
+  <div id="step1" class="step">
+    <div class="step-label">Step 1 of 4</div>
+    <div class="step-title">Pick a company to anchor your analysis</div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Search by name or ticker…" oninput="filterCompanies()">
+    </div>
+    <div class="filter-pills">
+      <span class="pill active" onclick="setFilter('all',this)">All</span>
+      <span class="pill" onclick="setFilter('Technology',this)">Technology</span>
+      <span class="pill" onclick="setFilter('Banking',this)">Banking</span>
+      <span class="pill" onclick="setFilter('FMCG',this)">FMCG</span>
+      <span class="pill" onclick="setFilter('Auto',this)">Auto</span>
+      <span class="pill" onclick="setFilter('Pharma',this)">Pharma</span>
+      <span class="pill" onclick="setFilter('Infrastructure',this)">Infrastructure</span>
+      <span class="pill" onclick="setFilter('Energy',this)">Energy</span>
+    </div>
+    <div class="company-grid" id="companyGrid"></div>
+    <br>
+    <button class="btn-primary" id="step1Btn" onclick="goStep2()" disabled>Continue →</button>
+  </div>
+
+  <!-- STEP 2: Context -->
+  <div id="step2" class="step" style="display:none">
+    <div class="step-label">Step 2 of 4 · Free</div>
+    <div class="selected-co-bar"><span><strong id="ctx-name"></strong> · <span id="ctx-sector"></span></span><span class="change-link" onclick="resetToStep1()">Change company</span></div>
+    <div class="context-card">
+      <h3>Capital Structure 101: The CFO's Core Trade-off</h3>
+      <p class="context-body">Modigliani and Miller proved in 1958 that in a perfect world, capital structure doesn't matter — a company's value is determined by its assets, not how it's financed. But in the real world, two forces pull in opposite directions: <strong>the debt tax shield</strong> (interest is tax-deductible, so debt reduces your tax bill) and <strong>financial distress costs</strong> (too much debt increases bankruptcy risk and operational friction).<br><br>The optimal capital structure sits at the peak of the trade-off curve — where the marginal benefit of another rupee of debt equals its marginal cost.</p>
+      <div class="stat-row" id="sectorStats"></div>
+      <div class="insight-box" id="sectorInsight"></div>
+      <br>
+      <h3 style="margin-bottom:10px">Sector Leverage Benchmarks</h3>
+      <table class="sector-table">
+        <thead><tr><th>Sector</th><th>Typical D/E</th><th>Interest Coverage</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr class="highlight"><td>Banking / NBFC</td><td>5–12×</td><td>N/A</td><td>Leverage is the business model</td></tr>
+          <tr><td>Infrastructure</td><td>2–4×</td><td>1.5–3×</td><td>Stable cash flows justify high debt</td></tr>
+          <tr class="highlight"><td>Telecom</td><td>2–4×</td><td>2–4×</td><td>Spectrum capex funded by debt</td></tr>
+          <tr><td>Energy / Oil & Gas</td><td>0.5–1.5×</td><td>4–8×</td><td>Commodity volatility limits leverage</td></tr>
+          <tr class="highlight"><td>Auto</td><td>0.5–1.5×</td><td>5–10×</td><td>Capex-heavy but cyclical</td></tr>
+          <tr><td>Pharma</td><td>0.1–0.5×</td><td>10–20×</td><td>IP-driven, high margins, low debt need</td></tr>
+          <tr class="highlight"><td>FMCG / Consumer</td><td>0–0.3×</td><td>&gt;15×</td><td>Negative working capital, self-funded</td></tr>
+          <tr><td>Technology</td><td>0–0.5×</td><td>&gt;20×</td><td>Asset-light, high cash generation</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <button class="btn-primary" onclick="goStep3()">See Capital Structure Tools →</button>
+  </div>
+
+  <!-- STEP 3: Pro Gate -->
+  <div id="step3" class="step" style="display:none">
+    <div class="step-label">Step 3 of 4 · Pro</div>
+    <div class="selected-co-bar"><span><strong id="ctx-name3"></strong> · <span id="ctx-sector3"></span></span><span class="change-link" onclick="resetToStep1()">Change company</span></div>
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <div class="pro-gate-title">Pro Feature</div>
+      <p class="pro-gate-desc">Input your assumptions and model the full capital structure optimization</p>
+      <ul class="pro-gate-features">
+        <li>→ WACC curve across 0–80% debt ratios</li>
+        <li>→ Optimal leverage point finder</li>
+        <li>→ Tax shield present value calculator</li>
+        <li>→ Financial distress cost estimator</li>
+        <li>→ Interest coverage & credit rating proxy</li>
+        <li>→ Export analysis to Vault</li>
+      </ul>
+      <button class="pro-gate-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+      <div class="pro-gate-note">Monthly only · Cancel anytime · All 15 domains included</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const COMPANIES = [
+  {name:'Reliance Industries',ticker:'RIL',sector:'Energy',market:'NSE'},
+  {name:'TCS',ticker:'TCS',sector:'Technology',market:'NSE'},
+  {name:'HDFC Bank',ticker:'HDFCBANK',sector:'Banking',market:'NSE'},
+  {name:'Infosys',ticker:'INFY',sector:'Technology',market:'NSE'},
+  {name:'ICICI Bank',ticker:'ICICIBANK',sector:'Banking',market:'NSE'},
+  {name:'Hindustan Unilever',ticker:'HINDUNILVR',sector:'FMCG',market:'NSE'},
+  {name:'ITC',ticker:'ITC',sector:'FMCG',market:'NSE'},
+  {name:'Bajaj Finance',ticker:'BAJFINANCE',sector:'NBFC',market:'NSE'},
+  {name:'Bharti Airtel',ticker:'BHARTIARTL',sector:'Telecom',market:'NSE'},
+  {name:'Wipro',ticker:'WIPRO',sector:'Technology',market:'NSE'},
+  {name:'Asian Paints',ticker:'ASIANPAINT',sector:'Consumer',market:'NSE'},
+  {name:'Maruti Suzuki',ticker:'MARUTI',sector:'Auto',market:'NSE'},
+  {name:'Sun Pharma',ticker:'SUNPHARMA',sector:'Pharma',market:'NSE'},
+  {name:'Larsen & Toubro',ticker:'LT',sector:'Infrastructure',market:'NSE'},
+  {name:'Tata Motors',ticker:'TATAMOTORS',sector:'Auto',market:'NSE'},
+  {name:'Apple',ticker:'AAPL',sector:'Technology',market:'NASDAQ'},
+  {name:'Microsoft',ticker:'MSFT',sector:'Technology',market:'NASDAQ'},
+  {name:'Alphabet',ticker:'GOOGL',sector:'Technology',market:'NASDAQ'},
+  {name:'Amazon',ticker:'AMZN',sector:'Technology',market:'NASDAQ'},
+  {name:'Meta Platforms',ticker:'META',sector:'Technology',market:'NASDAQ'},
+  {name:'JPMorgan Chase',ticker:'JPM',sector:'Banking',market:'NYSE'},
+  {name:'Johnson & Johnson',ticker:'JNJ',sector:'Pharma',market:'NYSE'},
+  {name:'Procter & Gamble',ticker:'PG',sector:'FMCG',market:'NYSE'},
+  {name:'Berkshire Hathaway',ticker:'BRK.B',sector:'Conglomerate',market:'NYSE'},
+  {name:'ExxonMobil',ticker:'XOM',sector:'Energy',market:'NYSE'},
+  {name:'Tesla',ticker:'TSLA',sector:'Auto',market:'NASDAQ'},
+  {name:'LVMH',ticker:'MC',sector:'Consumer',market:'EPA'},
+  {name:'Toyota',ticker:'TM',sector:'Auto',market:'NYSE'},
+  {name:'Samsung',ticker:'005930',sector:'Technology',market:'KRX'},
+  {name:'Nestlé',ticker:'NESN',sector:'FMCG',market:'SIX'},
+];
+
+const SECTOR_CONTEXT = {
+  Technology:{deRatio:'0–0.5×',coverage:'>20×',taxShield:'Low (minimal debt)',distress:'Very Low',summary:'Technology companies rarely need debt — high margins and negative working capital generate abundant cash. When tech companies do take debt (Apple's $100B+), it\'s pure tax arbitrage, not necessity. The optimal capital structure for most tech companies is near-zero leverage.',insight:'Apple has ~$100B in debt not because it needs cash, but because US taxes on repatriated offshore cash made borrowing domestically cheaper than using its own money. That\'s capital structure optimization in its purest form.'},
+  Banking:{deRatio:'5–12×',coverage:'N/A',taxShield:'High (core model)',distress:'Systemic',summary:'Banks are fundamentally different — deposits ARE the debt. Tier 1 Capital Ratio (equity / risk-weighted assets) replaces D/E as the key metric. Basel III mandates minimum 8% Tier 1; Indian banks typically run at 13–17%. The leverage is the product, not a choice.',insight:'Don\'t apply corporate capital structure analysis to banks. The RBI\'s CAR framework is what governs their leverage. A bank with 10% CAR has ~10× leverage by design.'},
+  NBFC:{deRatio:'3–5×',coverage:'1.5–3×',taxShield:'Moderate',distress:'Moderate-High',summary:'NBFCs borrow to lend — their business is the spread between cost of funds and lending rates. Retail NBFCs (Bajaj Finance) typically run 4–5× D/E; wholesale/infrastructure NBFCs can go higher. RBI\'s scale-based regulation now caps leverage ratios.',insight:'Bajaj Finance\'s genius is its diversified liability mix (FDs, NCD, bank loans, CP) that keeps cost of funds low even at 4–5× D/E. The capital structure IS the competitive moat.'},
+  FMCG:{deRatio:'0–0.3×',coverage:'>15×',taxShield:'Minimal need',distress:'Negligible',summary:'FMCG companies have negative working capital (distributors fund inventory) and high margins — they generate more cash than they can deploy. Debt is almost never needed for operations; any debt typically funds acquisitions or buybacks.',insight:'HUL and ITC have essentially zero net debt. Their capital structure challenge is the opposite: what to do with excess cash. That\'s why FMCG companies often run aggressive buyback programs.'},
+  Auto:{deRatio:'0.5–1.5×',coverage:'5–10×',taxShield:'Moderate',distress:'Moderate',summary:'Automakers balance capex-heavy manufacturing (requires some debt financing) against cyclical demand (limits how much leverage is safe). Commercial vehicle makers (Ashok Leyland) tend to be more levered than passenger vehicle OEMs (Maruti).',insight:'Maruti Suzuki has historically operated with net cash — its capital structure reflects the fact that it outsources most manufacturing complexity to Suzuki Japan and its vendor ecosystem.'},
+  Pharma:{deRatio:'0.1–0.5×',coverage:'10–20×',taxShield:'Low',distress:'Very Low',summary:'Pharma companies generate high EBITDA margins (20–35%) with relatively modest capex needs. Debt is primarily used for large acquisitions (Sun Pharma\'s Taro, Ranbaxy). The high cash conversion makes leverage largely unnecessary.',insight:'Indian pharma companies often have more cash on the balance sheet than debt. Sun Pharma\'s net cash position despite operating 40+ plants globally is a testament to the sector\'s cash generation capacity.'},
+  Infrastructure:{deRatio:'2–4×',coverage:'1.5–3×',taxShield:'Very High',distress:'Moderate',summary:'Infrastructure assets (toll roads, ports, airports) generate stable, long-duration cash flows that support significant leverage. Project finance (non-recourse debt at the SPV level) is the standard tool. L&T\'s construction business is different from its infrastructure assets.',insight:'L&T\'s infrastructure subsidiaries (L&T Infrastructure Finance) are structured to be highly levered while the parent company maintains investment-grade credit. The art is separating asset risk from parent risk.'},
+  Energy:{deRatio:'0.5–1.5×',coverage:'4–8×',taxShield:'Moderate',distress:'Moderate',summary:'Commodity price volatility limits energy companies\' leverage capacity. Refiners (RIL\'s O2C business) can handle more leverage than upstream E&P due to more predictable margins. RIL\'s current deleveraging is a deliberate capital structure optimization.',insight:'Reliance Industries paid down ₹1.56 lakh crore of net debt in FY21 through rights issue and strategic investments. The shift from a highly leveraged conglomerate to a net-cash company was one of the biggest capital structure transformations in Indian corporate history.'},
+  Telecom:{deRatio:'2–4×',coverage:'2–4×',taxShield:'High',distress:'High',summary:'Telecom companies are capital-intensive (spectrum, towers) with subscriber-funded revenue that makes moderate leverage acceptable. But spectrum auction debt in India has pushed Bharti to 3×+ leverage. Vodafone Idea\'s capital structure failure is the cautionary tale.',insight:'Bharti Airtel manages ~3× net debt/EBITDA by sweating its tower assets (IndiGrid spin-off), monetizing Africa (Airtel Africa listing), and maintaining strong EBITDA margins. Capital structure management is existential in telecom.'},
+  Consumer:{deRatio:'0–0.5×',coverage:'>10×',taxShield:'Low',distress:'Very Low',summary:'Consumer discretionary companies (Asian Paints, LVMH) typically carry minimal debt, relying on brand economics and strong margins. Premiumization trends support even lower leverage needs over time.',insight:'Asian Paints\' near-zero debt with 50%+ ROE proves that the best capital structures sometimes involve almost no debt at all. When ROIC >> WACC by a wide margin, equity financing is optimal.'},
+  Conglomerate:{deRatio:'Varies',coverage:'Varies',taxShield:'Complex',distress:'Complex',summary:'Conglomerates are complex — each business should ideally be financed optimally for its own risk profile. Berkshire Hathaway\'s insurance float gives it effectively free leverage. Tata Sons\' holding company structure requires looking through to each operating subsidiary.',insight:'Warren Buffett\'s "secret" is using insurance float (Geico\'s policyholder premiums received but not yet paid out) as essentially free leverage. It\'s capital structure optimization at a masterclass level.'},
+  default:{deRatio:'1–2×',coverage:'3–8×',taxShield:'Moderate',distress:'Moderate',summary:'Most companies target a moderate leverage ratio that balances the interest tax shield against financial distress costs. The target D/E typically reflects industry norms, credit rating aspirations, and management\'s risk tolerance.',insight:'The practical capital structure decision for most companies: target a leverage ratio that maintains an investment-grade credit rating (BBB- or higher), then use excess cash flow for dividends and buybacks.'}
+};
+
+let selectedCo = null, activeFilter = 'all';
+
+function renderGrid(list){
+  const g = document.getElementById('companyGrid');
+  g.innerHTML = list.map(co=>`
+    <div class="co-card${selectedCo&&selectedCo.ticker===co.ticker?' selected':''}" onclick="selectCo('${co.ticker}')">
+      <div class="co-name">${co.name}</div>
+      <div class="co-meta">${co.ticker} · ${co.sector} · ${co.market}</div>
+    </div>`).join('');
+}
+
+function filterCompanies(){
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const list = COMPANIES.filter(c=>
+    (activeFilter==='all'||c.sector===activeFilter) &&
+    (c.name.toLowerCase().includes(q)||c.ticker.toLowerCase().includes(q))
+  );
+  renderGrid(list);
+}
+
+function setFilter(f,el){
+  activeFilter=f;
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  filterCompanies();
+}
+
+function selectCo(ticker){
+  selectedCo = COMPANIES.find(c=>c.ticker===ticker);
+  filterCompanies();
+  document.getElementById('step1Btn').disabled = false;
+}
+
+function goStep2(){
+  if(!selectedCo) return;
+  const ctx = SECTOR_CONTEXT[selectedCo.sector]||SECTOR_CONTEXT.default;
+  document.getElementById('ctx-name').textContent = selectedCo.name;
+  document.getElementById('ctx-sector').textContent = selectedCo.sector;
+  const sr = document.getElementById('sectorStats');
+  sr.innerHTML = `
+    <div class="stat-box"><div class="stat-val">${ctx.deRatio}</div><div class="stat-label">Typical D/E</div></div>
+    <div class="stat-box"><div class="stat-val">${ctx.coverage}</div><div class="stat-label">Interest Coverage</div></div>
+    <div class="stat-box"><div class="stat-val">${ctx.distress}</div><div class="stat-label">Distress Risk</div></div>`;
+  document.getElementById('sectorInsight').innerHTML = `<strong>${selectedCo.sector} Insight:</strong> ${ctx.insight}`;
+  document.querySelector('.context-card .context-body').innerHTML = ctx.summary;
+  document.getElementById('step1').style.display='none';
+  document.getElementById('step2').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function goStep3(){
+  document.getElementById('ctx-name3').textContent = selectedCo.name;
+  document.getElementById('ctx-sector3').textContent = selectedCo.sector;
+  document.getElementById('step2').style.display='none';
+  document.getElementById('step3').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function resetToStep1(){
+  document.getElementById('step1').style.display='block';
+  document.getElementById('step2').style.display='none';
+  document.getElementById('step3').style.display='none';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function unlockPro(){
+  alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');
+}
+
+renderGrid(COMPANIES);
+</script>
+</body>
+</html>
