@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Learn Private Equity — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* === DESIGN SYSTEM — SELF-CONTAINED, ZERO EXTERNAL CSS === */
+:root{
+  --bg:#fff; --text:#0a0a0a; --muted:#6b7280; --border:#e5e5e5;
+  --card:#f9fafb; --green:#16a34a; --red:#dc2626; --blue:#2563eb;
+  --amber:#d97706; --font:'Inter',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;}
+
+/* === TOP NAV === */
+.top-nav{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:56px;}
+.top-nav-logo{font-family:var(--font);font-size:1rem;font-weight:800;color:var(--text);text-decoration:none;letter-spacing:-0.02em;}
+.top-nav-logo strong{font-weight:900;}
+.top-nav-links{display:flex;align-items:center;gap:0.25rem;list-style:none;}
+.top-nav-links a{font-size:0.82rem;font-weight:500;color:var(--muted);text-decoration:none;padding:0.4rem 0.75rem;border-radius:6px;transition:all 0.15s;}
+.top-nav-links a:hover{color:var(--text);background:var(--card);}
+.top-nav-right{display:flex;align-items:center;gap:0.75rem;}
+.top-nav-vault-btn{font-size:0.78rem;font-weight:600;color:var(--text);text-decoration:none;padding:0.4rem 0.75rem;border:1px solid var(--border);border-radius:6px;transition:all 0.15s;}
+.top-nav-vault-btn:hover{background:var(--card);}
+.top-nav-pro-btn{font-size:0.78rem;font-weight:700;color:#fff;background:var(--text);text-decoration:none;padding:0.4rem 1rem;border-radius:6px;transition:all 0.15s;}
+.top-nav-pro-btn:hover{opacity:0.85;}
+
+/* === DOMAIN NAV === */
+.domain-nav{background:var(--bg);border-bottom:1px solid var(--border);padding:0 2rem;}
+.domain-nav-inner{display:flex;overflow-x:auto;scrollbar-width:none;}
+.domain-nav-inner::-webkit-scrollbar{display:none;}
+.domain-nav-inner a{display:inline-block;font-size:0.8rem;font-weight:500;color:var(--muted);text-decoration:none;padding:0.65rem 1rem;border-bottom:2px solid transparent;transition:all 0.15s;white-space:nowrap;}
+.domain-nav-inner a:hover{color:var(--text);}
+.domain-nav-inner a.active{color:var(--text);font-weight:600;border-bottom-color:var(--text);}
+
+/* === LAYOUT === */
+.page{min-height:100vh;}
+.section{padding:3rem 2rem;}
+.container{max-width:1100px;margin:0 auto;}
+
+/* === HERO === */
+.hero{background:var(--text);color:#fff;padding:3.5rem 2rem;}
+.hero-inner{max-width:1100px;margin:0 auto;}
+.hero-eyebrow{font-family:var(--mono);font-size:0.65rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-bottom:0.75rem;}
+.hero-title{font-size:2.2rem;font-weight:800;letter-spacing:-0.03em;line-height:1.15;margin-bottom:0.75rem;}
+.hero-sub{font-size:0.95rem;color:rgba(255,255,255,0.7);max-width:540px;line-height:1.6;}
+.hero-meta{display:flex;align-items:center;gap:1rem;margin-top:1.25rem;}
+.hero-badge{font-family:var(--mono);font-size:0.6rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.25rem 0.6rem;border-radius:3px;border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.7);}
+.hero-badge-green{background:#166534;color:#bbf7d0;border-color:#166534;}
+
+/* === SECTION HEADERS === */
+.sec-eyebrow{font-family:var(--mono);font-size:0.65rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.5rem;}
+.sec-title{font-size:1.4rem;font-weight:800;letter-spacing:-0.02em;color:var(--text);margin-bottom:0.4rem;}
+.sec-sub{font-size:0.88rem;color:var(--muted);margin-bottom:2rem;}
+
+/* === MODULE CARDS === */
+.module-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:1.5rem;margin-bottom:3rem;}
+.module-card{border:1px solid var(--border);border-radius:10px;background:var(--bg);overflow:hidden;transition:all 0.2s;}
+.module-card:hover{border-color:#aaa;box-shadow:0 4px 24px rgba(0,0,0,0.07);}
+.module-accent{height:4px;}
+.module-body{padding:1.5rem;}
+.module-header{display:flex;align-items:flex-start;gap:1rem;margin-bottom:1rem;}
+.module-num{font-family:var(--mono);font-size:0.65rem;font-weight:700;letter-spacing:0.1em;color:var(--muted);margin-bottom:0.15rem;}
+.module-title{font-size:1.05rem;font-weight:700;letter-spacing:-0.02em;color:var(--text);}
+.module-desc{font-size:0.83rem;color:var(--muted);line-height:1.6;margin-bottom:1.25rem;}
+.module-icon{width:42px;height:42px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.module-tags{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1.25rem;}
+.mtag{font-family:var(--mono);font-size:0.58rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;padding:0.2rem 0.5rem;border-radius:3px;background:var(--card);color:var(--muted);border:1px solid var(--border);}
+.module-footer{display:flex;align-items:center;justify-content:space-between;padding-top:1rem;border-top:1px solid var(--border);}
+.module-status{font-family:var(--mono);font-size:0.6rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:0.2rem 0.55rem;border-radius:3px;}
+.status-soon{background:#fef3c7;color:var(--amber);}
+.status-free{background:#dcfce7;color:var(--green);}
+.status-pro{background:#0a0a0a;color:#fff;}
+.module-link{font-size:0.78rem;font-weight:600;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:0.3rem;opacity:0.5;cursor:default;}
+.module-link.ready{opacity:1;cursor:pointer;}
+.module-link.ready:hover{color:var(--blue);}
+
+/* === CONCEPTS SECTION === */
+.concepts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;margin-bottom:2.5rem;}
+.concept-card{border:1px solid var(--border);border-radius:8px;padding:1rem 1.1rem;background:var(--bg);}
+.concept-emoji{font-size:1.2rem;margin-bottom:0.5rem;}
+.concept-title{font-size:0.82rem;font-weight:700;color:var(--text);margin-bottom:0.3rem;}
+.concept-desc{font-size:0.75rem;color:var(--muted);line-height:1.5;}
+
+/* === PATH SECTION === */
+.path-steps{display:flex;flex-direction:column;gap:0;max-width:700px;}
+.path-step{display:flex;gap:1.25rem;padding-bottom:1.5rem;position:relative;}
+.path-step:not(:last-child)::after{content:'';position:absolute;left:15px;top:32px;bottom:0;width:1px;background:var(--border);}
+.path-dot{width:32px;height:32px;border-radius:50%;border:2px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:0.65rem;font-weight:700;color:var(--muted);flex-shrink:0;position:relative;z-index:1;}
+.path-dot.done{background:var(--text);border-color:var(--text);color:#fff;}
+.path-content{}
+.path-label{font-size:0.85rem;font-weight:700;color:var(--text);margin-bottom:0.2rem;}
+.path-note{font-size:0.77rem;color:var(--muted);}
+
+/* === GLOSSARY === */
+.glossary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.75rem;}
+.glossary-item{border:1px solid var(--border);border-radius:6px;padding:0.9rem 1rem;}
+.glossary-term{font-family:var(--mono);font-size:0.72rem;font-weight:700;color:var(--text);margin-bottom:0.25rem;}
+.glossary-def{font-size:0.77rem;color:var(--muted);line-height:1.5;}
+
+/* === BACK BREADCRUMB === */
+.breadcrumb{display:flex;align-items:center;gap:0.5rem;font-size:0.78rem;color:var(--muted);margin-bottom:1.5rem;}
+.breadcrumb a{color:var(--muted);text-decoration:none;transition:color 0.15s;}
+.breadcrumb a:hover{color:var(--text);}
+.breadcrumb span{color:var(--border);}
+
+/* === FOOTER === */
+.footer{border-top:1px solid var(--border);padding:2rem;text-align:center;}
+.footer-text{font-size:0.75rem;color:var(--muted);}
+
+@media(max-width:700px){
+  .hero-title{font-size:1.6rem;}
+  .module-grid{grid-template-columns:1fr;}
+  .top-nav-links{display:none;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <a href="../../../index.html" class="top-nav-logo">Valuation<strong>Desk</strong></a>
+  <ul class="top-nav-links">
+    <li><a href="../../../index.html">Home</a></li>
+    <li><a href="../index.html">Private Equity</a></li>
+    <li><a href="../calculators/index.html">Calculators</a></li>
+    <li><a href="#" class="active">Learn</a></li>
+  </ul>
+  <div class="top-nav-right">
+    <a href="../calculators/lbo-model.html" class="top-nav-vault-btn">Try LBO Model →</a>
+    <a href="#" onclick="unlockPro()" class="top-nav-pro-btn">Unlock Pro</a>
+  </div>
+</nav>
+
+<!-- DOMAIN NAV -->
+<nav class="domain-nav">
+  <div class="domain-nav-inner">
+    <a href="../../../domains/valuation-advisory/index.html">Valuation</a>
+    <a href="../../../domains/investment-banking/index.html">Investment Banking</a>
+    <a href="../../../domains/corporate-finance/index.html">Corporate Finance</a>
+    <a href="../../../domains/ma/index.html">M&amp;A</a>
+    <a href="../index.html" class="active">Private Equity</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Domain 05 · Private Equity · Learn</div>
+    <h1 class="hero-title">Master Private Equity<br>from First Principles</h1>
+    <p class="hero-sub">Four structured modules covering LBOs, returns waterfall, fund mechanics, and value creation — built for Indian finance professionals aiming for PE/VC roles.</p>
+    <div class="hero-meta">
+      <span class="hero-badge">4 Modules</span>
+      <span class="hero-badge">India-Focused</span>
+      <span class="hero-badge hero-badge-green">Free Previews</span>
+    </div>
+  </div>
+</div>
+
+<!-- MODULES -->
+<section class="section">
+  <div class="container">
+    <div class="breadcrumb">
+      <a href="../index.html">Private Equity</a>
+      <span>/</span>
+      <span>Learn</span>
+    </div>
+
+    <div class="sec-eyebrow">Curriculum</div>
+    <div class="sec-title">4 Learning Modules</div>
+    <div class="sec-sub">Each module pairs conceptual depth with India-specific case studies and live calculator walkthroughs.</div>
+
+    <div class="module-grid">
+
+      <!-- MODULE 01 -->
+      <div class="module-card">
+        <div class="module-accent" style="background:linear-gradient(90deg,#16a34a,#22c55e);"></div>
+        <div class="module-body">
+          <div class="module-header">
+            <div class="module-icon" style="background:#dcfce7;">🏗️</div>
+            <div>
+              <div class="module-num">Module 01</div>
+              <div class="module-title">LBO Fundamentals</div>
+            </div>
+          </div>
+          <p class="module-desc">Understand how private equity firms acquire companies using leveraged debt — from deal sourcing and entry structuring to the mechanics of debt tranches, amortization, and free cash flow conversion that drive returns.</p>
+          <div class="module-tags">
+            <span class="mtag">LBO Structure</span>
+            <span class="mtag">Debt Tranches</span>
+            <span class="mtag">EBITDA Multiples</span>
+            <span class="mtag">Cash Flow Sweep</span>
+            <span class="mtag">Entry vs Exit</span>
+          </div>
+          <div class="module-footer">
+            <span class="module-status status-soon">Coming Soon</span>
+            <a href="../calculators/lbo-model.html" class="module-link ready">Try LBO Calculator →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODULE 02 -->
+      <div class="module-card">
+        <div class="module-accent" style="background:linear-gradient(90deg,#2563eb,#60a5fa);"></div>
+        <div class="module-body">
+          <div class="module-header">
+            <div class="module-icon" style="background:#dbeafe;">📊</div>
+            <div>
+              <div class="module-num">Module 02</div>
+              <div class="module-title">Returns Analysis</div>
+            </div>
+          </div>
+          <p class="module-desc">Deconstruct how PE firms measure and communicate returns — IRR vs MOIC, the difference between gross and net, DPI vs TVPI vs RVPI, and how vintage year benchmarks and PME compare PE performance to public markets.</p>
+          <div class="module-tags">
+            <span class="mtag">IRR vs MOIC</span>
+            <span class="mtag">DPI / TVPI / RVPI</span>
+            <span class="mtag">Gross vs Net IRR</span>
+            <span class="mtag">PME</span>
+            <span class="mtag">Vintage Analysis</span>
+          </div>
+          <div class="module-footer">
+            <span class="module-status status-soon">Coming Soon</span>
+            <a href="../calculators/portfolio-irr.html" class="module-link ready">Try Portfolio IRR →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODULE 03 -->
+      <div class="module-card">
+        <div class="module-accent" style="background:linear-gradient(90deg,#d97706,#fbbf24);"></div>
+        <div class="module-body">
+          <div class="module-header">
+            <div class="module-icon" style="background:#fef3c7;">⚙️</div>
+            <div>
+              <div class="module-num">Module 03</div>
+              <div class="module-title">Fund Mechanics</div>
+            </div>
+          </div>
+          <p class="module-desc">Go behind the scenes of how a PE fund actually works — the 2-and-20 fee model, management fee on committed vs deployed capital, the J-curve, GP/LP economics, carried interest waterfalls, clawback provisions, and the full fund lifecycle from fundraise to final distribution.</p>
+          <div class="module-tags">
+            <span class="mtag">2-and-20</span>
+            <span class="mtag">J-Curve</span>
+            <span class="mtag">Carried Interest</span>
+            <span class="mtag">Clawback</span>
+            <span class="mtag">European Waterfall</span>
+          </div>
+          <div class="module-footer">
+            <span class="module-status status-soon">Coming Soon</span>
+            <a href="../calculators/fund-economics.html" class="module-link ready">Try Fund Economics →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- MODULE 04 -->
+      <div class="module-card">
+        <div class="module-accent" style="background:linear-gradient(90deg,#7c3aed,#a78bfa);"></div>
+        <div class="module-body">
+          <div class="module-header">
+            <div class="module-icon" style="background:#ede9fe;">🚀</div>
+            <div>
+              <div class="module-num">Module 04</div>
+              <div class="module-title">Value Creation</div>
+            </div>
+          </div>
+          <p class="module-desc">Learn how PE funds actually grow enterprise value post-acquisition — revenue growth levers, margin expansion playbooks, multiple arbitrage, add-on acquisitions, management incentives, and India-specific operational turnaround strategies used by KKR, Blackstone, ChrysCapital, and Warburg Pincus.</p>
+          <div class="module-tags">
+            <span class="mtag">Revenue Growth</span>
+            <span class="mtag">Margin Expansion</span>
+            <span class="mtag">Multiple Arbitrage</span>
+            <span class="mtag">Add-ons (Bolt-ons)</span>
+            <span class="mtag">ESOP / MIP</span>
+          </div>
+          <div class="module-footer">
+            <span class="module-status status-soon">Coming Soon</span>
+            <a href="../calculators/returns-waterfall.html" class="module-link ready">Try Returns Waterfall →</a>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.module-grid -->
+  </div>
+</section>
+
+<!-- LEARNING PATH -->
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="sec-eyebrow">Suggested Path</div>
+    <div class="sec-title">Where to Start</div>
+    <div class="sec-sub">Structured sequence for analysts new to PE, or those preparing for PE/VC interviews.</div>
+
+    <div class="path-steps">
+      <div class="path-step">
+        <div class="path-dot done">01</div>
+        <div class="path-content">
+          <div class="path-label">Try the LBO Model Calculator (Free)</div>
+          <div class="path-note">No account needed. Run an LBO on any Indian listed company — see how debt, multiple, and margin assumptions drive returns.</div>
+        </div>
+      </div>
+      <div class="path-step">
+        <div class="path-dot">02</div>
+        <div class="path-content">
+          <div class="path-label">Read Module 01 — LBO Fundamentals</div>
+          <div class="path-note">Understand deal structure, tranche hierarchy, and why EBITDA is the PE firm's north star metric.</div>
+        </div>
+      </div>
+      <div class="path-step">
+        <div class="path-dot">03</div>
+        <div class="path-content">
+          <div class="path-label">Read Module 02 — Returns Analysis</div>
+          <div class="path-note">Learn how DPI, TVPI, and RVPI work together — and why a high TVPI can hide a poorly-performing fund.</div>
+        </div>
+      </div>
+      <div class="path-step">
+        <div class="path-dot">04</div>
+        <div class="path-content">
+          <div class="path-label">Unlock Pro — Run All 5 Calculators</div>
+          <div class="path-note">Debt Schedule, Fund Economics, Carry Calculator, Portfolio IRR, Returns Waterfall — full Pro access at ₹799/month.</div>
+        </div>
+      </div>
+      <div class="path-step">
+        <div class="path-dot">05</div>
+        <div class="path-content">
+          <div class="path-label">Read Modules 03 &amp; 04 — Fund Mechanics + Value Creation</div>
+          <div class="path-note">The carry + J-curve module is essential for anyone targeting fund roles. Value Creation ties everything together for portfolio operations teams.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CORE CONCEPTS QUICK-REF -->
+<section class="section" style="background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+  <div class="container">
+    <div class="sec-eyebrow">Quick Reference</div>
+    <div class="sec-title">Core PE Concepts</div>
+    <div class="sec-sub">The 12 ideas every PE analyst needs cold before a first-round interview.</div>
+
+    <div class="concepts-grid">
+      <div class="concept-card">
+        <div class="concept-emoji">⚖️</div>
+        <div class="concept-title">LBO (Leveraged Buyout)</div>
+        <div class="concept-desc">Acquisition using significant debt — typically 4–7× EBITDA total leverage — against the target's own cash flows and assets as collateral.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-emoji">📈</div>
+        <div class="concept-title">IRR (Internal Rate of Return)</div>
+        <div class="concept-desc">The discount rate that makes NPV = 0. PE's primary performance metric. Gross IRR is before fees; Net IRR is what LPs actually receive.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-emoji">💰</div>
+        <div class="concept-title">MOIC (Multiple on Invested Capital)</div>
+        <div class="concept-desc">Exit value ÷ entry equity cost. Also called Money-on-Money (MoM). Simple, time-independent — paired with IRR for complete return picture.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-emoji">🏊</div>
+        <div class="concept-title">Waterfall Distribution</div>
+        <div class="concept-desc">The ordered sequence of who gets paid: Return of Capital → Preferred Return → GP Catch-Up → Carried Interest split. European waterfall = fund-level; American = deal-level.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-emoji">📉</div>
+        <div class="concept-title">J-Curve</div>
+        <div class="concept-desc">Early years of a fund show negative net cash flow (management fees, slow deployment). Returns turn positive as portfolio companies mature and exits occur — forming a "J" shape.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-emoji">✂️</div>
+        <div class="concept-title">Carried Interest ("Carry")</div>
+        <div class="concept-desc">GP's profit share — typically 20% of gains above the hurdle rate. The primary GP incentive. Taxed as capital gains in most jurisdictions, including India.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-emoji">🏦</div>
+        <div class="concept-title">2-and-20 Fee Model</div>
+        <div class="concept-desc">2% annual management fee (on committed or deployed capital) + 20% carried interest on profits. Management fee typically declines post-investment period.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-emoji">📤</div>
+        <div class="concept-title">DPI (Distributions to Paid-In)</div>
+        <div class="concept-desc">Cash actually returned to LPs ÷ total invested. The "realised" multiple. DPI &gt; 1× means LPs have received back more than they put in.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-emoji">📊</div>
+        <div class="concept-title">TVPI (Total Value to Paid-In)</div>
+        <div class="concept-desc">DPI + RVPI (residual NAV). Includes unrealised portfolio value. A high TVPI with low DPI means the fund looks good on paper but hasn't distributed cash yet.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-emoji">🔄</div>
+        <div class="concept-title">Clawback</div>
+        <div class="concept-desc">If GPs receive excess carry (because early exits looked great but later deals underperform), LPs can "claw back" the overpayment. Standard in European waterfall structures.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-emoji">🔀</div>
+        <div class="concept-title">PME (Public Market Equivalent)</div>
+        <div class="concept-desc">Benchmarks PE returns against investing the same cash flows in a public index (Nifty 500, BSE 500). PME &gt; 1× means PE outperformed public markets.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-emoji">🎯</div>
+        <div class="concept-title">Multiple Arbitrage</div>
+        <div class="concept-desc">Buying at a lower EV/EBITDA multiple than you sell at. Even with flat EBITDA, a re-rating from 8× to 10× exit creates significant equity returns — and it's the riskiest assumption to model.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PE GLOSSARY -->
+<section class="section">
+  <div class="container">
+    <div class="sec-eyebrow">Glossary</div>
+    <div class="sec-title">PE Terminology — A to Z</div>
+    <div class="sec-sub">Key terms you'll encounter in PE deal memos, LP reports, and fund documents.</div>
+
+    <div class="glossary-grid">
+      <div class="glossary-item">
+        <div class="glossary-term">TLA / Term Loan A</div>
+        <div class="glossary-def">Senior secured debt with scheduled amortization (typically 5–7 year maturity). Lower spread, held by banks. Amortises 15–25% of principal annually.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">TLB / Term Loan B</div>
+        <div class="glossary-def">Senior secured debt held by institutional investors. Minimal amortization (1% p.a. "bullet"), higher spread, covenant-lite. 7 year typical maturity.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">RCF / Revolving Credit Facility</div>
+        <div class="glossary-def">Undrawn working capital line. Drawn for seasonal needs, capex, or bolt-on funding. Commitment fee applies even when undrawn.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">High Yield (HY) Bonds</div>
+        <div class="glossary-def">Sub-investment grade bonds issued in public markets. Fixed coupon, non-amortising, bullet maturity. Higher yield than TLB but more flexible covenants.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">PIK (Pay-in-Kind)</div>
+        <div class="glossary-def">Interest accrues and is added to principal instead of paid in cash. Used in highly levered situations. Compounds the debt balance — highest risk tranche.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">ICR (Interest Coverage Ratio)</div>
+        <div class="glossary-def">EBITDA ÷ Cash Interest Expense. Core maintenance covenant. Typical threshold: ≥2.0–2.5× for TLA/TLB facilities in Indian PE deals.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">DSCR (Debt Service Coverage)</div>
+        <div class="glossary-def">CFADS ÷ (Interest + Scheduled Principal). Measures cash flow capacity to service all debt obligations. Infrastructure deals typically require DSCR ≥1.2×.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">CFADS</div>
+        <div class="glossary-def">Cash Flow Available for Debt Service. EBITDA minus capex, taxes, and changes in working capital — the true number available to pay lenders.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Preferred Return / Hurdle Rate</div>
+        <div class="glossary-def">Minimum return LPs must receive before the GP earns carry. Standard is 8% p.a. compound. Some VC funds have no hurdle rate.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">GP Catch-Up</div>
+        <div class="glossary-def">After LPs clear the hurdle, GP receives 100% of incremental distributions until they've "caught up" to their 20% carry split on total profits above ROC.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Commitment Period</div>
+        <div class="glossary-def">First 3–5 years of a fund during which the GP can call capital and make new investments. Management fee typically on committed capital during this period.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Harvest Period</div>
+        <div class="glossary-def">Years 5–10 of a fund when the focus shifts from deployment to realizations (exits). Management fee typically switches to deployed/invested capital basis.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Co-Investment</div>
+        <div class="glossary-def">LP invests directly alongside the fund in a specific deal — usually fee-free and carry-free. Allows LPs to concentrate in deals they like most.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Secondary Transaction</div>
+        <div class="glossary-def">Sale of an LP's interest in a fund, or a GP-led restructuring. Secondaries market provides liquidity before fund wind-down. Traded at discounts or premiums to NAV.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">MIP (Management Incentive Plan)</div>
+        <div class="glossary-def">Equity incentive structure for portfolio company management team — typically 5–15% of equity in "sweet equity" that vests over time or at exit. Aligns PE and management interests.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Bolt-on Acquisition</div>
+        <div class="glossary-def">Add-on deal where a PE-backed platform company acquires a smaller target to grow through M&amp;A. Usually at lower multiples than the platform — creates immediate value uplift.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INDIA PE LANDSCAPE -->
+<section class="section" style="background:var(--card);border-top:1px solid var(--border);">
+  <div class="container">
+    <div class="sec-eyebrow">India Context</div>
+    <div class="sec-title">PE/VC in India — Key Facts</div>
+    <div class="sec-sub">The India PE market operates differently from the US/European market. Here's what matters.</div>
+
+    <div class="concepts-grid">
+      <div class="concept-card">
+        <div class="concept-emoji">🇮🇳</div>
+        <div class="concept-title">Market Size</div>
+        <div class="concept-desc">India PE/VC market attracted ~$30–40B annually in 2021–23. KKR, Blackstone, ChrysCapital, Warburg Pincus, General Atlantic are top players.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-emoji">📋</div>
+        <div class="concept-title">SEBI AIF Regulations</div>
+        <div class="concept-desc">Category II AIFs are the standard structure for PE funds in India. Carry is tax-exempt as long-term capital gains when assets are held 24+ months.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-emoji">🏦</div>
+        <div class="concept-title">Leverage Market</div>
+        <div class="concept-desc">Indian LBO market is nascent vs US. Banks lend 3–4× EBITDA max; no leveraged loan market. ECBs (External Commercial Borrowings) used for offshore leverage.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-emoji">🚪</div>
+        <div class="concept-title">Exit Routes</div>
+        <div class="concept-desc">IPO (NSE/BSE), strategic sale to MNC or Indian conglomerate, secondary to another PE fund, or buyback by promoter. IPO window critical for PE exit timelines.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-emoji">💼</div>
+        <div class="concept-title">Waterfall Standard</div>
+        <div class="concept-desc">European waterfall (fund-level carry) is the India standard for PE buyout funds. Carry typically 20%, hurdle 8%. Management fee often 1.5–2% on deployed capital.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-emoji">📐</div>
+        <div class="concept-title">Deal Multiples</div>
+        <div class="concept-desc">Indian PE deals typically done at 10–18× EBITDA for quality assets. Consumer/FMCG and Healthcare command premium. Infrastructure and traditional manufacturing at 7–11×.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="section" style="text-align:center;padding:4rem 2rem;">
+  <div class="container">
+    <div style="font-family:var(--mono);font-size:0.65rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:0.75rem;">Ready to Build?</div>
+    <h2 style="font-size:1.6rem;font-weight:800;letter-spacing:-0.03em;margin-bottom:0.75rem;">Run Real LBO Models</h2>
+    <p style="font-size:0.88rem;color:var(--muted);max-width:460px;margin:0 auto 1.75rem;">The LBO calculator is free — no login needed. Unlock Pro for debt schedules, fund economics, carry, and portfolio IRR.</p>
+    <div style="display:flex;align-items:center;justify-content:center;gap:0.75rem;flex-wrap:wrap;">
+      <a href="../calculators/lbo-model.html" style="display:inline-flex;align-items:center;font-size:0.85rem;font-weight:700;color:#fff;background:var(--text);text-decoration:none;padding:0.65rem 1.4rem;border-radius:7px;transition:opacity 0.15s;" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">Try Free LBO Calculator →</a>
+      <a href="../calculators/index.html" style="display:inline-flex;align-items:center;font-size:0.85rem;font-weight:600;color:var(--text);text-decoration:none;padding:0.65rem 1.4rem;border-radius:7px;border:1px solid var(--border);transition:background 0.15s;" onmouseover="this.style.background='var(--card)'" onmouseout="this.style.background='transparent'">View All Calculators</a>
+    </div>
+    <p style="font-size:0.72rem;color:var(--muted);margin-top:1rem;">Pro: ₹799/mo · Monthly only · Cancel anytime · All 15 domains included</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <p class="footer-text">ValuationDesk · India's finance learning platform · <a href="../../../index.html" style="color:var(--muted);">Back to Home</a></p>
+</footer>
+
+<script>
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+</script>
+</body>
+</html>

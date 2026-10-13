@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portfolio IRR Tracker — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-pro{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+.steps-bar{padding:20px 24px 0;max-width:720px;margin:0 auto}
+.steps{display:flex;align-items:center}
+.stp{display:flex;align-items:center;gap:7px}
+.stp-n{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
+.stp.done .stp-n{background:#dcfce7;color:var(--green)}
+.stp.active .stp-n{background:var(--text);color:#fff}
+.stp.idle .stp-n{background:var(--card);color:var(--muted);border:1px solid var(--border)}
+.stp-l{font-size:12px;font-weight:600}
+.stp.done .stp-l{color:var(--green)}
+.stp.active .stp-l{color:var(--text)}
+.stp.idle .stp-l{color:var(--muted)}
+.stp-line{flex:1;height:1px;background:var(--border);margin:0 10px}
+.stp-done-line{background:var(--green)}
+.main{max-width:720px;margin:0 auto;padding:24px 24px 80px}
+.screen{display:none}.screen.active{display:block}
+h2{font-size:20px;font-weight:900;letter-spacing:-.02em;margin-bottom:6px}
+.sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.search-box{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;font-family:inherit;outline:none;margin-bottom:14px}
+.search-box:focus{border-color:#aaa}
+.sectors{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.sec-btn{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid var(--border);background:#fff;cursor:pointer;color:var(--muted)}
+.sec-btn.on{background:var(--text);color:#fff;border-color:var(--text)}
+.co-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.co-card{border:1px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;transition:all .15s}
+.co-card:hover{border-color:#aaa;background:var(--card)}
+.co-card.sel{border-color:var(--text);background:#f5f5f5}
+.co-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.co-meta{font-size:11px;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:11px 22px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:inherit}
+.btn-primary{background:var(--text);color:#fff}.btn-primary:hover{opacity:.85}.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-outline{background:#fff;border:1px solid var(--border);color:var(--text)}.btn-outline:hover{border-color:#aaa}
+.nav-btns{display:flex;gap:10px;margin-top:28px}
+.teach-hero{background:#0a0a0a;color:#fff;border-radius:12px;padding:24px;margin-bottom:20px}
+.teach-hero-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6b7280;margin-bottom:8px}
+.teach-hero h3{font-size:18px;font-weight:900;margin-bottom:8px;letter-spacing:-.02em}
+.teach-hero p{font-size:13px;color:#9ca3af;line-height:1.6}
+/* metric trio */
+.metric-trio{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.metric-card{border-radius:10px;padding:16px;text-align:center}
+.metric-card .mc-icon{font-size:22px;margin-bottom:8px}
+.metric-card .mc-name{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.metric-card .mc-full{font-size:10px;margin-bottom:8px}
+.metric-card .mc-formula{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;margin-bottom:6px}
+.metric-card .mc-desc{font-size:11px;line-height:1.45}
+.mc-dpi{background:#dcfce7}.mc-dpi .mc-name{color:#14532d}.mc-dpi .mc-full{color:#166534}.mc-dpi .mc-formula{color:#15803d}.mc-dpi .mc-desc{color:#166534}
+.mc-tvpi{background:#dbeafe}.mc-tvpi .mc-name{color:#1e3a5f}.mc-tvpi .mc-full{color:#1e40af}.mc-tvpi .mc-formula{color:#1d4ed8}.mc-tvpi .mc-desc{color:#1e40af}
+.mc-rvpi{background:#fefce8}.mc-rvpi .mc-name{color:#78350f}.mc-rvpi .mc-full{color:#92400e}.mc-rvpi .mc-formula{color:#b45309}.mc-rvpi .mc-desc{color:#92400e}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.info-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
+.info-box h4{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:10px}
+.info-row{display:flex;justify-content:space-between;align-items:baseline;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px}
+.info-row:last-child{border:none}
+.info-row .lbl{color:var(--muted)}.info-row .val{font-weight:700;font-family:'JetBrains Mono',monospace;font-size:11px}
+.formula-box{background:#0a0a0a;color:#fff;border-radius:10px;padding:16px;margin-bottom:20px}
+.formula-box h4{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6b7280;margin-bottom:12px}
+.formula{font-family:'JetBrains Mono',monospace;font-size:12px;color:#d1fae5;margin-bottom:6px;line-height:1.5}
+.formula span{color:#6b7280}
+.vintage-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px}
+.vintage-box h4{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:12px}
+.vintage-row{display:grid;grid-template-columns:80px 1fr 60px 60px;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--border);font-size:12px}
+.vintage-row:last-child{border:none}
+.vintage-row.hdr{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.vbar{height:8px;border-radius:4px;background:#dbeafe}
+.vbar-fill{height:100%;border-radius:4px;background:var(--green)}
+.callout{border-left:3px solid var(--amber);background:#fffbeb;border-radius:0 8px 8px 0;padding:12px 14px;margin-bottom:20px;font-size:13px;color:#78350f;line-height:1.55}
+.callout strong{display:block;font-weight:700;margin-bottom:4px}
+.sector-ctx{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px}
+.sector-ctx-hdr{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.ctx-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px}
+.ctx-row:last-child{border:none}
+.ctx-row .k{color:var(--muted)}.ctx-row .v{font-weight:700;max-width:60%;text-align:right}
+.pro-gate{border:2px dashed var(--border);border-radius:12px;padding:32px;text-align:center}
+.pro-gate-icon{font-size:32px;margin-bottom:12px}
+.pro-gate h3{font-size:18px;font-weight:900;margin-bottom:6px;letter-spacing:-.02em}
+.pro-gate p{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.55}
+.pro-feats{text-align:left;margin:0 auto 24px;max-width:360px}
+.pro-feat{font-size:13px;padding:5px 0;color:var(--muted)}
+.pro-feat::before{content:'→ ';font-weight:700;color:var(--text)}
+.btn-unlock{background:var(--text);color:#fff;padding:13px 28px;border-radius:8px;font-size:14px;font-weight:800;cursor:pointer;border:none;font-family:inherit;width:100%;max-width:280px}
+.btn-unlock:hover{opacity:.85}
+.pro-note{font-size:11px;color:var(--muted);margin-top:10px}
+@media(max-width:600px){.metric-trio{grid-template-columns:1fr}.two-col{grid-template-columns:1fr}.co-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-left">
+    <a href="/valuation-toolkit/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">›</span>
+    <a href="/valuation-toolkit/domains/pe/">Private Equity</a>
+    <span class="nav-sep">›</span>
+    <a href="/valuation-toolkit/domains/pe/calculators/">Calculators</a>
+    <span class="nav-sep">›</span>
+    <span>Portfolio IRR Tracker</span>
+  </div>
+  <button class="nav-pro" onclick="unlockPro()">Go Pro — ₹799/mo</button>
+</nav>
+
+<div class="steps-bar">
+  <div class="steps">
+    <div class="stp active" id="si1"><div class="stp-n">1</div><div class="stp-l">Company</div></div>
+    <div class="stp-line" id="sl1"></div>
+    <div class="stp idle" id="si2"><div class="stp-n">2</div><div class="stp-l">Portfolio Metrics</div></div>
+    <div class="stp-line" id="sl2"></div>
+    <div class="stp idle" id="si3"><div class="stp-n">3</div><div class="stp-l">Inputs</div></div>
+    <div class="stp-line" id="sl3"></div>
+    <div class="stp idle" id="si4"><div class="stp-n">4</div><div class="stp-l">Dashboard</div></div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- STEP 1 -->
+<div class="screen active" id="s1">
+  <h2>Pick a Company</h2>
+  <p class="sub">Select the portfolio company — we'll load sector benchmarks for DPI, TVPI, and typical fund IRR targets.</p>
+  <input class="search-box" id="search" placeholder="Search by name or ticker…" oninput="filterCos()">
+  <div class="sectors" id="sectors"></div>
+  <div class="co-grid" id="cogrid"></div>
+  <div class="nav-btns">
+    <button class="btn btn-primary" id="s1btn" onclick="goStep(2)" disabled>Continue →</button>
+  </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="screen" id="s2">
+  <div class="teach-hero">
+    <div class="teach-hero-label">📊 Portfolio Performance</div>
+    <h3>The Three Metrics That Define PE Performance</h3>
+    <p>When an LP asks "how's the fund doing?" — they mean DPI, TVPI, and RVPI. These three ratios tell the full story of what's been returned, what's still at work, and whether the fund is on track. IRR alone can be gamed with timing; multiples tell the truth.</p>
+  </div>
+
+  <div class="metric-trio">
+    <div class="metric-card mc-dpi">
+      <div class="mc-icon">💵</div>
+      <div class="mc-name">DPI</div>
+      <div class="mc-full">Distributions to Paid-In</div>
+      <div class="mc-formula">Dist. ÷ Capital</div>
+      <div class="mc-desc">Cash actually returned to LPs. The only "real" metric — money in hand. A fund with DPI &lt;1× has not yet returned capital. Strong funds hit DPI 1.5–2.5×+.</div>
+    </div>
+    <div class="metric-card mc-tvpi">
+      <div class="mc-icon">📈</div>
+      <div class="mc-name">TVPI</div>
+      <div class="mc-full">Total Value to Paid-In</div>
+      <div class="mc-formula">(Dist. + NAV) ÷ Capital</div>
+      <div class="mc-desc">Distributions plus unrealized NAV as a multiple of invested capital. The headline number on fund reports. Target: 2–3× for a top-quartile fund. TVPI = DPI + RVPI.</div>
+    </div>
+    <div class="metric-card mc-rvpi">
+      <div class="mc-icon">🏦</div>
+      <div class="mc-name">RVPI</div>
+      <div class="mc-full">Residual Value to Paid-In</div>
+      <div class="mc-formula">NAV ÷ Paid-In Capital</div>
+      <div class="mc-desc">Unrealized portfolio value as a multiple of capital. As exits happen, RVPI falls and DPI rises. RVPI &gt;1.5× in year 7+ may signal delayed exits or optimistic marks.</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="info-box">
+      <h4>Interpreting the Multiples</h4>
+      <div class="info-row"><span class="lbl">Top-quartile target</span><span class="val">TVPI ≥ 2.5×</span></div>
+      <div class="info-row"><span class="lbl">Median PE fund</span><span class="val">TVPI 1.7–2.1×</span></div>
+      <div class="info-row"><span class="lbl">DPI by year 7</span><span class="val">Should be ≥0.8×</span></div>
+      <div class="info-row"><span class="lbl">Late fund RVPI</span><span class="val">Should be declining</span></div>
+      <div class="info-row"><span class="lbl">Loss ratio (typical)</span><span class="val">15–25% of deals</span></div>
+    </div>
+    <div class="info-box">
+      <h4>Portfolio vs Deal IRR</h4>
+      <div class="info-row"><span class="lbl">Fund IRR</span><span class="val">Blended across deals</span></div>
+      <div class="info-row"><span class="lbl">Best deal IRR</span><span class="val">Often 5–10× MOIC</span></div>
+      <div class="info-row"><span class="lbl">Power law</span><span class="val">Top 2–3 deals drive 60%+</span></div>
+      <div class="info-row"><span class="lbl">Loss floor</span><span class="val">Max 1× loss per deal</span></div>
+      <div class="info-row"><span class="lbl">Diversification</span><span class="val">8–15 deals typical</span></div>
+    </div>
+  </div>
+
+  <div class="vintage-box">
+    <h4>India PE Vintage Year Benchmarks (Illustrative)</h4>
+    <div class="vintage-row hdr">
+      <span>Vintage</span><span>DPI Progress</span><span>DPI</span><span>TVPI</span>
+    </div>
+    <div class="vintage-row">
+      <span>2014–15</span><div class="vbar"><div class="vbar-fill" style="width:90%"></div></div><span>1.8×</span><span>2.2×</span>
+    </div>
+    <div class="vintage-row">
+      <span>2016–17</span><div class="vbar"><div class="vbar-fill" style="width:75%"></div></div><span>1.4×</span><span>2.0×</span>
+    </div>
+    <div class="vintage-row">
+      <span>2018–19</span><div class="vbar"><div class="vbar-fill" style="width:45%"></div></div><span>0.8×</span><span>1.7×</span>
+    </div>
+    <div class="vintage-row">
+      <span>2020–21</span><div class="vbar"><div class="vbar-fill" style="width:20%"></div></div><span>0.3×</span><span>1.4×</span>
+    </div>
+    <div class="vintage-row">
+      <span>2022–23</span><div class="vbar"><div class="vbar-fill" style="width:5%"></div></div><span>0.1×</span><span>1.1×</span>
+    </div>
+    <p style="font-size:11px;color:var(--muted);margin-top:10px">Illustrative only. Actual returns vary by manager, sector, and market conditions.</p>
+  </div>
+
+  <div class="formula-box">
+    <h4>Portfolio Math</h4>
+    <div class="formula">TVPI = DPI + RVPI <span style="color:#6b7280"> ← always true by definition</span></div>
+    <div class="formula">Fund IRR = <span>IRR of all LP cash flows (calls and distributions)</span></div>
+    <div class="formula">Gross-to-Net spread ≈ <span>Mgmt Fees + Carry + Expenses ≈ 3–5%</span></div>
+    <div class="formula">Public Market Equivalent (PME) = <span>Fund DPI ÷ Index DPI over same period</span></div>
+    <div class="formula">Paid-In Capital = <span>Sum of all capital calls (contributions)</span></div>
+  </div>
+
+  <div id="sectorCtx2" class="sector-ctx" style="display:none">
+    <div class="sector-ctx-hdr" id="ctxTitle2">Sector IRR Benchmarks</div>
+    <div id="ctxBody2"></div>
+  </div>
+
+  <div class="callout">
+    <strong>Why TVPI Can Be Misleading</strong>
+    A fund showing TVPI 2.5× in year 4 looks great — but if DPI is only 0.1× (almost no cash returned), the TVPI relies entirely on unrealized marks that the GP controls. LPs have learned to discount RVPI, especially in late-cycle or distressed markets. The RVPI / DPI ratio and its trend over time tells you more about fund quality than the headline TVPI.
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn btn-outline" onclick="goStep(1)">← Back</button>
+    <button class="btn btn-primary" onclick="goStep(3)">Continue to Inputs →</button>
+  </div>
+</div>
+
+<!-- STEP 3 — PRO GATE -->
+<div class="screen" id="s3">
+  <div class="pro-gate">
+    <div class="pro-gate-icon">🔒</div>
+    <h3>Build Your Portfolio IRR Tracker</h3>
+    <p>Add up to 15 investments, input entry date, committed capital, cost basis, distributions received, and current NAV for each deal — and watch the fund-level metrics compute in real time.</p>
+    <div class="pro-feats">
+      <div class="pro-feat">Up to 15 deals in one portfolio</div>
+      <div class="pro-feat">Per-deal: entry date, cost, distributions, current NAV</div>
+      <div class="pro-feat">Live DPI, TVPI, RVPI by deal and at fund level</div>
+      <div class="pro-feat">Gross fund IRR using all cash flows (XIRR)</div>
+      <div class="pro-feat">Vintage year grouping and contribution analysis</div>
+      <div class="pro-feat">Sector allocation and realized vs unrealized split</div>
+    </div>
+    <button class="btn-unlock" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    <div class="pro-note">Monthly only · Cancel anytime · All 15 domains included</div>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-outline" onclick="goStep(2)">← Back</button>
+  </div>
+</div>
+
+<!-- STEP 4 — PRO GATE -->
+<div class="screen" id="s4">
+  <div class="pro-gate">
+    <div class="pro-gate-icon">🔒</div>
+    <h3>Fund Performance Dashboard</h3>
+    <p>Complete DPI / TVPI / RVPI dashboard with deal-level waterfall, IRR attribution by sector and vintage, and a public market equivalent comparison.</p>
+    <div class="pro-feats">
+      <div class="pro-feat">Fund-level: DPI, TVPI, RVPI, gross IRR, net IRR</div>
+      <div class="pro-feat">Deal-level league table: top performers, write-offs</div>
+      <div class="pro-feat">Realized vs unrealized value split by sector</div>
+      <div class="pro-feat">Vintage year contribution to fund TVPI</div>
+      <div class="pro-feat">PME vs Nifty 500 / BSE 500 benchmark comparison</div>
+      <div class="pro-feat">Export: full portfolio table + performance charts</div>
+    </div>
+    <button class="btn-unlock" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    <div class="pro-note">Monthly only · Cancel anytime · All 15 domains included</div>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-outline" onclick="goStep(3)">← Back</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+const COMPANIES=[
+  {name:'Reliance Industries',ticker:'RIL',sector:'Conglomerate'},
+  {name:'Tata Consultancy Services',ticker:'TCS',sector:'Technology'},
+  {name:'Infosys',ticker:'INFY',sector:'Technology'},
+  {name:'HDFC Bank',ticker:'HDFCBANK',sector:'Banking/NBFC'},
+  {name:'ICICI Bank',ticker:'ICICIBANK',sector:'Banking/NBFC'},
+  {name:'Hindustan Unilever',ticker:'HUL',sector:'FMCG/Consumer'},
+  {name:'ITC Limited',ticker:'ITC',sector:'FMCG/Consumer'},
+  {name:'Bharti Airtel',ticker:'AIRTEL',sector:'Telecom'},
+  {name:'Wipro',ticker:'WIPRO',sector:'Technology'},
+  {name:'Asian Paints',ticker:'ASIANPAINT',sector:'Chemicals'},
+  {name:'Bajaj Finance',ticker:'BAJFINANCE',sector:'Banking/NBFC'},
+  {name:'Maruti Suzuki',ticker:'MARUTI',sector:'Automobiles'},
+  {name:'Sun Pharmaceutical',ticker:'SUNPHARMA',sector:'Healthcare/Pharma'},
+  {name:"Dr. Reddy's Labs",ticker:'DRREDDY',sector:'Healthcare/Pharma'},
+  {name:'Titan Company',ticker:'TITAN',sector:'FMCG/Consumer'},
+  {name:'Larsen & Toubro',ticker:'LT',sector:'Infrastructure'},
+  {name:'UltraTech Cement',ticker:'ULTRACEMCO',sector:'Conglomerate'},
+  {name:'Nestle India',ticker:'NESTLEIND',sector:'FMCG/Consumer'},
+  {name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',sector:'Banking/NBFC'},
+  {name:'Axis Bank',ticker:'AXISBANK',sector:'Banking/NBFC'},
+  {name:'State Bank of India',ticker:'SBIN',sector:'Banking/NBFC'},
+  {name:'ONGC',ticker:'ONGC',sector:'Oil & Gas'},
+  {name:'Coal India',ticker:'COALINDIA',sector:'Metals & Mining'},
+  {name:'JSW Steel',ticker:'JSWSTEEL',sector:'Metals & Mining'},
+  {name:'Tata Steel',ticker:'TATASTEEL',sector:'Metals & Mining'},
+  {name:'Power Grid Corp',ticker:'POWERGRID',sector:'Power/Utilities'},
+  {name:'NTPC',ticker:'NTPC',sector:'Power/Utilities'},
+  {name:'DLF',ticker:'DLF',sector:'Real Estate'},
+  {name:'Godrej Properties',ticker:'GODREJPROP',sector:'Real Estate'},
+  {name:'Zee Entertainment',ticker:'ZEEL',sector:'Media'}
+];
+
+const SECTOR_CONTEXT={
+  'Technology':{targetTVPI:'2.5–4×',targetDPI:'1.5–2.5× by Y7',benchmarkIRR:'20–30% net',exitProfile:'IPO (NSE/BSE), strategic sale, secondary to later-stage PE'},
+  'Banking/NBFC':{targetTVPI:'2–2.8×',targetDPI:'1.2–2× by Y7',benchmarkIRR:'15–22% net',exitProfile:'Open market sale (block deal), QIP, secondary sale to institution'},
+  'Healthcare/Pharma':{targetTVPI:'2.2–3×',targetDPI:'1.3–2× by Y7',benchmarkIRR:'18–26% net',exitProfile:'IPO, strategic acquisition (MNC pharma), secondary to growth PE'},
+  'FMCG/Consumer':{targetTVPI:'2–2.8×',targetDPI:'1.2–2× by Y8',benchmarkIRR:'16–24% net',exitProfile:'Strategic sale to global FMCG, IPO, secondary buyout'},
+  'Oil & Gas':{targetTVPI:'1.8–2.5×',targetDPI:'1–1.8× by Y8',benchmarkIRR:'14–20% net',exitProfile:'InvIT listing, PSU acquisition, secondary to infra fund'},
+  'Metals & Mining':{targetTVPI:'2–2.8×',targetDPI:'1.2–2× by Y7',benchmarkIRR:'16–24% net',exitProfile:'IPO, strategic sale, secondary buyout at commodity peak'},
+  'Telecom':{targetTVPI:'2–3×',targetDPI:'1.2–2× by Y8',benchmarkIRR:'15–22% net',exitProfile:'Tower carve-out, spectrum sale, strategic sale to Jio/Airtel'},
+  'Automobiles':{targetTVPI:'2–2.8×',targetDPI:'1.2–2× by Y7',benchmarkIRR:'16–26% net',exitProfile:'IPO, strategic partnership (OEM), secondary buyout (EV focus)'},
+  'Power/Utilities':{targetTVPI:'1.8–2.5×',targetDPI:'0.8–1.5× by Y8',benchmarkIRR:'13–20% net',exitProfile:'InvIT / REIT listing, long-term PPA sale, utility acquisition'},
+  'Real Estate':{targetTVPI:'2–2.8×',targetDPI:'1.2–2× by Y7',benchmarkIRR:'16–24% net',exitProfile:'REIT listing, bulk sale to institution, joint development exit'},
+  'Media':{targetTVPI:'2.2–3.5×',targetDPI:'1.2–2× by Y6',benchmarkIRR:'18–28% net',exitProfile:'Strategic sale (global media group), IPO, secondary to growth fund'},
+  'Chemicals':{targetTVPI:'2.2–3×',targetDPI:'1.3–2× by Y7',benchmarkIRR:'18–28% net',exitProfile:'IPO (specialty chemicals rally), strategic sale to global chemical company'},
+  'Infrastructure':{targetTVPI:'1.8–2.4×',targetDPI:'0.8–1.5× by Y9',benchmarkIRR:'13–18% net',exitProfile:'InvIT listing, long-term concession sale, sovereign wealth fund secondary'},
+  'Conglomerate':{targetTVPI:'2–2.8×',targetDPI:'1.2–2× by Y7',benchmarkIRR:'16–24% net',exitProfile:'Subsidiary IPO (SOTP unlock), strategic divestiture, secondary buyout'}
+};
+
+let activeSector='All',selectedCo=null,currentStep=1;
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+function renderSectors(){
+  const s=document.getElementById('sectors');
+  const all=['All',...new Set(COMPANIES.map(c=>c.sector))];
+  s.innerHTML=all.map(x=>`<button class="sec-btn${activeSector===x?' on':''}" onclick="setSector('${x}')">${x}</button>`).join('');
+}
+function setSector(s){activeSector=s;renderSectors();renderGrid();}
+function filterCos(){renderGrid();}
+function renderGrid(){
+  const q=document.getElementById('search').value.toLowerCase();
+  const list=COMPANIES.filter(c=>(activeSector==='All'||c.sector===activeSector)&&(!q||c.name.toLowerCase().includes(q)||c.ticker.toLowerCase().includes(q)));
+  document.getElementById('cogrid').innerHTML=list.map(c=>`<div class="co-card${selectedCo&&selectedCo.name===c.name?' sel':''}" onclick="selectCo(${JSON.stringify(c).replace(/"/g,'&quot;')})"><div class="co-name">${c.name}</div><div class="co-meta">${c.ticker} · ${c.sector}</div></div>`).join('');
+}
+function selectCo(c){selectedCo=c;document.getElementById('s1btn').disabled=false;renderGrid();}
+function showStep(n){
+  [1,2,3,4].forEach(i=>{
+    document.getElementById('s'+i).classList.toggle('active',i===n);
+    const si=document.getElementById('si'+i);
+    si.className='stp '+(i<n?'done':i===n?'active':'idle');
+    if(i<4){const ln=document.getElementById('sl'+i);if(ln)ln.className='stp-line'+(i<n?' stp-done-line':'');}
+  });
+  currentStep=n;
+  if(n===2&&selectedCo)renderSectorCtx();
+}
+function renderSectorCtx(){
+  const ctx=SECTOR_CONTEXT[selectedCo.sector];
+  if(!ctx){document.getElementById('sectorCtx2').style.display='none';return;}
+  document.getElementById('ctxTitle2').textContent=selectedCo.sector+' — IRR &amp; Portfolio Benchmarks';
+  const rows=[['Target TVPI',ctx.targetTVPI],['Target DPI',ctx.targetDPI],['Benchmark Net IRR',ctx.benchmarkIRR],['Exit Profile',ctx.exitProfile]];
+  document.getElementById('ctxBody2').innerHTML=rows.map(r=>`<div class="ctx-row"><span class="k">${r[0]}</span><span class="v">${r[1]}</span></div>`).join('');
+  document.getElementById('sectorCtx2').style.display='block';
+}
+function goStep(n){showStep(n);}
+renderSectors();renderGrid();
+</script>
+</body>
+</html>

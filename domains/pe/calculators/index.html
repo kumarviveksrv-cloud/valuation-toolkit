@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PE Calculators — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--amber:#d97706}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-pro{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+.main{max-width:860px;margin:0 auto;padding:40px 24px 80px}
+h1{font-size:clamp(20px,3vw,26px);font-weight:900;letter-spacing:-.02em;margin-bottom:6px}
+.sub{font-size:14px;color:var(--muted);margin-bottom:32px}
+.free-banner{background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:14px 18px;display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.free-banner-icon{font-size:18px}
+.free-banner-text{font-size:13px;color:#15803d;font-weight:600}
+.free-banner-text span{font-weight:400;color:#166534}
+.list{display:flex;flex-direction:column;gap:2px}
+.row{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
+.row:last-child{border-bottom:none}
+.row-icon{font-size:20px;width:32px;text-align:center;flex-shrink:0}
+.row-body{flex:1}
+.row-name{font-size:14px;font-weight:700;margin-bottom:2px}
+.row-desc{font-size:12px;color:var(--muted)}
+.badge{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:4px;flex-shrink:0}
+.badge-free{background:#dcfce7;color:#15803d}
+.badge-pro{background:#fef3c7;color:#92400e}
+.row-link{font-size:12px;font-weight:700;color:var(--text);flex-shrink:0}
+.row-link:hover{opacity:.7}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-left">
+    <a href="/valuation-toolkit/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">›</span>
+    <a href="/valuation-toolkit/domains/pe/">Private Equity</a>
+    <span class="nav-sep">›</span>
+    <span>Calculators</span>
+  </div>
+  <button class="nav-pro" onclick="alert('Pro unlock coming soon — ₹799/mo for all 15 domains.')">Go Pro — ₹799/mo</button>
+</nav>
+<div class="main">
+  <h1>PE Calculators</h1>
+  <p class="sub">6 deal-execution tools — from entry LBO model to full fund economics, debt scheduling, and portfolio tracking.</p>
+
+  <div class="free-banner">
+    <div class="free-banner-icon">🎁</div>
+    <div class="free-banner-text">Free today: LBO Model <span>— build a full returns analysis, no account needed</span></div>
+  </div>
+
+  <div class="list">
+    <div class="row">
+      <div class="row-icon">🏗️</div>
+      <div class="row-body">
+        <div class="row-name">LBO Model</div>
+        <div class="row-desc">Entry multiple, debt structure, hold period, exit assumptions → equity IRR + MOIC + full returns bridge. The core PE skill.</div>
+      </div>
+      <div class="badge badge-free">Free</div>
+      <a class="row-link" href="/valuation-toolkit/domains/pe/calculators/lbo-model.html">Open →</a>
+    </div>
+    <div class="row">
+      <div class="row-icon">🌊</div>
+      <div class="row-body">
+        <div class="row-name">Returns Waterfall</div>
+        <div class="row-desc">LP/GP distribution waterfall with hurdle rate, catch-up, and multi-tier carry. Net-of-fee IRR by investor class.</div>
+      </div>
+      <div class="badge badge-pro">Pro</div>
+      <a class="row-link" href="/valuation-toolkit/domains/pe/calculators/returns-waterfall.html">Open →</a>
+    </div>
+    <div class="row">
+      <div class="row-icon">📋</div>
+      <div class="row-body">
+        <div class="row-name">Debt Schedule Builder</div>
+        <div class="row-desc">Multi-tranche debt model — TLA, TLB, revolver, high-yield, PIK. Amortization, prepayment, and live covenant ratios.</div>
+      </div>
+      <div class="badge badge-pro">Pro</div>
+      <a class="row-link" href="/valuation-toolkit/domains/pe/calculators/debt-schedule.html">Open →</a>
+    </div>
+    <div class="row">
+      <div class="row-icon">💼</div>
+      <div class="row-body">
+        <div class="row-name">Fund Economics</div>
+        <div class="row-desc">Management fee waterfall, J-curve, gross vs net IRR, GP commit mechanics, and LP return sensitivity by vintage.</div>
+      </div>
+      <div class="badge badge-pro">Pro</div>
+      <a class="row-link" href="/valuation-toolkit/domains/pe/calculators/fund-economics.html">Open →</a>
+    </div>
+    <div class="row">
+      <div class="row-icon">💎</div>
+      <div class="row-body">
+        <div class="row-name">Carry Calculator</div>
+        <div class="row-desc">Deal-level and fund-level carried interest, European vs American waterfall, clawback provisions and team economics.</div>
+      </div>
+      <div class="badge badge-pro">Pro</div>
+      <a class="row-link" href="/valuation-toolkit/domains/pe/calculators/carry-calculator.html">Open →</a>
+    </div>
+    <div class="row">
+      <div class="row-icon">📊</div>
+      <div class="row-body">
+        <div class="row-name">Portfolio IRR Tracker</div>
+        <div class="row-desc">Track a multi-investment portfolio — DPI, TVPI, RVPI, gross/net fund IRR, realized vs unrealized splits by vintage.</div>
+      </div>
+      <div class="badge badge-pro">Pro</div>
+      <a class="row-link" href="/valuation-toolkit/domains/pe/calculators/portfolio-irr.html">Open →</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

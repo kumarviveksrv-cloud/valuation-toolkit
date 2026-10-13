@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Returns Waterfall — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.step-bar{border-bottom:1px solid var(--border);padding:0 24px;height:44px;display:flex;align-items:center;gap:0;overflow-x:auto;background:#fff;position:sticky;top:56px;z-index:99}
+.step-pill{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;color:var(--muted);cursor:default;white-space:nowrap}
+.step-pill.active{background:var(--text);color:#fff}
+.step-pill.done{color:var(--green)}
+.step-sep{color:var(--border);font-size:14px;padding:0 2px}
+.step{display:none;max-width:900px;margin:0 auto;padding:36px 24px 80px}
+.step.active{display:block}
+.step-eyebrow{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
+.step-title{font-size:clamp(20px,3vw,28px);font-weight:900;letter-spacing:-.02em;margin-bottom:6px}
+.step-sub{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:28px}
+.search-input{flex:1;min-width:180px;border:1px solid var(--border);border-radius:8px;padding:9px 13px;font-size:13px;font-family:'Inter',sans-serif;outline:none}
+.search-input:focus{border-color:#aaa}
+.sector-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.sf{border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;transition:all .12s;color:var(--muted);background:#fff}
+.sf.active{background:var(--text);color:#fff;border-color:var(--text)}
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin-bottom:24px}
+.co-card{border:1px solid var(--border);border-radius:8px;padding:12px 14px;cursor:pointer;transition:all .12s}
+.co-card:hover{border-color:#aaa;background:var(--card)}
+.co-card.selected{border-color:var(--text);background:var(--text);color:#fff}
+.co-card.hidden{display:none}
+.co-ticker{font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--muted);margin-bottom:3px}
+.co-card.selected .co-ticker,.co-card.selected .co-sector{color:#9ca3af}
+.co-name{font-size:12px;font-weight:700;line-height:1.3}
+.co-sector{font-size:11px;color:var(--muted);margin-top:2px}
+.btn-primary{background:var(--text);color:#fff;border:none;border-radius:8px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:opacity .12s}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed}
+.btn-primary:not(:disabled):hover{opacity:.85}
+.btn-ghost{background:none;border:1px solid var(--border);border-radius:8px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;color:var(--text)}
+.btn-ghost:hover{border-color:#aaa}
+.context-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;margin-bottom:24px}
+.context-card h3{font-size:16px;font-weight:800;margin-bottom:16px}
+.ctx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.ctx-box{background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px}
+.ctx-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px}
+.ctx-val{font-size:18px;font-weight:900;letter-spacing:-.01em}
+.ctx-note{font-size:11px;color:var(--muted);margin-top:2px}
+.formula-box{background:var(--text);color:#fff;border-radius:10px;padding:20px 24px;margin-bottom:20px;font-family:'JetBrains Mono',monospace}
+.formula-box .f-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;margin-bottom:10px}
+.formula-box .f-line{font-size:12px;color:#e5e7eb;margin-bottom:4px}
+.formula-box .f-line strong{color:#fff}
+.callout{border-radius:8px;padding:14px 16px;font-size:13px;line-height:1.55;margin-bottom:16px}
+.callout-amber{background:#fffbeb;border-left:3px solid var(--amber);color:#78350f}
+.callout-blue{background:#eff6ff;border-left:3px solid var(--blue);color:#1e3a8a}
+.waterfall-teach{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:20px}
+.wf-tier{border-radius:8px;padding:14px;font-size:12px}
+.wf-tier-title{font-weight:700;margin-bottom:4px;font-size:13px}
+.wf-tier-desc{color:var(--muted);line-height:1.5}
+.tier-1{background:#f0fdf4;border:1px solid #86efac}
+.tier-1 .wf-tier-title{color:var(--green)}
+.tier-2{background:#eff6ff;border:1px solid #bfdbfe}
+.tier-2 .wf-tier-title{color:var(--blue)}
+.tier-3{background:#fffbeb;border:1px solid #fde68a}
+.tier-3 .wf-tier-title{color:var(--amber)}
+.tier-4{background:#fef2f2;border:1px solid #fecaca}
+.tier-4 .wf-tier-title{color:var(--red)}
+/* Pro gate */
+.pro-gate{border:2px dashed var(--border);border-radius:12px;padding:40px 32px;text-align:center;margin-top:28px}
+.pro-gate-icon{font-size:32px;margin-bottom:12px}
+.pro-gate h3{font-size:20px;font-weight:900;margin-bottom:8px}
+.pro-gate p{font-size:14px;color:var(--muted);margin-bottom:20px;line-height:1.6;max-width:420px;margin-left:auto;margin-right:auto}
+.pro-features{display:flex;flex-direction:column;gap:6px;margin-bottom:24px;text-align:left;display:inline-flex}
+.pro-feature{font-size:13px;color:var(--muted)}
+.pro-feature::before{content:'→ ';font-weight:700;color:var(--text)}
+.unlock-btn{background:var(--text);color:#fff;border:none;border-radius:8px;padding:14px 32px;font-size:15px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;display:block;margin:0 auto 8px}
+.unlock-note{font-size:11px;color:var(--muted)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-left">
+    <a href="/valuation-toolkit/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">›</span>
+    <a href="/valuation-toolkit/domains/pe/">Private Equity</a>
+    <span class="nav-sep">›</span>
+    <span>Returns Waterfall</span>
+  </div>
+</nav>
+<div class="step-bar">
+  <div class="step-pill active" id="pill1">1 · Pick Company</div>
+  <span class="step-sep">›</span>
+  <div class="step-pill" id="pill2">2 · Waterfall Structure</div>
+  <span class="step-sep">›</span>
+  <div class="step-pill" id="pill3">3 · Model (Pro)</div>
+  <span class="step-sep">›</span>
+  <div class="step-pill" id="pill4">4 · Output (Pro)</div>
+</div>
+
+<!-- STEP 1 -->
+<div class="step active" id="step1">
+  <div class="step-eyebrow">Step 1 of 4</div>
+  <div class="step-title">Choose Your Fund's Portfolio Company</div>
+  <div class="step-sub">Select a company to anchor your fund's returns waterfall analysis.</div>
+  <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+    <input class="search-input" type="text" id="searchInput" placeholder="Search by name or ticker..." oninput="filterCompanies()">
+  </div>
+  <div class="sector-filters" id="sectorFilters"></div>
+  <div class="company-grid" id="companyGrid"></div>
+  <button class="btn-primary" id="step1Btn" disabled onclick="goStep(2)">Continue →</button>
+</div>
+
+<!-- STEP 2 -->
+<div class="step" id="step2">
+  <div class="step-eyebrow" id="s2Eyebrow">Step 2 of 4</div>
+  <div class="step-title">How LP/GP Waterfall Distributions Work</div>
+  <div class="step-sub">Before modelling, understand the mechanics of how PE funds distribute proceeds to their investors.</div>
+
+  <div class="context-card">
+    <h3 id="s2ContextTitle">Sector Fund Economics</h3>
+    <div class="ctx-grid">
+      <div class="ctx-box"><div class="ctx-label">Typical Hurdle</div><div class="ctx-val" id="ctxHurdle">—</div><div class="ctx-note">Preferred return rate</div></div>
+      <div class="ctx-box"><div class="ctx-label">Carry Rate</div><div class="ctx-val" id="ctxCarry">—</div><div class="ctx-note">GP carry on profits</div></div>
+      <div class="ctx-box"><div class="ctx-label">GP Commit</div><div class="ctx-val" id="ctxGPCommit">—</div><div class="ctx-note">% of fund capital</div></div>
+      <div class="ctx-box"><div class="ctx-label">Catch-Up</div><div class="ctx-val" id="ctxCatchUp">—</div><div class="ctx-note">GP catch-up structure</div></div>
+    </div>
+  </div>
+
+  <h4 style="font-size:13px;font-weight:700;margin-bottom:12px">The Four Tiers of a PE Waterfall</h4>
+  <div class="waterfall-teach">
+    <div class="wf-tier tier-1">
+      <div class="wf-tier-title">Tier 1: Return of Capital</div>
+      <div class="wf-tier-desc">LPs receive 100% of all distributions until they've received back their entire committed capital. GP receives nothing at this stage.</div>
+    </div>
+    <div class="wf-tier tier-2">
+      <div class="wf-tier-title">Tier 2: Preferred Return (Hurdle)</div>
+      <div class="wf-tier-desc">LPs receive a preferred return (typically 8% p.a.) on their capital before any carry is paid. This is the "hurdle rate" the fund must clear.</div>
+    </div>
+    <div class="wf-tier tier-3">
+      <div class="wf-tier-title">Tier 3: GP Catch-Up</div>
+      <div class="wf-tier-desc">After the hurdle, the GP receives 100% of distributions (in a full catch-up) until they've received their target carry percentage of total profits.</div>
+    </div>
+    <div class="wf-tier tier-4">
+      <div class="wf-tier-title">Tier 4: Carried Interest Split</div>
+      <div class="wf-tier-desc">Remaining profits split 80/20 (or 70/30 for top-tier funds): LPs get 80%, GP gets 20% as carried interest. This is the GP's performance fee.</div>
+    </div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-label">Waterfall Distribution Logic</div>
+    <div class="f-line"><strong>Step 1:</strong> LP Capital Return = min(Total Distributions, LP Committed Capital)</div>
+    <div class="f-line"><strong>Step 2:</strong> LP Hurdle = LP Capital × Hurdle Rate × Hold Period</div>
+    <div class="f-line"><strong>Step 3:</strong> GP Catch-Up = LP Carry Share ÷ (1 − LP Carry Share) × LP Hurdle</div>
+    <div class="f-line"><strong>Step 4:</strong> Remaining split: LP% × Remainder to LPs; GP% × Remainder to GP</div>
+    <div class="f-line" style="margin-top:8px;color:#9ca3af"><strong>Net LP IRR</strong> = IRR after management fees and carry deductions</div>
+  </div>
+
+  <div class="callout callout-amber">
+    <strong>European vs American Waterfall:</strong> European (fund-as-a-whole) waterfalls pay carry only after ALL capital is returned and the hurdle is met across the entire fund. American (deal-by-deal) allows carry on each realized deal individually — more GP-friendly, but creates clawback risk.
+  </div>
+
+  <div class="callout callout-blue">
+    <strong>India PE Practice:</strong> Most India-focused funds use European-style waterfalls with 8% preferred return and 20% carry. Top-quartile GPs sometimes negotiate 25–30% carry with a 6–7% hurdle.
+  </div>
+
+  <div style="display:flex;gap:12px;flex-wrap:wrap">
+    <button class="btn-ghost" onclick="goStep(1)">← Back</button>
+    <button class="btn-primary" onclick="goStep(3)">Continue →</button>
+  </div>
+</div>
+
+<!-- STEP 3 — Pro Gate -->
+<div class="step" id="step3">
+  <div class="step-eyebrow">Step 3 of 4 · Pro Feature</div>
+  <div class="step-title">Waterfall Inputs</div>
+  <div class="step-sub">Configure your fund structure, hurdle rate, carry tier, and distribution schedule.</div>
+
+  <div class="pro-gate">
+    <div class="pro-gate-icon">🔒</div>
+    <h3>Returns Waterfall Modeller</h3>
+    <p>Build a full LP/GP distribution waterfall with preferred return, catch-up mechanics, multi-tier carry, and net-of-fee IRR by investor class.</p>
+    <div class="pro-features">
+      <div class="pro-feature">LP/GP capital commitments and co-invest</div>
+      <div class="pro-feature">European vs American waterfall toggle</div>
+      <div class="pro-feature">Multi-tier carry (20% → 25% above 2× MOIC)</div>
+      <div class="pro-feature">Full catch-up mechanics (100% or pro-rata)</div>
+      <div class="pro-feature">Management fee offset on carry calculation</div>
+      <div class="pro-feature">Gross vs net IRR per LP class</div>
+      <div class="pro-feature">Clawback provision modelling</div>
+      <div class="pro-feature">Export waterfall to PDF</div>
+    </div>
+    <button class="unlock-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    <div class="unlock-note">Monthly only · Cancel anytime · All 15 domains included</div>
+  </div>
+</div>
+
+<!-- STEP 4 — Pro Gate -->
+<div class="step" id="step4">
+  <div class="step-eyebrow">Step 4 of 4 · Pro Feature</div>
+  <div class="step-title">Waterfall Output</div>
+  <div class="step-sub">LP/GP distribution summary with net IRR by investor class.</div>
+  <div class="pro-gate">
+    <div class="pro-gate-icon">🔒</div>
+    <h3>Waterfall Distribution Results</h3>
+    <p>See the full tier-by-tier distribution table, cumulative proceeds by class, carried interest calculation, and net IRR sensitivity across exit scenarios.</p>
+    <div class="pro-features">
+      <div class="pro-feature">Tier-by-tier proceeds table (Return of Capital → Carry)</div>
+      <div class="pro-feature">LP net IRR vs GP gross carry sensitivity</div>
+      <div class="pro-feature">Deal-level vs fund-level carry comparison</div>
+      <div class="pro-feature">Clawback amount under adverse scenarios</div>
+    </div>
+    <button class="unlock-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    <div class="unlock-note">Monthly only · Cancel anytime · All 15 domains included</div>
+  </div>
+</div>
+
+<script>
+const COMPANIES=[{name:'Reliance Industries',ticker:'RIL',sector:'Conglomerate'},{name:'Tata Consultancy Services',ticker:'TCS',sector:'Technology'},{name:'Infosys',ticker:'INFY',sector:'Technology'},{name:'HDFC Bank',ticker:'HDFCBANK',sector:'Banking/NBFC'},{name:'ICICI Bank',ticker:'ICICIBANK',sector:'Banking/NBFC'},{name:'Hindustan Unilever',ticker:'HUL',sector:'FMCG/Consumer'},{name:'ITC Limited',ticker:'ITC',sector:'FMCG/Consumer'},{name:'Bharti Airtel',ticker:'AIRTEL',sector:'Telecom'},{name:'Wipro',ticker:'WIPRO',sector:'Technology'},{name:'Asian Paints',ticker:'ASIANPAINT',sector:'Chemicals'},{name:'Bajaj Finance',ticker:'BAJFINANCE',sector:'Banking/NBFC'},{name:'Maruti Suzuki',ticker:'MARUTI',sector:'Automobiles'},{name:'Sun Pharmaceutical',ticker:'SUNPHARMA',sector:'Healthcare/Pharma'},{name:"Dr. Reddy's Labs",ticker:'DRREDDY',sector:'Healthcare/Pharma'},{name:'Titan Company',ticker:'TITAN',sector:'FMCG/Consumer'},{name:'Larsen & Toubro',ticker:'LT',sector:'Infrastructure'},{name:'UltraTech Cement',ticker:'ULTRACEMCO',sector:'Conglomerate'},{name:'Nestle India',ticker:'NESTLEIND',sector:'FMCG/Consumer'},{name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',sector:'Banking/NBFC'},{name:'Axis Bank',ticker:'AXISBANK',sector:'Banking/NBFC'},{name:'State Bank of India',ticker:'SBIN',sector:'Banking/NBFC'},{name:'ONGC',ticker:'ONGC',sector:'Oil & Gas'},{name:'Coal India',ticker:'COALINDIA',sector:'Metals & Mining'},{name:'JSW Steel',ticker:'JSWSTEEL',sector:'Metals & Mining'},{name:'Tata Steel',ticker:'TATASTEEL',sector:'Metals & Mining'},{name:'Power Grid Corp',ticker:'POWERGRID',sector:'Power/Utilities'},{name:'NTPC',ticker:'NTPC',sector:'Power/Utilities'},{name:'DLF',ticker:'DLF',sector:'Real Estate'},{name:'Godrej Properties',ticker:'GODREJPROP',sector:'Real Estate'},{name:'Zee Entertainment',ticker:'ZEEL',sector:'Media'}];
+const SECTORS=['All','Technology','Banking/NBFC','Healthcare/Pharma','FMCG/Consumer','Oil & Gas','Metals & Mining','Telecom','Automobiles','Power/Utilities','Real Estate','Media','Chemicals','Infrastructure','Conglomerate'];
+const SECTOR_CONTEXT={
+  'Technology':{hurdle:'8%',carry:'20–25%',gpCommit:'1–2%',catchUp:'100% GP'},
+  'Banking/NBFC':{hurdle:'8%',carry:'20%',gpCommit:'2–3%',catchUp:'100% GP'},
+  'Healthcare/Pharma':{hurdle:'8%',carry:'20%',gpCommit:'1–2%',catchUp:'Pro-rata'},
+  'FMCG/Consumer':{hurdle:'8%',carry:'20%',gpCommit:'1–2%',catchUp:'100% GP'},
+  'Oil & Gas':{hurdle:'7–8%',carry:'20%',gpCommit:'2–3%',catchUp:'Pro-rata'},
+  'Metals & Mining':{hurdle:'8%',carry:'20%',gpCommit:'2–3%',catchUp:'Pro-rata'},
+  'Telecom':{hurdle:'8%',carry:'20%',gpCommit:'1–2%',catchUp:'100% GP'},
+  'Automobiles':{hurdle:'8%',carry:'20%',gpCommit:'1–2%',catchUp:'Pro-rata'},
+  'Power/Utilities':{hurdle:'7–8%',carry:'20%',gpCommit:'2–3%',catchUp:'Pro-rata'},
+  'Real Estate':{hurdle:'10–12%',carry:'20%',gpCommit:'2–3%',catchUp:'100% GP'},
+  'Media':{hurdle:'8%',carry:'20–25%',gpCommit:'1–2%',catchUp:'100% GP'},
+  'Chemicals':{hurdle:'8%',carry:'20%',gpCommit:'1–2%',catchUp:'Pro-rata'},
+  'Infrastructure':{hurdle:'8–10%',carry:'20%',gpCommit:'2–3%',catchUp:'Pro-rata'},
+  'Conglomerate':{hurdle:'8%',carry:'20%',gpCommit:'1–2%',catchUp:'100% GP'}
+};
+
+let selectedCo=null,activeSector='All';
+
+function buildSectors(){
+  const sf=document.getElementById('sectorFilters');
+  SECTORS.forEach(s=>{
+    const d=document.createElement('div');
+    d.className='sf'+(s==='All'?' active':'');
+    d.textContent=s;
+    d.onclick=()=>{activeSector=s;document.querySelectorAll('.sf').forEach(x=>x.classList.remove('active'));d.classList.add('active');filterCompanies();};
+    sf.appendChild(d);
+  });
+}
+
+function buildGrid(){
+  const g=document.getElementById('companyGrid');
+  COMPANIES.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='co-card';
+    d.dataset.sector=c.sector;
+    d.innerHTML=`<div class="co-ticker">${c.ticker}</div><div class="co-name">${c.name}</div><div class="co-sector">${c.sector}</div>`;
+    d.onclick=()=>{document.querySelectorAll('.co-card').forEach(x=>x.classList.remove('selected'));d.classList.add('selected');selectedCo=c;document.getElementById('step1Btn').disabled=false;};
+    g.appendChild(d);
+  });
+}
+
+function filterCompanies(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  document.querySelectorAll('.co-card').forEach(card=>{
+    const name=card.querySelector('.co-name').textContent.toLowerCase();
+    const ticker=card.querySelector('.co-ticker').textContent.toLowerCase();
+    const sector=card.dataset.sector;
+    card.classList.toggle('hidden',!((activeSector==='All'||sector===activeSector)&&(!q||name.includes(q)||ticker.includes(q))));
+  });
+}
+
+function goStep(n){
+  document.querySelectorAll('.step').forEach((s,i)=>s.classList.toggle('active',i===n-1));
+  ['pill1','pill2','pill3','pill4'].forEach((id,i)=>{
+    const p=document.getElementById(id);
+    p.classList.remove('active','done');
+    if(i===n-1)p.classList.add('active');
+    else if(i<n-1)p.classList.add('done');
+  });
+  if(n===2)populateContext();
+  window.scrollTo(0,0);
+}
+
+function populateContext(){
+  if(!selectedCo)return;
+  const ctx=SECTOR_CONTEXT[selectedCo.sector]||SECTOR_CONTEXT['Conglomerate'];
+  document.getElementById('s2Eyebrow').textContent=`Step 2 of 4 · ${selectedCo.ticker}`;
+  document.getElementById('s2ContextTitle').textContent=`${selectedCo.name} — Fund Economics Benchmarks`;
+  document.getElementById('ctxHurdle').textContent=ctx.hurdle;
+  document.getElementById('ctxCarry').textContent=ctx.carry;
+  document.getElementById('ctxGPCommit').textContent=ctx.gpCommit;
+  document.getElementById('ctxCatchUp').textContent=ctx.catchUp;
+}
+
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+
+buildSectors();buildGrid();
+</script>
+</body>
+</html>

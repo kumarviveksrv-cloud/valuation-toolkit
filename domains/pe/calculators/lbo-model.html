@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LBO Model — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+
+.step-bar{border-bottom:1px solid var(--border);padding:0 24px;height:44px;display:flex;align-items:center;gap:0;overflow-x:auto;background:#fff;position:sticky;top:56px;z-index:99}
+.step-pill{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;color:var(--muted);cursor:default;white-space:nowrap}
+.step-pill.active{background:var(--text);color:#fff}
+.step-pill.done{color:var(--green)}
+.step-sep{color:var(--border);font-size:14px;padding:0 2px}
+
+.step{display:none;max-width:900px;margin:0 auto;padding:36px 24px 80px}
+.step.active{display:block}
+
+.step-eyebrow{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px}
+.step-title{font-size:clamp(20px,3vw,28px);font-weight:900;letter-spacing:-.02em;margin-bottom:6px}
+.step-sub{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:28px}
+
+/* Step 1 — Company Picker */
+.search-row{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.search-input{flex:1;min-width:180px;border:1px solid var(--border);border-radius:8px;padding:9px 13px;font-size:13px;font-family:'Inter',sans-serif;outline:none}
+.search-input:focus{border-color:#aaa}
+.sector-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.sf{border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:600;cursor:pointer;transition:all .12s;color:var(--muted);background:#fff}
+.sf.active{background:var(--text);color:#fff;border-color:var(--text)}
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;margin-bottom:24px}
+.co-card{border:1px solid var(--border);border-radius:8px;padding:12px 14px;cursor:pointer;transition:all .12s}
+.co-card:hover{border-color:#aaa;background:var(--card)}
+.co-card.selected{border-color:var(--text);background:var(--text);color:#fff}
+.co-card.hidden{display:none}
+.co-ticker{font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--muted);margin-bottom:3px}
+.co-card.selected .co-ticker{color:#9ca3af}
+.co-name{font-size:12px;font-weight:700;line-height:1.3}
+.co-sector{font-size:11px;color:var(--muted);margin-top:2px}
+.co-card.selected .co-sector{color:#9ca3af}
+
+.btn-primary{background:var(--text);color:#fff;border:none;border-radius:8px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:opacity .12s}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed}
+.btn-primary:not(:disabled):hover{opacity:.85}
+.btn-ghost{background:none;border:1px solid var(--border);border-radius:8px;padding:10px 20px;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;color:var(--text)}
+.btn-ghost:hover{border-color:#aaa}
+
+/* Step 2 — Context */
+.context-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;margin-bottom:24px}
+.context-card h3{font-size:16px;font-weight:800;margin-bottom:16px}
+.ctx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:20px}
+.ctx-box{background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px}
+.ctx-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px}
+.ctx-val{font-size:18px;font-weight:900;letter-spacing:-.01em}
+.ctx-note{font-size:11px;color:var(--muted);margin-top:2px}
+
+.teach-block{margin-bottom:20px}
+.teach-block h4{font-size:13px;font-weight:700;margin-bottom:10px}
+.teach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.teach-box{background:#fff;border:1px solid var(--border);border-radius:8px;padding:14px}
+.teach-box-title{font-size:12px;font-weight:700;margin-bottom:4px}
+.teach-box-desc{font-size:12px;color:var(--muted);line-height:1.55}
+
+.formula-box{background:var(--text);color:#fff;border-radius:10px;padding:20px 24px;margin-bottom:20px;font-family:'JetBrains Mono',monospace}
+.formula-box .f-label{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#6b7280;margin-bottom:10px}
+.formula-box .f-line{font-size:13px;color:#e5e7eb;margin-bottom:4px}
+.formula-box .f-line:last-child{margin-bottom:0}
+.formula-box .f-line strong{color:#fff}
+
+.deal-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px}
+.deal-table th{text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:6px 10px;border-bottom:2px solid var(--border)}
+.deal-table td{padding:8px 10px;border-bottom:1px solid var(--border)}
+.deal-table tr:last-child td{border-bottom:none}
+
+.callout{border-radius:8px;padding:14px 16px;font-size:13px;line-height:1.55;margin-bottom:16px}
+.callout-blue{background:#eff6ff;border-left:3px solid var(--blue);color:#1e3a8a}
+.callout-green{background:#f0fdf4;border-left:3px solid var(--green);color:#14532d}
+.callout-amber{background:#fffbeb;border-left:3px solid var(--amber);color:#78350f}
+
+/* Step 3 — Inputs */
+.input-section{margin-bottom:28px}
+.input-section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.input-row{display:flex;align-items:center;gap:14px;margin-bottom:12px;flex-wrap:wrap}
+.input-label{font-size:13px;font-weight:600;flex:1;min-width:180px}
+.input-desc{font-size:11px;color:var(--muted);font-weight:400}
+.input-field-wrap{display:flex;align-items:center;gap:6px}
+.input-prefix,.input-suffix{font-size:13px;font-weight:600;color:var(--muted)}
+input[type=number]{border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:14px;font-family:'JetBrains Mono',monospace;font-weight:600;width:120px;outline:none}
+input[type=number]:focus{border-color:#aaa}
+.input-hint{font-size:11px;color:var(--muted);margin-top:2px}
+
+.sources-uses{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:24px}
+.su-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:12px}
+.su-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.su-col h5{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em}
+.su-row{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px solid var(--border)}
+.su-row:last-child{border-bottom:none;font-weight:700;padding-top:8px}
+.su-num{font-family:'JetBrains Mono',monospace}
+
+/* Step 4 — Results */
+.loading-overlay{position:fixed;inset:0;background:#fff;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.loading-overlay.hidden{display:none}
+.loading-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.loading-bar-wrap{width:240px;height:2px;background:var(--border);border-radius:2px;overflow:hidden}
+.loading-bar{height:100%;background:var(--text);border-radius:2px;transition:width .4s ease}
+.loading-step-text{font-size:13px;color:var(--muted)}
+
+.result-hero{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:32px}
+.rh-card{border:1px solid var(--border);border-radius:10px;padding:18px}
+.rh-card.highlight{background:var(--text);color:#fff;border-color:var(--text)}
+.rh-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+.rh-card.highlight .rh-label{color:#6b7280}
+.rh-val{font-size:28px;font-weight:900;letter-spacing:-.02em}
+.rh-note{font-size:11px;color:var(--muted);margin-top:4px}
+.rh-card.highlight .rh-note{color:#9ca3af}
+.val-green{color:var(--green)}
+.val-red{color:var(--red)}
+
+.bridge-section{margin-bottom:32px}
+.bridge-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:14px}
+.bridge-table{width:100%;border-collapse:collapse;font-size:13px}
+.bridge-table th{text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding:8px 12px;border-bottom:2px solid var(--border)}
+.bridge-table td{padding:10px 12px;border-bottom:1px solid var(--border)}
+.bridge-table tr.total-row td{font-weight:800;border-top:2px solid var(--text);border-bottom:none;background:var(--card)}
+.bridge-table .mono{font-family:'JetBrains Mono',monospace}
+.pct-bar-wrap{width:80px;height:6px;background:var(--border);border-radius:3px;overflow:hidden;display:inline-block;vertical-align:middle;margin-right:6px}
+.pct-bar{height:100%;border-radius:3px}
+.bar-ebitda{background:#16a34a}
+.bar-multiple{background:#2563eb}
+.bar-debt{background:#d97706}
+
+.sensitivity-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:32px}
+.sens-table-wrap{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
+.sens-table-title{font-size:12px;font-weight:700;margin-bottom:12px}
+.sens-table{width:100%;border-collapse:collapse;font-size:11px;font-family:'JetBrains Mono',monospace}
+.sens-table th{background:var(--text);color:#fff;padding:5px 8px;font-size:10px;font-weight:600;text-align:center}
+.sens-table th:first-child{text-align:left}
+.sens-table td{padding:5px 8px;border:1px solid var(--border);text-align:center}
+.sens-table td:first-child{text-align:left;font-weight:700;background:var(--card)}
+.sens-cell-high{background:#dcfce7;color:#14532d}
+.sens-cell-mid{background:#fff}
+.sens-cell-low{background:#fee2e2;color:#991b1b}
+.sens-cell-base{background:#fef3c7;color:#78350f;font-weight:700}
+</style>
+</head>
+<body>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-label">Building LBO Model</div>
+  <div class="loading-bar-wrap"><div class="loading-bar" id="loadingBar" style="width:0%"></div></div>
+  <div class="loading-step-text" id="loadingText">Structuring the capital stack...</div>
+</div>
+
+<nav>
+  <div class="nav-left">
+    <a href="/valuation-toolkit/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">›</span>
+    <a href="/valuation-toolkit/domains/pe/">Private Equity</a>
+    <span class="nav-sep">›</span>
+    <span>LBO Model</span>
+  </div>
+</nav>
+
+<div class="step-bar">
+  <div class="step-pill active" id="pill1">1 · Pick Company</div>
+  <span class="step-sep">›</span>
+  <div class="step-pill" id="pill2">2 · Sector Context</div>
+  <span class="step-sep">›</span>
+  <div class="step-pill" id="pill3">3 · Assumptions</div>
+  <span class="step-sep">›</span>
+  <div class="step-pill" id="pill4">4 · LBO Output</div>
+</div>
+
+<!-- STEP 1 -->
+<div class="step active" id="step1">
+  <div class="step-eyebrow">Step 1 of 4</div>
+  <div class="step-title">Choose Your Target Company</div>
+  <div class="step-sub">Select an Indian listed company to run your LBO analysis on. We'll show you sector-specific benchmarks before you model.</div>
+
+  <div class="search-row">
+    <input class="search-input" type="text" id="searchInput" placeholder="Search by name or ticker..." oninput="filterCompanies()">
+  </div>
+  <div class="sector-filters" id="sectorFilters"></div>
+  <div class="company-grid" id="companyGrid"></div>
+
+  <button class="btn-primary" id="step1Btn" disabled onclick="goStep(2)">Continue with selected company →</button>
+</div>
+
+<!-- STEP 2 -->
+<div class="step" id="step2">
+  <div class="step-eyebrow" id="s2Eyebrow">Step 2 of 4</div>
+  <div class="step-title" id="s2Title">PE Landscape in Your Sector</div>
+  <div class="step-sub">Understand typical deal structures and return profiles before building your LBO assumptions.</div>
+
+  <div class="context-card">
+    <h3 id="s2ContextTitle">Sector PE Benchmarks</h3>
+    <div class="ctx-grid">
+      <div class="ctx-box">
+        <div class="ctx-label">Entry EV/EBITDA</div>
+        <div class="ctx-val" id="ctxEntry">—</div>
+        <div class="ctx-note" id="ctxEntryNote">Typical PE entry</div>
+      </div>
+      <div class="ctx-box">
+        <div class="ctx-label">Leverage</div>
+        <div class="ctx-val" id="ctxLeverage">—</div>
+        <div class="ctx-note">Debt/EBITDA at close</div>
+      </div>
+      <div class="ctx-box">
+        <div class="ctx-label">Hold Period</div>
+        <div class="ctx-val" id="ctxHold">—</div>
+        <div class="ctx-note">Typical hold years</div>
+      </div>
+      <div class="ctx-box">
+        <div class="ctx-label">Target Gross IRR</div>
+        <div class="ctx-val" id="ctxIrr">—</div>
+        <div class="ctx-note">PE fund target</div>
+      </div>
+    </div>
+    <div class="ctx-note" style="font-size:12px;color:var(--muted);margin-top:4px">Key value creation: <span id="ctxDriver" style="font-weight:700;color:var(--text)">—</span></div>
+  </div>
+
+  <div class="teach-block">
+    <h4>How an LBO Works — The Three Sources of Returns</h4>
+    <div class="teach-grid">
+      <div class="teach-box">
+        <div class="teach-box-title" style="color:var(--green)">📈 EBITDA Growth</div>
+        <div class="teach-box-desc">Revenue growth + margin expansion increases EBITDA. At the same exit multiple, higher EBITDA = higher EV. Often the largest return driver in Indian PE.</div>
+      </div>
+      <div class="teach-box">
+        <div class="teach-box-title" style="color:var(--blue)">✖️ Multiple Expansion</div>
+        <div class="teach-box-desc">Exiting at a higher EV/EBITDA than you entered. Happens when sector re-rates upward or the company earns a premium multiple post-transformation.</div>
+      </div>
+      <div class="teach-box">
+        <div class="teach-box-title" style="color:var(--amber)">💸 Debt Paydown</div>
+        <div class="teach-box-desc">Free cash flows pay down acquisition debt. Every rupee of debt repaid transfers to equity holders — this is the "financial engineering" component.</div>
+      </div>
+      <div class="teach-box">
+        <div class="teach-box-title" style="color:var(--red)">⚠️ Leverage Effect</div>
+        <div class="teach-box-desc">Debt amplifies both gains and losses. A 2× EBITDA growth on a 5× leveraged deal can yield 4–5× equity MOIC. The same leverage wipes equity if EBITDA falls.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="formula-box">
+    <div class="f-label">LBO Returns Decomposition</div>
+    <div class="f-line"><strong>Entry Equity</strong> = Entry EV − Total Debt</div>
+    <div class="f-line"><strong>Exit Equity</strong> = Exit EV − Remaining Debt</div>
+    <div class="f-line"><strong>MOIC</strong> = Exit Equity ÷ Entry Equity</div>
+    <div class="f-line"><strong>Equity IRR</strong> = MOIC^(1 ÷ Hold Years) − 1</div>
+    <div class="f-line" style="margin-top:10px;color:#9ca3af">Returns Bridge: EBITDA Growth + Multiple Expansion + Debt Paydown = Total Return</div>
+  </div>
+
+  <div class="callout callout-blue">
+    <strong>India PE Context:</strong> Most Indian PE deals are growth equity (minority stakes with governance rights), not classic leveraged buyouts. Debt is lower (1–3× EBITDA vs 5–6× in the US). But LBO mechanics apply to buyouts by global PE firms (KKR, Blackstone, Carlyle) increasingly active in India mid-market.
+  </div>
+
+  <div style="display:flex;gap:12px;flex-wrap:wrap">
+    <button class="btn-ghost" onclick="goStep(1)">← Back</button>
+    <button class="btn-primary" onclick="goStep(3)">Continue to Assumptions →</button>
+  </div>
+</div>
+
+<!-- STEP 3 -->
+<div class="step" id="step3">
+  <div class="step-eyebrow">Step 3 of 4</div>
+  <div class="step-title">Build Your LBO Assumptions</div>
+  <div class="step-sub">Set entry, operating, and exit parameters. The model will compute equity returns and decompose them into their drivers.</div>
+
+  <div class="input-section">
+    <div class="input-section-title">Entry Parameters</div>
+    <div class="input-row">
+      <div class="input-label">LTM EBITDA <span class="input-desc">(₹ Crore)</span></div>
+      <div class="input-field-wrap"><span class="input-prefix">₹</span><input type="number" id="iEbitda" value="1000" min="1"><span class="input-suffix">Cr</span></div>
+    </div>
+    <div class="input-row">
+      <div class="input-label">Entry EV/EBITDA Multiple <span class="input-desc">(×)</span></div>
+      <div class="input-field-wrap"><input type="number" id="iEntryMult" value="12" min="1" step="0.5"><span class="input-suffix">×</span></div>
+    </div>
+    <div class="input-row">
+      <div class="input-label">Leverage — Debt/EBITDA <span class="input-desc">(at close)</span></div>
+      <div class="input-field-wrap"><input type="number" id="iLeverage" value="3" min="0" step="0.5"><span class="input-suffix">× EBITDA</span></div>
+    </div>
+    <div class="input-row">
+      <div class="input-label">Interest Rate on Debt <span class="input-desc">(%  p.a.)</span></div>
+      <div class="input-field-wrap"><input type="number" id="iInterestRate" value="10" min="0" step="0.5"><span class="input-suffix">%</span></div>
+    </div>
+  </div>
+
+  <div class="sources-uses" id="sourcesUses">
+    <div class="su-title">Sources & Uses (Live)</div>
+    <div class="su-grid">
+      <div>
+        <h5>Sources</h5>
+        <div class="su-row"><span>Equity cheque</span><span class="su-num" id="suEquity">—</span></div>
+        <div class="su-row"><span>Total debt</span><span class="su-num" id="suDebt">—</span></div>
+        <div class="su-row"><span>Total sources</span><span class="su-num" id="suSources">—</span></div>
+      </div>
+      <div>
+        <h5>Uses</h5>
+        <div class="su-row"><span>Enterprise value</span><span class="su-num" id="suEV">—</span></div>
+        <div class="su-row"><span>Transaction fees</span><span class="su-num" id="suFees">—</span></div>
+        <div class="su-row"><span>Total uses</span><span class="su-num" id="suUses">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="input-section">
+    <div class="input-section-title">Operating Assumptions (5-Year Projection)</div>
+    <div class="input-row">
+      <div class="input-label">Revenue Growth Rate <span class="input-desc">(% p.a., CAGR)</span></div>
+      <div class="input-field-wrap"><input type="number" id="iRevGrowth" value="15" min="0" step="1"><span class="input-suffix">%</span></div>
+    </div>
+    <div class="input-row">
+      <div class="input-label">EBITDA Margin Expansion <span class="input-desc">(bps p.a.)</span></div>
+      <div class="input-field-wrap"><input type="number" id="iMarginExp" value="50" min="0" step="25"><span class="input-suffix">bps/yr</span></div>
+    </div>
+    <div class="input-row">
+      <div class="input-label">Entry EBITDA Margin <span class="input-desc">(%)</span></div>
+      <div class="input-field-wrap"><input type="number" id="iEntryMargin" value="20" min="1" step="0.5"><span class="input-suffix">%</span></div>
+    </div>
+  </div>
+
+  <div class="input-section">
+    <div class="input-section-title">Exit Assumptions</div>
+    <div class="input-row">
+      <div class="input-label">Hold Period <span class="input-desc">(years)</span></div>
+      <div class="input-field-wrap"><input type="number" id="iHoldPeriod" value="5" min="2" max="10"><span class="input-suffix">years</span></div>
+    </div>
+    <div class="input-row">
+      <div class="input-label">Exit EV/EBITDA Multiple <span class="input-desc">(×)</span></div>
+      <div class="input-field-wrap"><input type="number" id="iExitMult" value="13" min="1" step="0.5"><span class="input-suffix">×</span></div>
+    </div>
+    <div class="input-row">
+      <div class="input-label">Annual Debt Amortization <span class="input-desc">(% of total debt)</span></div>
+      <div class="input-field-wrap"><input type="number" id="iDebtAmort" value="10" min="0" max="50" step="5"><span class="input-suffix">%/yr</span></div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:12px;flex-wrap:wrap">
+    <button class="btn-ghost" onclick="goStep(2)">← Back</button>
+    <button class="btn-primary" onclick="runLBO()">Run LBO Model →</button>
+  </div>
+</div>
+
+<!-- STEP 4 -->
+<div class="step" id="step4">
+  <div class="step-eyebrow">Step 4 of 4</div>
+  <div class="step-title" id="s4Title">LBO Analysis</div>
+  <div class="step-sub" id="s4Sub">Returns summary with full driver decomposition.</div>
+
+  <div class="result-hero" id="resultHero"></div>
+
+  <div class="bridge-section">
+    <div class="bridge-title">Returns Bridge — Sources of Equity Value Creation</div>
+    <table class="bridge-table" id="bridgeTable">
+      <thead><tr>
+        <th>Driver</th>
+        <th>Value Created (₹ Cr)</th>
+        <th>Contribution</th>
+        <th>How it works</th>
+      </tr></thead>
+      <tbody id="bridgeTbody"></tbody>
+    </table>
+  </div>
+
+  <div class="bridge-section">
+    <div class="bridge-title">5-Year Operating Projections</div>
+    <table class="bridge-table" id="projTable">
+      <thead><tr>
+        <th>Year</th>
+        <th>Revenue (₹ Cr)</th>
+        <th>EBITDA (₹ Cr)</th>
+        <th>EBITDA Margin</th>
+        <th>Debt Balance (₹ Cr)</th>
+        <th>FCF (₹ Cr)</th>
+      </tr></thead>
+      <tbody id="projTbody"></tbody>
+    </table>
+  </div>
+
+  <div class="sensitivity-grid">
+    <div class="sens-table-wrap">
+      <div class="sens-table-title">IRR Sensitivity: Exit Multiple × Hold Period</div>
+      <table class="sens-table" id="sensIRR"></table>
+    </div>
+    <div class="sens-table-wrap">
+      <div class="sens-table-title">MOIC Sensitivity: Exit Multiple × EBITDA Growth</div>
+      <table class="sens-table" id="sensMOIC"></table>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:12px;flex-wrap:wrap">
+    <button class="btn-ghost" onclick="goStep(3)">← Adjust Assumptions</button>
+    <button class="btn-primary" onclick="window.print()">Export PDF</button>
+  </div>
+</div>
+
+<script>
+const COMPANIES = [
+  {name:'Reliance Industries',ticker:'RIL',sector:'Conglomerate'},
+  {name:'Tata Consultancy Services',ticker:'TCS',sector:'Technology'},
+  {name:'Infosys',ticker:'INFY',sector:'Technology'},
+  {name:'HDFC Bank',ticker:'HDFCBANK',sector:'Banking/NBFC'},
+  {name:'ICICI Bank',ticker:'ICICIBANK',sector:'Banking/NBFC'},
+  {name:'Hindustan Unilever',ticker:'HUL',sector:'FMCG/Consumer'},
+  {name:'ITC Limited',ticker:'ITC',sector:'FMCG/Consumer'},
+  {name:'Bharti Airtel',ticker:'AIRTEL',sector:'Telecom'},
+  {name:'Wipro',ticker:'WIPRO',sector:'Technology'},
+  {name:'Asian Paints',ticker:'ASIANPAINT',sector:'Chemicals'},
+  {name:'Bajaj Finance',ticker:'BAJFINANCE',sector:'Banking/NBFC'},
+  {name:'Maruti Suzuki',ticker:'MARUTI',sector:'Automobiles'},
+  {name:'Sun Pharmaceutical',ticker:'SUNPHARMA',sector:'Healthcare/Pharma'},
+  {name:"Dr. Reddy's Labs",ticker:'DRREDDY',sector:'Healthcare/Pharma'},
+  {name:'Titan Company',ticker:'TITAN',sector:'FMCG/Consumer'},
+  {name:'Larsen & Toubro',ticker:'LT',sector:'Infrastructure'},
+  {name:'UltraTech Cement',ticker:'ULTRACEMCO',sector:'Conglomerate'},
+  {name:'Nestle India',ticker:'NESTLEIND',sector:'FMCG/Consumer'},
+  {name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',sector:'Banking/NBFC'},
+  {name:'Axis Bank',ticker:'AXISBANK',sector:'Banking/NBFC'},
+  {name:'State Bank of India',ticker:'SBIN',sector:'Banking/NBFC'},
+  {name:'ONGC',ticker:'ONGC',sector:'Oil & Gas'},
+  {name:'Coal India',ticker:'COALINDIA',sector:'Metals & Mining'},
+  {name:'JSW Steel',ticker:'JSWSTEEL',sector:'Metals & Mining'},
+  {name:'Tata Steel',ticker:'TATASTEEL',sector:'Metals & Mining'},
+  {name:'Power Grid Corp',ticker:'POWERGRID',sector:'Power/Utilities'},
+  {name:'NTPC',ticker:'NTPC',sector:'Power/Utilities'},
+  {name:'DLF',ticker:'DLF',sector:'Real Estate'},
+  {name:'Godrej Properties',ticker:'GODREJPROP',sector:'Real Estate'},
+  {name:'Zee Entertainment',ticker:'ZEEL',sector:'Media'}
+];
+
+const SECTORS = ['All','Technology','Banking/NBFC','Healthcare/Pharma','FMCG/Consumer','Oil & Gas','Metals & Mining','Telecom','Automobiles','Power/Utilities','Real Estate','Media','Chemicals','Infrastructure','Conglomerate'];
+
+const SECTOR_CONTEXT = {
+  'Technology':{entryMult:'18–24×',leverage:'2–3× EBITDA',hold:'4–6 yrs',irr:'25–35%',driver:'ARR growth, NRR, Rule of 40, margin expansion'},
+  'Banking/NBFC':{entryMult:'2–4× Book',leverage:'Not applicable (financial sector)',hold:'4–6 yrs',irr:'20–28%',driver:'AUM growth, NIM expansion, asset quality improvement'},
+  'Healthcare/Pharma':{entryMult:'14–20×',leverage:'3–4× EBITDA',hold:'4–5 yrs',irr:'22–30%',driver:'ANDA pipeline, hospital bed expansion, CDMO contracts'},
+  'FMCG/Consumer':{entryMult:'20–35×',leverage:'2–3× EBITDA',hold:'5–7 yrs',irr:'18–25%',driver:'Distribution expansion, premiumization, margin improvement'},
+  'Oil & Gas':{entryMult:'6–10×',leverage:'2–4× EBITDA',hold:'4–6 yrs',irr:'15–22%',driver:'Reservoir upside, refining margin, downstream integration'},
+  'Metals & Mining':{entryMult:'5–8×',leverage:'2–3× EBITDA',hold:'4–5 yrs',irr:'18–25%',driver:'Commodity cycle, capacity expansion, cost reduction'},
+  'Telecom':{entryMult:'8–12×',leverage:'3–5× EBITDA',hold:'5–7 yrs',irr:'15–22%',driver:'ARPU improvement, data monetization, tower carve-outs'},
+  'Automobiles':{entryMult:'8–14×',leverage:'2–3× EBITDA',hold:'4–6 yrs',irr:'20–28%',driver:'EV transition, premiumization, export markets'},
+  'Power/Utilities':{entryMult:'8–12×',leverage:'4–5× EBITDA',hold:'6–8 yrs',irr:'14–20%',driver:'Capacity additions, renewable transition, PPA rerating'},
+  'Real Estate':{entryMult:'12–18×',leverage:'2–4× EBITDA',hold:'4–6 yrs',irr:'18–25%',driver:'Land bank monetisation, project completion, REIT listing'},
+  'Media':{entryMult:'10–16×',leverage:'2–3× EBITDA',hold:'3–5 yrs',irr:'22–30%',driver:'Subscriber growth, ad revenue rebound, OTT pivot'},
+  'Chemicals':{entryMult:'14–20×',leverage:'2–3× EBITDA',hold:'4–6 yrs',irr:'20–28%',driver:'China+1 export contracts, specialty mix upgrade, backward integration'},
+  'Infrastructure':{entryMult:'10–16×',leverage:'4–6× EBITDA',hold:'6–8 yrs',irr:'14–20%',driver:'Order book execution, InvIT listing, government capex tailwinds'},
+  'Conglomerate':{entryMult:'12–18×',leverage:'2–3× EBITDA',hold:'4–6 yrs',irr:'18–25%',driver:'Sum-of-the-parts unlock, business simplification, holding company discount narrowing'}
+};
+
+let selectedCo = null;
+let activeSector = 'All';
+
+function buildSectors(){
+  const sf = document.getElementById('sectorFilters');
+  SECTORS.forEach(s=>{
+    const d = document.createElement('div');
+    d.className='sf'+(s==='All'?' active':'');
+    d.textContent=s;
+    d.onclick=()=>setSector(s,d);
+    sf.appendChild(d);
+  });
+}
+
+function setSector(s,el){
+  activeSector=s;
+  document.querySelectorAll('.sf').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  filterCompanies();
+}
+
+function buildGrid(){
+  const g=document.getElementById('companyGrid');
+  COMPANIES.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='co-card';
+    d.dataset.sector=c.sector;
+    d.innerHTML=`<div class="co-ticker">${c.ticker}</div><div class="co-name">${c.name}</div><div class="co-sector">${c.sector}</div>`;
+    d.onclick=()=>selectCo(c,d);
+    g.appendChild(d);
+  });
+}
+
+function filterCompanies(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  document.querySelectorAll('.co-card').forEach(card=>{
+    const name=card.querySelector('.co-name').textContent.toLowerCase();
+    const ticker=card.querySelector('.co-ticker').textContent.toLowerCase();
+    const sector=card.dataset.sector;
+    const matchQ=!q||name.includes(q)||ticker.includes(q);
+    const matchS=activeSector==='All'||sector===activeSector;
+    card.classList.toggle('hidden',!(matchQ&&matchS));
+  });
+}
+
+function selectCo(c,el){
+  document.querySelectorAll('.co-card').forEach(x=>x.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedCo=c;
+  document.getElementById('step1Btn').disabled=false;
+}
+
+function goStep(n){
+  document.querySelectorAll('.step').forEach((s,i)=>{
+    s.classList.toggle('active',i===n-1);
+  });
+  ['pill1','pill2','pill3','pill4'].forEach((id,i)=>{
+    const p=document.getElementById(id);
+    p.classList.remove('active','done');
+    if(i===n-1) p.classList.add('active');
+    else if(i<n-1) p.classList.add('done');
+  });
+  if(n===2) populateContext();
+  if(n===3) bindLiveCalc();
+  window.scrollTo(0,0);
+}
+
+function populateContext(){
+  if(!selectedCo) return;
+  const ctx=SECTOR_CONTEXT[selectedCo.sector]||SECTOR_CONTEXT['Conglomerate'];
+  document.getElementById('s2Eyebrow').textContent=`Step 2 of 4 · ${selectedCo.ticker}`;
+  document.getElementById('s2Title').textContent=`PE Landscape: ${selectedCo.sector}`;
+  document.getElementById('s2ContextTitle').textContent=`${selectedCo.name} — Sector PE Benchmarks`;
+  document.getElementById('ctxEntry').textContent=ctx.entryMult;
+  document.getElementById('ctxLeverage').textContent=ctx.leverage;
+  document.getElementById('ctxHold').textContent=ctx.hold;
+  document.getElementById('ctxIrr').textContent=ctx.irr;
+  document.getElementById('ctxDriver').textContent=ctx.driver;
+}
+
+function fmt(n){return '₹'+n.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',')+'Cr';}
+function fmtPct(n){return (n*100).toFixed(1)+'%';}
+
+function calcSU(){
+  const ebitda=parseFloat(document.getElementById('iEbitda').value)||1000;
+  const entryMult=parseFloat(document.getElementById('iEntryMult').value)||12;
+  const leverage=parseFloat(document.getElementById('iLeverage').value)||3;
+  const ev=ebitda*entryMult;
+  const debt=ebitda*leverage;
+  const equity=ev-debt;
+  const fees=ev*0.02;
+  document.getElementById('suEquity').textContent=fmt(equity);
+  document.getElementById('suDebt').textContent=fmt(debt);
+  document.getElementById('suSources').textContent=fmt(equity+debt);
+  document.getElementById('suEV').textContent=fmt(ev);
+  document.getElementById('suFees').textContent=fmt(fees);
+  document.getElementById('suUses').textContent=fmt(ev+fees);
+}
+
+function bindLiveCalc(){
+  ['iEbitda','iEntryMult','iLeverage','iInterestRate','iRevGrowth','iMarginExp','iEntryMargin','iHoldPeriod','iExitMult','iDebtAmort'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.oninput=calcSU;
+  });
+  calcSU();
+}
+
+function runLBO(){
+  const steps=['Structuring the capital stack...','Projecting EBITDA over hold period...','Computing debt amortization schedule...','Calculating equity returns and MOIC...','Building sensitivity tables...'];
+  const bar=document.getElementById('loadingBar');
+  const txt=document.getElementById('loadingText');
+  const overlay=document.getElementById('loadingOverlay');
+  overlay.classList.remove('hidden');
+  let pct=0; let si=0;
+  const interval=setInterval(()=>{
+    pct+=4;
+    bar.style.width=Math.min(pct,95)+'%';
+    if(pct%20===0&&si<steps.length) txt.textContent=steps[si++];
+    if(pct>=100){
+      clearInterval(interval);
+      bar.style.width='100%';
+      setTimeout(()=>{
+        overlay.classList.add('hidden');
+        buildResults();
+        goStep(4);
+      },300);
+    }
+  },100);
+}
+
+function buildResults(){
+  const ebitda=parseFloat(document.getElementById('iEbitda').value)||1000;
+  const entryMult=parseFloat(document.getElementById('iEntryMult').value)||12;
+  const leverage=parseFloat(document.getElementById('iLeverage').value)||3;
+  const intRate=(parseFloat(document.getElementById('iInterestRate').value)||10)/100;
+  const revGrowth=(parseFloat(document.getElementById('iRevGrowth').value)||15)/100;
+  const marginExp=(parseFloat(document.getElementById('iMarginExp').value)||50)/10000;
+  const entryMargin=(parseFloat(document.getElementById('iEntryMargin').value)||20)/100;
+  const holdYears=parseInt(document.getElementById('iHoldPeriod').value)||5;
+  const exitMult=parseFloat(document.getElementById('iExitMult').value)||13;
+  const amortRate=(parseFloat(document.getElementById('iDebtAmort').value)||10)/100;
+
+  const entryEV=ebitda*entryMult;
+  const entryDebt=ebitda*leverage;
+  const entryEquity=entryEV-entryDebt;
+  const entryRevenue=ebitda/entryMargin;
+
+  // Project EBITDA over hold period
+  let projRows=[];
+  let currentDebt=entryDebt;
+  for(let y=1;y<=holdYears;y++){
+    const rev=entryRevenue*Math.pow(1+revGrowth,y);
+    const margin=entryMargin+marginExp*y;
+    const eb=rev*margin;
+    const interest=currentDebt*intRate;
+    const fcf=eb-interest;
+    const amort=Math.min(entryDebt*amortRate, currentDebt);
+    currentDebt=Math.max(currentDebt-amort,entryDebt*0.2);
+    projRows.push({year:y,rev:rev,ebitda:eb,margin:margin,debt:currentDebt,fcf:fcf});
+  }
+
+  const exitEBITDA=projRows[holdYears-1].ebitda;
+  const exitDebt=projRows[holdYears-1].debt;
+  const exitEV=exitEBITDA*exitMult;
+  const exitEquity=exitEV-exitDebt;
+  const moic=exitEquity/entryEquity;
+  const irr=Math.pow(moic,1/holdYears)-1;
+
+  // Returns bridge
+  const ebitdaGrowthContrib=(exitEBITDA-ebitda)*exitMult;
+  const multipleExpContrib=ebitda*(exitMult-entryMult);
+  const debtPaydownContrib=entryDebt-exitDebt;
+  const totalContrib=ebitdaGrowthContrib+multipleExpContrib+debtPaydownContrib;
+
+  // Hero cards
+  const irrClass=irr>=0.25?'val-green':irr>=0.15?'':'val-red';
+  document.getElementById('resultHero').innerHTML=`
+    <div class="rh-card highlight"><div class="rh-label">Equity IRR</div><div class="rh-val ${irrClass}">${fmtPct(irr)}</div><div class="rh-note">${holdYears}-year hold period</div></div>
+    <div class="rh-card highlight"><div class="rh-label">MOIC</div><div class="rh-val">${moic.toFixed(2)}×</div><div class="rh-note">Money-on-money multiple</div></div>
+    <div class="rh-card"><div class="rh-label">Entry Equity</div><div class="rh-val">${fmt(entryEquity)}</div><div class="rh-note">Equity cheque at close</div></div>
+    <div class="rh-card"><div class="rh-label">Exit Equity</div><div class="rh-val">${fmt(exitEquity)}</div><div class="rh-note">EV minus residual debt</div></div>
+    <div class="rh-card"><div class="rh-label">Entry EV</div><div class="rh-val">${fmt(entryEV)}</div><div class="rh-note">${entryMult}× entry multiple</div></div>
+    <div class="rh-card"><div class="rh-label">Exit EV</div><div class="rh-val">${fmt(exitEV)}</div><div class="rh-note">${exitMult}× exit multiple</div></div>
+  `;
+
+  document.getElementById('s4Title').textContent=`LBO Analysis — ${selectedCo?selectedCo.name:'Target'}`;
+  document.getElementById('s4Sub').textContent=`${holdYears}-year hold · ${fmtPct(irr)} IRR · ${moic.toFixed(2)}× MOIC · Entry ${entryMult}× → Exit ${exitMult}×`;
+
+  // Bridge table
+  const bridgeRows=[
+    {label:'EBITDA Growth',val:ebitdaGrowthContrib,pct:ebitdaGrowthContrib/totalContrib,cls:'bar-ebitda',how:'Higher EBITDA at same exit multiple'},
+    {label:'Multiple Expansion',val:multipleExpContrib,pct:multipleExpContrib/totalContrib,cls:'bar-multiple',how:`Entry ${entryMult}× → Exit ${exitMult}×`},
+    {label:'Debt Paydown',val:debtPaydownContrib,pct:debtPaydownContrib/totalContrib,cls:'bar-debt',how:'FCF used to repay acquisition debt'},
+  ];
+  const btbody=document.getElementById('bridgeTbody');
+  btbody.innerHTML='';
+  bridgeRows.forEach(r=>{
+    const pctVal=Math.max(r.pct*100,0);
+    btbody.innerHTML+=`<tr>
+      <td class="mono">${r.label}</td>
+      <td class="mono">${fmt(r.val)}</td>
+      <td><div class="pct-bar-wrap"><div class="pct-bar ${r.cls}" style="width:${Math.min(pctVal,100)}%"></div></div>${pctVal.toFixed(0)}%</td>
+      <td style="color:var(--muted);font-size:12px">${r.how}</td>
+    </tr>`;
+  });
+  btbody.innerHTML+=`<tr class="total-row"><td>Total Return</td><td class="mono">${fmt(exitEquity-entryEquity)}</td><td>${((exitEquity/entryEquity-1)*100).toFixed(0)}% total gain</td><td>= Exit Equity − Entry Equity</td></tr>`;
+
+  // Projections
+  const ptbody=document.getElementById('projTbody');
+  ptbody.innerHTML='';
+  projRows.forEach(r=>{
+    ptbody.innerHTML+=`<tr>
+      <td class="mono">Year ${r.year}</td>
+      <td class="mono">${fmt(r.rev)}</td>
+      <td class="mono">${fmt(r.ebitda)}</td>
+      <td class="mono">${(r.margin*100).toFixed(1)}%</td>
+      <td class="mono">${fmt(r.debt)}</td>
+      <td class="mono">${fmt(r.fcf)}</td>
+    </tr>`;
+  });
+
+  // IRR Sensitivity: Exit Multiple (rows) × Hold Period (cols)
+  const holdOptions=[3,4,5,6,7];
+  const exitMultOptions=[exitMult-3,exitMult-1.5,exitMult,exitMult+1.5,exitMult+3];
+  buildSensTable('sensIRR', exitMultOptions, holdOptions, '× Exit', 'Yrs Hold', (em,hp)=>{
+    const eb=projRows[Math.min(hp,holdYears)-1].ebitda;
+    const d=projRows[Math.min(hp,holdYears)-1].debt;
+    const ee=eb*em-d;
+    if(ee<=0) return 'n/m';
+    const m=ee/entryEquity;
+    const r=Math.pow(m,1/hp)-1;
+    return fmtPct(r);
+  }, irr, (v,base)=>parseFloat(v)>base*100*1.1?'high':parseFloat(v)<base*100*0.9?'low':'mid');
+
+  // MOIC Sensitivity: Exit Multiple (rows) × EBITDA Growth (cols)
+  const growthOptions=[revGrowth-0.05,revGrowth-0.02,revGrowth,revGrowth+0.03,revGrowth+0.06];
+  buildSensTable('sensMOIC', exitMultOptions, growthOptions, '× Exit', '% EBITDA Gr', (em,gr)=>{
+    const eb2=entryRevenue*Math.pow(1+gr,holdYears)*(entryMargin+marginExp*holdYears);
+    const ee2=eb2*em-exitDebt;
+    if(ee2<=0) return 'n/m';
+    return (ee2/entryEquity).toFixed(2)+'×';
+  }, moic, (v,base)=>{
+    const n=parseFloat(v);
+    return n>base*1.1?'high':n<base*0.9?'low':'mid';
+  });
+}
+
+function buildSensTable(id, rowVals, colVals, rowLabel, colLabel, calc, baseVal, cellClass){
+  const tbl=document.getElementById(id);
+  tbl.innerHTML='';
+  // Header
+  let hr=`<tr><th>${rowLabel} \\ ${colLabel}</th>`;
+  colVals.forEach(c=>hr+=`<th>${typeof c==='number'&&c<1?fmtPct(c):c.toFixed?c.toFixed(1):c}</th>`);
+  tbl.innerHTML+=hr+'</tr>';
+  rowVals.forEach(r=>{
+    let tr=`<tr><td>${typeof r==='number'?r.toFixed(1)+'×':r}</td>`;
+    colVals.forEach(c=>{
+      const v=calc(r,c);
+      const cc=v==='n/m'?'':'sens-cell-'+cellClass(v,baseVal);
+      tr+=`<td class="${cc}">${v}</td>`;
+    });
+    tbl.innerHTML+=tr+'</tr>';
+  });
+}
+
+// Init
+buildSectors();
+buildGrid();
+</script>
+</body>
+</html>

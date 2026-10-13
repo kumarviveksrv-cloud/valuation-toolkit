@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fund Economics — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-pro{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+.steps-bar{padding:20px 24px 0;max-width:720px;margin:0 auto}
+.steps{display:flex;align-items:center}
+.stp{display:flex;align-items:center;gap:7px}
+.stp-n{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0}
+.stp.done .stp-n{background:#dcfce7;color:var(--green)}
+.stp.active .stp-n{background:var(--text);color:#fff}
+.stp.idle .stp-n{background:var(--card);color:var(--muted);border:1px solid var(--border)}
+.stp-l{font-size:12px;font-weight:600}
+.stp.done .stp-l{color:var(--green)}
+.stp.active .stp-l{color:var(--text)}
+.stp.idle .stp-l{color:var(--muted)}
+.stp-line{flex:1;height:1px;background:var(--border);margin:0 10px}
+.stp.done+.stp-line,.stp-done-line{background:var(--green)}
+.main{max-width:720px;margin:0 auto;padding:24px 24px 80px}
+.screen{display:none}.screen.active{display:block}
+h2{font-size:20px;font-weight:900;letter-spacing:-.02em;margin-bottom:6px}
+.sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.search-box{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;font-family:inherit;outline:none;margin-bottom:14px}
+.search-box:focus{border-color:#aaa}
+.sectors{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.sec-btn{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid var(--border);background:#fff;cursor:pointer;color:var(--muted)}
+.sec-btn.on{background:var(--text);color:#fff;border-color:var(--text)}
+.co-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.co-card{border:1px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;transition:all .15s}
+.co-card:hover{border-color:#aaa;background:var(--card)}
+.co-card.sel{border-color:var(--text);background:#f5f5f5}
+.co-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.co-meta{font-size:11px;color:var(--muted)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:11px 22px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:inherit}
+.btn-primary{background:var(--text);color:#fff}
+.btn-primary:hover{opacity:.85}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-outline{background:#fff;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{border-color:#aaa}
+.nav-btns{display:flex;gap:10px;margin-top:28px}
+.teach-hero{background:#0a0a0a;color:#fff;border-radius:12px;padding:24px;margin-bottom:20px}
+.teach-hero-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6b7280;margin-bottom:8px}
+.teach-hero h3{font-size:18px;font-weight:900;margin-bottom:8px;letter-spacing:-.02em}
+.teach-hero p{font-size:13px;color:#9ca3af;line-height:1.6}
+/* lifecycle flow */
+.lifecycle{display:flex;gap:0;margin-bottom:20px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.lc-phase{flex:1;padding:14px 12px;text-align:center;border-right:1px solid var(--border)}
+.lc-phase:last-child{border:none}
+.lc-icon{font-size:20px;margin-bottom:6px}
+.lc-title{font-size:12px;font-weight:800;margin-bottom:4px}
+.lc-sub{font-size:11px;color:var(--muted);line-height:1.4}
+.lc-1{background:#f0fdf4}.lc-2{background:#eff6ff}.lc-3{background:#fefce8}.lc-4{background:#fdf4ff}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.info-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px}
+.info-box h4{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:10px}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px}
+.info-row:last-child{border:none}
+.info-row .lbl{color:var(--muted)}
+.info-row .val{font-weight:700;font-family:'JetBrains Mono',monospace;font-size:11px}
+.j-curve-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px}
+.j-curve-box h4{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:12px}
+.j-svg{width:100%;height:120px}
+.formula-box{background:#0a0a0a;color:#fff;border-radius:10px;padding:16px;margin-bottom:20px}
+.formula-box h4{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#6b7280;margin-bottom:12px}
+.formula{font-family:'JetBrains Mono',monospace;font-size:12px;color:#d1fae5;margin-bottom:6px;line-height:1.5}
+.formula span{color:#6b7280}
+.callout{border-left:3px solid var(--amber);background:#fffbeb;border-radius:0 8px 8px 0;padding:12px 14px;margin-bottom:20px;font-size:13px;color:#78350f;line-height:1.55}
+.callout strong{display:block;font-weight:700;margin-bottom:4px}
+.sector-ctx{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px}
+.sector-ctx-hdr{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.ctx-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px}
+.ctx-row:last-child{border:none}
+.ctx-row .k{color:var(--muted)}
+.ctx-row .v{font-weight:700;max-width:60%;text-align:right}
+.pro-gate{border:2px dashed var(--border);border-radius:12px;padding:32px;text-align:center}
+.pro-gate-icon{font-size:32px;margin-bottom:12px}
+.pro-gate h3{font-size:18px;font-weight:900;margin-bottom:6px;letter-spacing:-.02em}
+.pro-gate p{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.55}
+.pro-feats{text-align:left;margin:0 auto 24px;max-width:360px}
+.pro-feat{font-size:13px;padding:5px 0;color:var(--muted)}
+.pro-feat::before{content:'→ ';font-weight:700;color:var(--text)}
+.btn-unlock{background:var(--text);color:#fff;padding:13px 28px;border-radius:8px;font-size:14px;font-weight:800;cursor:pointer;border:none;font-family:inherit;width:100%;max-width:280px}
+.btn-unlock:hover{opacity:.85}
+.pro-note{font-size:11px;color:var(--muted);margin-top:10px}
+@media(max-width:600px){.two-col{grid-template-columns:1fr}.co-grid{grid-template-columns:1fr 1fr}.lifecycle{flex-direction:column}.lc-phase{border-right:none;border-bottom:1px solid var(--border)}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-left">
+    <a href="/valuation-toolkit/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">›</span>
+    <a href="/valuation-toolkit/domains/pe/">Private Equity</a>
+    <span class="nav-sep">›</span>
+    <a href="/valuation-toolkit/domains/pe/calculators/">Calculators</a>
+    <span class="nav-sep">›</span>
+    <span>Fund Economics</span>
+  </div>
+  <button class="nav-pro" onclick="unlockPro()">Go Pro — ₹799/mo</button>
+</nav>
+
+<div class="steps-bar">
+  <div class="steps">
+    <div class="stp active" id="si1"><div class="stp-n">1</div><div class="stp-l">Company</div></div>
+    <div class="stp-line" id="sl1"></div>
+    <div class="stp idle" id="si2"><div class="stp-n">2</div><div class="stp-l">Fund Context</div></div>
+    <div class="stp-line" id="sl2"></div>
+    <div class="stp idle" id="si3"><div class="stp-n">3</div><div class="stp-l">Inputs</div></div>
+    <div class="stp-line" id="sl3"></div>
+    <div class="stp idle" id="si4"><div class="stp-n">4</div><div class="stp-l">Economics</div></div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- STEP 1 -->
+<div class="screen active" id="s1">
+  <h2>Pick a Company</h2>
+  <p class="sub">Select the portfolio company — we'll load sector-specific fund benchmarks and typical GP/LP structures.</p>
+  <input class="search-box" id="search" placeholder="Search by name or ticker…" oninput="filterCos()">
+  <div class="sectors" id="sectors"></div>
+  <div class="co-grid" id="cogrid"></div>
+  <div class="nav-btns">
+    <button class="btn btn-primary" id="s1btn" onclick="goStep(2)" disabled>Continue →</button>
+  </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="screen" id="s2">
+  <div class="teach-hero">
+    <div class="teach-hero-label">💼 Fund Economics</div>
+    <h3>How GPs Make Money (and How LPs Measure Them)</h3>
+    <p>PE fund economics are governed by two streams: management fees (recurring income) and carried interest (performance-based upside). Understanding the interplay between these — and how fees drag net IRR — is essential for any GP/LP negotiation or fund diligence.</p>
+  </div>
+
+  <div class="lifecycle">
+    <div class="lc-phase lc-1">
+      <div class="lc-icon">🏦</div>
+      <div class="lc-title">Fundraise</div>
+      <div class="lc-sub">LPs commit capital. Management fees begin on committed capital (typically 2%).</div>
+    </div>
+    <div class="lc-phase lc-2">
+      <div class="lc-icon">📥</div>
+      <div class="lc-title">Deploy</div>
+      <div class="lc-sub">Capital called in tranches as deals close. J-curve deepens as fees accumulate.</div>
+    </div>
+    <div class="lc-phase lc-3">
+      <div class="lc-icon">📈</div>
+      <div class="lc-title">Harvest</div>
+      <div class="lc-sub">Portfolio exits via IPO, trade sale, or secondary. Distributions returned to LPs.</div>
+    </div>
+    <div class="lc-phase lc-4">
+      <div class="lc-icon">💰</div>
+      <div class="lc-title">Return</div>
+      <div class="lc-sub">After hurdle and catch-up, GP takes 20% of profits as carried interest.</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="info-box">
+      <h4>The 2-and-20 Model</h4>
+      <div class="info-row"><span class="lbl">Management Fee</span><span class="val">1.5–2.5% pa</span></div>
+      <div class="info-row"><span class="lbl">Fee Base</span><span class="val">Committed → Deployed</span></div>
+      <div class="info-row"><span class="lbl">Carry Rate</span><span class="val">20% (15–25% range)</span></div>
+      <div class="info-row"><span class="lbl">Hurdle Rate</span><span class="val">8% preferred return</span></div>
+      <div class="info-row"><span class="lbl">GP Commitment</span><span class="val">1–3% of fund size</span></div>
+      <div class="info-row"><span class="lbl">Fund Life</span><span class="val">10 years + 2 extensions</span></div>
+    </div>
+    <div class="info-box">
+      <h4>Gross → Net IRR Drag</h4>
+      <div class="info-row"><span class="lbl">Gross IRR (portfolio)</span><span class="val">e.g. 25%</span></div>
+      <div class="info-row"><span class="lbl">Mgmt fee drag</span><span class="val">–3 to –5 pts</span></div>
+      <div class="info-row"><span class="lbl">Carry drag (on profits)</span><span class="val">–2 to –4 pts</span></div>
+      <div class="info-row"><span class="lbl">Fund expenses</span><span class="val">–0.2 to –0.5 pts</span></div>
+      <div class="info-row"><span class="lbl">Net IRR (LP return)</span><span class="val">e.g. 17–19%</span></div>
+      <div class="info-row"><span class="lbl">GP:LP share of gains</span><span class="val">~20:80 at 2× fund</span></div>
+    </div>
+  </div>
+
+  <div class="j-curve-box">
+    <h4>The J-Curve Effect</h4>
+    <svg class="j-svg" viewBox="0 0 400 120" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="jgrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#16a34a" stop-opacity=".2"/>
+          <stop offset="100%" stop-color="#16a34a" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <!-- baseline -->
+      <line x1="0" y1="70" x2="400" y2="70" stroke="#e5e5e5" stroke-width="1"/>
+      <!-- J-curve path -->
+      <path d="M 0,70 C 40,70 60,90 100,105 C 140,118 160,115 200,100 C 240,85 280,50 340,20 C 360,12 380,10 400,8" fill="url(#jgrad)" stroke="#16a34a" stroke-width="2" fill-opacity="0.3"/>
+      <!-- labels -->
+      <text x="5" y="68" font-size="9" fill="#6b7280" font-family="Inter,sans-serif">0</text>
+      <text x="5" y="110" font-size="9" fill="#dc2626" font-family="Inter,sans-serif">Negative (fees)</text>
+      <text x="310" y="18" font-size="9" fill="#16a34a" font-family="Inter,sans-serif">Positive returns</text>
+      <text x="85" y="118" font-size="8" fill="#6b7280" font-family="Inter,sans-serif">Y1–3</text>
+      <text x="185" y="118" font-size="8" fill="#6b7280" font-family="Inter,sans-serif">Y4–5</text>
+      <text x="315" y="118" font-size="8" fill="#6b7280" font-family="Inter,sans-serif">Y7–10</text>
+      <!-- inflection -->
+      <circle cx="195" cy="100" r="4" fill="#d97706"/>
+      <text x="200" y="96" font-size="8" fill="#d97706" font-family="Inter,sans-serif">Inflection</text>
+    </svg>
+    <p style="font-size:12px;color:var(--muted);margin-top:8px;line-height:1.55">Early years show negative net cash flows as management fees are called but investments haven't matured. The J-curve "inflects" as exits begin, and the curve rises steeply in harvest years. Deeper vintage funds show later inflection — critical for LP liquidity planning.</p>
+  </div>
+
+  <div class="formula-box">
+    <h4>Key Fund Math</h4>
+    <div class="formula">Net IRR ≈ <span>Gross IRR – Mgmt Fee Impact – Carry Drag</span></div>
+    <div class="formula">DPI = <span>Cumulative Distributions ÷ Paid-In Capital</span> <span style="color:#6b7280"> ← realized</span></div>
+    <div class="formula">TVPI = <span>(Distributions + NAV) ÷ Paid-In Capital</span> <span style="color:#6b7280"> ← total value</span></div>
+    <div class="formula">Total Carry = <span>Carry Rate × (Profits above Hurdle)</span></div>
+    <div class="formula">Fee Drag ≈ <span>Mgmt Fee % × (1 + Carry Rate) / Net MOIC</span></div>
+  </div>
+
+  <div id="sectorCtx2" class="sector-ctx" style="display:none">
+    <div class="sector-ctx-hdr" id="ctxTitle2">Sector Fund Benchmarks</div>
+    <div id="ctxBody2"></div>
+  </div>
+
+  <div class="callout">
+    <strong>India PE Fund Landscape</strong>
+    India's buyout funds (KKR, Blackstone, Warburg Pincus, ChrysCapital) typically target 20–25% gross IRR and 15–18% net. Management fees have compressed to 1.5–2% on deployed (not committed) capital for India-focused vehicles. Carry is typically European waterfall (whole-fund basis) — meaning LPs recover all capital + hurdle before GP takes any carry, reducing GP risk of clawback compared to deal-by-deal American structures.
+  </div>
+
+  <div class="nav-btns">
+    <button class="btn btn-outline" onclick="goStep(1)">← Back</button>
+    <button class="btn btn-primary" onclick="goStep(3)">Continue to Inputs →</button>
+  </div>
+</div>
+
+<!-- STEP 3 — PRO GATE -->
+<div class="screen" id="s3">
+  <div class="pro-gate">
+    <div class="pro-gate-icon">🔒</div>
+    <h3>Model Full Fund Economics</h3>
+    <p>Input fund size, vintage year, deployment schedule, and fee structure to generate a complete J-curve projection and gross-to-net IRR bridge.</p>
+    <div class="pro-feats">
+      <div class="pro-feat">Fund size, vintage year, deployment pace inputs</div>
+      <div class="pro-feat">Management fee waterfall: committed → deployed → cost</div>
+      <div class="pro-feat">GP commitment and co-invest mechanics</div>
+      <div class="pro-feat">J-curve projection by year with inflection point</div>
+      <div class="pro-feat">Gross vs net IRR bridge with fee drag decomposition</div>
+      <div class="pro-feat">LP return sensitivity by entry timing (vintage)</div>
+    </div>
+    <button class="btn-unlock" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    <div class="pro-note">Monthly only · Cancel anytime · All 15 domains included</div>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-outline" onclick="goStep(2)">← Back</button>
+  </div>
+</div>
+
+<!-- STEP 4 — PRO GATE -->
+<div class="screen" id="s4">
+  <div class="pro-gate">
+    <div class="pro-gate-icon">🔒</div>
+    <h3>Fund Economics Dashboard</h3>
+    <p>Year-by-year cash flows, DPI/TVPI/RVPI progression, management fee totals, carry computation under European waterfall, and LP net IRR by commitment tranche.</p>
+    <div class="pro-feats">
+      <div class="pro-feat">Annual cash flow table: contributions, distributions, NAV</div>
+      <div class="pro-feat">Fee drag calculation: cumulative fees vs returns</div>
+      <div class="pro-feat">Carry computation: hurdle, catch-up, final split</div>
+      <div class="pro-feat">DPI / TVPI / RVPI progression by year</div>
+      <div class="pro-feat">Net IRR by LP commitment timing (early vs late close)</div>
+      <div class="pro-feat">Export: J-curve chart + full economics table</div>
+    </div>
+    <button class="btn-unlock" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    <div class="pro-note">Monthly only · Cancel anytime · All 15 domains included</div>
+  </div>
+  <div class="nav-btns">
+    <button class="btn btn-outline" onclick="goStep(3)">← Back</button>
+  </div>
+</div>
+
+</div>
+
+<script>
+const COMPANIES=[
+  {name:'Reliance Industries',ticker:'RIL',sector:'Conglomerate'},
+  {name:'Tata Consultancy Services',ticker:'TCS',sector:'Technology'},
+  {name:'Infosys',ticker:'INFY',sector:'Technology'},
+  {name:'HDFC Bank',ticker:'HDFCBANK',sector:'Banking/NBFC'},
+  {name:'ICICI Bank',ticker:'ICICIBANK',sector:'Banking/NBFC'},
+  {name:'Hindustan Unilever',ticker:'HUL',sector:'FMCG/Consumer'},
+  {name:'ITC Limited',ticker:'ITC',sector:'FMCG/Consumer'},
+  {name:'Bharti Airtel',ticker:'AIRTEL',sector:'Telecom'},
+  {name:'Wipro',ticker:'WIPRO',sector:'Technology'},
+  {name:'Asian Paints',ticker:'ASIANPAINT',sector:'Chemicals'},
+  {name:'Bajaj Finance',ticker:'BAJFINANCE',sector:'Banking/NBFC'},
+  {name:'Maruti Suzuki',ticker:'MARUTI',sector:'Automobiles'},
+  {name:'Sun Pharmaceutical',ticker:'SUNPHARMA',sector:'Healthcare/Pharma'},
+  {name:"Dr. Reddy's Labs",ticker:'DRREDDY',sector:'Healthcare/Pharma'},
+  {name:'Titan Company',ticker:'TITAN',sector:'FMCG/Consumer'},
+  {name:'Larsen & Toubro',ticker:'LT',sector:'Infrastructure'},
+  {name:'UltraTech Cement',ticker:'ULTRACEMCO',sector:'Conglomerate'},
+  {name:'Nestle India',ticker:'NESTLEIND',sector:'FMCG/Consumer'},
+  {name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',sector:'Banking/NBFC'},
+  {name:'Axis Bank',ticker:'AXISBANK',sector:'Banking/NBFC'},
+  {name:'State Bank of India',ticker:'SBIN',sector:'Banking/NBFC'},
+  {name:'ONGC',ticker:'ONGC',sector:'Oil & Gas'},
+  {name:'Coal India',ticker:'COALINDIA',sector:'Metals & Mining'},
+  {name:'JSW Steel',ticker:'JSWSTEEL',sector:'Metals & Mining'},
+  {name:'Tata Steel',ticker:'TATASTEEL',sector:'Metals & Mining'},
+  {name:'Power Grid Corp',ticker:'POWERGRID',sector:'Power/Utilities'},
+  {name:'NTPC',ticker:'NTPC',sector:'Power/Utilities'},
+  {name:'DLF',ticker:'DLF',sector:'Real Estate'},
+  {name:'Godrej Properties',ticker:'GODREJPROP',sector:'Real Estate'},
+  {name:'Zee Entertainment',ticker:'ZEEL',sector:'Media'}
+];
+
+const SECTOR_CONTEXT={
+  'Technology':{fundType:'Venture / Growth Equity',mgmtFee:'2–2.5% on committed',targetNet:'20–30% net IRR',jCurveNote:'Y1–3 negative; exits typically Y4–6 via IPO or strategic sale'},
+  'Banking/NBFC':{fundType:'NBFC-focused PE / Credit funds',mgmtFee:'1.5–2% on deployed',targetNet:'15–22% net IRR',jCurveNote:'Earlier inflection — dividend income from NBFC holdings reduces J-curve depth'},
+  'Healthcare/Pharma':{fundType:'Healthcare PE / Growth buyout',mgmtFee:'2% on committed',targetNet:'18–25% net IRR',jCurveNote:'Y2–4 negative; hospital and pharma exits via IPO (NSE/BSE) or strategic PE secondary'},
+  'FMCG/Consumer':{fundType:'Consumer-focused Growth PE',mgmtFee:'2% on committed',targetNet:'18–24% net IRR',jCurveNote:'Moderate J-curve; brands often generate dividends during hold, softening early drag'},
+  'Oil & Gas':{fundType:'Infrastructure / Energy PE',mgmtFee:'1.5–2% on committed',targetNet:'15–20% net IRR',jCurveNote:'Long holds (6–8 years) deepen J-curve; exits via InvIT listing or trade sale to PSU'},
+  'Metals & Mining':{fundType:'Commodity / Special situations PE',mgmtFee:'1.75–2% on committed',targetNet:'18–25% net IRR',jCurveNote:'Cyclical — J-curve may be extended if commodity downturn delays exits'},
+  'Telecom':{fundType:'Infrastructure carve-out / Growth PE',mgmtFee:'1.75–2% on committed',targetNet:'15–22% net IRR',jCurveNote:'High capex during hold period deepens J-curve; tower/fibre carve-outs accelerate exits'},
+  'Automobiles':{fundType:'Sector PE / Family office buyout',mgmtFee:'1.5–2% on committed',targetNet:'18–26% net IRR',jCurveNote:'Cyclical exposure — EV transition investments may extend J-curve if capex elevated'},
+  'Power/Utilities':{fundType:'Infrastructure / Renewable PE',mgmtFee:'1.5% on committed',targetNet:'14–20% net IRR',jCurveNote:'Long construction periods (Y1–4) keep J-curve deep; InvIT listing provides mid-term liquidity'},
+  'Real Estate':{fundType:'Real Estate PE / REPE',mgmtFee:'2% on committed',targetNet:'18–24% net IRR',jCurveNote:'Construction risk deepens early J-curve; REIT listing or bulk sale marks harvest'},
+  'Media':{fundType:'TMT Growth PE',mgmtFee:'2–2.5% on committed',targetNet:'22–30% net IRR',jCurveNote:'Digital media exits fast (Y3–5); OTT platform deals may need 6–7 years for strategic exits'},
+  'Chemicals':{fundType:'Industrial / Specialty PE',mgmtFee:'1.75–2% on committed',targetNet:'20–28% net IRR',jCurveNote:'China+1 exports create rapid value creation; IPO exits (India specialty chemical rally) accelerate'},
+  'Infrastructure':{fundType:'Infra PE / Project Finance',mgmtFee:'1.25–1.75% on committed',targetNet:'14–18% net IRR',jCurveNote:'Very deep J-curve (Y1–5); InvIT or yield-co exit strategy common for infra assets'},
+  'Conglomerate':{fundType:'Large-cap Buyout / SOTP unlock',mgmtFee:'1.5–2% on committed',targetNet:'18–25% net IRR',jCurveNote:'Sum-of-the-parts strategy: partial exits via IPO of subsidiary accelerate DPI mid-hold'}
+};
+
+let activeSector='All',selectedCo=null,currentStep=1;
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+
+function renderSectors(){
+  const s=document.getElementById('sectors');
+  const all=['All',...new Set(COMPANIES.map(c=>c.sector))];
+  s.innerHTML=all.map(x=>`<button class="sec-btn${activeSector===x?' on':''}" onclick="setSector('${x}')">${x}</button>`).join('');
+}
+function setSector(s){activeSector=s;renderSectors();renderGrid();}
+function filterCos(){renderGrid();}
+function renderGrid(){
+  const q=document.getElementById('search').value.toLowerCase();
+  const list=COMPANIES.filter(c=>(activeSector==='All'||c.sector===activeSector)&&(!q||c.name.toLowerCase().includes(q)||c.ticker.toLowerCase().includes(q)));
+  document.getElementById('cogrid').innerHTML=list.map(c=>`<div class="co-card${selectedCo&&selectedCo.name===c.name?' sel':''}" onclick="selectCo(${JSON.stringify(c).replace(/"/g,'&quot;')})"><div class="co-name">${c.name}</div><div class="co-meta">${c.ticker} · ${c.sector}</div></div>`).join('');
+}
+function selectCo(c){selectedCo=c;document.getElementById('s1btn').disabled=false;renderGrid();}
+function showStep(n){
+  [1,2,3,4].forEach(i=>{
+    document.getElementById('s'+i).classList.toggle('active',i===n);
+    const si=document.getElementById('si'+i);
+    si.className='stp '+(i<n?'done':i===n?'active':'idle');
+    if(i<4){const ln=document.getElementById('sl'+i);if(ln)ln.className='stp-line'+(i<n?' stp-done-line':'');}
+  });
+  currentStep=n;
+  if(n===2&&selectedCo)renderSectorCtx();
+}
+function renderSectorCtx(){
+  const ctx=SECTOR_CONTEXT[selectedCo.sector];
+  if(!ctx){document.getElementById('sectorCtx2').style.display='none';return;}
+  document.getElementById('ctxTitle2').textContent=selectedCo.sector+' — Fund Benchmarks';
+  const rows=[['Fund Type',ctx.fundType],['Mgmt Fee',ctx.mgmtFee],['Target Net IRR',ctx.targetNet],['J-Curve Shape',ctx.jCurveNote]];
+  document.getElementById('ctxBody2').innerHTML=rows.map(r=>`<div class="ctx-row"><span class="k">${r[0]}</span><span class="v">${r[1]}</span></div>`).join('');
+  document.getElementById('sectorCtx2').style.display='block';
+}
+function goStep(n){showStep(n);}
+renderSectors();renderGrid();
+</script>
+</body>
+</html>
