@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fund Screener &amp; Scorecard — Asset Management — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--accent:#dc2626;--accent-bg:#fef2f2;--accent-border:#fecaca}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-pro{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+.hero{background:#0a0a0a;color:#fff;padding:32px 24px 28px}
+.hero-inner{max-width:780px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(220,38,38,.15);border:1px solid rgba(220,38,38,.3);color:#f87171;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;margin-bottom:14px;letter-spacing:.04em}
+.hero h1{font-size:clamp(20px,3vw,30px);font-weight:900;letter-spacing:-.02em;margin-bottom:6px}
+.hero h1 span{color:#f87171}
+.hero p{font-size:13px;color:#9ca3af;line-height:1.6}
+.step-bar{background:#111;border-bottom:1px solid #222;padding:0 24px}
+.step-bar-inner{max-width:780px;margin:0 auto;display:flex;gap:0}
+.step-tab{padding:14px 20px;font-size:12px;font-weight:700;color:#4b5563;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.step-tab.active{color:#f87171;border-bottom-color:#f87171}
+.main{max-width:780px;margin:0 auto;padding:32px 24px 80px}
+.step{display:none}
+.step.active{display:block}
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:14px}
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:24px}
+.company-card{border:1px solid var(--border);border-radius:8px;padding:14px 16px;cursor:pointer;transition:all .15s;background:#fff}
+.company-card:hover{border-color:var(--accent);background:var(--accent-bg)}
+.company-card.selected{border-color:var(--accent);background:var(--accent-bg);box-shadow:0 0 0 3px rgba(220,38,38,.15)}
+.company-name{font-size:14px;font-weight:800;margin-bottom:2px}
+.company-sub{font-size:11px;color:var(--muted)}
+.company-meta{font-size:11px;color:var(--muted);margin-top:6px;font-family:'JetBrains Mono',monospace}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .15s;font-family:'Inter',sans-serif}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{opacity:.9}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{color:var(--text);border-color:#aaa}
+.btn-row{display:flex;gap:10px;align-items:center;margin-top:24px}
+.metric-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.metric-box{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+.metric-label{font-size:11px;color:var(--muted);margin-bottom:4px}
+.metric-value{font-size:20px;font-weight:900;font-family:'JetBrains Mono',monospace}
+.metric-sub{font-size:11px;color:var(--muted);margin-top:2px}
+.pos{color:var(--green)}
+.neg{color:var(--red)}
+.neut{color:var(--muted)}
+.teach-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+.teach-card{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:8px;padding:16px}
+.teach-card h4{font-size:13px;font-weight:800;margin-bottom:6px;color:var(--accent)}
+.teach-card p{font-size:12px;color:var(--muted);line-height:1.6}
+.qa-block{border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:10px}
+.qa-q{font-size:13px;font-weight:700;margin-bottom:6px}
+.qa-a{font-size:13px;color:var(--muted);line-height:1.6}
+.qa-a b{color:var(--text)}
+.pro-gate{border:2px dashed var(--border);border-radius:12px;padding:36px 24px;text-align:center}
+.pro-lock{font-size:36px;margin-bottom:12px}
+.pro-gate h3{font-size:18px;font-weight:900;margin-bottom:8px}
+.pro-gate p{font-size:13px;color:var(--muted);margin-bottom:20px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.6}
+.pro-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:24px}
+.pro-pill{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;color:var(--muted)}
+.btn-pro{background:var(--text);color:#fff;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:800;cursor:pointer;border:none;font-family:'Inter',sans-serif}
+.btn-pro:hover{opacity:.85}
+.divider{height:1px;background:var(--border);margin:24px 0}
+.score-bar{margin-bottom:12px}
+.score-bar-label{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+.score-bar-track{height:8px;background:#e5e7eb;border-radius:4px;overflow:hidden}
+.score-bar-fill{height:100%;border-radius:4px;background:var(--accent);transition:width .5s ease}
+@media(max-width:600px){.teach-grid{grid-template-columns:1fr}.metric-grid{grid-template-columns:repeat(2,1fr)}.company-grid{grid-template-columns:1fr 1fr}.step-tab{padding:12px 10px;font-size:11px}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <a href="/valuation-toolkit/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">›</span>
+    <a href="/valuation-toolkit/domains/asset-management/">Asset Management</a>
+    <span class="nav-sep">›</span>
+    <span>Fund Screener</span>
+  </div>
+  <button class="nav-pro" onclick="unlockPro()">Go Pro — ₹799/mo</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">🔍 Calculator 05 · Asset Management</div>
+    <h1>Fund Screener <span>&amp; Scorecard</span></h1>
+    <p>Multi-factor scoring across performance, risk, manager alpha, fees and AUM growth — composite rank and buy/hold/sell recommendation.</p>
+  </div>
+</div>
+
+<div class="step-bar">
+  <div class="step-bar-inner">
+    <div class="step-tab active" id="tab-1">1 · Pick AMC</div>
+    <div class="step-tab" id="tab-2">2 · Context</div>
+    <div class="step-tab" id="tab-3">3 · Scorecard 🔒</div>
+    <div class="step-tab" id="tab-4">4 · Rankings 🔒</div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- STEP 1 -->
+<div class="step active" id="step-1">
+  <p class="section-label">Select an AMC to screen and score</p>
+  <div class="company-grid" id="company-grid"></div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="goStep(2)" id="btn-next-1" disabled>Next: Context →</button>
+    <a href="index.html" class="btn btn-ghost">← All Calculators</a>
+  </div>
+</div>
+
+<!-- STEP 2 -->
+<div class="step" id="step-2">
+  <div id="context-content"></div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="goStep(3)">Next: Scorecard →</button>
+    <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
+  </div>
+</div>
+
+<!-- STEP 3: PRO -->
+<div class="step" id="step-3">
+  <div class="pro-gate">
+    <div class="pro-lock">🔒</div>
+    <h3>Multi-Factor Fund Scorecard — Pro Feature</h3>
+    <p>Score this AMC across 6 dimensions — performance, risk, manager alpha, fee efficiency, AUM growth, and consistency — to get a weighted composite fund score.</p>
+    <div class="pro-pills">
+      <span class="pro-pill">Performance Score</span>
+      <span class="pro-pill">Risk Score</span>
+      <span class="pro-pill">Manager Alpha Score</span>
+      <span class="pro-pill">Fee Efficiency Score</span>
+      <span class="pro-pill">AUM Growth Score</span>
+      <span class="pro-pill">Consistency Score</span>
+    </div>
+    <button class="btn-pro" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goStep(2)">← Back</button>
+    <button class="btn btn-primary" onclick="goStep(4)">Next: Rankings →</button>
+  </div>
+</div>
+
+<!-- STEP 4: PRO -->
+<div class="step" id="step-4">
+  <div class="pro-gate">
+    <div class="pro-lock">🔒</div>
+    <h3>Peer Rankings &amp; Recommendation — Pro Feature</h3>
+    <p>See this AMC's composite rank among all 30 peers, quartile placement, Buy/Hold/Sell recommendation with rationale, and risk-return quadrant positioning.</p>
+    <div class="pro-pills">
+      <span class="pro-pill">Composite Rank</span>
+      <span class="pro-pill">Quartile Ranking</span>
+      <span class="pro-pill">Buy / Hold / Sell</span>
+      <span class="pro-pill">Peer Comparison Table</span>
+      <span class="pro-pill">Selection Rationale</span>
+      <span class="pro-pill">Risk-Return Quadrant</span>
+    </div>
+    <button class="btn-pro" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goStep(3)">← Back</button>
+    <a href="portfolio-performance.html" class="btn btn-primary">Try Free: Portfolio Analyzer →</a>
+  </div>
+</div>
+
+</div>
+
+<script>
+var COMPANIES=[
+  {id:'sbimf',name:'SBI MF',sector:'Large-Cap AMC',aum:1050000,equityAumPct:58,flagship:'SBI Bluechip Fund',ret1y:18.2,ret3y:14.1,ret5y:15.8,sharpe:1.42,alpha:2.4,maxDrawdown:-22.1,beta:0.91,expenseRatio:1.48,schemes:42},
+  {id:'iciciprumf',name:'ICICI Pru AMC',sector:'Large-Cap AMC',aum:830000,equityAumPct:52,flagship:'ICICI Pru Bluechip',ret1y:17.8,ret3y:13.6,ret5y:15.2,sharpe:1.38,alpha:1.9,maxDrawdown:-23.4,beta:0.94,expenseRatio:1.52,schemes:48},
+  {id:'hdfcamc',name:'HDFC AMC',sector:'Large-Cap AMC',aum:750000,equityAumPct:55,flagship:'HDFC Top 100',ret1y:19.1,ret3y:14.8,ret5y:16.4,sharpe:1.51,alpha:3.1,maxDrawdown:-21.8,beta:0.89,expenseRatio:1.45,schemes:38},
+  {id:'adityabirla',name:'Aditya Birla SL MF',sector:'Large-Cap AMC',aum:340000,equityAumPct:49,flagship:'ABSL Frontline Equity',ret1y:16.8,ret3y:12.8,ret5y:14.4,sharpe:1.24,alpha:0.4,maxDrawdown:-24.9,beta:0.98,expenseRatio:1.58,schemes:44},
+  {id:'nippon',name:'Nippon India MF',sector:'Large-Cap AMC',aum:480000,equityAumPct:48,flagship:'Nippon India Large Cap',ret1y:16.4,ret3y:12.9,ret5y:14.7,sharpe:1.28,alpha:0.8,maxDrawdown:-24.6,beta:0.97,expenseRatio:1.62,schemes:35},
+  {id:'kotakmf',name:'Kotak MF',sector:'Large-Cap AMC',aum:420000,equityAumPct:51,flagship:'Kotak Bluechip',ret1y:17.2,ret3y:13.4,ret5y:15.1,sharpe:1.35,alpha:1.6,maxDrawdown:-23.1,beta:0.93,expenseRatio:1.55,schemes:36},
+  {id:'miraemf',name:'Mirae Asset MF',sector:'Mid-Cap AMC',aum:310000,equityAumPct:72,flagship:'Mirae Asset Emerging Bluechip',ret1y:22.4,ret3y:16.2,ret5y:18.1,sharpe:1.68,alpha:4.8,maxDrawdown:-26.3,beta:1.02,expenseRatio:1.68,schemes:28},
+  {id:'axismf',name:'Axis MF',sector:'Mid-Cap AMC',aum:290000,equityAumPct:68,flagship:'Axis Bluechip Fund',ret1y:14.2,ret3y:10.8,ret5y:13.2,sharpe:1.08,alpha:-1.2,maxDrawdown:-28.4,beta:1.06,expenseRatio:1.72,schemes:32},
+  {id:'utiamc',name:'UTI AMC',sector:'Large-Cap AMC',aum:280000,equityAumPct:46,flagship:'UTI Nifty 50 Index',ret1y:15.8,ret3y:12.4,ret5y:14.0,sharpe:1.22,alpha:0.1,maxDrawdown:-22.8,beta:0.99,expenseRatio:0.18,schemes:39},
+  {id:'bandhanmf',name:'Bandhan MF',sector:'Mid-Cap AMC',aum:145000,equityAumPct:54,flagship:'Bandhan Core Equity',ret1y:18.6,ret3y:13.8,ret5y:15.4,sharpe:1.36,alpha:2.0,maxDrawdown:-25.4,beta:1.01,expenseRatio:1.65,schemes:31},
+  {id:'dsp',name:'DSP Investment Mgrs',sector:'Mid-Cap AMC',aum:148000,equityAumPct:65,flagship:'DSP Midcap Fund',ret1y:24.6,ret3y:17.4,ret5y:19.2,sharpe:1.74,alpha:5.6,maxDrawdown:-28.1,beta:1.08,expenseRatio:1.74,schemes:26},
+  {id:'tatamf',name:'Tata MF',sector:'Mid-Cap AMC',aum:120000,equityAumPct:58,flagship:'Tata Digital India',ret1y:21.8,ret3y:15.6,ret5y:17.4,sharpe:1.58,alpha:3.8,maxDrawdown:-27.2,beta:1.04,expenseRatio:1.68,schemes:24},
+  {id:'360one',name:'360 ONE Asset',sector:'PMS/AIF',aum:112000,equityAumPct:88,flagship:'360 ONE Focused Equity',ret1y:28.4,ret3y:19.8,ret5y:22.1,sharpe:1.92,alpha:8.2,maxDrawdown:-24.6,beta:0.96,expenseRatio:2.25,schemes:12},
+  {id:'edelweiss',name:'Edelweiss MF',sector:'Small-Cap AMC',aum:98000,equityAumPct:74,flagship:'Edelweiss Mid Cap',ret1y:26.2,ret3y:18.4,ret5y:20.6,sharpe:1.82,alpha:6.8,maxDrawdown:-31.2,beta:1.14,expenseRatio:1.78,schemes:22},
+  {id:'motilal',name:'Motilal Oswal MF',sector:'Small-Cap AMC',aum:92000,equityAumPct:82,flagship:'Motilal Oswal Midcap',ret1y:32.4,ret3y:22.6,ret5y:24.8,sharpe:2.04,alpha:9.8,maxDrawdown:-29.8,beta:1.12,expenseRatio:1.82,schemes:18},
+  {id:'canararobeco',name:'Canara Robeco MF',sector:'Mid-Cap AMC',aum:88000,equityAumPct:61,flagship:'Canara Robeco Equity Tax Saver',ret1y:17.4,ret3y:13.2,ret5y:14.8,sharpe:1.32,alpha:1.4,maxDrawdown:-24.2,beta:0.98,expenseRatio:1.62,schemes:20},
+  {id:'ppfas',name:'PPFAS MF',sector:'Focused AMC',aum:82000,equityAumPct:94,flagship:'Parag Parikh Flexi Cap',ret1y:21.2,ret3y:15.8,ret5y:18.4,sharpe:1.64,alpha:4.2,maxDrawdown:-18.6,beta:0.78,expenseRatio:1.45,schemes:4},
+  {id:'quant',name:'Quant MF',sector:'Small-Cap AMC',aum:78000,equityAumPct:86,flagship:'Quant Small Cap',ret1y:42.6,ret3y:28.4,ret5y:32.1,sharpe:2.28,alpha:14.2,maxDrawdown:-38.4,beta:1.24,expenseRatio:1.92,schemes:16},
+  {id:'franklin',name:'Franklin Templeton MF',sector:'Debt-Focused AMC',aum:68000,equityAumPct:38,flagship:'Franklin India Prima',ret1y:14.8,ret3y:11.6,ret5y:13.8,sharpe:1.18,alpha:0.2,maxDrawdown:-26.8,beta:1.02,expenseRatio:1.72,schemes:28},
+  {id:'invesco',name:'Invesco India MF',sector:'Mid-Cap AMC',aum:52000,equityAumPct:64,flagship:'Invesco India Midcap',ret1y:22.6,ret3y:16.4,ret5y:18.2,sharpe:1.66,alpha:4.4,maxDrawdown:-28.6,beta:1.06,expenseRatio:1.74,schemes:16},
+  {id:'pgim',name:'PGIM India MF',sector:'Small-Cap AMC',aum:48000,equityAumPct:72,flagship:'PGIM India Midcap Opp',ret1y:23.8,ret3y:16.8,ret5y:18.6,sharpe:1.72,alpha:5.0,maxDrawdown:-29.4,beta:1.09,expenseRatio:1.76,schemes:14},
+  {id:'njmf',name:'NJ MF',sector:'New-Age AMC',aum:42000,equityAumPct:58,flagship:'NJ Flexi Cap',ret1y:16.2,ret3y:12.2,ret5y:null,sharpe:1.24,alpha:0.2,maxDrawdown:-23.8,beta:0.96,expenseRatio:1.52,schemes:8},
+  {id:'mahindramanulife',name:'Mahindra Manulife MF',sector:'Small-Cap AMC',aum:32000,equityAumPct:68,flagship:'Mahindra Manulife Midcap',ret1y:24.4,ret3y:17.2,ret5y:null,sharpe:1.74,alpha:5.4,maxDrawdown:-30.2,beta:1.12,expenseRatio:1.82,schemes:10},
+  {id:'whiteoak',name:'WhiteOak Capital MF',sector:'Focused AMC',aum:28000,equityAumPct:96,flagship:'WhiteOak Capital Flexi Cap',ret1y:26.8,ret3y:null,ret5y:null,sharpe:1.88,alpha:7.2,maxDrawdown:-22.4,beta:0.88,expenseRatio:1.48,schemes:6},
+  {id:'jmfinancial',name:'JM Financial MF',sector:'Small-Cap AMC',aum:24000,equityAumPct:62,flagship:'JM Flexi Cap',ret1y:38.4,ret3y:24.6,ret5y:26.2,sharpe:2.12,alpha:11.8,maxDrawdown:-34.6,beta:1.18,expenseRatio:1.88,schemes:12},
+  {id:'growwmf',name:'Groww MF',sector:'New-Age AMC',aum:22000,equityAumPct:72,flagship:'Groww Nifty Index',ret1y:15.6,ret3y:null,ret5y:null,sharpe:1.18,alpha:-0.4,maxDrawdown:-22.6,beta:1.00,expenseRatio:0.22,schemes:6},
+  {id:'bajajfinserv',name:'Bajaj Finserv AMC',sector:'New-Age AMC',aum:16000,equityAumPct:64,flagship:'Bajaj Finserv Flexi Cap',ret1y:18.4,ret3y:null,ret5y:null,sharpe:1.42,alpha:2.4,maxDrawdown:-24.2,beta:0.98,expenseRatio:1.58,schemes:8},
+  {id:'quantum',name:'Quantum AMC',sector:'Focused AMC',aum:12000,equityAumPct:52,flagship:'Quantum Long Term Equity',ret1y:15.4,ret3y:12.6,ret5y:14.2,sharpe:1.24,alpha:0.2,maxDrawdown:-21.4,beta:0.86,expenseRatio:1.25,schemes:5},
+  {id:'iti',name:'ITI MF',sector:'Small-Cap AMC',aum:8000,equityAumPct:76,flagship:'ITI Small Cap',ret1y:28.6,ret3y:19.4,ret5y:null,sharpe:1.86,alpha:7.6,maxDrawdown:-33.8,beta:1.16,expenseRatio:1.92,schemes:8},
+  {id:'trustmf',name:'Trust MF',sector:'New-Age AMC',aum:6000,equityAumPct:68,flagship:'Trust Midcap',ret1y:22.4,ret3y:null,ret5y:null,sharpe:1.68,alpha:5.2,maxDrawdown:-27.6,beta:1.08,expenseRatio:1.78,schemes:6}
+];
+
+var NIFTY={ret1y:16.0,ret3y:12.8,ret5y:14.2};
+var selected=null;
+
+function fmtAum(n){
+  if(n>=100000) return '₹'+(n/100000).toFixed(1)+'L Cr';
+  if(n>=1000) return '₹'+(n/1000).toFixed(0)+'K Cr';
+  return '₹'+n+' Cr';
+}
+function fmtRet(r){
+  if(r===null) return 'N/A';
+  var sign=r>0?'+':'';
+  return sign+r.toFixed(1)+'%';
+}
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+
+function scorePerf(c){
+  var base=((c.ret1y/NIFTY.ret1y)*40)+((c.ret3y||NIFTY.ret3y)/NIFTY.ret3y)*35+((c.ret5y||NIFTY.ret5y)/NIFTY.ret5y)*25;
+  return Math.min(100,Math.max(0,base*48));
+}
+function scoreRisk(c){
+  var drawScore=Math.max(0,(40-Math.abs(c.maxDrawdown))/40)*50;
+  var betaScore=Math.max(0,(1.5-Math.abs(c.beta-1))/1.5)*30;
+  var sharpeScore=Math.min(30,c.sharpe*12);
+  return Math.min(100,drawScore+betaScore+sharpeScore);
+}
+function scoreAlpha(c){
+  return Math.min(100,Math.max(0,50+c.alpha*5));
+}
+function scoreFee(c){
+  return Math.min(100,Math.max(0,(2.5-c.expenseRatio)/2.5*100));
+}
+
+function buildGrid(){
+  var g=document.getElementById('company-grid');
+  COMPANIES.forEach(function(c){
+    var perfScore=Math.round(scorePerf(c));
+    var card=document.createElement('div');
+    card.className='company-card';
+    card.innerHTML='<div class="company-name">'+c.name+'</div><div class="company-sub">'+c.sector+'</div><div class="company-meta">Perf: '+perfScore+'/100&nbsp;&nbsp;Alpha: '+fmtRet(c.alpha)+'</div>';
+    card.onclick=function(){
+      document.querySelectorAll('.company-card').forEach(function(x){x.classList.remove('selected');});
+      card.classList.add('selected');
+      selected=c;
+      document.getElementById('btn-next-1').disabled=false;
+    };
+    g.appendChild(card);
+  });
+}
+
+function buildContext(){
+  var c=selected;
+  var perfS=Math.round(scorePerf(c));
+  var riskS=Math.round(scoreRisk(c));
+  var alphaS=Math.round(scoreAlpha(c));
+  var feeS=Math.round(scoreFee(c));
+  var sharpeLabel = c.sharpe>1.5 ? 'Strong' : (c.sharpe>1.2 ? 'Decent' : 'Weak');
+  var feeLabel = c.expenseRatio<0.5 ? 'Passive-level fees' : (c.expenseRatio<1.5 ? 'Below median' : 'Above median');
+
+  var html='';
+  html+='<p class="section-label">Fund screening context — '+c.name+'</p>';
+  html+='<div class="metric-grid">';
+  html+='<div class="metric-box"><div class="metric-label">1Y Return</div><div class="metric-value '+(c.ret1y>NIFTY.ret1y?'pos':'neg')+'">'+fmtRet(c.ret1y)+'</div><div class="metric-sub">vs Nifty '+NIFTY.ret1y.toFixed(1)+'%</div></div>';
+  html+='<div class="metric-box"><div class="metric-label">Alpha</div><div class="metric-value '+(c.alpha>0?'pos':'neg')+'">'+fmtRet(c.alpha)+'</div><div class="metric-sub">Annualised vs benchmark</div></div>';
+  html+='<div class="metric-box"><div class="metric-label">Sharpe Ratio</div><div class="metric-value">'+c.sharpe.toFixed(2)+'</div><div class="metric-sub">'+sharpeLabel+' risk-adjusted return</div></div>';
+  html+='<div class="metric-box"><div class="metric-label">Expense Ratio</div><div class="metric-value">'+c.expenseRatio.toFixed(2)+'%</div><div class="metric-sub">'+feeLabel+'</div></div>';
+  html+='<div class="metric-box"><div class="metric-label">Max Drawdown</div><div class="metric-value neg">'+c.maxDrawdown.toFixed(1)+'%</div><div class="metric-sub">Worst peak-to-trough</div></div>';
+  html+='<div class="metric-box"><div class="metric-label">Total AUM</div><div class="metric-value" style="font-size:16px;margin-top:4px">'+fmtAum(c.aum)+'</div><div class="metric-sub">'+c.schemes+' schemes</div></div>';
+  html+='</div>';
+
+  html+='<div class="divider"></div>';
+  html+='<p class="section-label">Indicative factor scores (free preview)</p>';
+  var factors=[
+    {label:'Performance Score',score:perfS,detail:'Based on 1Y/3Y/5Y CAGR vs Nifty 50'},
+    {label:'Risk Score',score:riskS,detail:'Drawdown, beta and Sharpe weighted'},
+    {label:'Alpha Score',score:alphaS,detail:'Manager alpha vs benchmark over time'},
+    {label:'Fee Efficiency',score:feeS,detail:'Expense ratio vs category median'}
+  ];
+  factors.forEach(function(f){
+    var fillColor=f.score>=70?'#16a34a':f.score>=45?'#d97706':'#dc2626';
+    html+='<div class="score-bar"><div class="score-bar-label"><span>'+f.label+'</span><span style="font-family:JetBrains Mono,monospace;font-weight:700">'+f.score+'/100</span></div><div class="score-bar-track"><div class="score-bar-fill" style="width:'+f.score+'%;background:'+fillColor+'"></div></div><div style="font-size:11px;color:var(--muted);margin-top:3px">'+f.detail+'</div></div>';
+  });
+
+  html+='<div class="divider"></div>';
+  html+='<p class="section-label">What fund screeners look at</p>';
+  html+='<div class="teach-grid">';
+  html+='<div class="teach-card"><h4>Performance Consistency</h4><p>A fund that ranks in the top quartile for 1Y but drops to 4th quartile over 3Y signals a lucky short-term run. Screeners weight long-term rolling returns more than point-to-point figures — consistency beats peaks.</p></div>';
+  html+='<div class="teach-card"><h4>Risk-Adjusted Returns</h4><p>Two funds with identical 5Y CAGR can have vastly different Sharpe ratios. The one that achieved the same return with lower volatility is superior — it gives you better sleep-adjusted performance.</p></div>';
+  html+='<div class="teach-card"><h4>Manager Alpha vs Fees</h4><p>A fund charging 1.8% expense ratio needs to generate at least 2%+ alpha just to break even against a cheaper index fund. Fee-adjusted alpha is what actually shows up in your account — always net fees before comparing.</p></div>';
+  html+='<div class="teach-card"><h4>AUM Growth Signals</h4><p>Rapid AUM growth can be a double-edged sword. Inflows validate track record, but excess AUM can make a mid/small-cap fund hard to manage without impact costs. Watch AUM growth rate alongside return stability.</p></div>';
+  html+='</div>';
+
+  html+='<div class="divider"></div>';
+  html+='<p class="section-label">Q&A — '+c.name+' screening context</p>';
+
+  var isStrongBuy = c.alpha>3 && c.sharpe>1.4;
+  var isWatchList = c.alpha>0 && c.sharpe>1.2;
+  var preliminary = isStrongBuy ? 'strong buy candidate' : (isWatchList ? 'watch list candidate' : 'needs improvement');
+  html+='<div class="qa-block"><div class="qa-q">Based on these early indicators, where does '+c.name+' stand?</div><div class="qa-a">With alpha of '+fmtRet(c.alpha)+' and a Sharpe of '+c.sharpe.toFixed(2)+', '+c.name+' looks like a <b>'+(c.alpha>3&&c.sharpe>1.4?'strong candidate to investigate further':c.alpha>0?'moderate performer — competitive but not standout':'laggard that needs deeper scrutiny')+'</b>. That said, a composite score needs all 6 factors — the Pro Scorecard weights AUM growth and consistency data that are not visible in these preview scores.</div></div>';
+
+  html+='<div class="qa-block"><div class="qa-q">Why does expense ratio of '+c.expenseRatio.toFixed(2)+'% matter so much in screening?</div><div class="qa-a">Compounding works against you on fees. A 0.5% difference in expense ratio over 20 years erodes roughly 10% of terminal corpus. For '+c.name+', at '+c.expenseRatio.toFixed(2)+'%, the fund needs to generate at least <b>'+c.expenseRatio.toFixed(2)+'% of sustained alpha</b> just to match an index fund. If alpha is '+fmtRet(c.alpha)+', the net value add is <b>'+((c.alpha-c.expenseRatio+0.1).toFixed(1))+'%</b> — that\'s the real question.</div></div>';
+
+  var aumLabel = c.aum>=100000 ? '₹'+(c.aum/100000).toFixed(1)+'L Cr AUM' : '₹'+(c.aum/1000).toFixed(0)+'K Cr AUM';
+  var sectorNote = c.sector==='Small-Cap AMC' ? 'small-cap strategies like '+c.name+', large AUM is a genuine constraint — impact costs in thin liquidity securities can erode alpha significantly' : (c.sector==='Large-Cap AMC' ? 'large-cap mandates, AUM size matters less — large-cap stocks absorb inflows without material impact' : 'mid-cap strategies, AUM needs monitoring — returns can soften as the fund grows beyond efficient deployment capacity');
+  html+='<div class="qa-block"><div class="qa-q">Is '+aumLabel+' at '+c.name+' a concern for future returns?</div><div class="qa-a">AUM size affects different strategies differently. For '+sectorNote+'. The Pro Rankings tab models this impact.</div></div>';
+
+  document.getElementById('context-content').innerHTML=html;
+}
+
+function goStep(n){
+  document.querySelectorAll('.step').forEach(function(s){s.classList.remove('active');});
+  document.querySelectorAll('.step-tab').forEach(function(t){t.classList.remove('active');});
+  document.getElementById('step-'+n).classList.add('active');
+  document.getElementById('tab-'+n).classList.add('active');
+  window.scrollTo(0,0);
+  if(n===2) buildContext();
+}
+
+buildGrid();
+</script>
+</body>
+</html>

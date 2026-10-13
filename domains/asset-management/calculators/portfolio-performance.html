@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portfolio Performance Analyzer — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--accent:#0891b2;--accent-bg:#e0f2fe;--accent-border:#bae6fd}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+a{color:inherit;text-decoration:none}
+code{font-family:'JetBrains Mono',monospace}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-pro{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+.badge-domain{display:inline-flex;align-items:center;gap:6px;background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;margin-bottom:16px}
+.hero{background:#0a0a0a;color:#fff;padding:48px 24px 36px}
+.hero-inner{max-width:700px;margin:0 auto}
+.hero h1{font-size:clamp(24px,3.8vw,38px);font-weight:900;letter-spacing:-.03em;margin-bottom:10px}
+.hero h1 span{color:#67e8f9}
+.hero p{font-size:14px;color:#9ca3af;line-height:1.65;max-width:480px}
+.progress-bar{background:#1f2937;height:4px;margin-top:28px;border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease}
+.step-labels{display:flex;gap:0;margin-top:8px}
+.step-label{flex:1;font-size:10px;color:#4b5563;font-weight:600;text-align:center}
+.step-label.active{color:#67e8f9}
+.main{max-width:700px;margin:0 auto;padding:40px 24px 80px}
+.step{display:none}
+.step.active{display:block}
+.step-title{font-size:22px;font-weight:900;letter-spacing:-.02em;margin-bottom:6px}
+.step-sub{font-size:14px;color:var(--muted);margin-bottom:28px;line-height:1.55}
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:32px}
+.company-btn{border:1.5px solid var(--border);border-radius:8px;padding:14px 16px;background:#fff;cursor:pointer;text-align:left;transition:all .15s;font-family:'Inter',sans-serif}
+.company-btn:hover{border-color:var(--accent);background:var(--accent-bg)}
+.company-btn.selected{border-color:var(--accent);background:var(--accent-bg);box-shadow:0 0 0 3px rgba(8,145,178,.12)}
+.cb-name{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px}
+.cb-sub{font-size:11px;color:var(--muted)}
+.cb-aum{font-size:11px;font-weight:600;color:var(--accent);margin-top:4px}
+.btn-row{display:flex;gap:12px;margin-top:28px;align-items:center}
+.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:12px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:opacity .15s}
+.btn-primary:hover{opacity:.88}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-secondary{background:#fff;color:var(--text);border:1.5px solid var(--border);border-radius:8px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-secondary:hover{border-color:#aaa}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;margin-bottom:28px}
+.metric-card{border:1px solid var(--border);border-radius:8px;padding:16px;background:#fff}
+.metric-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.metric-value{font-size:22px;font-weight:900;letter-spacing:-.02em;color:var(--text)}
+.metric-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.metric-value.good{color:var(--green)}
+.metric-value.warn{color:var(--amber)}
+.metric-value.bad{color:var(--red)}
+.metric-value.accent{color:var(--accent)}
+.teach-block{border-left:3px solid var(--accent);padding:14px 18px;background:var(--accent-bg);border-radius:0 8px 8px 0;margin-bottom:16px}
+.teach-block h4{font-size:13px;font-weight:800;margin-bottom:6px;color:var(--accent)}
+.teach-block p{font-size:13px;color:var(--text);line-height:1.6}
+.teach-block ul{font-size:13px;color:var(--text);line-height:1.7;padding-left:18px}
+.qa-list{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.qa{border:1px solid var(--border);border-radius:8px;padding:14px 16px;background:#fff}
+.qa-q{font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px}
+.qa-a{font-size:13px;color:var(--muted);line-height:1.6}
+.return-table{width:100%;border-collapse:collapse;margin-bottom:24px;font-size:13px}
+.return-table th{background:var(--card);padding:10px 14px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);border-bottom:1px solid var(--border)}
+.return-table td{padding:12px 14px;border-bottom:1px solid var(--border)}
+.return-table tr:last-child td{border-bottom:none}
+.return-table .fund-row{background:var(--accent-bg);font-weight:700}
+.ret-pos{color:var(--green);font-weight:700}
+.ret-neg{color:var(--red);font-weight:700}
+.load-box{text-align:center;padding:60px 24px}
+.load-label{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:20px;min-height:20px}
+.load-bar-bg{background:var(--border);border-radius:4px;height:6px;max-width:320px;margin:0 auto 12px}
+.load-bar-fill{background:var(--accent);height:6px;border-radius:4px;width:0%;transition:width .6s ease}
+.load-pct{font-size:12px;color:var(--muted)}
+.result-box{display:none}
+.score-card{border:2px solid var(--accent-border);border-radius:12px;padding:24px;background:var(--accent-bg);margin-bottom:20px}
+.score-card h3{font-size:13px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px}
+.score-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+.score-item{background:#fff;border-radius:8px;padding:14px;border:1px solid var(--accent-border)}
+.score-item-label{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:4px}
+.score-item-val{font-size:20px;font-weight:900;letter-spacing:-.02em}
+.score-item-note{font-size:11px;color:var(--muted);margin-top:3px}
+.verdict-box{border-radius:10px;padding:20px 24px;margin-bottom:20px}
+.verdict-box.good{background:#f0fdf4;border:1.5px solid #bbf7d0}
+.verdict-box.warn{background:#fffbeb;border:1.5px solid #fde68a}
+.verdict-box.bad{background:#fef2f2;border:1.5px solid #fecaca}
+.verdict-title{font-size:14px;font-weight:800;margin-bottom:6px}
+.verdict-text{font-size:13px;line-height:1.6;color:var(--text)}
+.risk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:24px}
+.risk-card{border:1px solid var(--border);border-radius:10px;padding:18px;background:#fff}
+.risk-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:8px}
+.risk-val{font-size:24px;font-weight:900;letter-spacing:-.02em;margin-bottom:4px}
+.risk-badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:.04em}
+.rb-low{background:#dcfce7;color:#15803d}
+.rb-med{background:#fef3c7;color:#92400e}
+.rb-high{background:#fee2e2;color:#991b1b}
+.expense-box{background:var(--card);border-radius:8px;padding:18px;font-size:13px;line-height:1.7;margin-bottom:20px}
+.expense-box strong{font-weight:700}
+.summary-rating{border-radius:10px;padding:20px 24px;margin-bottom:24px;background:#0a0a0a;color:#fff}
+.sr-label{font-size:11px;color:#6b7280;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px}
+.sr-rating{font-size:32px;font-weight:900;letter-spacing:-.02em;color:#67e8f9;margin-bottom:6px}
+.sr-text{font-size:13px;color:#9ca3af;line-height:1.6}
+.section-h{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:24px 0 14px}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <a href="/valuation-toolkit/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">›</span>
+    <a href="../">Asset Management</a>
+    <span class="nav-sep">›</span>
+    <span>Portfolio Performance</span>
+  </div>
+  <button class="nav-pro" onclick="alert('Pro unlock coming soon — ₹799/mo for all 15 domains.')">Go Pro — ₹799/mo</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="badge-domain">📊 Calculator 01 · Asset Management</div>
+    <h1>Portfolio <span>Performance</span> Analyzer</h1>
+    <p>Pick any Indian AMC, study its risk-adjusted return profile, and understand how Sharpe ratio and alpha reveal what raw CAGR hides.</p>
+    <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:25%"></div></div>
+    <div class="step-labels">
+      <div class="step-label active" id="lbl1">1 · Pick AMC</div>
+      <div class="step-label" id="lbl2">2 · Context</div>
+      <div class="step-label" id="lbl3">3 · Scorecard</div>
+      <div class="step-label" id="lbl4">4 · Risk Panel</div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- STEP 1: Pick -->
+<div class="step active" id="step1">
+  <div class="step-title">Pick an AMC</div>
+  <div class="step-sub">Select an Indian Asset Management Company to analyse its fund performance profile. Sorted by AUM.</div>
+  <div class="company-grid" id="companyGrid"></div>
+  <div class="btn-row">
+    <button class="btn-primary" id="btnStep1" onclick="goStep(2)" disabled>Continue →</button>
+  </div>
+</div>
+
+<!-- STEP 2: Context -->
+<div class="step" id="step2">
+  <div id="contextContent"></div>
+  <div class="btn-row">
+    <button class="btn-secondary" onclick="goStep(1)">← Back</button>
+    <button class="btn-primary" onclick="goStep(3)">Run Scorecard →</button>
+  </div>
+</div>
+
+<!-- STEP 3: Scorecard (5s loading) -->
+<div class="step" id="step3">
+  <div class="load-box" id="loadBox">
+    <div style="font-size:36px;margin-bottom:16px">📊</div>
+    <div class="load-label" id="loadMsg">Initialising performance model…</div>
+    <div class="load-bar-bg"><div class="load-bar-fill" id="loadBar"></div></div>
+    <div class="load-pct" id="loadPct">0%</div>
+  </div>
+  <div class="result-box" id="scorecardResult">
+    <div id="scorecardContent"></div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="goStep(2)">← Back</button>
+      <button class="btn-primary" onclick="goStep(4)">See Risk Panel →</button>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 4: Risk Panel -->
+<div class="step" id="step4">
+  <div id="riskContent"></div>
+  <div class="btn-row">
+    <button class="btn-secondary" onclick="goStep(3)">← Back</button>
+    <button class="btn-primary" onclick="goStep(1)" style="background:var(--text)">Analyse Another AMC →</button>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+var NIFTY={ret1y:16.0,ret3y:12.8,ret5y:14.2};
+var COMPANIES=[
+  {id:'sbimf',name:'SBI MF',sector:'Large-Cap AMC',aum:1050000,equityAumPct:58,flagship:'SBI Bluechip Fund',ret1y:18.2,ret3y:14.1,ret5y:15.8,sharpe:1.42,alpha:2.4,maxDrawdown:-22.1,beta:0.91,expenseRatio:1.48,schemes:42},
+  {id:'iciciprumf',name:'ICICI Pru AMC',sector:'Large-Cap AMC',aum:830000,equityAumPct:52,flagship:'ICICI Pru Bluechip',ret1y:17.8,ret3y:13.6,ret5y:15.2,sharpe:1.38,alpha:1.9,maxDrawdown:-23.4,beta:0.94,expenseRatio:1.52,schemes:48},
+  {id:'hdfcamc',name:'HDFC AMC',sector:'Large-Cap AMC',aum:750000,equityAumPct:55,flagship:'HDFC Top 100',ret1y:19.1,ret3y:14.8,ret5y:16.4,sharpe:1.51,alpha:3.1,maxDrawdown:-21.8,beta:0.89,expenseRatio:1.45,schemes:38},
+  {id:'adityabirla',name:'Aditya Birla SL MF',sector:'Large-Cap AMC',aum:340000,equityAumPct:49,flagship:'ABSL Frontline Equity',ret1y:16.8,ret3y:12.8,ret5y:14.4,sharpe:1.24,alpha:0.4,maxDrawdown:-24.9,beta:0.98,expenseRatio:1.58,schemes:44},
+  {id:'nippon',name:'Nippon India MF',sector:'Large-Cap AMC',aum:480000,equityAumPct:48,flagship:'Nippon India Large Cap',ret1y:16.4,ret3y:12.9,ret5y:14.7,sharpe:1.28,alpha:0.8,maxDrawdown:-24.6,beta:0.97,expenseRatio:1.62,schemes:35},
+  {id:'kotakmf',name:'Kotak MF',sector:'Large-Cap AMC',aum:420000,equityAumPct:51,flagship:'Kotak Bluechip',ret1y:17.2,ret3y:13.4,ret5y:15.1,sharpe:1.35,alpha:1.6,maxDrawdown:-23.1,beta:0.93,expenseRatio:1.55,schemes:36},
+  {id:'miraemf',name:'Mirae Asset MF',sector:'Mid-Cap AMC',aum:310000,equityAumPct:72,flagship:'Mirae Asset Emerging Bluechip',ret1y:22.4,ret3y:16.2,ret5y:18.1,sharpe:1.68,alpha:4.8,maxDrawdown:-26.3,beta:1.02,expenseRatio:1.68,schemes:28},
+  {id:'axismf',name:'Axis MF',sector:'Mid-Cap AMC',aum:290000,equityAumPct:68,flagship:'Axis Bluechip Fund',ret1y:14.2,ret3y:10.8,ret5y:13.2,sharpe:1.08,alpha:-1.2,maxDrawdown:-28.4,beta:1.06,expenseRatio:1.72,schemes:32},
+  {id:'utiamc',name:'UTI AMC',sector:'Large-Cap AMC',aum:280000,equityAumPct:46,flagship:'UTI Nifty 50 Index',ret1y:15.8,ret3y:12.4,ret5y:14.0,sharpe:1.22,alpha:0.1,maxDrawdown:-22.8,beta:0.99,expenseRatio:0.18,schemes:39},
+  {id:'bandhanmf',name:'Bandhan MF',sector:'Mid-Cap AMC',aum:145000,equityAumPct:54,flagship:'Bandhan Core Equity',ret1y:18.6,ret3y:13.8,ret5y:15.4,sharpe:1.36,alpha:2.0,maxDrawdown:-25.4,beta:1.01,expenseRatio:1.65,schemes:31},
+  {id:'dsp',name:'DSP Investment Mgrs',sector:'Mid-Cap AMC',aum:148000,equityAumPct:65,flagship:'DSP Midcap Fund',ret1y:24.6,ret3y:17.4,ret5y:19.2,sharpe:1.74,alpha:5.6,maxDrawdown:-28.1,beta:1.08,expenseRatio:1.74,schemes:26},
+  {id:'tatamf',name:'Tata MF',sector:'Mid-Cap AMC',aum:120000,equityAumPct:58,flagship:'Tata Digital India',ret1y:21.8,ret3y:15.6,ret5y:17.4,sharpe:1.58,alpha:3.8,maxDrawdown:-27.2,beta:1.04,expenseRatio:1.68,schemes:24},
+  {id:'360one',name:'360 ONE Asset',sector:'PMS/AIF',aum:112000,equityAumPct:88,flagship:'360 ONE Focused Equity',ret1y:28.4,ret3y:19.8,ret5y:22.1,sharpe:1.92,alpha:8.2,maxDrawdown:-24.6,beta:0.96,expenseRatio:2.25,schemes:12},
+  {id:'edelweiss',name:'Edelweiss MF',sector:'Small-Cap AMC',aum:98000,equityAumPct:74,flagship:'Edelweiss Mid Cap',ret1y:26.2,ret3y:18.4,ret5y:20.6,sharpe:1.82,alpha:6.8,maxDrawdown:-31.2,beta:1.14,expenseRatio:1.78,schemes:22},
+  {id:'motilal',name:'Motilal Oswal MF',sector:'Small-Cap AMC',aum:92000,equityAumPct:82,flagship:'Motilal Oswal Midcap',ret1y:32.4,ret3y:22.6,ret5y:24.8,sharpe:2.04,alpha:9.8,maxDrawdown:-29.8,beta:1.12,expenseRatio:1.82,schemes:18},
+  {id:'canararobeco',name:'Canara Robeco MF',sector:'Mid-Cap AMC',aum:88000,equityAumPct:61,flagship:'Canara Robeco Equity Tax Saver',ret1y:17.4,ret3y:13.2,ret5y:14.8,sharpe:1.32,alpha:1.4,maxDrawdown:-24.2,beta:0.98,expenseRatio:1.62,schemes:20},
+  {id:'ppfas',name:'PPFAS MF',sector:'Focused AMC',aum:82000,equityAumPct:94,flagship:'Parag Parikh Flexi Cap',ret1y:21.2,ret3y:15.8,ret5y:18.4,sharpe:1.64,alpha:4.2,maxDrawdown:-18.6,beta:0.78,expenseRatio:1.45,schemes:4},
+  {id:'quant',name:'Quant MF',sector:'Small-Cap AMC',aum:78000,equityAumPct:86,flagship:'Quant Small Cap',ret1y:42.6,ret3y:28.4,ret5y:32.1,sharpe:2.28,alpha:14.2,maxDrawdown:-38.4,beta:1.24,expenseRatio:1.92,schemes:16},
+  {id:'franklin',name:'Franklin Templeton MF',sector:'Debt-Focused AMC',aum:68000,equityAumPct:38,flagship:'Franklin India Prima',ret1y:14.8,ret3y:11.6,ret5y:13.8,sharpe:1.18,alpha:0.2,maxDrawdown:-26.8,beta:1.02,expenseRatio:1.72,schemes:28},
+  {id:'invesco',name:'Invesco India MF',sector:'Mid-Cap AMC',aum:52000,equityAumPct:64,flagship:'Invesco India Midcap',ret1y:22.6,ret3y:16.4,ret5y:18.2,sharpe:1.66,alpha:4.4,maxDrawdown:-28.6,beta:1.06,expenseRatio:1.74,schemes:16},
+  {id:'pgim',name:'PGIM India MF',sector:'Small-Cap AMC',aum:48000,equityAumPct:72,flagship:'PGIM India Midcap Opp',ret1y:23.8,ret3y:16.8,ret5y:18.6,sharpe:1.72,alpha:5.0,maxDrawdown:-29.4,beta:1.09,expenseRatio:1.76,schemes:14},
+  {id:'njmf',name:'NJ MF',sector:'New-Age AMC',aum:42000,equityAumPct:58,flagship:'NJ Flexi Cap',ret1y:16.2,ret3y:12.2,ret5y:null,sharpe:1.24,alpha:0.2,maxDrawdown:-23.8,beta:0.96,expenseRatio:1.52,schemes:8},
+  {id:'mahindramanulife',name:'Mahindra Manulife MF',sector:'Small-Cap AMC',aum:32000,equityAumPct:68,flagship:'Mahindra Manulife Midcap',ret1y:24.4,ret3y:17.2,ret5y:null,sharpe:1.74,alpha:5.4,maxDrawdown:-30.2,beta:1.12,expenseRatio:1.82,schemes:10},
+  {id:'whiteoak',name:'WhiteOak Capital MF',sector:'Focused AMC',aum:28000,equityAumPct:96,flagship:'WhiteOak Capital Flexi Cap',ret1y:26.8,ret3y:null,ret5y:null,sharpe:1.88,alpha:7.2,maxDrawdown:-22.4,beta:0.88,expenseRatio:1.48,schemes:6},
+  {id:'jmfinancial',name:'JM Financial MF',sector:'Small-Cap AMC',aum:24000,equityAumPct:62,flagship:'JM Flexi Cap',ret1y:38.4,ret3y:24.6,ret5y:26.2,sharpe:2.12,alpha:11.8,maxDrawdown:-34.6,beta:1.18,expenseRatio:1.88,schemes:12},
+  {id:'growwmf',name:'Groww MF',sector:'New-Age AMC',aum:22000,equityAumPct:72,flagship:'Groww Nifty Index',ret1y:15.6,ret3y:null,ret5y:null,sharpe:1.18,alpha:-0.4,maxDrawdown:-22.6,beta:1.00,expenseRatio:0.22,schemes:6},
+  {id:'bajajfinserv',name:'Bajaj Finserv AMC',sector:'New-Age AMC',aum:16000,equityAumPct:64,flagship:'Bajaj Finserv Flexi Cap',ret1y:18.4,ret3y:null,ret5y:null,sharpe:1.42,alpha:2.4,maxDrawdown:-24.2,beta:0.98,expenseRatio:1.58,schemes:8},
+  {id:'quantum',name:'Quantum AMC',sector:'Focused AMC',aum:12000,equityAumPct:52,flagship:'Quantum Long Term Equity',ret1y:15.4,ret3y:12.6,ret5y:14.2,sharpe:1.24,alpha:0.2,maxDrawdown:-21.4,beta:0.86,expenseRatio:1.25,schemes:5},
+  {id:'iti',name:'ITI MF',sector:'Small-Cap AMC',aum:8000,equityAumPct:76,flagship:'ITI Small Cap',ret1y:28.6,ret3y:19.4,ret5y:null,sharpe:1.86,alpha:7.6,maxDrawdown:-33.8,beta:1.16,expenseRatio:1.92,schemes:8},
+  {id:'trustmf',name:'Trust MF',sector:'New-Age AMC',aum:6000,equityAumPct:68,flagship:'Trust Midcap',ret1y:22.4,ret3y:null,ret5y:null,sharpe:1.68,alpha:5.2,maxDrawdown:-27.6,beta:1.08,expenseRatio:1.78,schemes:6}
+];
+
+var selected=null;
+
+function fmtAum(n){
+  if(n>=100000)return'₹'+(n/100000).toFixed(1)+'L Cr';
+  if(n>=1000)return'₹'+(n/1000).toFixed(0)+'K Cr';
+  return'₹'+n+' Cr';
+}
+function fmtRet(r){
+  if(r===null||r===undefined)return'N/A';
+  return(r>0?'+':'')+r.toFixed(1)+'%';
+}
+function retClass(r,b){
+  if(r===null)return'';
+  return r>=b?'ret-pos':'ret-neg';
+}
+function outperf(r,b){
+  if(r===null)return'N/A';
+  var d=r-b;
+  return(d>0?'+':'')+d.toFixed(1)+'%';
+}
+function outperfClass(r,b){
+  if(r===null)return'';
+  return r>=b?'ret-pos':'ret-neg';
+}
+
+function buildGrid(){
+  var g=document.getElementById('companyGrid');
+  g.innerHTML='';
+  COMPANIES.forEach(function(c){
+    var el=document.createElement('button');
+    el.className='company-btn';
+    el.innerHTML='<div class="cb-name">'+c.name+'</div>'
+      +'<div class="cb-sub">'+c.sector+' · '+c.schemes+' schemes</div>'
+      +'<div class="cb-aum">AUM '+fmtAum(c.aum)+'</div>';
+    el.onclick=function(){
+      document.querySelectorAll('.company-btn').forEach(function(b){b.classList.remove('selected');});
+      el.classList.add('selected');
+      selected=c;
+      document.getElementById('btnStep1').disabled=false;
+    };
+    g.appendChild(el);
+  });
+}
+
+function buildContext(){
+  var c=selected;
+  var op1=outperf(c.ret1y,NIFTY.ret1y);
+  var op3=c.ret3y!==null?outperf(c.ret3y,NIFTY.ret3y):'N/A';
+  var op5=c.ret5y!==null?outperf(c.ret5y,NIFTY.ret5y):'N/A';
+  var sharpeLabel=c.sharpe>=2.0?'Excellent':c.sharpe>=1.5?'Strong':c.sharpe>=1.0?'Good':'Below Par';
+  var alphaLabel=c.alpha>5?'Exceptional outperformer':c.alpha>=2?'Solid outperformer':c.alpha>=0?'Mild outperformer':'Underperformer';
+
+  var html='<div class="step-title">'+c.name+' — Context</div>';
+  html+='<div class="step-sub">Flagship: '+c.flagship+' · '+c.sector+'</div>';
+
+  html+='<div class="metric-grid">';
+  html+='<div class="metric-card"><div class="metric-label">Total AUM</div><div class="metric-value accent">'+fmtAum(c.aum)+'</div><div class="metric-sub">Equity: '+c.equityAumPct+'%</div></div>';
+  html+='<div class="metric-card"><div class="metric-label">1Y Return</div><div class="metric-value '+retClass(c.ret1y,NIFTY.ret1y)+'">'+fmtRet(c.ret1y)+'</div><div class="metric-sub">Nifty: +'+NIFTY.ret1y.toFixed(1)+'%</div></div>';
+  html+='<div class="metric-card"><div class="metric-label">3Y Return</div><div class="metric-value '+retClass(c.ret3y,NIFTY.ret3y)+'">'+fmtRet(c.ret3y)+'</div><div class="metric-sub">Nifty: +'+NIFTY.ret3y.toFixed(1)+'%</div></div>';
+  html+='<div class="metric-card"><div class="metric-label">Sharpe Ratio</div><div class="metric-value">'+c.sharpe.toFixed(2)+'</div><div class="metric-sub">'+sharpeLabel+'</div></div>';
+  html+='<div class="metric-card"><div class="metric-label">Alpha (ann.)</div><div class="metric-value '+(c.alpha>=0?'good':'bad')+'">'+fmtRet(c.alpha)+'</div><div class="metric-sub">'+alphaLabel+'</div></div>';
+  html+='<div class="metric-card"><div class="metric-label">Expense Ratio</div><div class="metric-value warn">'+c.expenseRatio.toFixed(2)+'%</div><div class="metric-sub">p.a. cost drag</div></div>';
+  html+='</div>';
+
+  html+='<div class="section-h">Return vs Nifty 50 Benchmark</div>';
+  html+='<table class="return-table">';
+  html+='<tr><th>Period</th><th>'+c.name+'</th><th>Nifty 50</th><th>Outperformance</th></tr>';
+  var op1c=outperfClass(c.ret1y,NIFTY.ret1y);
+  html+='<tr class="fund-row"><td>1 Year</td><td>'+fmtRet(c.ret1y)+'</td><td>+'+NIFTY.ret1y.toFixed(1)+'%</td><td class="'+op1c+'">'+op1+'</td></tr>';
+  var op3c=c.ret3y!==null?outperfClass(c.ret3y,NIFTY.ret3y):'';
+  html+='<tr><td>3 Year</td><td>'+fmtRet(c.ret3y)+'</td><td>+'+NIFTY.ret3y.toFixed(1)+'%</td><td class="'+op3c+'">'+op3+'</td></tr>';
+  var op5c=c.ret5y!==null?outperfClass(c.ret5y,NIFTY.ret5y):'';
+  html+='<tr><td>5 Year</td><td>'+fmtRet(c.ret5y)+'</td><td>+'+NIFTY.ret5y.toFixed(1)+'%</td><td class="'+op5c+'">'+op5+'</td></tr>';
+  html+='</table>';
+
+  html+='<div class="section-h">Core Concepts</div>';
+  html+='<div class="teach-block"><h4>Why Sharpe Ratio Beats Raw CAGR</h4><p>Two funds can both return 20% p.a. but one may take twice the risk to get there. The Sharpe ratio divides excess return (over risk-free rate, ~7%) by portfolio volatility — a score above 1.5 is considered strong for Indian equity funds.</p></div>';
+  html+='<div class="teach-block"><h4>What is Alpha?</h4><p>Alpha is return earned above what the market (beta) explains. A fund with beta 1.0 and 20% return when Nifty was 16% has generated +4% alpha. Sustained alpha over 5Y is the gold standard for active management quality.</p></div>';
+  html+='<div class="teach-block"><h4>AUM Size &amp; Performance</h4><p>Large AUM (₹1L Cr+) constrains midcap/smallcap exposure and index-hugging behaviour. Boutique AMCs (₹10K-50K Cr) often take higher conviction bets. Check equity AUM % — a 40% equity ratio in a large AMC signals significant debt/liquid AUM masking equity performance.</p></div>';
+  html+='<div class="teach-block"><h4>Expense Ratio Impact</h4><p>At 1.5% p.a., a ₹10L investment underperforms a 0% cost index fund by ~₹3.4L over 10 years at 12% gross return. Even 0.5% difference compounds significantly — this is why UTI and Groww\'s index funds win on cost.</p></div>';
+
+  html+='<div class="section-h">Quick Q&amp;As</div>';
+  html+='<div class="qa-list">';
+  html+='<div class="qa"><div class="qa-q">Why does '+c.name+'\'s 1Y number matter less than 3Y/5Y?</div><div class="qa-a">Short-term returns capture market timing luck and sector momentum. Three to five year rolling CAGRs across different cycles (bull + bear) reveal manager consistency and downside protection quality.</div></div>';
+  html+='<div class="qa"><div class="qa-q">Is '+c.equityAumPct+'% equity AUM concentration healthy?</div><div class="qa-a">'+( c.equityAumPct>=70?'High equity concentration ('+c.equityAumPct+'%) means '+c.name+' is primarily an equity house — fund selector should understand cycle risk exposure.':c.equityAumPct>=50?'Balanced equity mix ('+c.equityAumPct+'%) — '+c.name+' runs both equity and debt/liquid funds, providing AUM diversification.':'Lower equity AUM ('+c.equityAumPct+'%) suggests '+c.name+' has significant debt/liquid/FoF assets — equity performance data may not reflect full company capability.')+'</div></div>';
+  html+='<div class="qa"><div class="qa-q">What does running '+c.schemes+' schemes say about '+c.name+'?</div><div class="qa-a">'+( c.schemes<=8?'A focused scheme count ('+c.schemes+') signals high-conviction management — each fund gets serious attention and AUM isn\'t spread thin.':c.schemes<=25?'A manageable '+c.schemes+' schemes — broad product coverage without fund overlap risk.':'With '+c.schemes+' schemes, watch for category overlap and diworsification — more schemes means more distribution push, not necessarily more alpha.')+'</div></div>';
+  html+='</div>';
+
+  document.getElementById('contextContent').innerHTML=html;
+}
+
+function buildScorecard(){
+  var c=selected;
+  var sharpeLabel=c.sharpe>=2.0?'Excellent':c.sharpe>=1.5?'Strong':c.sharpe>=1.0?'Good':'Below Par';
+  var sharpeClass=c.sharpe>=1.5?'good':c.sharpe>=1.0?'warn':'bad';
+  var alphaClass=c.alpha>=2?'good':c.alpha>=0?'warn':'bad';
+
+  // compute beating on available periods
+  var beats=0; var total=0;
+  if(c.ret1y!==null){total++;if(c.ret1y>=NIFTY.ret1y)beats++;}
+  if(c.ret3y!==null){total++;if(c.ret3y>=NIFTY.ret3y)beats++;}
+  if(c.ret5y!==null){total++;if(c.ret5y>=NIFTY.ret5y)beats++;}
+
+  var overallRating,overallClass,overallText;
+  var score=0;
+  if(c.sharpe>=1.8)score+=3;else if(c.sharpe>=1.4)score+=2;else if(c.sharpe>=1.0)score+=1;
+  if(c.alpha>=5)score+=3;else if(c.alpha>=2)score+=2;else if(c.alpha>=0)score+=1;
+  if(beats===total&&total>0)score+=2;else if(beats>0)score+=1;
+
+  if(score>=7){overallRating='⭐⭐⭐⭐⭐ Tier 1';overallClass='good';}
+  else if(score>=5){overallRating='⭐⭐⭐⭐ Strong';overallClass='good';}
+  else if(score>=3){overallRating='⭐⭐⭐ Solid';overallClass='warn';}
+  else{overallRating='⭐⭐ Watch';overallClass='bad';}
+  overallText=score>=7?'Consistent alpha generator with disciplined risk management. Suitable for long-term core portfolio allocation.':score>=5?'Above-average performance with manageable risk. Good active fund choice for equity sleeve.':score>=3?'Average risk-adjusted returns. Consider benchmark comparison before committing large allocation.':'Below-par risk-adjusted profile. Index fund may serve the category better at lower cost.';
+
+  var expDrag=((1.10)-(1.10*(1-c.expenseRatio/100)))*10;
+  var html='<div class="step-title">Performance Scorecard</div>';
+  html+='<div class="step-sub">Risk-adjusted analysis for '+c.name+' vs Nifty 50 benchmark.</div>';
+
+  html+='<div class="score-card"><h3>Risk-Adjusted Metrics</h3><div class="score-grid">';
+  html+='<div class="score-item"><div class="score-item-label">Sharpe Ratio</div><div class="score-item-val" style="color:'+(c.sharpe>=1.5?'var(--green)':c.sharpe>=1.0?'var(--amber)':'var(--red)')+'">'+c.sharpe.toFixed(2)+'</div><div class="score-item-note">'+sharpeLabel+'</div></div>';
+  html+='<div class="score-item"><div class="score-item-label">Annual Alpha</div><div class="score-item-val" style="color:'+(c.alpha>=2?'var(--green)':c.alpha>=0?'var(--amber)':'var(--red)')+'">'+fmtRet(c.alpha)+'</div><div class="score-item-note">'+(c.alpha>5?'Exceptional':c.alpha>=2?'Solid':c.alpha>=0?'Mild':'Destroys value')+'</div></div>';
+  html+='<div class="score-item"><div class="score-item-label">Beta</div><div class="score-item-val">'+c.beta.toFixed(2)+'</div><div class="score-item-note">'+(c.beta<0.9?'Defensive':c.beta<=1.05?'Market-like':'Aggressive')+'</div></div>';
+  html+='<div class="score-item"><div class="score-item-label">Expense Ratio</div><div class="score-item-val" style="color:var(--amber)">'+c.expenseRatio.toFixed(2)+'%</div><div class="score-item-note">'+(c.expenseRatio<0.5?'Index-grade':c.expenseRatio<1.5?'Competitive':'Expensive')+'</div></div>';
+  html+='</div></div>';
+
+  html+='<div class="section-h">Return vs Benchmark (CAGR)</div>';
+  html+='<table class="return-table">';
+  html+='<tr><th>Period</th><th>'+c.name+'</th><th>Nifty 50</th><th>Active Return</th></tr>';
+  html+='<tr class="fund-row"><td>1 Year</td><td>'+fmtRet(c.ret1y)+'</td><td>+'+NIFTY.ret1y.toFixed(1)+'%</td><td class="'+outperfClass(c.ret1y,NIFTY.ret1y)+'">'+outperf(c.ret1y,NIFTY.ret1y)+'</td></tr>';
+  html+='<tr><td>3 Year</td><td>'+fmtRet(c.ret3y)+'</td><td>+'+NIFTY.ret3y.toFixed(1)+'%</td><td class="'+(c.ret3y!==null?outperfClass(c.ret3y,NIFTY.ret3y):'')+'">'+(c.ret3y!==null?outperf(c.ret3y,NIFTY.ret3y):'N/A')+'</td></tr>';
+  html+='<tr><td>5 Year</td><td>'+fmtRet(c.ret5y)+'</td><td>+'+NIFTY.ret5y.toFixed(1)+'%</td><td class="'+(c.ret5y!==null?outperfClass(c.ret5y,NIFTY.ret5y):'')+'">'+(c.ret5y!==null?outperf(c.ret5y,NIFTY.ret5y):'N/A — fund too new')+'</td></tr>';
+  html+='</table>';
+
+  html+='<div class="expense-box">📌 <strong>Expense drag on ₹10L over 10 years</strong> at '+c.expenseRatio.toFixed(2)+'% p.a. cost = roughly <strong>₹'+(expDrag*100000/1000).toFixed(1)+'K in foregone compounding</strong> vs a 0-cost index fund (assuming 10% gross return). '+(c.expenseRatio<0.5?'This is index-grade cost discipline — outstanding.':c.expenseRatio<1.5?'Manageable for an active fund if alpha justifies it.':'High cost requires consistently strong alpha to justify.')+'</div>';
+
+  html+='<div class="verdict-box '+overallClass+'"><div class="verdict-title">Overall Rating: '+overallRating+'</div><div class="verdict-text">'+overallText+'</div></div>';
+
+  document.getElementById('scorecardContent').innerHTML=html;
+}
+
+function buildRisk(){
+  var c=selected;
+  var ddSev=Math.abs(c.maxDrawdown)>=35?'High':Math.abs(c.maxDrawdown)>=25?'Medium':'Low';
+  var ddBadge=ddSev==='High'?'rb-high':ddSev==='Medium'?'rb-med':'rb-low';
+  var betaLabel=c.beta<0.9?'Defensive':c.beta<=1.05?'Market-neutral':'Aggressive';
+  var betaBadge=c.beta<0.9?'rb-low':c.beta<=1.05?'rb-med':'rb-high';
+  var exLabel=c.expenseRatio<0.5?'Index-grade':c.expenseRatio<1.5?'Competitive':'Expensive';
+  var exBadge=c.expenseRatio<0.5?'rb-low':c.expenseRatio<1.5?'rb-med':'rb-high';
+
+  var html='<div class="step-title">Risk Profile</div>';
+  html+='<div class="step-sub">Understand downside exposure, market sensitivity and cost drag for '+c.name+'.</div>';
+
+  html+='<div class="risk-grid">';
+  html+='<div class="risk-card"><div class="risk-label">Max Drawdown</div><div class="risk-val" style="color:var(--red)">'+c.maxDrawdown.toFixed(1)+'%</div><span class="risk-badge '+ddBadge+'">'+ddSev+' Severity</span><div style="font-size:12px;color:var(--muted);margin-top:8px">Peak-to-trough decline in equity portfolio</div></div>';
+  html+='<div class="risk-card"><div class="risk-label">Beta vs Nifty</div><div class="risk-val">'+c.beta.toFixed(2)+'</div><span class="risk-badge '+betaBadge+'">'+betaLabel+'</span><div style="font-size:12px;color:var(--muted);margin-top:8px">'+c.name+' moves '+(c.beta*100).toFixed(0)+'% as much as the index</div></div>';
+  html+='<div class="risk-card"><div class="risk-label">Expense Ratio</div><div class="risk-val" style="color:var(--amber)">'+c.expenseRatio.toFixed(2)+'%</div><span class="risk-badge '+exBadge+'">'+exLabel+'</span><div style="font-size:12px;color:var(--muted);margin-top:8px">Annual cost hurdle before alpha kicks in</div></div>';
+  html+='<div class="risk-card"><div class="risk-label">Sharpe Ratio</div><div class="risk-val" style="color:'+(c.sharpe>=1.5?'var(--green)':c.sharpe>=1.0?'var(--amber)':'var(--red)')+'">'+c.sharpe.toFixed(2)+'</div><span class="risk-badge '+(c.sharpe>=1.5?'rb-low':c.sharpe>=1.0?'rb-med':'rb-high')+'">'+(c.sharpe>=1.5?'Strong':'Below 1.5')+'</span><div style="font-size:12px;color:var(--muted);margin-top:8px">Return per unit of volatility taken</div></div>';
+  html+='</div>';
+
+  html+='<div class="section-h">Risk Interpretation</div>';
+  html+='<div class="teach-block"><h4>Drawdown Context</h4><p>'+c.name+'\'s max drawdown of '+c.maxDrawdown.toFixed(1)+'% means a ₹10L investment would have fallen to ₹'+(10*(1+c.maxDrawdown/100)).toFixed(2)+'L at its worst. '+(Math.abs(c.maxDrawdown)>=35?'This is severe — only suitable for investors with 10Y+ horizon and high risk tolerance.':Math.abs(c.maxDrawdown)>=25?'Moderate severity — investor must stay invested through drawdown periods to earn the return.':'Contained drawdown — relative to peers, portfolio management quality on downside is good.')+'</p></div>';
+  html+='<div class="teach-block"><h4>Beta in a Falling Market</h4><p>If Nifty 50 falls 20%, '+c.name+' is expected to fall ~'+(c.beta*20).toFixed(1)+'% based on its beta of '+c.beta.toFixed(2)+'. '+(c.beta<0.9?'Sub-1 beta offers capital protection in bear markets — often achieved through global diversification, gold allocation or defensive sector tilt.':c.beta<=1.05?'Market-neutral beta — returns track the index closely. Alpha is the key differentiator at this beta level.':'Above-1 beta amplifies both gains and losses — only justify this if long-term alpha compensates for extra volatility.')+'</p></div>';
+
+  html+='<div class="section-h">Final Verdict</div>';
+  var finalScore=0;
+  if(c.sharpe>=1.5)finalScore++;
+  if(c.alpha>=2)finalScore++;
+  if(Math.abs(c.maxDrawdown)<25)finalScore++;
+  if(c.expenseRatio<1.6)finalScore++;
+  if(c.ret1y>=NIFTY.ret1y)finalScore++;
+
+  var finalRating,finalColor,finalText;
+  if(finalScore>=4){finalRating='Strong Buy — Core Holding';finalColor='#15803d';}
+  else if(finalScore===3){finalRating='Hold — Above Average';finalColor='#1d4ed8';}
+  else if(finalScore===2){finalRating='Selective — Benchmark Closely';finalColor='#d97706';}
+  else{finalRating='Avoid — Index Fund Superior';finalColor='#dc2626';}
+  finalText='Based on Sharpe ('+c.sharpe.toFixed(2)+'), Alpha ('+fmtRet(c.alpha)+'), Max Drawdown ('+c.maxDrawdown.toFixed(1)+'%), Expense Ratio ('+c.expenseRatio.toFixed(2)+'%) and 1Y outperformance vs Nifty 50.';
+
+  html+='<div class="summary-rating"><div class="sr-label">Investment Verdict</div><div class="sr-rating" style="color:'+finalColor+'">'+finalRating+'</div><div class="sr-text">'+finalText+'</div></div>';
+
+  html+='<div style="font-size:12px;color:var(--muted);line-height:1.7;background:var(--card);padding:14px;border-radius:8px">⚠️ This analysis is for educational purposes only. Past returns do not guarantee future performance. Mutual fund investments are subject to market risks. Consult a SEBI-registered investment advisor before making investment decisions.</div>';
+
+  document.getElementById('riskContent').innerHTML=html;
+}
+
+function goStep(n){
+  document.querySelectorAll('.step').forEach(function(s){s.classList.remove('active');});
+  document.getElementById('step'+n).classList.add('active');
+  var pct=n/4*100;
+  document.getElementById('progFill').style.width=pct+'%';
+  [1,2,3,4].forEach(function(i){
+    var el=document.getElementById('lbl'+i);
+    if(el)el.className='step-label'+(i===n?' active':'');
+  });
+  if(n===2)buildContext();
+  if(n===3)startLoading();
+  if(n===4)buildRisk();
+  window.scrollTo(0,0);
+}
+
+var MSGS=['Loading fund performance model…','Mapping AUM and return data…','Computing risk-adjusted metrics…','Benchmarking vs Nifty 50…','Generating performance scorecard…'];
+
+function startLoading(){
+  document.getElementById('loadBox').style.display='block';
+  document.getElementById('scorecardResult').style.display='none';
+  document.getElementById('loadMsg').textContent=MSGS[0];
+  document.getElementById('loadBar').style.width='0%';
+  document.getElementById('loadPct').textContent='0%';
+  var idx=0;
+  function tick(){
+    idx++;
+    var pct=Math.round(idx/MSGS.length*100);
+    if(idx<MSGS.length){
+      document.getElementById('loadMsg').textContent=MSGS[idx];
+    }
+    document.getElementById('loadBar').style.width=pct+'%';
+    document.getElementById('loadPct').textContent=pct+'%';
+    if(idx<MSGS.length)setTimeout(tick,900);
+    else setTimeout(showScorecard,900);
+  }
+  setTimeout(tick,900);
+}
+
+function showScorecard(){
+  buildScorecard();
+  document.getElementById('loadBox').style.display='none';
+  document.getElementById('scorecardResult').style.display='block';
+}
+
+buildGrid();
+</script>
+</body>
+</html>

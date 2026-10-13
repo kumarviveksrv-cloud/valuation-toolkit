@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Asset Management — Learn — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--accent:#0891b2;--accent-bg:#e0f2fe;--accent-border:#bae6fd}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-pro{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+.hero{background:#0a0a0a;color:#fff;padding:40px 24px}
+.hero-inner{max-width:780px;margin:0 auto}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6b7280;margin-bottom:10px}
+.hero h1{font-size:clamp(22px,3.5vw,34px);font-weight:900;letter-spacing:-.02em;margin-bottom:8px}
+.hero h1 span{color:#67e8f9}
+.hero p{font-size:14px;color:#9ca3af;line-height:1.6}
+.main{max-width:780px;margin:0 auto;padding:40px 24px 80px}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);margin-bottom:28px}
+.back-link:hover{color:var(--text)}
+.module-wrap{border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden}
+.module-header{padding:18px 22px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;background:#fff;user-select:none}
+.module-header:hover{background:var(--card)}
+.module-left{display:flex;align-items:center;gap:14px}
+.module-num{font-size:11px;font-weight:700;color:var(--muted);min-width:28px}
+.module-title{font-size:15px;font-weight:800}
+.module-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.module-toggle{font-size:18px;color:var(--muted);transition:transform .2s}
+.module-toggle.open{transform:rotate(180deg)}
+.module-body{display:none;padding:0 22px 22px;border-top:1px solid var(--border)}
+.module-body.open{display:block}
+.module-body p{font-size:14px;line-height:1.7;color:var(--muted);margin-bottom:14px}
+.module-body p b{color:var(--text)}
+.module-body h4{font-size:13px;font-weight:800;margin:18px 0 6px;color:var(--text)}
+.concept-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.concept-card{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:8px;padding:14px}
+.concept-card h5{font-size:12px;font-weight:800;color:var(--accent);margin-bottom:4px}
+.concept-card p{font-size:12px;color:var(--muted);line-height:1.5;margin:0}
+.formula-box{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:12px;margin:10px 0;color:var(--text)}
+.key-point{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px}
+.key-point .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:6px}
+.key-point p{font-size:13px;color:var(--muted);line-height:1.6;margin:0}
+.key-point p b{color:var(--text)}
+.gloss-wrap{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-top:32px}
+.gloss-header{padding:16px 22px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:#fff}
+.gloss-header:hover{background:var(--card)}
+.gloss-header h3{font-size:15px;font-weight:800}
+.gloss-body{display:none;border-top:1px solid var(--border)}
+.gloss-body.open{display:block}
+.gloss-item{padding:12px 22px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:160px 1fr;gap:16px;align-items:start}
+.gloss-item:last-child{border-bottom:none}
+.gloss-term{font-size:13px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--accent)}
+.gloss-def{font-size:13px;color:var(--muted);line-height:1.6}
+.cta-card{background:var(--text);color:#fff;border-radius:12px;padding:28px 32px;margin-top:32px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.cta-card h3{font-size:17px;font-weight:800;margin-bottom:4px}
+.cta-card p{font-size:13px;color:#9ca3af}
+.cta-btns{display:flex;gap:10px;flex-wrap:wrap}
+.cta-btn{padding:10px 20px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;border:none;font-family:'Inter',sans-serif}
+.cta-btn-white{background:#fff;color:var(--text)}
+.cta-btn-outline{background:transparent;color:#fff;border:1px solid #444}
+@media(max-width:600px){.concept-grid{grid-template-columns:1fr}.gloss-item{grid-template-columns:1fr;gap:4px}.cta-btns{flex-direction:column}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <a href="/valuation-toolkit/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">›</span>
+    <a href="/valuation-toolkit/domains/asset-management/">Asset Management</a>
+    <span class="nav-sep">›</span>
+    <span>Learn</span>
+  </div>
+  <button class="nav-pro" onclick="alert('Pro unlock coming soon — ₹799/mo for all 15 domains.')">Go Pro — ₹799/mo</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="eyebrow">Domain 11 · Asset Management</div>
+    <h1>Asset Management <span>Learning Hub</span></h1>
+    <p>3 modules covering fund performance measurement, alpha vs beta in active management, and portfolio construction — the knowledge base every fund analyst and wealth advisor needs.</p>
+  </div>
+</div>
+
+<div class="main">
+  <a href="../" class="back-link">← Back to Asset Management</a>
+
+  <!-- MODULE 1 -->
+  <div class="module-wrap">
+    <div class="module-header" onclick="toggleModule(this)">
+      <div class="module-left">
+        <span class="module-num">01</span>
+        <div>
+          <div class="module-title">Fund Performance Measurement</div>
+          <div class="module-sub">CAGR, absolute vs risk-adjusted returns, why Sharpe matters more than raw return</div>
+        </div>
+      </div>
+      <span class="module-toggle open" id="tog-1">▼</span>
+    </div>
+    <div class="module-body open" id="body-1">
+      <p style="margin-top:16px">The first instinct when evaluating a mutual fund is to look at returns — the fund gave 22% last year, great. But raw return is a dangerously incomplete metric. It tells you where you ended up, not how rough the ride was, and not whether the manager deserved credit or just got lucky.</p>
+
+      <h4>CAGR — Compounded Annual Growth Rate</h4>
+      <p>CAGR smooths out the bumps and tells you the equivalent steady annual return. A fund that returns 40% in year 1 and -10% in year 2 has a CAGR of approximately 12.5% — not the arithmetic average of 15%. CAGR is the only fair way to compare returns across different time horizons.</p>
+      <div class="formula-box">CAGR = (Ending Value / Beginning Value)^(1/Years) - 1</div>
+
+      <h4>Why Sharpe Ratio beats raw return</h4>
+      <p>Two funds can both deliver 18% CAGR. One achieves it with smooth, consistent gains — the other through violent swings with -30% drawdowns that cause investors to panic-sell at the worst time. The first fund has a higher Sharpe ratio and is objectively the better vehicle for most investors, even though raw returns are identical.</p>
+      <div class="formula-box">Sharpe = (Portfolio Return - Risk-Free Rate) / Portfolio Standard Deviation</div>
+      <p>A Sharpe above 1.0 is acceptable, above 1.5 is strong, and above 2.0 is exceptional. Anything below 0.5 suggests the return doesn't compensate for the risk taken.</p>
+
+      <div class="concept-grid">
+        <div class="concept-card"><h5>Alpha</h5><p>Return generated above and beyond what the benchmark would have given for the same level of market risk. Positive alpha = manager skill. Negative alpha = you paid active fees for below-benchmark returns.</p></div>
+        <div class="concept-card"><h5>Beta</h5><p>Sensitivity to market moves. Beta of 1.2 means the fund moves 1.2% for every 1% market move — amplified exposure. Beta below 1.0 is defensive. Index funds target beta of exactly 1.0.</p></div>
+        <div class="concept-card"><h5>Standard Deviation</h5><p>Measures how much returns fluctuate around their average. A fund with 20% annual SD has more volatile month-to-month returns than one at 12% SD, even with the same long-run CAGR.</p></div>
+        <div class="concept-card"><h5>Maximum Drawdown</h5><p>The worst peak-to-trough decline in the fund's history. A -35% max drawdown means an investor entering at the peak lost 35% before recovery. This is the behavioral risk metric — it predicts when investors will panic-sell.</p></div>
+      </div>
+
+      <h4>Key takeaways</h4>
+      <div class="key-point"><span class="dot"></span><p><b>Never compare funds on raw return alone.</b> Always look at the risk taken to achieve that return. A 20% return with 30% volatility is inferior to a 18% return with 12% volatility.</p></div>
+      <div class="key-point"><span class="dot"></span><p><b>Rolling returns beat point-to-point.</b> A fund that shows 22% 1Y return might have been at -5% just 6 months ago. Rolling 3Y SIP returns are the most honest long-term metric.</p></div>
+      <div class="key-point"><span class="dot"></span><p><b>Expense ratio is a guaranteed drag.</b> A 1.5% expense ratio is a guaranteed -1.5% on your NAV every year. The fund must generate alpha above this just to match a zero-cost index fund.</p></div>
+    </div>
+  </div>
+
+  <!-- MODULE 2 -->
+  <div class="module-wrap">
+    <div class="module-header" onclick="toggleModule(this)">
+      <div class="module-left">
+        <span class="module-num">02</span>
+        <div>
+          <div class="module-title">Alpha vs Beta — Active Management</div>
+          <div class="module-sub">Brinson attribution, information ratio, active share and the cost of active management</div>
+        </div>
+      </div>
+      <span class="module-toggle" id="tog-2">▼</span>
+    </div>
+    <div class="module-body" id="body-2">
+      <p style="margin-top:16px">The central debate in asset management: does active management actually add value after costs? The data globally is humbling — most active funds underperform their benchmark net of fees over a 10-year horizon. But the Indian equity market, with information inefficiencies in mid and small caps, has historically rewarded active managers more than developed markets.</p>
+
+      <h4>Brinson Attribution — Decomposing Alpha</h4>
+      <p>Not all alpha is created equal. A fund that outperformed by making a lucky macro call on one sector is very different from one that consistently picked better stocks within each sector. Brinson attribution splits the active return into three components that reveal the source of outperformance:</p>
+
+      <div class="concept-grid">
+        <div class="concept-card"><h5>Allocation Effect</h5><p>Did the manager overweight sectors that outperformed the index? This is the top-down macro bet. Positive allocation means the sector weighting decision added value.</p></div>
+        <div class="concept-card"><h5>Selection Effect</h5><p>Within each sector, did the manager pick better stocks than the benchmark held? This is the bottom-up stock-picking skill — arguably the more repeatable source of alpha.</p></div>
+        <div class="concept-card"><h5>Interaction Effect</h5><p>The cross-product of overweighting a sector AND picking better stocks within it. A bonus that accrues when both allocation and selection simultaneously work.</p></div>
+        <div class="concept-card"><h5>Total Active Return</h5><p>Sum of all three = total alpha generated. Brinson tells you if the manager earned it through skill (selection) or luck (allocation call that may not repeat).</p></div>
+      </div>
+
+      <h4>Information Ratio and Active Share</h4>
+      <p>The <b>Information Ratio (IR)</b> measures consistency of alpha generation: alpha divided by tracking error (how much the fund deviates from the benchmark). An IR above 0.5 is considered skillful — it means the fund generates reliable excess returns, not just occasional lucky bets.</p>
+      <div class="formula-box">Information Ratio = Alpha / Tracking Error</div>
+      <p><b>Active Share</b> measures how different the portfolio is from the index. A fund with 95% active share looks almost nothing like the Nifty 50. A fund with 30% active share is essentially a closet indexer — charging active fees to hold near-index weights. Active share above 60% is generally considered genuinely active management.</p>
+
+      <h4>The cost of active management — what the numbers say</h4>
+      <div class="key-point"><span class="dot"></span><p><b>Most active funds underperform over 10 years globally</b> — SPIVA data consistently shows 70-80% of large-cap active funds in the US underperform their benchmark after fees over 15 years.</p></div>
+      <div class="key-point"><span class="dot"></span><p><b>India is the exception — for now.</b> Indian mid and small-cap active funds have historically outperformed their benchmarks, reflecting genuine information inefficiency. As the market matures, this edge will narrow.</p></div>
+      <div class="key-point"><span class="dot"></span><p><b>Expense ratio is the single most reliable predictor of future underperformance.</b> Cheap funds outperform expensive funds over long horizons, on average, because the cost drag is guaranteed while alpha is not.</p></div>
+    </div>
+  </div>
+
+  <!-- MODULE 3 -->
+  <div class="module-wrap">
+    <div class="module-header" onclick="toggleModule(this)">
+      <div class="module-left">
+        <span class="module-num">03</span>
+        <div>
+          <div class="module-title">Portfolio Construction &amp; Asset Allocation</div>
+          <div class="module-sub">Modern Portfolio Theory, efficient frontier, rebalancing triggers and risk-profile frameworks</div>
+        </div>
+      </div>
+      <span class="module-toggle" id="tog-3">▼</span>
+    </div>
+    <div class="module-body" id="body-3">
+      <p style="margin-top:16px">Picking good individual funds is only half the battle. How you combine them — across asset classes, geographies, and risk profiles — determines the portfolio's overall risk-return profile. This is where Modern Portfolio Theory becomes practically useful.</p>
+
+      <h4>Modern Portfolio Theory (MPT)</h4>
+      <p>Harry Markowitz showed in 1952 that combining assets with low or negative correlation reduces total portfolio volatility without proportionally reducing return. The intuition: when equity drops 20%, gold often rises — holding both cushions the blow. The optimal blend depends on the correlation between assets and the investor's risk tolerance.</p>
+
+      <div class="concept-grid">
+        <div class="concept-card"><h5>Efficient Frontier</h5><p>A curve plotting the maximum expected return achievable at each level of risk. Portfolios on the curve are optimal — no better return is possible without taking more risk.</p></div>
+        <div class="concept-card"><h5>Sharpe Optimal Point</h5><p>The point on the efficient frontier with the highest Sharpe ratio — maximum risk-adjusted return. This is the theoretically "best" portfolio for a risk-neutral investor.</p></div>
+        <div class="concept-card"><h5>Correlation</h5><p>When two assets move together, correlation = +1; opposite directions = -1. MPT works because Indian equity and global bonds historically have low or negative correlation.</p></div>
+        <div class="concept-card"><h5>Rebalancing</h5><p>Markets drift your allocation. A target 70/30 equity/debt portfolio becomes 80/20 after a bull run — restoring it forces "sell high, buy low," the only timing strategy that reliably works.</p></div>
+      </div>
+
+      <h4>Risk profile frameworks in Indian wealth management</h4>
+      <p>Indian wealth advisors typically work with 4 risk profiles, each with a corresponding equity/debt/alternatives target allocation:</p>
+
+      <div class="key-point"><span class="dot"></span><p><b>Conservative (20/70/10):</b> Dominated by short-duration debt. Typical client: retiree or investor with income dependence on this corpus. Target: inflation + 2-3%.</p></div>
+      <div class="key-point"><span class="dot"></span><p><b>Moderate (50/40/10):</b> Balanced between large-cap equity and medium-duration debt. Typical client: salaried professional 10-15 years from retirement. Target: 11-13% CAGR.</p></div>
+      <div class="key-point"><span class="dot"></span><p><b>Growth (70/20/10):</b> Equity-dominant with a debt cushion to reduce drawdown. Typical client: 30-40 year old with stable income and 15+ year horizon. Target: 13-15% CAGR.</p></div>
+      <div class="key-point"><span class="dot"></span><p><b>Aggressive (85/5/10):</b> Maximum equity including mid/small caps and thematic funds. Typical client: young investor with high income stability and high loss tolerance. Target: 15%+ CAGR.</p></div>
+
+      <h4>Rebalancing triggers — when to act</h4>
+      <p>Two approaches work in practice. <b>Calendar rebalancing</b> (annually on a fixed date) is simple and ignores market noise. <b>Threshold-based rebalancing</b> (trigger when any asset class drifts more than 5% from target) is more reactive but captures significant drift faster. For most investors, annual rebalancing combined with SIP investment into underweight assets achieves the same result with less tax friction than selling and buying.</p>
+    </div>
+  </div>
+
+  <!-- GLOSSARY -->
+  <div class="gloss-wrap">
+    <div class="gloss-header" onclick="toggleGloss()">
+      <h3>Glossary — Asset Management Terms</h3>
+      <span id="gloss-toggle" style="font-size:18px;color:var(--muted)">▼</span>
+    </div>
+    <div class="gloss-body" id="gloss-body">
+      <div class="gloss-item"><span class="gloss-term">CAGR</span><span class="gloss-def">Compounded Annual Growth Rate — the steady annual return equivalent to an investment's actual performance over a period, smoothing out year-to-year volatility.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Sharpe Ratio</span><span class="gloss-def">Excess return per unit of total risk. (Portfolio Return - Risk-Free Rate) / Standard Deviation. Above 1.0 is acceptable; above 1.5 is strong.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Sortino Ratio</span><span class="gloss-def">Like Sharpe, but uses only downside deviation in the denominator — penalises only harmful volatility, not upside surprises. Better for asymmetric return distributions.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Calmar Ratio</span><span class="gloss-def">Annualised return divided by maximum drawdown. Measures return per unit of worst-case loss. Higher is better; above 1.0 is strong.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Alpha</span><span class="gloss-def">Return generated above what market beta alone would explain. Positive alpha = manager skill; negative alpha = manager destroyed value relative to passive exposure.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Beta</span><span class="gloss-def">Sensitivity of portfolio returns to market movements. Beta of 1.2 means 1.2% move for every 1% market move. Index funds target beta = 1.0.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Tracking Error</span><span class="gloss-def">Standard deviation of the difference between fund returns and benchmark returns. Low tracking error = benchmark-hugging; high = genuinely active management.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Information Ratio</span><span class="gloss-def">Alpha divided by tracking error. Measures consistency of alpha generation. IR above 0.5 is considered skillful active management.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Active Share</span><span class="gloss-def">Percentage of the portfolio that differs from the benchmark index. Above 60% is genuinely active; below 40% is often called closet indexing.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Max Drawdown</span><span class="gloss-def">The worst peak-to-trough decline in the fund's history. The key behavioural risk metric — determines how likely investors are to panic-sell at the bottom.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Efficient Frontier</span><span class="gloss-def">The set of portfolios that maximise expected return for a given level of risk. Portfolios below the frontier are suboptimal — they take the same risk for lower return.</span></div>
+      <div class="gloss-item"><span class="gloss-term">Rebalancing</span><span class="gloss-def">Restoring a portfolio to its target asset allocation after market drift. Mechanically enforces sell-high-buy-low discipline without requiring market timing ability.</span></div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-card">
+    <div>
+      <h3>Put the theory to work</h3>
+      <p>Use the free Portfolio Performance Analyzer to score any of 30 Indian AMCs — CAGR vs Nifty, Sharpe ratio, alpha, and expense drag.</p>
+    </div>
+    <div class="cta-btns">
+      <a href="../calculators/portfolio-performance.html"><button class="cta-btn cta-btn-white">Open Free Calculator →</button></a>
+      <a href="../calculators/index.html"><button class="cta-btn cta-btn-outline">All 5 Calculators</button></a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function toggleModule(header){
+  var num=header.parentElement.querySelectorAll('.module-header').length>0?header.parentElement.querySelector('.module-toggle').id.replace('tog-',''):'';
+  var toggle=header.querySelector('.module-toggle');
+  var bodyId='body-'+toggle.id.replace('tog-','');
+  var body=document.getElementById(bodyId);
+  var isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  toggle.classList.toggle('open',!isOpen);
+}
+
+function toggleGloss(){
+  var body=document.getElementById('gloss-body');
+  var tog=document.getElementById('gloss-toggle');
+  var isOpen=body.classList.contains('open');
+  body.classList.toggle('open',!isOpen);
+  tog.textContent=isOpen?'▼':'▲';
+}
+
+// auto-open module 1 on load (already open via HTML class)
+</script>
+</body>
+</html>

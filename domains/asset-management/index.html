@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Asset Management — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--accent:#0891b2;--accent-bg:#e0f2fe;--accent-border:#bae6fd}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-pro{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+.hero{background:#0a0a0a;color:#fff;padding:60px 24px}
+.hero-inner{max-width:900px;margin:0 auto}
+.hero-eyebrow{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6b7280;margin-bottom:14px}
+.hero h1{font-size:clamp(28px,4.5vw,48px);font-weight:900;letter-spacing:-.03em;line-height:1.08;margin-bottom:14px}
+.hero h1 span{color:#67e8f9}
+.hero p{font-size:15px;color:#9ca3af;line-height:1.65;max-width:540px;margin-bottom:28px}
+.hero-stats{display:flex;gap:32px;flex-wrap:wrap}
+.hero-stat .s-num{font-size:28px;font-weight:900;letter-spacing:-.02em;color:#67e8f9}
+.hero-stat .s-label{font-size:12px;color:#6b7280;margin-top:2px}
+.main{max-width:900px;margin:0 auto;padding:48px 24px 80px}
+.section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:18px}
+.calc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:48px}
+.calc-card{border:1px solid var(--border);border-radius:10px;padding:20px;background:#fff;display:flex;flex-direction:column;gap:10px;transition:all .15s}
+.calc-card:hover{border-color:#aaa;box-shadow:0 4px 12px rgba(0,0,0,.06);transform:translateY(-1px)}
+.calc-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.calc-icon{font-size:22px}
+.badge{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:4px;flex-shrink:0}
+.badge-free{background:#dcfce7;color:#15803d}
+.badge-pro{background:#fef3c7;color:#92400e}
+.calc-name{font-size:15px;font-weight:800;line-height:1.25}
+.calc-desc{font-size:13px;color:var(--muted);line-height:1.55}
+.calc-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--text);margin-top:auto}
+.calc-link:hover{opacity:.7}
+.learn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:48px}
+.learn-card{border:1px solid var(--border);border-radius:10px;padding:18px;background:var(--card)}
+.learn-num{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.learn-title{font-size:14px;font-weight:700;line-height:1.35;margin-bottom:6px}
+.learn-sub{font-size:12px;color:var(--muted)}
+.pro-strip{background:var(--text);color:#fff;border-radius:12px;padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:48px}
+.pro-strip h3{font-size:18px;font-weight:800;margin-bottom:4px}
+.pro-strip p{font-size:13px;color:#9ca3af;max-width:420px}
+.pro-strip-btn{background:#fff;color:var(--text);border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap}
+.domain-badge{display:inline-flex;align-items:center;gap:6px;background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;margin-bottom:12px}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <a href="/valuation-toolkit/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">›</span>
+    <a href="/valuation-toolkit/">Home</a>
+    <span class="nav-sep">›</span>
+    <span>Asset Management</span>
+  </div>
+  <button class="nav-pro" onclick="alert('Pro unlock coming soon — ₹799/mo for all 15 domains.')">Go Pro — ₹799/mo</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Domain 11 · Asset Management</div>
+    <h1>Where Funds Get <span>Measured</span></h1>
+    <p>Portfolio performance, risk-adjusted returns, alpha attribution, and asset allocation — the analytical toolkit every fund manager and wealth advisor needs.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="s-num">5</div><div class="s-label">Calculators</div></div>
+      <div class="hero-stat"><div class="s-num">3</div><div class="s-label">Learn Modules</div></div>
+      <div class="hero-stat"><div class="s-num">30</div><div class="s-label">Indian AMCs</div></div>
+      <div class="hero-stat"><div class="s-num">1</div><div class="s-label">Free Tool</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <p class="section-title">Calculators</p>
+  <div class="calc-grid">
+
+    <div class="calc-card">
+      <div class="calc-card-top">
+        <span class="calc-icon">📊</span>
+        <span class="badge badge-free">Free</span>
+      </div>
+      <div class="calc-name">Portfolio Performance Analyzer</div>
+      <div class="calc-desc">Measure 1Y/3Y/5Y CAGR vs Nifty 50 benchmark, compute Sharpe ratio and alpha, and generate a full performance scorecard.</div>
+      <a href="calculators/portfolio-performance.html" class="calc-link">Open Calculator →</a>
+    </div>
+
+    <div class="calc-card">
+      <div class="calc-card-top">
+        <span class="calc-icon">📐</span>
+        <span class="badge badge-pro">Pro</span>
+      </div>
+      <div class="calc-name">Risk-Adjusted Return Calculator</div>
+      <div class="calc-desc">Compute Sharpe, Sortino, Calmar and Information ratios. Decompose downside deviation and rank vs peers on risk-adjusted metrics.</div>
+      <a href="calculators/risk-adjusted-returns.html" class="calc-link">Open Calculator →</a>
+    </div>
+
+    <div class="calc-card">
+      <div class="calc-card-top">
+        <span class="calc-icon">🎯</span>
+        <span class="badge badge-pro">Pro</span>
+      </div>
+      <div class="calc-name">Alpha Attribution Engine</div>
+      <div class="calc-desc">Run Brinson attribution to split active return into allocation effect, selection effect and interaction — understand where alpha was won or lost.</div>
+      <a href="calculators/alpha-attribution.html" class="calc-link">Open Calculator →</a>
+    </div>
+
+    <div class="calc-card">
+      <div class="calc-card-top">
+        <span class="calc-icon">🏗️</span>
+        <span class="badge badge-pro">Pro</span>
+      </div>
+      <div class="calc-name">Asset Allocation Builder</div>
+      <div class="calc-desc">Model optimal equity/debt/alternatives split by investor risk profile. Compute efficient frontier point, expected return and volatility bounds.</div>
+      <a href="calculators/asset-allocation.html" class="calc-link">Open Calculator →</a>
+    </div>
+
+    <div class="calc-card">
+      <div class="calc-card-top">
+        <span class="calc-icon">🔍</span>
+        <span class="badge badge-pro">Pro</span>
+      </div>
+      <div class="calc-name">Fund Screener &amp; Scorecard</div>
+      <div class="calc-desc">Score funds on performance, risk, manager alpha, fee efficiency and AUM growth. Generate a composite rank and buy/hold/sell recommendation.</div>
+      <a href="calculators/fund-screener.html" class="calc-link">Open Calculator →</a>
+    </div>
+
+  </div>
+
+  <p class="section-title">Learn Modules</p>
+  <div class="learn-grid">
+    <div class="learn-card">
+      <div class="learn-num">Module 01</div>
+      <div class="learn-title">Fund Performance Measurement</div>
+      <div class="learn-sub">CAGR, absolute vs risk-adjusted returns, why Sharpe matters more than raw return</div>
+    </div>
+    <div class="learn-card">
+      <div class="learn-num">Module 02</div>
+      <div class="learn-title">Alpha vs Beta — Active Management</div>
+      <div class="learn-sub">Brinson attribution, information ratio, active share and the cost of active management</div>
+    </div>
+    <div class="learn-card">
+      <div class="learn-num">Module 03</div>
+      <div class="learn-title">Portfolio Construction & Allocation</div>
+      <div class="learn-sub">Modern Portfolio Theory, efficient frontier, rebalancing triggers and risk-profile frameworks</div>
+    </div>
+  </div>
+  <div style="margin-bottom:48px"><a href="learn/" style="font-size:13px;font-weight:700;color:var(--accent)">View all learning modules →</a></div>
+
+  <div class="pro-strip">
+    <div>
+      <h3>Unlock all 5 Asset Management tools</h3>
+      <p>Risk attribution, alpha decomposition, asset allocation optimiser and fund screener — all in one Pro plan across all 15 domains.</p>
+    </div>
+    <button class="pro-strip-btn" onclick="alert('Pro unlock coming soon — ₹799/mo for all 15 domains.')">Unlock Pro — ₹799/mo</button>
+  </div>
+
+  <div style="border-top:1px solid var(--border);padding-top:24px;display:flex;gap:24px;font-size:13px;color:var(--muted)">
+    <a href="/valuation-toolkit/" style="color:var(--muted)">← All Domains</a>
+    <a href="/valuation-toolkit/domains/financial-due-diligence/" style="color:var(--muted)">← Financial Due Diligence</a>
+    <a href="/valuation-toolkit/domains/investment-management/" style="color:var(--muted)">Investment Management →</a>
+  </div>
+
+</div>
+</body>
+</html>
