@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Credit Spread Analyser · Capital Markets · ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
+  --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;
+  --accent:#ea580c;--accent-bg:#fff7ed;--accent-border:#fed7aa;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.5}
+
+/* NAV */
+.nav{display:flex;align-items:center;gap:8px;padding:14px 24px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.nav a{font-size:13px;color:var(--muted);text-decoration:none}.nav a:hover{color:var(--text)}
+.nav-sep{color:var(--border);font-size:13px}
+.nav-cur{font-size:13px;color:var(--text);font-weight:600}
+
+/* HEADER */
+.hero{padding:32px 24px 24px;max-width:860px;margin:0 auto}
+.badge-row{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;letter-spacing:.04em}
+.badge-domain{background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-border)}
+.badge-pro{background:#f3e8ff;color:#7c3aed;border:1px solid #ddd6fe}
+.badge-num{background:var(--card);color:var(--muted);border:1px solid var(--border)}
+h1{font-size:clamp(22px,4vw,30px);font-weight:800;line-height:1.2;margin-bottom:8px}
+.sub{color:var(--muted);font-size:15px;max-width:580px}
+
+/* TABS */
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--border);margin:0 24px;overflow-x:auto}
+.tab{padding:10px 18px;font-size:13px;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;color:var(--muted);transition:color .15s}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab.done{color:var(--green)}
+.tab.locked{color:var(--border);cursor:default}
+
+/* STEPS */
+.step{display:none;padding:24px;max-width:860px;margin:0 auto}
+.step.active{display:block}
+
+/* COMPANY GRID */
+.search-row{display:flex;gap:10px;margin-bottom:16px}
+.search-row input{flex:1;padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;outline:none}
+.search-row input:focus{border-color:var(--accent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.card{border:1px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:border-color .15s,background .15s}
+.card:hover{border-color:var(--accent);background:var(--accent-bg)}
+.card.selected{border-color:var(--accent);background:var(--accent-bg)}
+.card-name{font-weight:700;font-size:14px;margin-bottom:2px}
+.card-sector{font-size:12px;color:var(--muted);margin-bottom:8px}
+.card-meta{display:flex;gap:12px;font-size:12px}
+.card-meta span{display:flex;flex-direction:column;gap:1px}
+.card-label{color:var(--muted)}
+.card-val{font-weight:600;font-family:'JetBrains Mono',monospace}
+
+/* CHIP BADGE */
+.chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.chip-aaa{background:#dcfce7;color:#16a34a}
+.chip-aap{background:#dbeafe;color:#2563eb}
+.chip-aa{background:#fef3c7;color:#d97706}
+.chip-aam{background:#ffedd5;color:#ea580c}
+.chip-a{background:#fee2e2;color:#dc2626}
+
+/* CTX SECTION */
+.ctx-section{margin-bottom:28px}
+.ctx-title{font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px}
+.ctx-label{font-size:13px;font-weight:600;margin-bottom:6px;color:var(--text)}
+.bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.bar-bg{flex:1;height:10px;background:var(--border);border-radius:6px;overflow:hidden}
+.bar-fill{height:100%;border-radius:6px;transition:width .4s}
+.bar-val{font-size:12px;font-weight:700;font-family:'JetBrains Mono',monospace;min-width:54px;text-align:right}
+
+/* SPREAD STACK */
+.spread-stack{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.spread-row{display:flex;align-items:stretch}
+.spread-seg{flex:1;padding:12px 14px;border-right:1px solid var(--border);text-align:center}
+.spread-seg:last-child{border-right:none}
+.seg-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.seg-val{font-size:17px;font-weight:800;font-family:'JetBrains Mono',monospace}
+.seg-bps{font-size:11px;color:var(--muted);margin-top:2px}
+.seg-gsec{background:#eff6ff;color:#2563eb}
+.seg-credit{background:#fef9c3;color:#854d0e}
+.seg-liq{background:#fce7f3;color:#9d174d}
+.seg-total{background:var(--accent-bg);color:var(--accent)}
+
+/* TEACH GRID */
+.teach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:20px}
+.teach-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px}
+.teach-icon{font-size:20px;margin-bottom:8px}
+.teach-head{font-size:13px;font-weight:700;margin-bottom:4px}
+.teach-body{font-size:12px;color:var(--muted);line-height:1.5}
+
+/* Q&A */
+.qa-block{border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px}
+.qa-q{font-size:13px;font-weight:700;margin-bottom:6px}
+.qa-a{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* CURVE VISUAL */
+.curve-wrap{border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px;overflow-x:auto}
+.curve-wrap svg{display:block;max-width:100%}
+
+/* COMPARE TABLE */
+.compare-table{width:100%;border-collapse:collapse;margin-bottom:20px;font-size:13px}
+.compare-table th{background:var(--card);padding:8px 12px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:2px solid var(--border)}
+.compare-table td{padding:9px 12px;border-bottom:1px solid var(--border)}
+.compare-table tr:last-child td{border-bottom:none}
+.compare-table tr:hover td{background:var(--card)}
+.mono{font-family:'JetBrains Mono',monospace;font-weight:700}
+.tag-wide{background:#dbeafe;color:#1d4ed8;padding:2px 7px;border-radius:12px;font-size:11px;font-weight:700}
+.tag-tight{background:#dcfce7;color:#166534;padding:2px 7px;border-radius:12px;font-size:11px;font-weight:700}
+
+/* PRO GATE */
+.pro-gate{border:2px dashed var(--border);border-radius:14px;padding:40px 32px;text-align:center;margin:8px 0}
+.pro-lock{font-size:40px;margin-bottom:12px}
+.pro-title{font-size:20px;font-weight:800;margin-bottom:6px}
+.pro-sub{font-size:14px;color:var(--muted);margin-bottom:20px}
+.pro-pills{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:24px}
+.pro-pill{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:5px 13px;font-size:12px;font-weight:600;color:var(--text)}
+.btn-pro{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:13px 28px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .15s}
+.btn-pro:hover{opacity:.9}
+
+/* NEXT BTN */
+.btn-next{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:11px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:20px;transition:opacity .15s}
+.btn-next:hover{opacity:.9}
+.btn-next:disabled{opacity:.4;cursor:default}
+
+/* SPREAD DECOMPOSE BOX */
+.decompose-box{border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:20px}
+.decompose-title{padding:12px 14px;background:var(--card);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:1px solid var(--border)}
+.decompose-row{display:grid;grid-template-columns:1fr auto;align-items:center;padding:10px 14px;border-bottom:1px solid var(--border);gap:12px}
+.decompose-row:last-child{border-bottom:none}
+.decompose-label{font-size:13px;font-weight:600}
+.decompose-sub{font-size:11px;color:var(--muted);margin-top:1px}
+.decompose-bps{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:15px;text-align:right}
+
+/* STAT GRID */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:20px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center}
+.stat-val{font-size:22px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--accent);margin-bottom:4px}
+.stat-label{font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+
+@media(max-width:600px){
+  .nav{padding:10px 16px}
+  .hero{padding:20px 16px 16px}
+  .tabs{margin:0 16px}
+  .step{padding:16px}
+  .spread-seg{padding:10px 8px}
+  .seg-val{font-size:14px}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="/valuation-toolkit/">ValuationDesk</a>
+  <span class="nav-sep">›</span>
+  <a href="/valuation-toolkit/domains/capital-markets/">Capital Markets</a>
+  <span class="nav-sep">›</span>
+  <a href="/valuation-toolkit/domains/capital-markets/calculators/">Calculators</a>
+  <span class="nav-sep">›</span>
+  <span class="nav-cur">Credit Spread Analyser</span>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="badge-row">
+    <span class="badge badge-domain">Capital Markets</span>
+    <span class="badge badge-pro">PRO</span>
+    <span class="badge badge-num">06 of 06</span>
+  </div>
+  <h1>Credit Spread Analyser</h1>
+  <p class="sub">Decompose a corporate bond's yield into G-sec benchmark, credit risk premium, liquidity premium, and term premium. Understand Z-spread and OAS for any rated issuer.</p>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" id="tab1" onclick="goStep(1)">1 · Pick Company</div>
+  <div class="tab" id="tab2" onclick="goStep(2)">2 · Spread Context</div>
+  <div class="tab locked" id="tab3">🔒 3 · Spread Inputs</div>
+  <div class="tab locked" id="tab4">🔒 4 · Decomposition</div>
+</div>
+
+<!-- STEP 1 -->
+<div class="step active" id="step1">
+  <div class="search-row">
+    <input type="text" id="search" placeholder="Search company or sector…" oninput="filterStocks()">
+  </div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<!-- STEP 2 -->
+<div class="step" id="step2">
+  <div id="ctx"></div>
+</div>
+
+<!-- STEP 3 -->
+<div class="step" id="step3">
+  <div class="pro-gate">
+    <div class="pro-lock">🔒</div>
+    <div class="pro-title">Spread Inputs — PRO</div>
+    <div class="pro-sub">Model the full credit spread for any issuer, maturity, and market scenario.</div>
+    <div class="pro-pills">
+      <span class="pro-pill">SEBI Floor Price</span>
+      <span class="pro-pill">G-sec Benchmark Picker</span>
+      <span class="pro-pill">Credit Risk Premium</span>
+      <span class="pro-pill">Liquidity Premium</span>
+      <span class="pro-pill">Term Premium</span>
+      <span class="pro-pill">Z-spread Engine</span>
+      <span class="pro-pill">OAS Calculator</span>
+      <span class="pro-pill">Maturity Selector</span>
+    </div>
+    <button class="btn-pro" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+  </div>
+</div>
+
+<!-- STEP 4 -->
+<div class="step" id="step4">
+  <div class="pro-gate">
+    <div class="pro-lock">🔒</div>
+    <div class="pro-title">Spread Decomposition — PRO</div>
+    <div class="pro-sub">See exactly where every basis point in the yield spread is coming from.</div>
+    <div class="pro-pills">
+      <span class="pro-pill">Full Spread Waterfall</span>
+      <span class="pro-pill">Z-spread vs OAS Delta</span>
+      <span class="pro-pill">Credit Risk Quantification</span>
+      <span class="pro-pill">Liquidity Bucket Analysis</span>
+      <span class="pro-pill">Term Premium Curve</span>
+      <span class="pro-pill">Peer Comparison Table</span>
+      <span class="pro-pill">Rating Migration Risk</span>
+      <span class="pro-pill">Carry & Roll Estimate</span>
+    </div>
+    <button class="btn-pro" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+  </div>
+</div>
+
+<script>
+var GSEC_10Y=7.25;
+var GSEC_CURVE=[
+  {tenor:'3M',years:0.25,yield:6.72},
+  {tenor:'6M',years:0.5,yield:6.78},
+  {tenor:'1Y',years:1,yield:6.85},
+  {tenor:'2Y',years:2,yield:6.92},
+  {tenor:'3Y',years:3,yield:6.98},
+  {tenor:'5Y',years:5,yield:7.08},
+  {tenor:'7Y',years:7,yield:7.18},
+  {tenor:'10Y',years:10,yield:7.25},
+  {tenor:'15Y',years:15,yield:7.38},
+  {tenor:'30Y',years:30,yield:7.48}
+];
+
+var STOCKS=[
+  {id:1,name:'Reliance Industries',sector:'Oil & Gas',marketCap:2010000,pe:24.8,beta:0.95,divYield:0.4,ret1y:8.2,price:2840,vol:18.2,creditRating:'AAA',bondYield:7.18,promoterHolding:50.3,floatPct:35.8},
+  {id:2,name:'HDFC Bank',sector:'Banking',marketCap:1285000,pe:18.2,beta:0.88,divYield:1.1,ret1y:12.4,price:1720,vol:16.4,creditRating:'AAA',bondYield:7.42,promoterHolding:0.0,floatPct:72.8},
+  {id:3,name:'Infosys',sector:'IT',marketCap:720000,pe:22.4,beta:0.82,divYield:2.4,ret1y:18.6,price:1840,vol:19.8,creditRating:'AAA',bondYield:7.08,promoterHolding:14.9,floatPct:72.8},
+  {id:4,name:'ICICI Bank',sector:'Banking',marketCap:890000,pe:17.6,beta:1.12,divYield:0.8,ret1y:24.8,price:1240,vol:20.4,creditRating:'AA+',bondYield:7.52,promoterHolding:0.0,floatPct:75.2},
+  {id:5,name:'TCS',sector:'IT',marketCap:1420000,pe:26.8,beta:0.72,divYield:3.2,ret1y:6.8,price:3980,vol:15.6,creditRating:'AAA',bondYield:6.98,promoterHolding:72.3,floatPct:22.8},
+  {id:6,name:'Bharti Airtel',sector:'Telecom',marketCap:920000,pe:48.2,beta:0.78,divYield:0.4,ret1y:42.4,price:1580,vol:22.4,creditRating:'AA',bondYield:7.68,promoterHolding:55.8,floatPct:37.4},
+  {id:7,name:'Kotak Mahindra Bank',sector:'Banking',marketCap:380000,pe:19.4,beta:0.94,divYield:0.1,ret1y:8.4,price:1840,vol:18.8,creditRating:'AAA',bondYield:7.38,promoterHolding:25.9,floatPct:62.4},
+  {id:8,name:'L&T',sector:'Capital Goods',marketCap:590000,pe:34.2,beta:1.24,divYield:0.9,ret1y:28.4,price:3640,vol:24.8,creditRating:'AAA',bondYield:7.22,promoterHolding:0.0,floatPct:74.8},
+  {id:9,name:'Axis Bank',sector:'Banking',marketCap:360000,pe:14.8,beta:1.18,divYield:0.1,ret1y:16.4,price:1180,vol:22.8,creditRating:'AA+',bondYield:7.58,promoterHolding:8.4,floatPct:79.2},
+  {id:10,name:'Maruti Suzuki',sector:'Auto',marketCap:440000,pe:28.4,beta:0.84,divYield:1.2,ret1y:14.2,price:12400,vol:21.2,creditRating:'AA+',bondYield:7.32,promoterHolding:58.2,floatPct:38.4},
+  {id:11,name:'Sun Pharmaceutical',sector:'Pharma',marketCap:410000,pe:38.4,beta:0.64,divYield:0.8,ret1y:32.4,price:1720,vol:17.4,creditRating:'AA+',bondYield:7.28,promoterHolding:54.5,floatPct:38.8},
+  {id:12,name:'HUL',sector:'FMCG',marketCap:530000,pe:52.4,beta:0.42,divYield:1.8,ret1y:2.4,price:2480,vol:14.2,creditRating:'AAA',bondYield:7.12,promoterHolding:61.9,floatPct:35.2},
+  {id:13,name:'ITC',sector:'FMCG',marketCap:590000,pe:24.8,beta:0.58,divYield:3.2,ret1y:12.4,price:468,vol:16.8,creditRating:'AAA',bondYield:7.05,promoterHolding:0.0,floatPct:72.8},
+  {id:14,name:'Asian Paints',sector:'Materials',marketCap:290000,pe:58.4,beta:0.48,divYield:1.2,ret1y:-14.2,price:2780,vol:19.4,creditRating:'AA+',bondYield:7.38,promoterHolding:52.8,floatPct:42.2},
+  {id:15,name:'Bajaj Finance',sector:'NBFC',marketCap:410000,pe:34.8,beta:1.42,divYield:0.1,ret1y:8.4,price:7240,vol:26.4,creditRating:'AAA',bondYield:7.82,promoterHolding:55.9,floatPct:38.4},
+  {id:16,name:'Wipro',sector:'IT',marketCap:280000,pe:20.8,beta:0.88,divYield:0.1,ret1y:6.4,price:580,vol:22.8,creditRating:'AAA',bondYield:7.08,promoterHolding:73.0,floatPct:22.4},
+  {id:17,name:'NTPC',sector:'Power',marketCap:380000,pe:18.4,beta:0.74,divYield:2.4,ret1y:32.4,price:384,vol:20.4,creditRating:'AAA',bondYield:7.15,promoterHolding:51.1,floatPct:42.8},
+  {id:18,name:'Power Grid',sector:'Power',marketCap:280000,pe:20.4,beta:0.68,divYield:3.4,ret1y:28.4,price:328,vol:18.4,creditRating:'AAA',bondYield:7.12,promoterHolding:51.3,floatPct:42.4},
+  {id:19,name:'Titan',sector:'Consumer',marketCap:320000,pe:84.2,beta:0.82,divYield:0.4,ret1y:4.2,price:3640,vol:24.8,creditRating:'AA+',bondYield:7.42,promoterHolding:52.8,floatPct:41.8},
+  {id:20,name:'UltraTech Cement',sector:'Materials',marketCap:340000,pe:42.4,beta:0.94,divYield:0.4,ret1y:8.4,price:11240,vol:22.4,creditRating:'AAA',bondYield:7.22,promoterHolding:60.2,floatPct:36.4},
+  {id:21,name:'HCL Technologies',sector:'IT',marketCap:450000,pe:24.8,beta:0.78,divYield:4.8,ret1y:22.4,price:1680,vol:20.4,creditRating:'AAA',bondYield:7.04,promoterHolding:60.8,floatPct:34.8},
+  {id:22,name:'M&M',sector:'Auto',marketCap:320000,pe:28.4,beta:1.08,divYield:0.8,ret1y:42.8,price:2940,vol:26.4,creditRating:'AA+',bondYield:7.45,promoterHolding:18.6,floatPct:72.4},
+  {id:23,name:'JSW Steel',sector:'Materials',marketCap:230000,pe:22.4,beta:1.48,divYield:0.8,ret1y:4.8,price:980,vol:28.8,creditRating:'AA',bondYield:7.88,promoterHolding:44.8,floatPct:48.4},
+  {id:24,name:'Adani Ports',sector:'Infrastructure',marketCap:280000,pe:32.4,beta:1.28,divYield:0.4,ret1y:24.4,price:1380,vol:26.4,creditRating:'AA+',bondYield:7.62,promoterHolding:65.1,floatPct:30.2},
+  {id:25,name:'Tata Motors',sector:'Auto',marketCap:360000,pe:8.4,beta:1.58,divYield:0.0,ret1y:24.4,price:980,vol:32.4,creditRating:'AA-',bondYield:8.12,promoterHolding:46.4,floatPct:48.8},
+  {id:26,name:'HDFC Life',sector:'Insurance',marketCap:160000,pe:72.4,beta:0.72,divYield:0.2,ret1y:8.4,price:680,vol:18.4,creditRating:'AAA',bondYield:7.28,promoterHolding:50.4,floatPct:44.8},
+  {id:27,name:'SBI',sector:'Banking',marketCap:720000,pe:10.8,beta:1.32,divYield:1.2,ret1y:28.4,price:840,vol:26.4,creditRating:'AA+',bondYield:7.48,promoterHolding:57.5,floatPct:38.4},
+  {id:28,name:'Tech Mahindra',sector:'IT',marketCap:140000,pe:38.4,beta:0.98,divYield:2.8,ret1y:8.4,price:1480,vol:26.4,creditRating:'AA+',bondYield:7.22,promoterHolding:35.8,floatPct:58.4},
+  {id:29,name:'Nestle India',sector:'FMCG',marketCap:220000,pe:68.4,beta:0.38,divYield:1.4,ret1y:-4.8,price:24800,vol:16.4,creditRating:'AAA',bondYield:7.02,promoterHolding:62.8,floatPct:34.2},
+  {id:30,name:'Cipla',sector:'Pharma',marketCap:175000,pe:28.4,beta:0.68,divYield:0.8,ret1y:18.4,price:1540,vol:18.8,creditRating:'AA+',bondYield:7.35,promoterHolding:33.4,floatPct:58.4}
+];
+
+var selected=null;
+var filtered=STOCKS.slice();
+
+function fmt(n,d){return Number(n).toLocaleString('en-IN',{minimumFractionDigits:d||0,maximumFractionDigits:d||0});}
+function fmtCr(n){return n>=100000?'₹'+(n/100000).toFixed(1)+'L Cr':'₹'+Math.round(n/100)+'K Cr';}
+
+function getRatingChip(r){
+  var cls='chip ';
+  if(r==='AAA') cls+='chip-aaa';
+  else if(r==='AA+') cls+='chip-aap';
+  else if(r==='AA') cls+='chip-aa';
+  else if(r==='AA-') cls+='chip-aam';
+  else cls+='chip-a';
+  return '<span class="'+cls+'">'+r+'</span>';
+}
+
+function getRatingWidth(r){
+  var widths={'AAA':92,'AA+':80,'AA':68,'AA-':58,'A+':48,'A':38};
+  return widths[r]||50;
+}
+function getRatingColor(r){
+  var colors={'AAA':'#16a34a','AA+':'#2563eb','AA':'#d97706','AA-':'#ea580c','A+':'#dc2626','A':'#dc2626'};
+  return colors[r]||'#6b7280';
+}
+
+function renderGrid(){
+  var h='';
+  filtered.forEach(function(s){
+    var isSel=selected&&selected.id===s.id;
+    var chipHtml=getRatingChip(s.creditRating);
+    h+='<div class="card'+(isSel?' selected':'')+'" onclick="pick('+s.id+')">';
+    h+='<div class="card-name">'+s.name+'</div>';
+    h+='<div class="card-sector">'+s.sector+'</div>';
+    h+='<div class="card-meta">';
+    h+='<span><span class="card-label">Rating</span><span class="card-val">'+chipHtml+'</span></span>';
+    h+='<span><span class="card-label">Yield</span><span class="card-val">'+s.bondYield.toFixed(2)+'%</span></span>';
+    h+='<span><span class="card-label">Mkt Cap</span><span class="card-val">'+fmtCr(s.marketCap)+'</span></span>';
+    h+='</div></div>';
+  });
+  document.getElementById('grid').innerHTML=h;
+}
+
+function filterStocks(){
+  var q=document.getElementById('search').value.toLowerCase().trim();
+  filtered=q?STOCKS.filter(function(s){return s.name.toLowerCase().includes(q)||s.sector.toLowerCase().includes(q)||s.creditRating.toLowerCase().includes(q);}):STOCKS.slice();
+  renderGrid();
+}
+
+function pick(id){
+  selected=STOCKS.find(function(s){return s.id===id;});
+  renderGrid();
+  goStep(2);
+}
+
+function goStep(n){
+  [1,2,3,4].forEach(function(i){
+    document.getElementById('step'+i).classList.toggle('active',i===n);
+    var t=document.getElementById('tab'+i);
+    t.classList.remove('active','done','locked');
+    if(i<n) t.classList.add('done');
+    else if(i===n) t.classList.add('active');
+    else t.classList.add('locked');
+  });
+  if(n===2&&selected) buildContext();
+}
+
+function buildContext(){
+  var c=selected;
+  var ratingWidth=getRatingWidth(c.creditRating);
+  var ratingColor=getRatingColor(c.creditRating);
+
+  /* Spread decomposition — named variables first */
+  var totalSpread=Math.round((c.bondYield-GSEC_10Y)*100);
+  var spreadBps=totalSpread;
+  var isAAA=c.creditRating==='AAA';
+  var isAAplus=c.creditRating==='AA+';
+  var isAA=c.creditRating==='AA';
+  var isAAMinus=c.creditRating==='AA-';
+  var isHighGrade=isAAA||isAAplus;
+  var isSpeculative=isAAMinus;
+
+  /* Credit risk premium: rated by credit quality */
+  var creditBps=isAAA?Math.max(0,Math.round(spreadBps*0.35)):isAAplus?Math.round(spreadBps*0.45):isAA?Math.round(spreadBps*0.52):isAAMinus?Math.round(spreadBps*0.60):Math.round(spreadBps*0.65);
+
+  /* Liquidity premium: inversely related to market cap & float */
+  var isLargeFloat=c.floatPct>55;
+  var isMedFloat=c.floatPct>35&&c.floatPct<=55;
+  var liquidityBps=isLargeFloat?Math.round(spreadBps*0.20):isMedFloat?Math.round(spreadBps*0.28):Math.round(spreadBps*0.35);
+
+  /* Term premium = residual */
+  var termBps=Math.max(0,spreadBps-creditBps-liquidityBps);
+
+  /* Spread colour */
+  var isNegSpread=spreadBps<0;
+  var isTightSpread=spreadBps>=0&&spreadBps<30;
+  var isWideSpread=spreadBps>=80;
+  var spreadColour=isNegSpread?'#16a34a':isTightSpread?'#2563eb':isWideSpread?'#dc2626':'#d97706';
+
+  /* Z-spread estimate: approximation over 5Y tenor */
+  var gsec5y=7.08;
+  var zSpreadBps=Math.round((c.bondYield-gsec5y)*100);
+
+  /* OAS estimate: adjust for embedded optionality (~10 bps for callable structures) */
+  var hasEmbedded=isAA||isAAMinus;
+  var oasAdjust=hasEmbedded?10:5;
+  var oasBps=Math.max(0,zSpreadBps-oasAdjust);
+
+  /* Peer average for sector comparison */
+  var sectorPeers=STOCKS.filter(function(s){return s.sector===c.sector&&s.id!==c.id;});
+  var peerAvgYield=sectorPeers.length?sectorPeers.reduce(function(a,b){return a+b.bondYield;},0)/sectorPeers.length:c.bondYield;
+  var peerSpreadBps=Math.round((peerAvgYield-GSEC_10Y)*100);
+
+  /* Spread bar width (0–200 bps scale) */
+  var spreadBarWidth=Math.min(100,Math.max(0,(spreadBps/200)*100));
+  var floatBarWidth=c.floatPct;
+
+  /* SVG yield curve with bond dot */
+  var padL=46,padR=20,padT=12,padB=32,W=700,H=160;
+  var yMin=6.5,yMax=7.7;
+  function xPos(i){return padL+Math.round((i/(GSEC_CURVE.length-1))*(W-padL-padR));}
+  function yPos(y){return padT+Math.round(((yMax-y)/(yMax-yMin))*(H-padT-padB));}
+
+  var pathD='M';
+  GSEC_CURVE.forEach(function(pt,i){pathD+=(i===0?'':' L')+xPos(i)+' '+yPos(pt.yield);});
+
+  var dotX=xPos(5); /* 5Y tenor at index 5 */
+  var dotY=yPos(c.bondYield);
+
+  var svgTicks='';
+  GSEC_CURVE.forEach(function(pt,i){
+    var x=xPos(i);
+    svgTicks+='<text x="'+x+'" y="'+(H-padB+14)+'" text-anchor="middle" font-size="9" fill="#9ca3af">'+pt.tenor+'</text>';
+  });
+
+  var yLabels='';
+  [6.6,6.8,7.0,7.2,7.4,7.6].forEach(function(yv){
+    var y=yPos(yv);
+    yLabels+='<text x="'+(padL-6)+'" y="'+(y+3)+'" text-anchor="end" font-size="9" fill="#9ca3af">'+yv.toFixed(1)+'</text>';
+    yLabels+='<line x1="'+padL+'" y1="'+y+'" x2="'+(W-padR)+'" y2="'+y+'" stroke="#f3f4f6" stroke-width="1"/>';
+  });
+
+  var svgHtml='<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="max-height:160px">'
+    +yLabels
+    +'<path d="'+pathD+'" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linejoin="round"/>'
+    +GSEC_CURVE.map(function(pt,i){return '<circle cx="'+xPos(i)+'" cy="'+yPos(pt.yield)+'" r="3" fill="#2563eb"/>';}).join('')
+    +'<circle cx="'+dotX+'" cy="'+dotY+'" r="6" fill="'+ratingColor+'" opacity=".85"/>'
+    +'<text x="'+(dotX+10)+'" y="'+(dotY-8)+'" font-size="10" font-weight="700" fill="'+ratingColor+'">'+c.name.split(' ')[0]+'</text>'
+    +svgTicks
+    +'</svg>';
+
+  /* Peer comparison table (top 5 same sector or near-rating) */
+  var peerRows='';
+  var compareStocks=STOCKS.filter(function(s){return s.id!==c.id;})
+    .sort(function(a,b){return Math.abs(a.bondYield-c.bondYield)-Math.abs(b.bondYield-c.bondYield);})
+    .slice(0,6);
+
+  compareStocks.forEach(function(s){
+    var sBps=Math.round((s.bondYield-GSEC_10Y)*100);
+    var isTight=sBps<spreadBps;
+    var tagCls=isTight?'tag-tight':'tag-wide';
+    var tagLbl=isTight?'Tighter':'Wider';
+    peerRows+='<tr>'
+      +'<td>'+s.name+'</td>'
+      +'<td>'+getRatingChip(s.creditRating)+'</td>'
+      +'<td class="mono">'+s.bondYield.toFixed(2)+'%</td>'
+      +'<td class="mono">'+sBps+' bps</td>'
+      +'<td><span class="'+tagCls+'">'+tagLbl+'</span></td>'
+      +'</tr>';
+  });
+
+  /* Commentary strings — named booleans before all ternary */
+  var spreadVerdict=isNegSpread?'trading through the G-sec benchmark (negative spread), a sign of exceptional credit quality or thin trading':isTightSpread?'at a very tight spread — market is pricing near risk-free quality for this issuer':isWideSpread?'at a wide spread, pricing in notable credit or liquidity risk':'at a moderate spread — balanced credit and liquidity assessment';
+  var spreadRating=isHighGrade?'high-grade credit in the same bracket as sovereign-adjacent paper':'sub-investment or sub-AAA credit where investors demand a risk premium';
+  var liquidityNote=isLargeFloat?'With '+c.floatPct.toFixed(1)+'% float, this is a highly liquid bond — liquidity premium is compressed':'With '+c.floatPct.toFixed(1)+'% float, liquidity is moderate — expect a noticeable liquidity premium in the spread';
+
+  var h='';
+
+  /* Spread context header */
+  h+='<div class="ctx-section">';
+  h+='<div class="ctx-title">Spread Snapshot — '+c.name+'</div>';
+
+  /* Yield decompose stack */
+  h+='<div class="spread-stack"><div class="spread-row">';
+  h+='<div class="spread-seg seg-gsec"><div class="seg-label">G-sec 10Y</div><div class="seg-val">'+GSEC_10Y.toFixed(2)+'%</div><div class="seg-bps">Benchmark</div></div>';
+  h+='<div class="spread-seg"><div class="seg-label">Total Spread</div><div class="seg-val" style="color:'+spreadColour+'">'+spreadBps+' bps</div><div class="seg-bps">'+(spreadBps>=0?'+':'')+spreadBps+' bps over G-sec</div></div>';
+  h+='<div class="spread-seg seg-total"><div class="seg-label">Corp Yield</div><div class="seg-val">'+c.bondYield.toFixed(2)+'%</div><div class="seg-bps">'+c.creditRating+' rated</div></div>';
+  h+='</div></div>';
+  h+='</div>';
+
+  /* Rating & spread bars */
+  h+='<div class="ctx-section">';
+  h+='<div class="ctx-title">Credit Quality & Spread</div>';
+  h+='<div class="ctx-label">Credit Rating</div>';
+  h+='<div class="bar-row"><div class="bar-bg"><div class="bar-fill" style="width:'+ratingWidth+'%;background:'+ratingColor+'"></div></div>';
+  h+='<div class="bar-val">'+getRatingChip(c.creditRating)+'</div></div>';
+  h+='<div class="ctx-label">Spread over G-sec</div>';
+  h+='<div class="bar-row"><div class="bar-bg"><div class="bar-fill" style="width:'+spreadBarWidth+'%;background:'+spreadColour+'"></div></div>';
+  h+='<div class="bar-val" style="color:'+spreadColour+'">'+spreadBps+' bps</div></div>';
+  h+='<div class="ctx-label">Bond Market Float</div>';
+  h+='<div class="bar-row"><div class="bar-bg"><div class="bar-fill" style="width:'+floatBarWidth+'%;background:#8b5cf6"></div></div>';
+  h+='<div class="bar-val">'+c.floatPct.toFixed(1)+'%</div></div>';
+  h+='</div>';
+
+  /* Spread decomposition breakdown */
+  h+='<div class="ctx-section">';
+  h+='<div class="ctx-title">Spread Decomposition (Illustrative)</div>';
+  h+='<div class="decompose-box">';
+  h+='<div class="decompose-title">Corporate Yield = G-sec Benchmark + Credit Premium + Liquidity Premium + Term Premium</div>';
+  h+='<div class="decompose-row"><div><div class="decompose-label">G-sec 10Y Benchmark</div><div class="decompose-sub">Risk-free sovereign rate anchoring the curve</div></div><div class="decompose-bps" style="color:#2563eb">'+GSEC_10Y.toFixed(2)+'%</div></div>';
+  h+='<div class="decompose-row"><div><div class="decompose-label">Credit Risk Premium</div><div class="decompose-sub">Compensation for default probability given '+c.creditRating+' rating</div></div><div class="decompose-bps" style="color:#854d0e">+'+creditBps+' bps</div></div>';
+  h+='<div class="decompose-row"><div><div class="decompose-label">Liquidity Premium</div><div class="decompose-sub">Compensation for bid-ask spread and market depth ('+c.floatPct.toFixed(0)+'% float)</div></div><div class="decompose-bps" style="color:#9d174d">+'+liquidityBps+' bps</div></div>';
+  h+='<div class="decompose-row"><div><div class="decompose-label">Term Premium</div><div class="decompose-sub">Extra yield for bearing duration risk over 10Y horizon</div></div><div class="decompose-bps" style="color:#d97706">+'+termBps+' bps</div></div>';
+  h+='<div class="decompose-row" style="background:var(--accent-bg)"><div><div class="decompose-label" style="color:var(--accent)">Implied Corporate Yield</div><div class="decompose-sub">Sum of all components</div></div><div class="decompose-bps" style="color:var(--accent)">'+c.bondYield.toFixed(2)+'%</div></div>';
+  h+='</div>';
+  h+='</div>';
+
+  /* Z-spread & OAS stat row */
+  h+='<div class="ctx-section">';
+  h+='<div class="ctx-title">Z-Spread & OAS Estimates</div>';
+  h+='<div class="stat-grid">';
+  h+='<div class="stat-card"><div class="stat-val" style="color:#2563eb">'+zSpreadBps+'</div><div class="stat-label">Z-spread (bps)</div></div>';
+  h+='<div class="stat-card"><div class="stat-val" style="color:#16a34a">'+oasBps+'</div><div class="stat-label">OAS (bps)</div></div>';
+  h+='<div class="stat-card"><div class="stat-val" style="color:'+spreadColour+'">'+spreadBps+'</div><div class="stat-label">Nominal Spread</div></div>';
+  h+='<div class="stat-card"><div class="stat-val" style="color:#7c3aed">'+peerSpreadBps+'</div><div class="stat-label">Sector Avg Spread</div></div>';
+  h+='</div>';
+  h+='</div>';
+
+  /* Yield curve SVG */
+  h+='<div class="ctx-section">';
+  h+='<div class="ctx-title">G-sec Curve with '+c.name.split(' ')[0]+' Bond (5Y tenor)</div>';
+  h+='<div class="curve-wrap">'+svgHtml+'</div>';
+  h+='</div>';
+
+  /* Teaching cards */
+  h+='<div class="ctx-section">';
+  h+='<div class="ctx-title">Core Concepts</div>';
+  h+='<div class="teach-grid">';
+  h+='<div class="teach-card"><div class="teach-icon">📐</div><div class="teach-head">Credit Spread</div><div class="teach-body">Difference between corporate bond yield and the G-sec benchmark. Compensation for default risk, liquidity, and term.</div></div>';
+  h+='<div class="teach-card"><div class="teach-icon">📊</div><div class="teach-head">Z-spread</div><div class="teach-body">Constant spread added to every point on the spot rate curve so the bond\'s discounted cash flows equal its market price.</div></div>';
+  h+='<div class="teach-card"><div class="teach-icon">⚙️</div><div class="teach-head">OAS</div><div class="teach-body">Option-Adjusted Spread removes the value of embedded options (calls, puts). OAS < Z-spread for callable bonds.</div></div>';
+  h+='<div class="teach-card"><div class="teach-icon">💧</div><div class="teach-head">Liquidity Premium</div><div class="teach-body">Investors demand extra yield for bonds that are harder to sell quickly without moving the price. Float % is a proxy.</div></div>';
+  h+='</div>';
+  h+='</div>';
+
+  /* Peer comparison table */
+  h+='<div class="ctx-section">';
+  h+='<div class="ctx-title">Nearest Spread Peers</div>';
+  h+='<table class="compare-table"><thead><tr><th>Company</th><th>Rating</th><th>Yield</th><th>Spread</th><th>vs '+c.name.split(' ')[0]+'</th></tr></thead><tbody>'+peerRows+'</tbody></table>';
+  h+='</div>';
+
+  /* Q&A blocks */
+  h+='<div class="ctx-section">';
+  h+='<div class="qa-block"><div class="qa-q">Why is '+c.name+'\'s spread '+spreadBps+' bps?</div>';
+  h+='<div class="qa-a">'+c.name+' is '+spreadVerdict+'. As a '+spreadRating+', the credit component accounts for roughly '+creditBps+' bps. '+liquidityNote+', contributing ~'+liquidityBps+' bps. The remaining ~'+termBps+' bps compensates for bearing the 10Y duration risk.</div></div>';
+  h+='<div class="qa-block"><div class="qa-q">What does a '+zSpreadBps+' bps Z-spread mean in practice?</div>';
+  h+='<div class="qa-a">It means if you shift every point on the G-sec spot curve up by '+zSpreadBps+' bps, the present value of '+c.name+'\'s bond cashflows equals its market price. The OAS of '+oasBps+' bps removes the embedded option value (~'+oasAdjust+' bps), giving the true credit + liquidity compensation. Relative to the sector average of '+peerSpreadBps+' bps, '+(spreadBps>peerSpreadBps?'this bond offers '+Math.abs(spreadBps-peerSpreadBps)+' bps of excess carry':'this bond is '+Math.abs(spreadBps-peerSpreadBps)+' bps tighter than peers, reflecting its better credit profile')+'.</div></div>';
+  h+='</div>';
+
+  h+='<button class="btn-next" onclick="goStep(3)">Continue to Spread Inputs 🔒 →</button>';
+
+  document.getElementById('ctx').innerHTML=h;
+}
+
+function unlockPro(){
+  alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');
+}
+
+renderGrid();
+</script>
+</body>
+</html>

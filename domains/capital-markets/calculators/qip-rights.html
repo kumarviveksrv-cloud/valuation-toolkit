@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>QIP &amp; Rights Issue — Capital Markets · ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--accent:#ea580c;--accent-bg:#fff7ed;--accent-border:#fed7aa}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-pro{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+.hero{background:#0a0a0a;color:#fff;padding:32px 24px 28px}
+.hero-inner{max-width:820px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(234,88,12,.15);border:1px solid rgba(234,88,12,.3);color:#fb923c;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:12px;letter-spacing:.04em}
+.hero h1{font-size:clamp(20px,3vw,32px);font-weight:900;letter-spacing:-.02em;margin-bottom:6px}
+.hero p{font-size:13px;color:#9ca3af;line-height:1.6}
+.tabs{border-bottom:1px solid var(--border);background:#fff;position:sticky;top:56px;z-index:90}
+.tabs-inner{max-width:820px;margin:0 auto;padding:0 24px;display:flex;gap:0}
+.tab{padding:14px 18px;font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;cursor:pointer;transition:all .15s;white-space:nowrap}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.tab.done{color:var(--green)}
+.tab.locked{color:var(--muted);opacity:.5;cursor:default}
+.step{display:none;max-width:820px;margin:0 auto;padding:32px 24px 80px}
+.step.active{display:block}
+.stock-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:20px}
+.stock-card{border:1px solid var(--border);border-radius:8px;padding:14px 16px;cursor:pointer;transition:all .15s}
+.stock-card:hover{border-color:var(--accent);background:var(--accent-bg)}
+.stock-card.selected{border-color:var(--accent);background:var(--accent-bg);box-shadow:0 0 0 3px rgba(234,88,12,.12)}
+.stock-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.stock-meta{font-size:11px;color:var(--muted)}
+.stock-meta span{display:inline-block;margin-right:8px}
+.step-header{margin-bottom:24px}
+.step-header h2{font-size:20px;font-weight:900;margin-bottom:4px;letter-spacing:-.01em}
+.step-header p{font-size:13px;color:var(--muted);line-height:1.6}
+.search-box{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:16px;font-family:'Inter',sans-serif;outline:none;transition:border-color .15s}
+.search-box:focus{border-color:var(--accent)}
+.context-card{border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-bottom:16px;background:var(--card)}
+.context-card h3{font-size:14px;font-weight:800;margin-bottom:12px;letter-spacing:-.01em}
+.metric-row{display:flex;flex-wrap:wrap;gap:16px}
+.metric{flex:1;min-width:100px}
+.metric-val{font-family:'JetBrains Mono',monospace;font-size:18px;font-weight:700;line-height:1}
+.metric-val.green{color:var(--green)}
+.metric-val.red{color:var(--red)}
+.metric-val.blue{color:var(--blue)}
+.metric-val.amber{color:var(--amber)}
+.metric-val.orange{color:var(--accent)}
+.metric-label{font-size:11px;color:var(--muted);margin-top:3px}
+.teach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px}
+.teach-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px}
+.teach-icon{font-size:20px;margin-bottom:8px}
+.teach-card h4{font-size:12px;font-weight:800;margin-bottom:4px}
+.teach-card p{font-size:11px;color:var(--muted);line-height:1.6}
+.qa-block{border-left:3px solid var(--accent-border);padding:12px 16px;margin-bottom:12px;background:var(--accent-bg);border-radius:0 6px 6px 0}
+.qa-q{font-size:12px;font-weight:700;color:var(--accent);margin-bottom:4px}
+.qa-a{font-size:12px;color:var(--text);line-height:1.6}
+.next-btn{background:var(--accent);color:#fff;border:none;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-top:20px;transition:opacity .15s}
+.next-btn:hover{opacity:.9}
+.pro-gate{border:2px dashed var(--border);border-radius:12px;padding:40px 32px;text-align:center;margin-top:8px}
+.pro-gate-icon{font-size:32px;margin-bottom:12px}
+.pro-gate h3{font-size:18px;font-weight:900;margin-bottom:8px}
+.pro-gate p{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6}
+.pro-features{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:24px}
+.pro-pill{background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);font-size:11px;font-weight:700;padding:4px 12px;border-radius:20px}
+.pro-btn{background:var(--accent);color:#fff;border:none;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.pro-btn:hover{opacity:.9}
+.holding-bar-wrap{margin-bottom:12px}
+.holding-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.holding-bar-label{font-size:11px;width:120px;flex-shrink:0}
+.holding-bar{flex:1;height:10px;background:var(--border);border-radius:4px;overflow:hidden}
+.holding-bar-fill{height:100%;border-radius:4px}
+.holding-bar-val{font-size:11px;font-family:'JetBrains Mono',monospace;width:48px;text-align:right;flex-shrink:0}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+.compare-col{border:1px solid var(--border);border-radius:8px;padding:16px}
+.compare-col h4{font-size:12px;font-weight:800;margin-bottom:10px;color:var(--accent)}
+.compare-col ul{list-style:none;padding:0}
+.compare-col li{font-size:11px;color:var(--muted);padding:3px 0;border-bottom:1px solid var(--border);line-height:1.5}
+.compare-col li:last-child{border-bottom:none}
+.compare-col li::before{content:'• ';color:var(--accent)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-left">
+    <a href="/valuation-toolkit/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">/</span>
+    <a href="../../">Capital Markets</a>
+    <span class="nav-sep">/</span>
+    <a href="../">Calculators</a>
+    <span class="nav-sep">/</span>
+    <span>QIP &amp; Rights Issue</span>
+  </div>
+  <button class="nav-pro" onclick="unlockPro()">Unlock Pro — ₹799/mo</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">📋 Calculator 04 · Capital Markets</div>
+    <h1>QIP &amp; Rights Issue Analyser</h1>
+    <p>Model a secondary equity issuance — SEBI floor price, discount to market, promoter dilution impact, EPS dilution, and demand sizing for QIPs and Rights Issues.</p>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tabs-inner">
+    <div class="tab active" id="tab1" onclick="goStep(1)">1 · Pick Company</div>
+    <div class="tab" id="tab2" onclick="goStep(2)">2 · Issuance Context</div>
+    <div class="tab locked" id="tab3">🔒 3 · Structure</div>
+    <div class="tab locked" id="tab4">🔒 4 · Dilution Model</div>
+  </div>
+</div>
+
+<!-- STEP 1 -->
+<div class="step active" id="step1">
+  <div class="step-header">
+    <h2>Select a company to model secondary issuance</h2>
+    <p>QIPs target institutional investors. Rights Issues give existing shareholders the option to buy new shares at a discount. Pick the company you want to analyse.</p>
+  </div>
+  <input class="search-box" type="text" placeholder="Search company or sector…" oninput="filterStocks(this.value)">
+  <div class="stock-grid" id="stockGrid"></div>
+</div>
+
+<!-- STEP 2 -->
+<div class="step" id="step2">
+  <div class="step-header">
+    <h2 id="ctx-title">Issuance context loading…</h2>
+    <p id="ctx-sub">Shareholding structure, float, and secondary issuance context.</p>
+  </div>
+  <div id="ctx-body"></div>
+  <button class="next-btn" onclick="goStep(3)">Proceed to Structure Inputs →</button>
+</div>
+
+<!-- STEP 3: PRO GATE -->
+<div class="step" id="step3">
+  <div class="pro-gate">
+    <div class="pro-gate-icon">🔒</div>
+    <h3>Pro Feature — QIP / Rights Issue Builder</h3>
+    <p>Model the full capital raise — issuance size, SEBI floor price calculation, discount to CMP, number of new shares, and pro-rata entitlement for Rights Issues.</p>
+    <div class="pro-features">
+      <span class="pro-pill">SEBI Floor Price</span>
+      <span class="pro-pill">Discount to CMP</span>
+      <span class="pro-pill">New Share Count</span>
+      <span class="pro-pill">Rights Entitlement Ratio</span>
+      <span class="pro-pill">Subscription Forecast</span>
+      <span class="pro-pill">Proceeds Modelling</span>
+      <span class="pro-pill">QIB Demand Sizing</span>
+      <span class="pro-pill">Underwriting Cost</span>
+    </div>
+    <button class="pro-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+  </div>
+</div>
+
+<!-- STEP 4: PRO GATE -->
+<div class="step" id="step4">
+  <div class="pro-gate">
+    <div class="pro-gate-icon">🔒</div>
+    <h3>Pro Feature — Dilution Impact Dashboard</h3>
+    <p>Full dilution analysis — EPS dilution, promoter holding post-issue, BVPS impact, accretion/dilution on market multiples, and share price reaction model.</p>
+    <div class="pro-features">
+      <span class="pro-pill">EPS Dilution %</span>
+      <span class="pro-pill">BVPS Impact</span>
+      <span class="pro-pill">Promoter Dilution</span>
+      <span class="pro-pill">Post-Issue Float</span>
+      <span class="pro-pill">P/E Re-rating</span>
+      <span class="pro-pill">Accretion Model</span>
+      <span class="pro-pill">ROE Impact</span>
+      <span class="pro-pill">Capital Efficiency</span>
+    </div>
+    <button class="pro-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+  </div>
+</div>
+
+<script>
+var STOCKS=[
+  {id:1,name:'Reliance Industries',sector:'Oil & Gas',marketCap:2010000,pe:24.8,beta:0.95,divYield:0.4,ret1y:8.2,price:2840,vol:18.2,creditRating:'AAA',bondYield:7.18,promoterHolding:50.3,floatPct:35.8},
+  {id:2,name:'HDFC Bank',sector:'Banking',marketCap:1285000,pe:18.2,beta:0.88,divYield:1.1,ret1y:12.4,price:1720,vol:16.4,creditRating:'AAA',bondYield:7.42,promoterHolding:0.0,floatPct:72.8},
+  {id:3,name:'Infosys',sector:'IT',marketCap:720000,pe:22.4,beta:0.82,divYield:2.4,ret1y:18.6,price:1840,vol:19.8,creditRating:'AAA',bondYield:7.08,promoterHolding:14.9,floatPct:72.8},
+  {id:4,name:'ICICI Bank',sector:'Banking',marketCap:890000,pe:17.6,beta:1.12,divYield:0.8,ret1y:24.8,price:1240,vol:20.4,creditRating:'AA+',bondYield:7.52,promoterHolding:0.0,floatPct:75.2},
+  {id:5,name:'TCS',sector:'IT',marketCap:1420000,pe:26.8,beta:0.72,divYield:3.2,ret1y:6.8,price:3980,vol:15.6,creditRating:'AAA',bondYield:6.98,promoterHolding:72.3,floatPct:22.8},
+  {id:6,name:'Bharti Airtel',sector:'Telecom',marketCap:920000,pe:48.2,beta:0.78,divYield:0.4,ret1y:42.4,price:1580,vol:22.4,creditRating:'AA',bondYield:7.68,promoterHolding:55.8,floatPct:37.4},
+  {id:7,name:'Kotak Mahindra Bank',sector:'Banking',marketCap:380000,pe:19.4,beta:0.94,divYield:0.1,ret1y:8.4,price:1840,vol:18.8,creditRating:'AAA',bondYield:7.38,promoterHolding:25.9,floatPct:62.4},
+  {id:8,name:'L&T',sector:'Capital Goods',marketCap:590000,pe:34.2,beta:1.24,divYield:0.9,ret1y:28.4,price:3640,vol:24.8,creditRating:'AAA',bondYield:7.22,promoterHolding:0.0,floatPct:74.8},
+  {id:9,name:'Axis Bank',sector:'Banking',marketCap:360000,pe:14.8,beta:1.18,divYield:0.1,ret1y:16.4,price:1180,vol:22.8,creditRating:'AA+',bondYield:7.58,promoterHolding:8.4,floatPct:79.2},
+  {id:10,name:'Maruti Suzuki',sector:'Auto',marketCap:440000,pe:28.4,beta:0.84,divYield:1.2,ret1y:14.2,price:12400,vol:21.2,creditRating:'AA+',bondYield:7.32,promoterHolding:58.2,floatPct:38.4},
+  {id:11,name:'Sun Pharmaceutical',sector:'Pharma',marketCap:410000,pe:38.4,beta:0.64,divYield:0.8,ret1y:32.4,price:1720,vol:17.4,creditRating:'AA+',bondYield:7.28,promoterHolding:54.5,floatPct:38.8},
+  {id:12,name:'HUL',sector:'FMCG',marketCap:530000,pe:52.4,beta:0.42,divYield:1.8,ret1y:2.4,price:2480,vol:14.2,creditRating:'AAA',bondYield:7.12,promoterHolding:61.9,floatPct:35.2},
+  {id:13,name:'ITC',sector:'FMCG',marketCap:590000,pe:24.8,beta:0.58,divYield:3.2,ret1y:12.4,price:468,vol:16.8,creditRating:'AAA',bondYield:7.05,promoterHolding:0.0,floatPct:72.8},
+  {id:14,name:'Asian Paints',sector:'Materials',marketCap:290000,pe:58.4,beta:0.48,divYield:1.2,ret1y:-14.2,price:2780,vol:19.4,creditRating:'AA+',bondYield:7.38,promoterHolding:52.8,floatPct:42.2},
+  {id:15,name:'Bajaj Finance',sector:'NBFC',marketCap:410000,pe:34.8,beta:1.42,divYield:0.1,ret1y:8.4,price:7240,vol:26.4,creditRating:'AAA',bondYield:7.82,promoterHolding:55.9,floatPct:38.4},
+  {id:16,name:'Wipro',sector:'IT',marketCap:280000,pe:20.8,beta:0.88,divYield:0.1,ret1y:6.4,price:580,vol:22.8,creditRating:'AAA',bondYield:7.08,promoterHolding:73.0,floatPct:22.4},
+  {id:17,name:'NTPC',sector:'Power',marketCap:380000,pe:18.4,beta:0.74,divYield:2.4,ret1y:32.4,price:384,vol:20.4,creditRating:'AAA',bondYield:7.15,promoterHolding:51.1,floatPct:42.8},
+  {id:18,name:'Power Grid',sector:'Power',marketCap:280000,pe:20.4,beta:0.68,divYield:3.4,ret1y:28.4,price:328,vol:18.4,creditRating:'AAA',bondYield:7.12,promoterHolding:51.3,floatPct:42.4},
+  {id:19,name:'Titan',sector:'Consumer',marketCap:320000,pe:84.2,beta:0.82,divYield:0.4,ret1y:4.2,price:3640,vol:24.8,creditRating:'AA+',bondYield:7.42,promoterHolding:52.8,floatPct:41.8},
+  {id:20,name:'UltraTech Cement',sector:'Materials',marketCap:340000,pe:42.4,beta:0.94,divYield:0.4,ret1y:8.4,price:11240,vol:22.4,creditRating:'AAA',bondYield:7.22,promoterHolding:60.2,floatPct:36.4},
+  {id:21,name:'HCL Technologies',sector:'IT',marketCap:450000,pe:24.8,beta:0.78,divYield:4.8,ret1y:22.4,price:1680,vol:20.4,creditRating:'AAA',bondYield:7.04,promoterHolding:60.8,floatPct:34.8},
+  {id:22,name:'M&M',sector:'Auto',marketCap:320000,pe:28.4,beta:1.08,divYield:0.8,ret1y:42.8,price:2940,vol:26.4,creditRating:'AA+',bondYield:7.45,promoterHolding:18.6,floatPct:72.4},
+  {id:23,name:'JSW Steel',sector:'Materials',marketCap:230000,pe:22.4,beta:1.48,divYield:0.8,ret1y:4.8,price:980,vol:28.8,creditRating:'AA',bondYield:7.88,promoterHolding:44.8,floatPct:48.4},
+  {id:24,name:'Adani Ports',sector:'Infrastructure',marketCap:280000,pe:32.4,beta:1.28,divYield:0.4,ret1y:24.4,price:1380,vol:26.4,creditRating:'AA+',bondYield:7.62,promoterHolding:65.1,floatPct:30.2},
+  {id:25,name:'Tata Motors',sector:'Auto',marketCap:360000,pe:8.4,beta:1.58,divYield:0.0,ret1y:24.4,price:980,vol:32.4,creditRating:'AA-',bondYield:8.12,promoterHolding:46.4,floatPct:48.8},
+  {id:26,name:'HDFC Life',sector:'Insurance',marketCap:160000,pe:72.4,beta:0.72,divYield:0.2,ret1y:8.4,price:680,vol:18.4,creditRating:'AAA',bondYield:7.28,promoterHolding:50.4,floatPct:44.8},
+  {id:27,name:'SBI',sector:'Banking',marketCap:720000,pe:10.8,beta:1.32,divYield:1.2,ret1y:28.4,price:840,vol:26.4,creditRating:'AA+',bondYield:7.48,promoterHolding:57.5,floatPct:38.4},
+  {id:28,name:'Tech Mahindra',sector:'IT',marketCap:140000,pe:38.4,beta:0.98,divYield:2.8,ret1y:8.4,price:1480,vol:26.4,creditRating:'AA+',bondYield:7.22,promoterHolding:35.8,floatPct:58.4},
+  {id:29,name:'Nestle India',sector:'FMCG',marketCap:220000,pe:68.4,beta:0.38,divYield:1.4,ret1y:-4.8,price:24800,vol:16.4,creditRating:'AAA',bondYield:7.02,promoterHolding:62.8,floatPct:34.2},
+  {id:30,name:'Cipla',sector:'Pharma',marketCap:175000,pe:28.4,beta:0.68,divYield:0.8,ret1y:18.4,price:1540,vol:18.8,creditRating:'AA+',bondYield:7.35,promoterHolding:33.4,floatPct:58.4}
+];
+
+var selected=null;
+var filtered=STOCKS.slice();
+
+function renderStocks(list){
+  var g=document.getElementById('stockGrid');
+  g.innerHTML=list.map(function(s){
+    var isSelected=selected&&selected.id===s.id;
+    var selClass=isSelected?' selected':'';
+    var freeFloatCr=(s.marketCap*s.floatPct/100/100000).toFixed(1);
+    return '<div class="stock-card'+selClass+'" onclick="selectStock('+s.id+')">'
+      +'<div class="stock-name">'+s.name+'</div>'
+      +'<div class="stock-meta">'
+      +'<span>'+s.sector+'</span>'
+      +'<span>P:'+(s.promoterHolding>0?s.promoterHolding.toFixed(1)+'%':'Nil')+'</span>'
+      +'<span>Float:'+s.floatPct.toFixed(1)+'%</span>'
+      +'<span>₹'+freeFloatCr+'L Cr</span>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+}
+
+function filterStocks(q){
+  var qLow=q.toLowerCase();
+  filtered=STOCKS.filter(function(s){
+    return s.name.toLowerCase().indexOf(qLow)>=0||s.sector.toLowerCase().indexOf(qLow)>=0;
+  });
+  renderStocks(filtered);
+}
+
+function selectStock(id){
+  selected=STOCKS.find(function(s){return s.id===id;});
+  renderStocks(filtered);
+  goStep(2);
+}
+
+function goStep(n){
+  [1,2,3,4].forEach(function(i){
+    document.getElementById('step'+i).classList.toggle('active',i===n);
+    var t=document.getElementById('tab'+i);
+    t.classList.remove('active','done','locked');
+    if(i<n) t.classList.add('done');
+    else if(i===n) t.classList.add('active');
+    else t.classList.add('locked');
+  });
+  if(n===2&&selected) buildContext();
+}
+
+function buildContext(){
+  var c=selected;
+  var sharesCr=(c.marketCap/c.price);
+  var promoterShares=sharesCr*(c.promoterHolding/100);
+  var publicFloat=100-c.promoterHolding;
+  var sebiFloor=Math.round(c.price*0.9*100)/100;
+  var qipDiscount=5;
+  var qipPrice=Math.round(c.price*(1-qipDiscount/100));
+  var targetRaiseCr=Math.round(c.marketCap*0.05/100)*100;
+  var newSharesCr=targetRaiseCr/qipPrice;
+  var dilutionPct=(newSharesCr/(sharesCr+newSharesCr))*100;
+
+  var hasPromoter=c.promoterHolding>0;
+  var isHighPromoter=c.promoterHolding>50;
+  var isZeroPromoter=c.promoterHolding===0;
+  var promoterNote=isZeroPromoter?'Professionally managed company — QIP does not dilute promoter holding (there is none). Board approval and QIB demand are the key gatekeepers.':isHighPromoter?'Promoter holds '+c.promoterHolding.toFixed(1)+'% — above 50% threshold. Post-QIP, promoter could dip below 50% if the raise is large enough, which is a SEBI trigger point to watch.':'Promoter at '+c.promoterHolding.toFixed(1)+'% with '+c.floatPct.toFixed(1)+'% float. Good balance for a QIP — sufficient institutional investor base to absorb a secondary issuance.';
+
+  var isQIPEligible=c.floatPct>20;
+  var eligibilityNote=isQIPEligible?'QIP eligible — minimum 10% public float requirement is met ('+c.floatPct.toFixed(1)+'% current float).':'Float below typical institutional comfort level. QIP may face demand challenges without significant discount.';
+
+  document.getElementById('ctx-title').textContent=c.name+' — QIP / Rights Issue Context';
+  document.getElementById('ctx-sub').textContent='Shareholding structure, SEBI floor price, and secondary issuance feasibility for '+c.name+'.';
+
+  var html='<div class="context-card"><h3>📊 Shareholding &amp; Issuance Snapshot</h3>'
+    +'<div class="metric-row">'
+    +'<div class="metric"><div class="metric-val orange">'+c.promoterHolding.toFixed(1)+'%</div><div class="metric-label">Promoter Holding</div></div>'
+    +'<div class="metric"><div class="metric-val blue">'+c.floatPct.toFixed(1)+'%</div><div class="metric-label">Free Float</div></div>'
+    +'<div class="metric"><div class="metric-val">₹'+qipPrice.toLocaleString('en-IN')+'</div><div class="metric-label">QIP Price (5% disc.)</div></div>'
+    +'<div class="metric"><div class="metric-val">'+dilutionPct.toFixed(1)+'%</div><div class="metric-label">Est. Dilution (5% raise)</div></div>'
+    +'<div class="metric"><div class="metric-val green">₹'+Math.round(targetRaiseCr/100)+'Cr</div><div class="metric-label">Indicative Raise (5% cap)</div></div>'
+    +'<div class="metric"><div class="metric-val">₹'+sebiFloor.toLocaleString('en-IN')+'</div><div class="metric-label">SEBI Floor Price</div></div>'
+    +'</div></div>';
+
+  html+='<div class="context-card"><h3>🏦 Shareholding Structure</h3>'
+    +'<div class="holding-bar-wrap">';
+
+  var holdingRows=[
+    {label:'Promoter',pct:c.promoterHolding,color:'#ea580c'},
+    {label:'Institutions',pct:Math.min(45,c.floatPct*0.65),color:'#2563eb'},
+    {label:'Retail Public',pct:Math.max(0,100-c.promoterHolding-Math.min(45,c.floatPct*0.65)),color:'#16a34a'}
+  ];
+
+  holdingRows.forEach(function(r){
+    html+='<div class="holding-bar-row">'
+      +'<span class="holding-bar-label">'+r.label+'</span>'
+      +'<div class="holding-bar"><div class="holding-bar-fill" style="width:'+r.pct+'%;background:'+r.color+'"></div></div>'
+      +'<span class="holding-bar-val">'+r.pct.toFixed(1)+'%</span>'
+      +'</div>';
+  });
+
+  html+='</div>'
+    +'<p style="font-size:12px;color:var(--muted);margin-top:8px;line-height:1.7">'+promoterNote+'</p>'
+    +'<p style="font-size:12px;color:var(--green);margin-top:6px;line-height:1.7">'+eligibilityNote+'</p>'
+    +'</div>';
+
+  html+='<div class="compare-grid">'
+    +'<div class="compare-col"><h4>🏢 QIP (Qualified Institutional Placement)</h4>'
+    +'<ul>'
+    +'<li>Only QIBs can participate (FIIs, MFs, Insurance)</li>'
+    +'<li>Min. discount: 5% below SEBI floor price</li>'
+    +'<li>No shareholder approval required</li>'
+    +'<li>Fast execution: 2–3 weeks</li>'
+    +'<li>Lock-in: 1 year for shares allotted</li>'
+    +'<li>Max raise: 5x float in 12 months</li>'
+    +'</ul></div>'
+    +'<div class="compare-col"><h4>📋 Rights Issue</h4>'
+    +'<ul>'
+    +'<li>Existing shareholders get pro-rata rights</li>'
+    +'<li>Discount: typically 25–35% to CMP</li>'
+    +'<li>Promoters can subscribe to maintain %</li>'
+    +'<li>Timeline: 45–60 days (longer)</li>'
+    +'<li>Rights entitlement traded on exchange</li>'
+    +'<li>ASBA-based application process</li>'
+    +'</ul></div>'
+    +'</div>';
+
+  html+='<div class="teach-grid">'
+    +'<div class="teach-card"><div class="teach-icon">📏</div><h4>SEBI Floor Price</h4><p>Higher of: 26-week average or 2-week average of the daily closing price on the stock exchange. QIPs must price at or above this floor.</p></div>'
+    +'<div class="teach-card"><div class="teach-icon">💹</div><h4>Dilution Impact</h4><p>New shares reduce EPS (earnings per share) and promoter % unless they subscribe. The bigger the raise relative to existing shares, the bigger the dilution.</p></div>'
+    +'<div class="teach-card"><div class="teach-icon">🎯</div><h4>Why Companies Do QIPs</h4><p>Capex funding, debt reduction, acquisitions. QIP is preferred vs IPO (faster) and vs rights issue (no need to approach retail investors).</p></div>'
+    +'<div class="teach-card"><div class="teach-icon">⚖️</div><h4>Rights Issue Signal</h4><p>Can signal stress (need to raise cash urgently) or growth (fund capacity expansion). Market reaction depends heavily on use of proceeds.</p></div>'
+    +'</div>';
+
+  html+='<div class="qa-block">'
+    +'<div class="qa-q">Can '+c.name+' do a QIP without promoter approval?</div>'
+    +'<div class="qa-a">'+(isZeroPromoter?c.name+' has no promoter — it is professionally managed. Board approval suffices for a QIP. The board would convene a special committee, get shareholder approval via EGM or postal ballot, and issue the allotment letter within the SEBI-mandated window.':'QIPs require board approval and may need EGM resolution if the issuance exceeds existing authorised capital. '+(isHighPromoter?'With a '+c.promoterHolding.toFixed(1)+'% promoter stake, any QIP that risks crossing the 75% institutional holding limit (max non-promoter + QIB holding) requires careful structuring.':'With '+c.promoterHolding.toFixed(1)+'% promoter holding, this company has enough float to comfortably execute a QIP without triggering promoter holding thresholds.'))+'</div>'
+    +'</div>';
+
+  html+='<div class="qa-block">'
+    +'<div class="qa-q">What discount is typical in a QIP vs current price of ₹'+c.price.toLocaleString('en-IN')+'?</div>'
+    +'<div class="qa-a">SEBI mandates the floor price (approx ₹'+sebiFloor.toLocaleString('en-IN')+'), but market practice allows a 5–10% additional discount to attract QIB demand. At 5% discount, QIP price = ₹'+qipPrice.toLocaleString('en-IN')+'. Larger discounts may be needed in volatile markets or for companies with lower institutional ownership — the price discovery happens through the book-building process with anchor investors.</div>'
+    +'</div>';
+
+  document.getElementById('ctx-body').innerHTML=html;
+}
+
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+
+renderStocks(STOCKS);
+</script>
+</body>
+</html>

@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IPO Subscription Analyser — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--accent:#ea580c;--accent-bg:#fff7ed;--accent-border:#fed7aa}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-pro{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+.hero{background:#0a0a0a;color:#fff;padding:32px 24px 28px;border-bottom:1px solid #1a1a1a}
+.hero-inner{max-width:820px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(234,88,12,.15);border:1px solid rgba(234,88,12,.3);color:#fb923c;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;margin-bottom:14px;letter-spacing:.04em}
+.hero h1{font-size:clamp(20px,3vw,30px);font-weight:900;letter-spacing:-.02em;margin-bottom:6px}
+.hero p{font-size:13px;color:#9ca3af;line-height:1.6}
+.tabs-bar{border-bottom:1px solid var(--border);background:#fff;position:sticky;top:56px;z-index:90}
+.tabs-inner{max-width:820px;margin:0 auto;display:flex;padding:0 24px}
+.tab{padding:14px 0;margin-right:28px;font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.main{max-width:820px;margin:0 auto;padding:32px 24px 80px}
+.step{display:none}
+.step.active{display:block}
+.stock-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:20px}
+.stock-card{border:1px solid var(--border);border-radius:8px;padding:14px;cursor:pointer;transition:all .15s}
+.stock-card:hover{border-color:var(--accent);background:var(--accent-bg)}
+.stock-card.selected{border-color:var(--accent);background:var(--accent-bg);box-shadow:0 0 0 3px rgba(234,88,12,.12)}
+.stock-card-name{font-size:13px;font-weight:700;margin-bottom:3px}
+.stock-card-sector{font-size:11px;color:var(--muted)}
+.stock-card-rating{font-size:11px;font-weight:700;color:var(--accent);margin-top:4px;font-family:'JetBrains Mono',monospace}
+.next-btn{background:var(--accent);color:#fff;border:none;padding:12px 28px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-top:28px;transition:opacity .15s}
+.next-btn:hover{opacity:.9}
+.next-btn:disabled{opacity:.4;cursor:not-allowed}
+.section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:16px}
+/* Loading */
+.loading-block{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:28px 24px;margin-bottom:20px;text-align:center}
+.loading-bar-wrap{background:var(--border);border-radius:4px;height:4px;margin:16px 0 10px;overflow:hidden}
+.loading-bar-fill{height:4px;background:var(--accent);border-radius:4px;width:0%;transition:width .4s ease}
+.loading-status{font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+/* Context cards */
+.ctx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:20px}
+.ctx-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px}
+.ctx-card-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px}
+.ctx-card-value{font-size:18px;font-weight:900;font-family:'JetBrains Mono',monospace;letter-spacing:-.01em}
+.ctx-card-sub{font-size:11px;color:var(--muted);margin-top:3px}
+.ret-pos{color:var(--green)}
+.ret-neg{color:var(--red)}
+.demand-bar-wrap{margin:10px 0 4px}
+.demand-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.demand-label{font-size:11px;font-weight:700;width:36px;flex-shrink:0;color:var(--muted)}
+.demand-track{flex:1;background:var(--border);border-radius:3px;height:6px}
+.demand-fill{height:6px;border-radius:3px;background:var(--accent)}
+.demand-val{font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;width:50px;text-align:right;flex-shrink:0}
+/* Teach cards */
+.teach-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:24px}
+.teach-card{border:1px solid var(--border);border-radius:8px;padding:16px}
+.teach-icon{font-size:20px;margin-bottom:8px}
+.teach-card h4{font-size:13px;font-weight:800;margin-bottom:6px}
+.teach-card p{font-size:12px;color:var(--muted);line-height:1.6}
+.qa-block{border-left:3px solid var(--accent-border);padding:14px 16px;background:var(--accent-bg);border-radius:0 8px 8px 0;margin-bottom:12px}
+.qa-q{font-size:12px;font-weight:800;margin-bottom:6px}
+.qa-a{font-size:12px;color:var(--muted);line-height:1.7}
+/* Step 3 — Assumptions */
+.form-group{margin-bottom:20px}
+.form-label{font-size:12px;font-weight:700;margin-bottom:8px;display:block}
+.form-select,.form-input{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:7px;font-size:13px;font-family:'Inter',sans-serif;background:#fff;color:var(--text)}
+.form-select:focus,.form-input:focus{outline:none;border-color:var(--accent)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-hint{font-size:11px;color:var(--muted);margin-top:5px}
+/* Results */
+.result-hero{background:linear-gradient(135deg,var(--accent-bg),#fff);border:2px solid var(--accent-border);border-radius:12px;padding:28px;margin-bottom:24px;text-align:center}
+.result-main-val{font-size:48px;font-weight:900;font-family:'JetBrains Mono',monospace;color:var(--accent);line-height:1}
+.result-main-label{font-size:13px;color:var(--muted);margin-top:6px}
+.result-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.result-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center}
+.result-card-val{font-size:20px;font-weight:900;font-family:'JetBrains Mono',monospace;margin-bottom:4px}
+.result-card-label{font-size:11px;color:var(--muted)}
+.verdict-box{border-radius:8px;padding:16px 20px;margin-bottom:16px}
+.verdict-box.buy{background:#f0fdf4;border:1px solid #bbf7d0}
+.verdict-box.hold{background:#fffbeb;border:1px solid #fde68a}
+.verdict-box.avoid{background:#fef2f2;border:1px solid #fecaca}
+.verdict-title{font-size:14px;font-weight:800;margin-bottom:4px}
+.verdict-body{font-size:12px;color:var(--muted);line-height:1.7}
+footer{border-top:1px solid var(--border);padding:24px;text-align:center;font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-left">
+    <a href="/valuation-toolkit/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">/</span>
+    <a href="../">Capital Markets</a>
+    <span class="nav-sep">/</span>
+    <span>IPO Subscription Analyser</span>
+  </div>
+  <button class="nav-pro" onclick="unlockPro()">Unlock Pro — ₹799/mo</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">📋 Calculator 01 · Capital Markets</div>
+    <h1>IPO Subscription Analyser</h1>
+    <p>Pick any Nifty 50 company · simulate its IPO · get demand, allotment probability, and listing forecast</p>
+  </div>
+</div>
+
+<div class="tabs-bar">
+  <div class="tabs-inner">
+    <div class="tab active" id="tab-1" onclick="goStep(1)">1 · Pick Company</div>
+    <div class="tab" id="tab-2" onclick="goStep(2)">2 · IPO Profile</div>
+    <div class="tab" id="tab-3" onclick="goStep(3)">3 · Assumptions</div>
+    <div class="tab" id="tab-4" onclick="goStep(4)">4 · Results</div>
+  </div>
+</div>
+
+<div class="main">
+  <!-- Step 1: Pick Company -->
+  <div class="step active" id="step-1">
+    <p class="section-label">Select a company to simulate its IPO</p>
+    <div class="stock-grid" id="stock-grid"></div>
+    <button class="next-btn" id="next-1" onclick="startContext()" disabled>Analyse IPO →</button>
+  </div>
+
+  <!-- Step 2: Loading + Context -->
+  <div class="step" id="step-2">
+    <div class="loading-block" id="loading-block">
+      <p style="font-size:14px;font-weight:700;margin-bottom:4px">Building IPO profile</p>
+      <p class="loading-status" id="loading-status">Fetching IPO filing data...</p>
+      <div class="loading-bar-wrap"><div class="loading-bar-fill" id="loading-bar"></div></div>
+    </div>
+    <div id="context-content" style="display:none"></div>
+    <button class="next-btn" id="next-2" onclick="goStep(3)" style="display:none">Run Assumptions →</button>
+  </div>
+
+  <!-- Step 3: Assumptions (FREE) -->
+  <div class="step" id="step-3">
+    <p class="section-label">Set your bidding assumptions</p>
+    <div id="step3-content"></div>
+    <button class="next-btn" onclick="computeResults()">See Results →</button>
+  </div>
+
+  <!-- Step 4: Results (FREE) -->
+  <div class="step" id="step-4">
+    <p class="section-label">IPO Analysis — <span id="result-company-name"></span></p>
+    <div id="step4-content"></div>
+    <button class="next-btn" onclick="goStep(1)" style="background:var(--card);color:var(--text);border:1px solid var(--border)">Analyse another company →</button>
+  </div>
+</div>
+
+<footer>
+  <p>© 2025 ValuationDesk · Simulated IPO data for educational purposes only</p>
+</footer>
+
+<script>
+var STOCKS=[
+  {id:1,name:'Reliance Industries',sector:'Oil & Gas',marketCap:2010000,pe:24.8,beta:0.95,divYield:0.4,ret1y:8.2,price:2840,vol:18.2,creditRating:'AAA',bondYield:7.18,promoterHolding:50.3,floatPct:35.8},
+  {id:2,name:'HDFC Bank',sector:'Banking',marketCap:1285000,pe:18.2,beta:0.88,divYield:1.1,ret1y:12.4,price:1720,vol:16.4,creditRating:'AAA',bondYield:7.42,promoterHolding:0.0,floatPct:72.8},
+  {id:3,name:'Infosys',sector:'IT',marketCap:720000,pe:22.4,beta:0.82,divYield:2.4,ret1y:18.6,price:1840,vol:19.8,creditRating:'AAA',bondYield:7.08,promoterHolding:14.9,floatPct:72.8},
+  {id:4,name:'ICICI Bank',sector:'Banking',marketCap:890000,pe:17.6,beta:1.12,divYield:0.8,ret1y:24.8,price:1240,vol:20.4,creditRating:'AA+',bondYield:7.52,promoterHolding:0.0,floatPct:75.2},
+  {id:5,name:'TCS',sector:'IT',marketCap:1420000,pe:26.8,beta:0.72,divYield:3.2,ret1y:6.8,price:3980,vol:15.6,creditRating:'AAA',bondYield:6.98,promoterHolding:72.3,floatPct:22.8},
+  {id:6,name:'Bharti Airtel',sector:'Telecom',marketCap:920000,pe:48.2,beta:0.78,divYield:0.4,ret1y:42.4,price:1580,vol:22.4,creditRating:'AA',bondYield:7.68,promoterHolding:55.8,floatPct:37.4},
+  {id:7,name:'Kotak Mahindra Bank',sector:'Banking',marketCap:380000,pe:19.4,beta:0.94,divYield:0.1,ret1y:8.4,price:1840,vol:18.8,creditRating:'AAA',bondYield:7.38,promoterHolding:25.9,floatPct:62.4},
+  {id:8,name:'L&T',sector:'Capital Goods',marketCap:590000,pe:34.2,beta:1.24,divYield:0.9,ret1y:28.4,price:3640,vol:24.8,creditRating:'AAA',bondYield:7.22,promoterHolding:0.0,floatPct:74.8},
+  {id:9,name:'Axis Bank',sector:'Banking',marketCap:360000,pe:14.8,beta:1.18,divYield:0.1,ret1y:16.4,price:1180,vol:22.8,creditRating:'AA+',bondYield:7.58,promoterHolding:8.4,floatPct:79.2},
+  {id:10,name:'Maruti Suzuki',sector:'Auto',marketCap:440000,pe:28.4,beta:0.84,divYield:1.2,ret1y:14.2,price:12400,vol:21.2,creditRating:'AA+',bondYield:7.32,promoterHolding:58.2,floatPct:38.4},
+  {id:11,name:'Sun Pharmaceutical',sector:'Pharma',marketCap:410000,pe:38.4,beta:0.64,divYield:0.8,ret1y:32.4,price:1720,vol:17.4,creditRating:'AA+',bondYield:7.28,promoterHolding:54.5,floatPct:38.8},
+  {id:12,name:'HUL',sector:'FMCG',marketCap:530000,pe:52.4,beta:0.42,divYield:1.8,ret1y:2.4,price:2480,vol:14.2,creditRating:'AAA',bondYield:7.12,promoterHolding:61.9,floatPct:35.2},
+  {id:13,name:'ITC',sector:'FMCG',marketCap:590000,pe:24.8,beta:0.58,divYield:3.2,ret1y:12.4,price:468,vol:16.8,creditRating:'AAA',bondYield:7.05,promoterHolding:0.0,floatPct:72.8},
+  {id:14,name:'Asian Paints',sector:'Materials',marketCap:290000,pe:58.4,beta:0.48,divYield:1.2,ret1y:-14.2,price:2780,vol:19.4,creditRating:'AA+',bondYield:7.38,promoterHolding:52.8,floatPct:42.2},
+  {id:15,name:'Bajaj Finance',sector:'NBFC',marketCap:410000,pe:34.8,beta:1.42,divYield:0.1,ret1y:8.4,price:7240,vol:26.4,creditRating:'AAA',bondYield:7.82,promoterHolding:55.9,floatPct:38.4},
+  {id:16,name:'Wipro',sector:'IT',marketCap:280000,pe:20.8,beta:0.88,divYield:0.1,ret1y:6.4,price:580,vol:22.8,creditRating:'AAA',bondYield:7.08,promoterHolding:73.0,floatPct:22.4},
+  {id:17,name:'NTPC',sector:'Power',marketCap:380000,pe:18.4,beta:0.74,divYield:2.4,ret1y:32.4,price:384,vol:20.4,creditRating:'AAA',bondYield:7.15,promoterHolding:51.1,floatPct:42.8},
+  {id:18,name:'Power Grid',sector:'Power',marketCap:280000,pe:20.4,beta:0.68,divYield:3.4,ret1y:28.4,price:328,vol:18.4,creditRating:'AAA',bondYield:7.12,promoterHolding:51.3,floatPct:42.4},
+  {id:19,name:'Titan',sector:'Consumer',marketCap:320000,pe:84.2,beta:0.82,divYield:0.4,ret1y:4.2,price:3640,vol:24.8,creditRating:'AA+',bondYield:7.42,promoterHolding:52.8,floatPct:41.8},
+  {id:20,name:'UltraTech Cement',sector:'Materials',marketCap:340000,pe:42.4,beta:0.94,divYield:0.4,ret1y:8.4,price:11240,vol:22.4,creditRating:'AAA',bondYield:7.22,promoterHolding:60.2,floatPct:36.4},
+  {id:21,name:'HCL Technologies',sector:'IT',marketCap:450000,pe:24.8,beta:0.78,divYield:4.8,ret1y:22.4,price:1680,vol:20.4,creditRating:'AAA',bondYield:7.04,promoterHolding:60.8,floatPct:34.8},
+  {id:22,name:'M&M',sector:'Auto',marketCap:320000,pe:28.4,beta:1.08,divYield:0.8,ret1y:42.8,price:2940,vol:26.4,creditRating:'AA+',bondYield:7.45,promoterHolding:18.6,floatPct:72.4},
+  {id:23,name:'JSW Steel',sector:'Materials',marketCap:230000,pe:22.4,beta:1.48,divYield:0.8,ret1y:4.8,price:980,vol:28.8,creditRating:'AA',bondYield:7.88,promoterHolding:44.8,floatPct:48.4},
+  {id:24,name:'Adani Ports',sector:'Infrastructure',marketCap:280000,pe:32.4,beta:1.28,divYield:0.4,ret1y:24.4,price:1380,vol:26.4,creditRating:'AA+',bondYield:7.62,promoterHolding:65.1,floatPct:30.2},
+  {id:25,name:'Tata Motors',sector:'Auto',marketCap:360000,pe:8.4,beta:1.58,divYield:0.0,ret1y:24.4,price:980,vol:32.4,creditRating:'AA-',bondYield:8.12,promoterHolding:46.4,floatPct:48.8},
+  {id:26,name:'HDFC Life',sector:'Insurance',marketCap:160000,pe:72.4,beta:0.72,divYield:0.2,ret1y:8.4,price:680,vol:18.4,creditRating:'AAA',bondYield:7.28,promoterHolding:50.4,floatPct:44.8},
+  {id:27,name:'SBI',sector:'Banking',marketCap:720000,pe:10.8,beta:1.32,divYield:1.2,ret1y:28.4,price:840,vol:26.4,creditRating:'AA+',bondYield:7.48,promoterHolding:57.5,floatPct:38.4},
+  {id:28,name:'Tech Mahindra',sector:'IT',marketCap:140000,pe:38.4,beta:0.98,divYield:2.8,ret1y:8.4,price:1480,vol:26.4,creditRating:'AA+',bondYield:7.22,promoterHolding:35.8,floatPct:58.4},
+  {id:29,name:'Nestle India',sector:'FMCG',marketCap:220000,pe:68.4,beta:0.38,divYield:1.4,ret1y:-4.8,price:24800,vol:16.4,creditRating:'AAA',bondYield:7.02,promoterHolding:62.8,floatPct:34.2},
+  {id:30,name:'Cipla',sector:'Pharma',marketCap:175000,pe:28.4,beta:0.68,divYield:0.8,ret1y:18.4,price:1540,vol:18.8,creditRating:'AA+',bondYield:7.35,promoterHolding:33.4,floatPct:58.4}
+];
+
+var selected=null;
+var ipoData=null;
+
+// Render stock grid
+var grid=document.getElementById('stock-grid');
+STOCKS.forEach(function(s){
+  var div=document.createElement('div');
+  div.className='stock-card';
+  div.id='sc-'+s.id;
+  div.innerHTML='<div class="stock-card-name">'+s.name+'</div><div class="stock-card-sector">'+s.sector+'</div><div class="stock-card-rating">'+s.creditRating+'</div>';
+  div.onclick=function(){selectStock(s.id);};
+  grid.appendChild(div);
+});
+
+function selectStock(id){
+  selected=STOCKS.find(function(s){return s.id===id;});
+  document.querySelectorAll('.stock-card').forEach(function(el){el.classList.remove('selected');});
+  document.getElementById('sc-'+id).classList.add('selected');
+  document.getElementById('next-1').disabled=false;
+}
+
+function goStep(n){
+  document.querySelectorAll('.step').forEach(function(el){el.classList.remove('active');});
+  document.querySelectorAll('.tab').forEach(function(el){el.classList.remove('active');});
+  document.getElementById('step-'+n).classList.add('active');
+  document.getElementById('tab-'+n).classList.add('active');
+}
+
+function computeIpoData(c){
+  // Price band from market cap and share price
+  var sharesCr=c.marketCap/c.price; // approx shares in crores
+  var issueSizePct=20;
+  var issueSharesCr=sharesCr*(issueSizePct/100);
+
+  // IPO price band = slight discount to market
+  var priceBandUpper=Math.round(c.price*0.95/5)*5;
+  var priceBandLower=Math.round(priceBandUpper*0.945/5)*5;
+  var lotSize=Math.max(1,Math.round(15000/priceBandUpper)); // ~₹15K min lot
+  var issueAmtCr=Math.round(issueSharesCr*priceBandUpper);
+
+  // Demand signals
+  var sectorIsIT=c.sector==='IT';
+  var sectorIsBanking=c.sector==='Banking';
+  var sectorIsPharma=c.sector==='Pharma';
+  var sectorMult=sectorIsIT?1.4:sectorIsBanking?1.1:sectorIsPharma?1.3:1.0;
+  var valuationIsLow=c.pe<25;
+  var valuationIsMid=c.pe<40;
+  var valuationScore=valuationIsLow?1.3:valuationIsMid?1.0:0.8;
+  var momentumIsHigh=c.ret1y>25;
+  var momentumIsMid=c.ret1y>10;
+  var momentumScore=momentumIsHigh?1.3:momentumIsMid?1.0:0.7;
+
+  var baseX=12*sectorMult*valuationScore*momentumScore;
+  var qibX=Math.round(baseX*1.6);
+  var niiX=Math.round(baseX*2.4);
+  var riiX=Math.round(baseX*0.75);
+  var totalX=Math.round(qibX*0.5+niiX*0.15+riiX*0.35);
+
+  // GMP proxy = momentum-adjusted quality signal
+  var gmpPct=Math.round(c.ret1y*0.3+(momentumIsHigh?8:momentumIsMid?4:0)-(c.pe>60?6:c.pe>40?3:0));
+  var gmpPct2=Math.min(48,Math.max(-8,gmpPct));
+  var listingPrice=Math.round(priceBandUpper*(1+gmpPct2/100)/5)*5;
+  var listingGainRs=listingPrice-priceBandUpper;
+
+  // Allotment probability for retail (1 lot)
+  var allotmentPct=Math.min(100,Math.round(100/riiX));
+
+  // Risk level
+  var riskIsHigh=c.beta>1.2||c.vol>26;
+  var riskIsLow=c.beta<0.7&&c.vol<18;
+  var riskLevel=riskIsHigh?'High':riskIsLow?'Low':'Moderate';
+
+  return{
+    sharesCr:sharesCr.toFixed(1),
+    issueSizePct:issueSizePct,
+    issueSharesCr:issueSharesCr.toFixed(1),
+    priceBandUpper:priceBandUpper,
+    priceBandLower:priceBandLower,
+    lotSize:lotSize,
+    issueAmtCr:issueAmtCr,
+    qibX:qibX,
+    niiX:niiX,
+    riiX:riiX,
+    totalX:totalX,
+    gmpPct:gmpPct2,
+    listingPrice:listingPrice,
+    listingGainRs:listingGainRs,
+    allotmentPct:allotmentPct,
+    riskLevel:riskLevel
+  };
+}
+
+function startContext(){
+  if(!selected)return;
+  ipoData=computeIpoData(selected);
+  goStep(2);
+  runLoading();
+}
+
+function runLoading(){
+  var states=['Fetching IPO filing data...','Sizing issue demand...','Computing subscription ratios...','Mapping anchor investors...','Building listing forecast...'];
+  var bar=document.getElementById('loading-bar');
+  var status=document.getElementById('loading-status');
+  var i=0;
+  var pcts=[18,38,58,78,100];
+  function step(){
+    if(i>=states.length){
+      document.getElementById('loading-block').style.display='none';
+      buildContextHtml();
+      document.getElementById('context-content').style.display='block';
+      document.getElementById('next-2').style.display='inline-block';
+      return;
+    }
+    status.textContent=states[i];
+    bar.style.width=pcts[i]+'%';
+    i++;
+    setTimeout(step,1000);
+  }
+  step();
+}
+
+function buildContextHtml(){
+  var c=selected;
+  var d=ipoData;
+  var retCls=c.ret1y>=0?'ret-pos':'ret-neg';
+  var retSign=c.ret1y>=0?'+':'';
+  var gmpCls=d.gmpPct>=0?'ret-pos':'ret-neg';
+  var gmpSign=d.gmpPct>=0?'+':'';
+
+  var qibBarW=Math.min(100,Math.round((d.qibX/80)*100));
+  var niiBarW=Math.min(100,Math.round((d.niiX/80)*100));
+  var riiBarW=Math.min(100,Math.round((d.riiX/30)*100));
+
+  var html='<p class="section-label" style="margin-bottom:16px">IPO Profile — '+c.name+'</p>';
+
+  html+='<div class="ctx-grid">';
+  html+='<div class="ctx-card"><div class="ctx-card-label">Issue Price Upper</div><div class="ctx-card-value">₹'+d.priceBandUpper.toLocaleString('en-IN')+'</div><div class="ctx-card-sub">Lower band: ₹'+d.priceBandLower.toLocaleString('en-IN')+'</div></div>';
+  html+='<div class="ctx-card"><div class="ctx-card-label">Issue Size</div><div class="ctx-card-value">₹'+d.issueAmtCr.toLocaleString('en-IN')+' Cr</div><div class="ctx-card-sub">'+d.issueSizePct+'% of equity</div></div>';
+  html+='<div class="ctx-card"><div class="ctx-card-label">Lot Size</div><div class="ctx-card-value">'+d.lotSize+' shares</div><div class="ctx-card-sub">~₹'+(d.lotSize*d.priceBandUpper).toLocaleString('en-IN')+' per lot</div></div>';
+  html+='<div class="ctx-card"><div class="ctx-card-label">Credit Rating</div><div class="ctx-card-value" style="color:var(--accent)">'+c.creditRating+'</div><div class="ctx-card-sub">Bond yield: '+c.bondYield+'%</div></div>';
+  html+='<div class="ctx-card"><div class="ctx-card-label">Promoter Holding</div><div class="ctx-card-value">'+c.promoterHolding+'%</div><div class="ctx-card-sub">Post-issue float: ~'+Math.min(100,c.floatPct+d.issueSizePct).toFixed(1)+'%</div></div>';
+  html+='<div class="ctx-card"><div class="ctx-card-label">1Y Price Return</div><div class="ctx-card-value '+retCls+'">'+retSign+c.ret1y+'%</div><div class="ctx-card-sub">P/E: '+c.pe+'x · Beta: '+c.beta+'</div></div>';
+  html+='</div>';
+
+  html+='<div class="ctx-card" style="margin-bottom:20px"><div class="ctx-card-label" style="margin-bottom:10px">Subscription Demand Forecast</div>';
+  html+='<div class="demand-row"><span class="demand-label">QIB</span><div class="demand-track"><div class="demand-fill" style="width:'+qibBarW+'%"></div></div><span class="demand-val">'+d.qibX+'x</span></div>';
+  html+='<div class="demand-row"><span class="demand-label">NII</span><div class="demand-track"><div class="demand-fill" style="width:'+niiBarW+'%"></div></div><span class="demand-val">'+d.niiX+'x</span></div>';
+  html+='<div class="demand-row"><span class="demand-label">RII</span><div class="demand-track"><div class="demand-fill" style="width:'+riiBarW+'%"></div></div><span class="demand-val">'+d.riiX+'x</span></div>';
+  html+='<div style="font-size:11px;color:var(--muted);margin-top:8px">Overall subscription: ~'+d.totalX+'x · Retail allotment probability: ~'+d.allotmentPct+'%</div></div>';
+
+  html+='<div class="ctx-card" style="margin-bottom:20px"><div class="ctx-card-label" style="margin-bottom:6px">Listing Forecast</div>';
+  html+='<div style="display:flex;gap:24px;flex-wrap:wrap">';
+  html+='<div><div class="ctx-card-label">GMP Proxy</div><div style="font-size:18px;font-weight:900;font-family:\'JetBrains Mono\',monospace" class="'+gmpCls+'">'+gmpSign+d.gmpPct+'%</div></div>';
+  html+='<div><div class="ctx-card-label">Est. Listing Price</div><div style="font-size:18px;font-weight:900;font-family:\'JetBrains Mono\',monospace">₹'+d.listingPrice.toLocaleString('en-IN')+'</div></div>';
+  html+='<div><div class="ctx-card-label">Expected Gain/Lot</div><div style="font-size:18px;font-weight:900;font-family:\'JetBrains Mono\',monospace" class="'+gmpCls+'">'+gmpSign+'₹'+(d.listingGainRs*d.lotSize).toLocaleString('en-IN')+'</div></div>';
+  html+='<div><div class="ctx-card-label">Risk Level</div><div style="font-size:18px;font-weight:900;font-family:\'JetBrains Mono\',monospace;color:var(--amber)">'+d.riskLevel+'</div></div>';
+  html+='</div></div>';
+
+  html+='<p class="section-label" style="margin-top:28px;margin-bottom:16px">How IPO subscription works</p>';
+  html+='<div class="teach-grid">';
+  html+='<div class="teach-card"><div class="teach-icon">🏢</div><h4>QIB / NII / RII buckets</h4><p>SEBI mandates 50% for Qualified Institutional Buyers, 15% for Non-Institutional Investors (HNIs), and 35% for Retail Individual Investors. Each bucket\'s oversubscription is independent.</p></div>';
+  html+='<div class="teach-card"><div class="teach-icon">🎰</div><h4>Allotment lottery</h4><p>When retail oversubscription exceeds 1x, allotment becomes a computerised lottery. At 20x RII subscription, your chance of getting 1 lot is roughly 5%. Applying for more lots doesn\'t help.</p></div>';
+  html+='<div class="teach-card"><div class="teach-icon">📊</div><h4>Grey Market Premium (GMP)</h4><p>GMP is an unofficial, unregulated price at which IPO shares trade before listing. It reflects market expectation of listing premium but carries no legal standing and can swing wildly.</p></div>';
+  html+='<div class="teach-card"><div class="teach-icon">⏰</div><h4>ASBA & fund block</h4><p>Application Supported by Blocked Amount — funds are blocked, not debited, during the subscription period. If unallotted, the block is released. You earn interest on blocked funds.</p></div>';
+  html+='</div>';
+
+  html+='<div class="qa-block"><div class="qa-q">Why does NII see higher demand than QIB even though QIBs are more sophisticated?</div><div class="qa-a">NIIs (HNIs applying above ₹2 lakh) use leverage — they borrow money at 6-9% for 7 days to fund applications. On a 30-40% listing gain, the leverage payoff is enormous. QIBs have suitability constraints and apply only with real conviction.</div></div>';
+  html+='<div class="qa-block"><div class="qa-q">Should I always bid at the cut-off price?</div><div class="qa-a">For retail, yes — bidding at the cut-off ensures you are allotted at whatever price clears the book. The cost difference is minimal. Bidding below cut-off on a successful IPO means you miss the allotment entirely.</div></div>';
+
+  document.getElementById('context-content').innerHTML=html;
+}
+
+function buildStep3(){
+  var c=selected;
+  var d=ipoData;
+  var html='<div style="background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:8px;padding:16px 20px;margin-bottom:24px">';
+  html+='<strong>'+c.name+' IPO</strong> · Price band ₹'+d.priceBandLower.toLocaleString('en-IN')+' – ₹'+d.priceBandUpper.toLocaleString('en-IN')+' · Lot size: '+d.lotSize+' shares';
+  html+='</div>';
+
+  html+='<div class="form-row">';
+  html+='<div class="form-group"><label class="form-label">Your investor category</label><select class="form-select" id="inp-category"><option value="RII">RII — Retail (up to ₹2 lakh)</option><option value="NII">NII — HNI (above ₹2 lakh)</option><option value="QIB">QIB — Institutional</option></select></div>';
+  html+='<div class="form-group"><label class="form-label">Number of lots applying for</label><select class="form-select" id="inp-lots"><option value="1">1 lot</option><option value="2">2 lots</option><option value="3">3 lots</option><option value="5">5 lots</option><option value="10">10 lots</option></select><div class="form-hint">For RII, multiple lot applications don\'t increase allotment probability</div></div>';
+  html+='</div>';
+  html+='<div class="form-row">';
+  html+='<div class="form-group"><label class="form-label">Expected listing gain (override)</label><input class="form-input" type="number" id="inp-gmp" value="'+d.gmpPct+'" min="-30" max="100" step="1"><div class="form-hint">Model your own GMP view (%)</div></div>';
+  html+='<div class="form-group"><label class="form-label">Holding period after listing</label><select class="form-select" id="inp-hold"><option value="listing">Sell on listing day</option><option value="1w">Hold 1 week</option><option value="1m">Hold 1 month</option><option value="6m">Hold 6 months</option></select></div>';
+  html+='</div>';
+  document.getElementById('step3-content').innerHTML=html;
+}
+
+function computeResults(){
+  var c=selected;
+  var d=ipoData;
+  var category=document.getElementById('inp-category').value;
+  var lots=parseInt(document.getElementById('inp-lots').value);
+  var gmpOverride=parseFloat(document.getElementById('inp-gmp').value);
+  var holdPeriod=document.getElementById('inp-hold').value;
+
+  // Allotment probability by category
+  var allotProb;
+  var allotIsQib=category==='QIB';
+  var allotIsNii=category==='NII';
+  if(allotIsQib){
+    allotProb=Math.min(100,Math.round(100/d.qibX));
+  } else if(allotIsNii){
+    allotProb=Math.min(100,Math.round(100/d.niiX));
+  } else {
+    allotProb=d.allotmentPct;
+  }
+
+  var lotCost=d.lotSize*d.priceBandUpper;
+  var totalInvestment=lotCost*lots;
+  var listingPrice=Math.round(d.priceBandUpper*(1+gmpOverride/100)/5)*5;
+  var gainPerLot=(listingPrice-d.priceBandUpper)*d.lotSize;
+
+  // Hold period return adjustment
+  var holdIsWeek=holdPeriod==='1w';
+  var holdIsMonth=holdPeriod==='1m';
+  var holdIs6m=holdPeriod==='6m';
+  var holdReturnAdj=holdIsWeek?c.ret1y/52:holdIsMonth?c.ret1y/12:holdIs6m?c.ret1y/2:0;
+  var finalPrice=holdPeriod==='listing'?listingPrice:Math.round(listingPrice*(1+holdReturnAdj/100)/5)*5;
+  var totalGainPerLot=(finalPrice-d.priceBandUpper)*d.lotSize;
+  var totalGainAll=totalGainPerLot*lots;
+  var gainPct=(totalGainPerLot/lotCost)*100;
+
+  // Verdict
+  var isStrongBuy=gmpOverride>20&&allotProb>30&&d.riskLevel!=='High';
+  var isAvoid=gmpOverride<0||d.riskLevel==='High'&&gmpOverride<10;
+  var verdictClass=isStrongBuy?'buy':isAvoid?'avoid':'hold';
+  var verdictTitle=isStrongBuy?'Strong Subscription Candidate':isAvoid?'Approach with Caution':'Subscribe at Cut-Off';
+  var verdictText=isStrongBuy?c.name+' presents favourable IPO dynamics — strong sector momentum, reasonable valuation at '+c.pe+'x PE, and '+allotProb+'% allotment probability. Bid at cut-off for maximum chance of allotment.':isAvoid?'Risk factors are elevated. Beta of '+c.beta+', vol of '+c.vol+'%, and muted GMP proxy signal limited upside. Consider waiting for a stronger entry post-listing.':'Moderate opportunity. At '+d.totalX+'x expected overall subscription, allotment probability for retail is ~'+allotProb+'%. The listing gain estimate of '+gmpOverride+'% is decent but not exceptional.';
+
+  var gmpCls=gmpOverride>=0?'ret-pos':'ret-neg';
+  var gmpSign=gmpOverride>=0?'+':'';
+
+  document.getElementById('result-company-name').textContent=c.name;
+
+  var html='<div class="result-hero">';
+  html+='<div class="result-main-val '+gmpCls+'">'+gmpSign+gmpOverride+'%</div>';
+  html+='<div class="result-main-label">Expected listing gain · Issue price ₹'+d.priceBandUpper.toLocaleString('en-IN')+' → listing ₹'+listingPrice.toLocaleString('en-IN')+'</div>';
+  html+='</div>';
+
+  html+='<div class="result-row">';
+  html+='<div class="result-card"><div class="result-card-val">'+allotProb+'%</div><div class="result-card-label">Allotment prob ('+category+')</div></div>';
+  html+='<div class="result-card"><div class="result-card-val">₹'+totalInvestment.toLocaleString('en-IN')+'</div><div class="result-card-label">Total application ('+lots+' lot'+( lots>1?'s':'')+')</div></div>';
+  html+='<div class="result-card"><div class="result-card-val '+gmpCls+'">'+gmpSign+'₹'+gainPerLot.toLocaleString('en-IN')+'</div><div class="result-card-label">Listing gain per lot</div></div>';
+  html+='<div class="result-card"><div class="result-card-val '+gmpCls+'">'+gmpSign+gainPct.toFixed(1)+'%</div><div class="result-card-label">Return on blocked capital</div></div>';
+  html+='</div>';
+
+  if(holdPeriod!=='listing'){
+    html+='<div class="result-row">';
+    html+='<div class="result-card"><div class="result-card-val">₹'+finalPrice.toLocaleString('en-IN')+'</div><div class="result-card-label">Price after hold period</div></div>';
+    html+='<div class="result-card"><div class="result-card-val '+gmpCls+'">'+gmpSign+'₹'+totalGainAll.toLocaleString('en-IN')+'</div><div class="result-card-label">Total gain ('+lots+' lots)</div></div>';
+    html+='</div>';
+  }
+
+  html+='<div class="verdict-box '+verdictClass+'">';
+  html+='<div class="verdict-title">'+verdictTitle+'</div>';
+  html+='<div class="verdict-body">'+verdictText+'</div>';
+  html+='</div>';
+
+  html+='<div class="ctx-card" style="margin-top:16px"><div class="ctx-card-label" style="margin-bottom:10px">Key numbers at a glance</div>';
+  html+='<table style="width:100%;border-collapse:collapse;font-size:12px">';
+  var rows=[
+    ['Issue price band','₹'+d.priceBandLower.toLocaleString('en-IN')+' – ₹'+d.priceBandUpper.toLocaleString('en-IN')],
+    ['Lot size',d.lotSize+' shares (₹'+lotCost.toLocaleString('en-IN')+' per lot)'],
+    ['QIB demand (est.)',d.qibX+'x subscription'],
+    ['NII demand (est.)',d.niiX+'x subscription'],
+    ['RII demand (est.)',d.riiX+'x subscription'],
+    ['GMP proxy',gmpSign+gmpOverride+'%'],
+    ['Expected listing price','₹'+listingPrice.toLocaleString('en-IN')],
+    ['Allotment probability ('+category+')',allotProb+'%'],
+    ['Risk level',d.riskLevel],
+    ['Promoter holding',c.promoterHolding+'%']
+  ];
+  rows.forEach(function(r,i){
+    var bg=i%2===0?'#fafafa':'#fff';
+    html+='<tr style="background:'+bg+'"><td style="padding:8px 10px;color:var(--muted);border-bottom:1px solid var(--border)">'+r[0]+'</td><td style="padding:8px 10px;font-weight:700;font-family:\'JetBrains Mono\',monospace;border-bottom:1px solid var(--border)">'+r[1]+'</td></tr>';
+  });
+  html+='</table></div>';
+
+  document.getElementById('step4-content').innerHTML=html;
+  goStep(4);
+}
+
+// Pre-build step 3 when going to step 2
+var origGoStep=goStep;
+goStep=function(n){
+  origGoStep(n);
+  if(n===3&&selected){buildStep3();}
+};
+
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+</script>
+</body>
+</html>

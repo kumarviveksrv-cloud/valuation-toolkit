@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Learn Capital Markets · ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
+  --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;
+  --accent:#ea580c;--accent-bg:#fff7ed;--accent-border:#fed7aa;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.6}
+
+.nav{display:flex;align-items:center;gap:8px;padding:14px 24px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.nav a{font-size:13px;color:var(--muted);text-decoration:none}.nav a:hover{color:var(--text)}
+.nav-sep{color:var(--border);font-size:13px}
+.nav-cur{font-size:13px;color:var(--text);font-weight:600}
+
+.hero{padding:40px 24px 32px;max-width:800px;margin:0 auto;text-align:center}
+.badge{display:inline-block;background:var(--accent-bg);color:var(--accent);border:1px solid var(--accent-border);font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:.04em;margin-bottom:14px}
+h1{font-size:clamp(24px,5vw,36px);font-weight:900;margin-bottom:10px;line-height:1.2}
+.hero-sub{font-size:16px;color:var(--muted);max-width:520px;margin:0 auto 28px}
+
+.progress-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:8px}
+.prog-item{font-size:12px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s}
+.prog-item:hover{border-color:var(--accent);color:var(--accent)}
+.prog-item.done{background:#dcfce7;border-color:#bbf7d0;color:#16a34a}
+
+.modules{max-width:800px;margin:0 auto;padding:0 24px 60px}
+
+/* MODULE ACCORDION */
+.module{border:1px solid var(--border);border-radius:14px;margin-bottom:14px;overflow:hidden;transition:box-shadow .2s}
+.module:hover{box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.module.open{box-shadow:0 4px 20px rgba(234,88,12,.08);border-color:var(--accent-border)}
+
+.mod-header{display:flex;align-items:center;gap:14px;padding:18px 20px;cursor:pointer;user-select:none}
+.mod-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;background:var(--accent-bg);color:var(--accent);border:2px solid var(--accent-border)}
+.module.done .mod-num{background:#dcfce7;color:#16a34a;border-color:#bbf7d0}
+.mod-title-wrap{flex:1}
+.mod-title{font-size:16px;font-weight:700;margin-bottom:2px}
+.mod-meta{font-size:12px;color:var(--muted)}
+.mod-arrow{font-size:18px;color:var(--muted);transition:transform .25s}
+.module.open .mod-arrow{transform:rotate(180deg)}
+.mod-status{font-size:11px;font-weight:700;padding:3px 8px;border-radius:12px}
+.mod-status-new{background:var(--accent-bg);color:var(--accent)}
+.mod-status-done{background:#dcfce7;color:#16a34a}
+
+.mod-body{display:none;padding:0 20px 24px}
+.module.open .mod-body{display:block}
+
+/* CONTENT WITHIN MODULE */
+.intro-box{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:10px;padding:16px;margin-bottom:20px;font-size:14px;line-height:1.7}
+.intro-box strong{color:var(--accent)}
+
+.section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:20px 0 10px}
+
+/* PROCESS FLOW */
+.flow{display:flex;flex-direction:column;gap:0;margin-bottom:20px}
+.flow-step{display:flex;gap:14px;position:relative}
+.flow-step::before{content:'';position:absolute;left:19px;top:44px;bottom:0;width:2px;background:var(--border)}
+.flow-step:last-child::before{display:none}
+.flow-num{width:38px;height:38px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;position:relative;z-index:1}
+.flow-content{padding-bottom:20px;flex:1}
+.flow-head{font-size:14px;font-weight:700;margin-bottom:4px}
+.flow-body{font-size:13px;color:var(--muted);line-height:1.6}
+.flow-tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;margin-bottom:6px}
+.tag-sebi{background:#dbeafe;color:#1d4ed8}
+.tag-mkt{background:#fef9c3;color:#854d0e}
+.tag-co{background:#f3e8ff;color:#7c3aed}
+.tag-inv{background:#dcfce7;color:#166534}
+
+/* CONCEPT GRID */
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:20px}
+.concept-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px}
+.concept-icon{font-size:22px;margin-bottom:8px}
+.concept-head{font-size:13px;font-weight:700;margin-bottom:6px}
+.concept-body{font-size:12px;color:var(--muted);line-height:1.6}
+.formula{font-family:'JetBrains Mono',monospace;font-size:12px;background:var(--card);border:1px solid var(--border);padding:10px 14px;border-radius:8px;margin:10px 0;line-height:1.8}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px}
+.data-table th{background:var(--card);padding:8px 12px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);border-bottom:2px solid var(--border)}
+.data-table td{padding:9px 12px;border-bottom:1px solid var(--border)}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:var(--card)}
+.mono{font-family:'JetBrains Mono',monospace;font-weight:700}
+.chip{display:inline-flex;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700}
+.chip-g{background:#dcfce7;color:#166534}
+.chip-y{background:#fef9c3;color:#854d0e}
+.chip-r{background:#fee2e2;color:#991b1b}
+
+/* KEY TERM GLOSSARY */
+.glossary{display:grid;gap:8px;margin-bottom:20px}
+.gloss-row{display:grid;grid-template-columns:140px 1fr;gap:12px;align-items:start;padding:10px 0;border-bottom:1px solid var(--border)}
+.gloss-row:last-child{border-bottom:none}
+.gloss-term{font-size:13px;font-weight:700;color:var(--accent)}
+.gloss-def{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* QUIZ */
+.quiz-block{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:10px}
+.quiz-q{font-size:14px;font-weight:700;margin-bottom:10px}
+.quiz-opt{display:flex;flex-direction:column;gap:6px}
+.quiz-btn{background:#fff;border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:13px;font-family:inherit;cursor:pointer;text-align:left;transition:all .15s}
+.quiz-btn:hover{border-color:var(--accent);background:var(--accent-bg)}
+.quiz-btn.correct{background:#dcfce7;border-color:#86efac;color:#166534;font-weight:600}
+.quiz-btn.wrong{background:#fee2e2;border-color:#fca5a5;color:#991b1b}
+.quiz-reveal{margin-top:10px;padding:10px 14px;background:#eff6ff;border-radius:8px;font-size:13px;color:#1d4ed8;display:none}
+
+/* CURVE VISUAL */
+.curve-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px;overflow-x:auto}
+.curve-legend{display:flex;gap:16px;margin-top:8px;font-size:12px}
+.legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:4px}
+
+/* CTA */
+.cta-box{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:12px;padding:20px;text-align:center;margin-top:12px}
+.cta-title{font-size:15px;font-weight:700;margin-bottom:6px;color:var(--accent)}
+.cta-sub{font-size:13px;color:var(--muted);margin-bottom:14px}
+.cta-btn{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:10px 22px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block;transition:opacity .15s}
+.cta-btn:hover{opacity:.9}
+
+@media(max-width:600px){
+  .nav{padding:10px 16px}
+  .hero{padding:28px 16px 20px}
+  .modules{padding:0 16px 40px}
+  .mod-header{padding:14px 16px;gap:10px}
+  .mod-body{padding:0 16px 20px}
+  .concept-grid{grid-template-columns:1fr}
+  .gloss-row{grid-template-columns:1fr;gap:4px}
+  .gloss-term{border-bottom:none}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/valuation-toolkit/">ValuationDesk</a>
+  <span class="nav-sep">›</span>
+  <a href="/valuation-toolkit/domains/capital-markets/">Capital Markets</a>
+  <span class="nav-sep">›</span>
+  <span class="nav-cur">Learn</span>
+</nav>
+
+<div class="hero">
+  <span class="badge">Capital Markets · Learning Hub</span>
+  <h1>Master Capital Markets</h1>
+  <p class="hero-sub">Four deep-dive modules covering IPO mechanics, bond mathematics, yield curve theory, and ECM/DCM transaction structures used by India's top investment banks.</p>
+  <div class="progress-row" id="progRow">
+    <span class="prog-item" id="prog1" onclick="openModule('m1')">01 · IPO Process</span>
+    <span class="prog-item" id="prog2" onclick="openModule('m2')">02 · Bond Fundamentals</span>
+    <span class="prog-item" id="prog3" onclick="openModule('m3')">03 · Yield Curves & RBI</span>
+    <span class="prog-item" id="prog4" onclick="openModule('m4')">04 · ECM / DCM Transactions</span>
+  </div>
+</div>
+
+<div class="modules">
+
+<!-- MODULE 1: IPO PROCESS -->
+<div class="module" id="m1">
+  <div class="mod-header" onclick="toggleModule('m1')">
+    <div class="mod-num">01</div>
+    <div class="mod-title-wrap">
+      <div class="mod-title">IPO Process Flow</div>
+      <div class="mod-meta">DRHP · Book Building · Allotment · Listing · Greenshoe</div>
+    </div>
+    <span class="mod-status mod-status-new">New</span>
+    <span class="mod-arrow">▾</span>
+  </div>
+  <div class="mod-body">
+    <div class="intro-box">India's primary markets processed <strong>over ₹60,000 Cr in IPO fundraising in FY25</strong>, making it one of the most active globally. Understanding the end-to-end IPO process is essential for anyone advising issuers, institutional investors, or underwriters.</div>
+
+    <div class="section-title">Step-by-Step IPO Process Flow</div>
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-num">1</div>
+        <div class="flow-content">
+          <span class="flow-tag tag-co">Company</span>
+          <div class="flow-head">Decision to Go Public & Investment Bank Mandate</div>
+          <div class="flow-body">The issuer's board approves a capital raise. Lead managers (Book Running Lead Managers — BRLMs) are appointed. Due diligence begins: legal, financial, and business audit. A consortium of underwriters is formed for large issues.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">2</div>
+        <div class="flow-content">
+          <span class="flow-tag tag-sebi">SEBI Filing</span>
+          <div class="flow-head">Draft Red Herring Prospectus (DRHP)</div>
+          <div class="flow-body">The DRHP is filed with SEBI. It discloses company financials (3 years audited), business description, risks, promoter background, use of proceeds, and IPO structure. SEBI reviews and issues observations within 30 days. The DRHP does not contain a price band.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">3</div>
+        <div class="flow-content">
+          <span class="flow-tag tag-mkt">Marketing</span>
+          <div class="flow-head">Roadshow & Price Discovery</div>
+          <div class="flow-body">BRLMs take management on a domestic and international roadshow to institutional investors (QIBs). Anchor investor bookbuilding begins 1 day before the IPO opens. The final price band is set based on investor feedback and comparable company valuations.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">4</div>
+        <div class="flow-content">
+          <span class="flow-tag tag-inv">Subscription</span>
+          <div class="flow-head">IPO Subscription Window (3 Days)</div>
+          <div class="flow-body">The IPO is open for 3 working days. SEBI mandates a 35% / 15% / 50% QIB / NII / Retail quota. Bids are placed via ASBA (Application Supported by Blocked Amount). Oversubscription is tracked live on NSE/BSE. Cut-off price bidding is available for retail investors.</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">5</div>
+        <div class="flow-content">
+          <span class="flow-tag tag-sebi">SEBI</span>
+          <div class="flow-head">Price Finalisation & Allotment</div>
+          <div class="flow-body">The issue price is fixed at the cut-off or at a price within the band. Allotment is done via lottery for retail (if oversubscribed) and proportionate for QIBs/NIIs. Unallotted applicants get refunds. T+6 listing timeline under SEBI's 2023 mandate (from 2024: T+3).</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-num">6</div>
+        <div class="flow-content">
+          <span class="flow-tag tag-mkt">Listing</span>
+          <div class="flow-head">NSE/BSE Listing & Greenshoe Option</div>
+          <div class="flow-body">Shares list on NSE and/or BSE. The underwriter's stabilisation agent may exercise the Greenshoe option — buying shares in the secondary market for up to 30 days post-listing to support the price if it falls below the issue price.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section-title">IPO Structure: Investor Quota (Mainboard)</div>
+    <table class="data-table">
+      <thead><tr><th>Category</th><th>Quota</th><th>Minimum Bid</th><th>Lock-up</th></tr></thead>
+      <tbody>
+        <tr><td>Qualified Institutional Buyers (QIB)</td><td class="mono">50%</td><td>Any</td><td>None (but anchor: 30 days)</td></tr>
+        <tr><td>Non-Institutional Investors (NII / HNI)</td><td class="mono">15%</td><td>₹2 lakh+</td><td>None</td></tr>
+        <tr><td>Retail Individual Investors (RII)</td><td class="mono">35%</td><td>Up to ₹2 lakh</td><td>None</td></tr>
+        <tr><td>Employees / Shareholders</td><td class="mono">Varies</td><td>Discounted</td><td>None</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-title">Key Terms</div>
+    <div class="glossary">
+      <div class="gloss-row"><span class="gloss-term">DRHP</span><span class="gloss-def">Draft Red Herring Prospectus — filed with SEBI before the IPO opens. Contains all disclosures except final price.</span></div>
+      <div class="gloss-row"><span class="gloss-term">Book Building</span><span class="gloss-def">Price discovery mechanism where investors bid at prices within a band. Cut-off price is where demand meets supply.</span></div>
+      <div class="gloss-row"><span class="gloss-term">ASBA</span><span class="gloss-def">Application Supported by Blocked Amount — investor's bank blocks the bid amount; deducted only on allotment.</span></div>
+      <div class="gloss-row"><span class="gloss-term">Anchor Investor</span><span class="gloss-def">QIBs allotted up to 60% of the QIB portion before IPO opens. Subject to 30-day lock-up. Signals credibility.</span></div>
+      <div class="gloss-row"><span class="gloss-term">Green Shoe Option</span><span class="gloss-def">Over-allotment of up to 15% of issue size. Used to stabilise price post-listing via secondary market buybacks.</span></div>
+    </div>
+
+    <div class="cta-box">
+      <div class="cta-title">Practice with the IPO Subscription Calculator</div>
+      <div class="cta-sub">Model real subscription patterns, allotment probability, and listing premium across 30 Nifty 50 companies.</div>
+      <a class="cta-btn" href="/valuation-toolkit/domains/capital-markets/calculators/ipo-subscription.html">Open Calculator →</a>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 2: BOND FUNDAMENTALS -->
+<div class="module" id="m2">
+  <div class="mod-header" onclick="toggleModule('m2')">
+    <div class="mod-num">02</div>
+    <div class="mod-title-wrap">
+      <div class="mod-title">Bond Fundamentals</div>
+      <div class="mod-meta">Pricing · YTM · Duration · Convexity · Credit Ratings</div>
+    </div>
+    <span class="mod-status mod-status-new">New</span>
+    <span class="mod-arrow">▾</span>
+  </div>
+  <div class="mod-body">
+    <div class="intro-box">India's corporate bond market crossed <strong>₹43 lakh Cr in outstanding issuance</strong> in 2024. Mastering bond mathematics is the foundation of fixed income analysis — from pricing a new issue to assessing duration risk in a portfolio.</div>
+
+    <div class="section-title">Bond Pricing Formula</div>
+    <div class="formula">
+      P = Σ [C / (1 + y)^t] + [FV / (1 + y)^n]<br>
+      Where: C = coupon, y = YTM per period, FV = face value, n = periods to maturity
+    </div>
+
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="concept-icon">💰</div>
+        <div class="concept-head">Clean vs Dirty Price</div>
+        <div class="concept-body">Clean price excludes accrued interest. Dirty (full) price = Clean + Accrued. Bonds quote clean; settle dirty. Accrued = coupon × (days since last coupon / days in period).</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">📈</div>
+        <div class="concept-head">Yield to Maturity (YTM)</div>
+        <div class="concept-body">The IRR of a bond's cashflows at the current market price. YTM = coupon rate when trading at par. YTM > coupon when trading at discount; YTM < coupon at premium.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">⏱️</div>
+        <div class="concept-head">Macaulay Duration</div>
+        <div class="concept-body">Weighted average time to receive cashflows, weighted by PV. A zero-coupon bond's duration equals its maturity. Higher coupon → shorter duration. Key measure of interest rate sensitivity.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">📉</div>
+        <div class="concept-head">Modified Duration</div>
+        <div class="concept-body">= Macaulay Duration / (1 + y). Measures % price change per 1% change in yield. If Mod Duration = 7, a 1% yield rise ≈ 7% price drop. The first derivative of the price-yield curve.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">🔄</div>
+        <div class="concept-head">Convexity</div>
+        <div class="concept-body">The second derivative of price vs yield. Positive convexity means bond gains more when yields fall than it loses when yields rise. Higher convexity = better risk/reward profile.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">📊</div>
+        <div class="concept-head">DV01 (Dollar Value of 01)</div>
+        <div class="concept-body">The rupee change in bond price per 1 basis point (0.01%) move in yield. DV01 = Modified Duration × Price × 0.0001. Used to size hedges and compare bonds.</div>
+      </div>
+    </div>
+
+    <div class="section-title">Credit Rating Scale (CRISIL / ICRA / CARE)</div>
+    <table class="data-table">
+      <thead><tr><th>Rating</th><th>Grade</th><th>Default Risk</th><th>Typical Spread over G-sec</th></tr></thead>
+      <tbody>
+        <tr><td>AAA</td><td><span class="chip chip-g">Highest Safety</span></td><td>Negligible</td><td class="mono">15–40 bps</td></tr>
+        <tr><td>AA+ / AA</td><td><span class="chip chip-g">High Safety</span></td><td>Very Low</td><td class="mono">40–80 bps</td></tr>
+        <tr><td>AA-</td><td><span class="chip chip-y">Adequate Safety</span></td><td>Low</td><td class="mono">80–130 bps</td></tr>
+        <tr><td>A+ / A</td><td><span class="chip chip-y">Moderate Safety</span></td><td>Moderate</td><td class="mono">130–200 bps</td></tr>
+        <tr><td>BBB</td><td><span class="chip chip-r">Minimum Safety</span></td><td>Higher</td><td class="mono">200–350 bps</td></tr>
+        <tr><td>BB and below</td><td><span class="chip chip-r">Speculative</span></td><td>Substantial</td><td class="mono">350 bps+</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-title">Price-Yield Relationship</div>
+    <div class="formula">
+      Bond price and yield move INVERSELY.<br>
+      ΔP ≈ –ModDuration × P × Δy + (½ × Convexity × P × Δy²)<br>
+      Duration gives linear estimate; Convexity corrects for curve shape.
+    </div>
+
+    <div class="cta-box">
+      <div class="cta-title">Use the Bond Pricer & Duration Calculator</div>
+      <div class="cta-sub">Compute clean/dirty price, YTM, Macaulay/Modified Duration, Convexity, and DV01 for any Nifty 50 issuer.</div>
+      <a class="cta-btn" href="/valuation-toolkit/domains/capital-markets/calculators/bond-pricer.html">Open Calculator →</a>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 3: YIELD CURVES & RBI -->
+<div class="module" id="m3">
+  <div class="mod-header" onclick="toggleModule('m3')">
+    <div class="mod-num">03</div>
+    <div class="mod-title-wrap">
+      <div class="mod-title">Yield Curves & RBI Policy</div>
+      <div class="mod-meta">G-sec Curve · Normal / Flat / Inverted · Carry Trade · RBI Signals</div>
+    </div>
+    <span class="mod-status mod-status-new">New</span>
+    <span class="mod-arrow">▾</span>
+  </div>
+  <div class="mod-body">
+    <div class="intro-box">The Indian G-sec yield curve is the <strong>backbone of all debt pricing</strong>. Every corporate bond, NCD, and FD rate anchors to it. The RBI's repo rate decisions and OMO operations shape the curve in real time, making it a direct read on monetary policy expectations.</div>
+
+    <div class="section-title">Current G-sec Yield Curve (Oct 2025, Illustrative)</div>
+    <div class="curve-box" id="curveBox"></div>
+
+    <div class="section-title">Three Curve Shapes & What They Signal</div>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="concept-icon">📈</div>
+        <div class="concept-head">Normal (Upward Sloping)</div>
+        <div class="concept-body">Long-term yields &gt; short-term yields. The usual shape — investors demand more for lending longer. Signals economic expansion and moderate inflation expectations. Current Indian curve (steepness ~76 bps).</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">➡️</div>
+        <div class="concept-head">Flat Curve</div>
+        <div class="concept-body">Short and long yields nearly equal. Signals uncertainty — market unsure whether RBI will cut or hike further. Often precedes a rate pivot or signals slowing growth. Seen in India 2023–24 when the curve flattened.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">📉</div>
+        <div class="concept-head">Inverted Curve</div>
+        <div class="concept-body">Short yields &gt; long yields. Rare in India but a powerful recession signal globally. Implies market expects rate cuts ahead (RBI will ease to stimulate). US curve was inverted for most of 2022–2024.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">🔄</div>
+        <div class="concept-head">Bear Steepening</div>
+        <div class="concept-body">Long rates rise faster than short rates. Happens when inflation expectations or fiscal concerns rise. Hurts long-duration bond holders. India saw this in 2022 when RBI hiked faster than market expected.</div>
+      </div>
+    </div>
+
+    <div class="section-title">Key Yield Curve Trading Strategies</div>
+    <table class="data-table">
+      <thead><tr><th>Strategy</th><th>Trade</th><th>Wins When</th><th>Risk</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Carry Trade</strong></td><td>Long high-yield bond, short low-yield bond</td><td>Curve stays stable</td><td>Parallel shift wipes carry</td></tr>
+        <tr><td><strong>Roll-Down</strong></td><td>Buy 5Y, sell as it becomes 4Y (yield drops)</td><td>Normal, stable curve</td><td>Curve steepens at short end</td></tr>
+        <tr><td><strong>Curve Steepener</strong></td><td>Long short bond + Short long bond</td><td>Curve steepens</td><td>Flattening moves</td></tr>
+        <tr><td><strong>Curve Flattener</strong></td><td>Short short bond + Long long bond</td><td>Curve flattens / inverts</td><td>Steepening moves</td></tr>
+        <tr><td><strong>Duration Positioning</strong></td><td>Extend duration ahead of RBI cut</td><td>Rate cuts materialise</td><td>Rate hike surprises</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-title">RBI Monetary Policy Toolkit</div>
+    <div class="glossary">
+      <div class="gloss-row"><span class="gloss-term">Repo Rate</span><span class="gloss-def">Rate at which RBI lends to banks. Primary lever for monetary policy. Higher repo → higher short-end yields.</span></div>
+      <div class="gloss-row"><span class="gloss-term">Reverse Repo</span><span class="gloss-def">Rate at which RBI absorbs excess liquidity from banks. Sets the floor on overnight rates.</span></div>
+      <div class="gloss-row"><span class="gloss-term">OMO</span><span class="gloss-def">Open Market Operations — RBI buys/sells G-secs to inject/drain liquidity. OMO purchases push yields down.</span></div>
+      <div class="gloss-row"><span class="gloss-term">SDF</span><span class="gloss-def">Standing Deposit Facility — the new floor rate (replaced reverse repo) from April 2022. Absorbs surplus liquidity.</span></div>
+      <div class="gloss-row"><span class="gloss-term">CRR / SLR</span><span class="gloss-def">Cash Reserve Ratio (kept as cash with RBI) and Statutory Liquidity Ratio (held in G-secs). Control bank lending capacity.</span></div>
+    </div>
+
+    <div class="section-title">Quick Check</div>
+    <div class="quiz-block" id="q3a">
+      <div class="quiz-q">If the RBI signals a rate cut cycle is beginning, which trade would you put on?</div>
+      <div class="quiz-opt">
+        <button class="quiz-btn" onclick="checkQ('q3a',this,'wrong')">Short long-duration G-secs</button>
+        <button class="quiz-btn" onclick="checkQ('q3a',this,'correct')">Long long-duration G-secs (duration extension)</button>
+        <button class="quiz-btn" onclick="checkQ('q3a',this,'wrong')">Buy short-tenor T-bills only</button>
+        <button class="quiz-btn" onclick="checkQ('q3a',this,'wrong')">Sell all fixed income, go cash</button>
+      </div>
+      <div class="quiz-reveal" id="q3a-reveal">Rate cuts lower yields → bond prices rise. Long-duration bonds gain the most from a yield decline because they have higher modified duration. Duration extension (buying long bonds before cuts) is the classic trade.</div>
+    </div>
+
+    <div class="cta-box">
+      <div class="cta-title">Visualise the Yield Curve Live</div>
+      <div class="cta-sub">Plot the full G-sec curve, see corporate spreads overlaid, and model carry/roll-down returns across tenors.</div>
+      <a class="cta-btn" href="/valuation-toolkit/domains/capital-markets/calculators/yield-curve.html">Open Calculator →</a>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE 4: ECM / DCM TRANSACTIONS -->
+<div class="module" id="m4">
+  <div class="mod-header" onclick="toggleModule('m4')">
+    <div class="mod-num">04</div>
+    <div class="mod-title-wrap">
+      <div class="mod-title">ECM / DCM Transactions</div>
+      <div class="mod-meta">QIP · Rights Issue · NCD · FPO · ESOP · Convertible Bonds</div>
+    </div>
+    <span class="mod-status mod-status-new">New</span>
+    <span class="mod-arrow">▾</span>
+  </div>
+  <div class="mod-body">
+    <div class="intro-box">Equity Capital Markets (ECM) and Debt Capital Markets (DCM) together form the <strong>primary capital-raising machinery</strong> for Indian corporates. Investment banks advise on instrument selection, structure, pricing, and regulatory compliance across both markets.</div>
+
+    <div class="section-title">ECM Transaction Types</div>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="concept-icon">🚀</div>
+        <div class="concept-head">IPO (Initial Public Offering)</div>
+        <div class="concept-body">First-ever listing of shares on a public exchange. Can include fresh issue (new shares, company gets cash) and/or OFS (offer for sale by existing shareholders).</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">📢</div>
+        <div class="concept-head">FPO (Follow-on Public Offer)</div>
+        <div class="concept-body">Secondary public offering by an already-listed company. Same book-building mechanism as IPO. Often used when promoter wants to reduce stake alongside a fresh capital raise.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">🏦</div>
+        <div class="concept-head">QIP (Qualified Institutional Placement)</div>
+        <div class="concept-body">Fastest institutional equity raise for listed companies. No retail component. SEBI floor price = 90% of CMP. Placement to QIBs within 4–6 weeks. No need for SEBI approval post-eligibility.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">🎫</div>
+        <div class="concept-head">Rights Issue</div>
+        <div class="concept-body">Existing shareholders get the right to buy new shares at a discount (typically 15–30% to CMP). Proportional entitlement preserves ownership. Rights are tradeable on exchange (SEBI 2020 reform).</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">🔒</div>
+        <div class="concept-head">Preferential Allotment</div>
+        <div class="concept-body">Private placement of shares to specific investors (strategic, PE/VC) without public process. Subject to SEBI pricing guidelines. Maximum 5% dilution without shareholder approval in many cases.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">👥</div>
+        <div class="concept-head">ESOP (Employee Stock Options)</div>
+        <div class="concept-body">Options granted to employees at an exercise price. Vest over 1–4 years. Upon exercise, new shares are issued (dilutive). ESOP pools are pre-approved by shareholders and SEBI.</div>
+      </div>
+    </div>
+
+    <div class="section-title">DCM Transaction Types</div>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <div class="concept-icon">📜</div>
+        <div class="concept-head">NCD (Non-Convertible Debenture)</div>
+        <div class="concept-body">Unsecured or secured bonds issued by corporates. Publicly placed via SEBI-regulated prospectus or privately placed with ≤200 investors. Market dominated by AAA/AA issuers. RBI: SLR-eligible NCDs must be listed.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">🔄</div>
+        <div class="concept-head">Convertible Bond (CB)</div>
+        <div class="concept-body">Bond that converts to equity at holder's option at a preset price. Typically issued at 20–35% conversion premium. Used by high-growth firms that want cheap debt (lower coupon than NCD) with equity upside for investors.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">🌐</div>
+        <div class="concept-head">ECB (External Commercial Borrowing)</div>
+        <div class="concept-body">Overseas borrowing by Indian companies under RBI's ECB framework. Max all-in cost limits apply. Used for forex capex or refinancing domestic debt at lower rates. Requires RBI/AD Bank approval.</div>
+      </div>
+      <div class="concept-card">
+        <div class="concept-icon">🟢</div>
+        <div class="concept-head">Green / Social Bonds</div>
+        <div class="concept-body">Earmarked for environmental or social projects. Must comply with SEBI's Green Bond Framework. Attracting global ESG investors. IREDA, REC, and Adani Green are frequent issuers.</div>
+      </div>
+    </div>
+
+    <div class="section-title">ECM vs DCM: Quick Comparison</div>
+    <table class="data-table">
+      <thead><tr><th>Dimension</th><th>ECM (Equity)</th><th>DCM (Debt)</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Instrument</strong></td><td>Shares, rights, warrants</td><td>Bonds, NCDs, CPs, loans</td></tr>
+        <tr><td><strong>Return to Investor</strong></td><td>Dividends + capital gains</td><td>Coupon + principal repayment</td></tr>
+        <tr><td><strong>Issuer Cost</strong></td><td>Dilution of ownership</td><td>Fixed interest burden</td></tr>
+        <tr><td><strong>Priority in Liquidation</strong></td><td>Last (residual claim)</td><td>Senior to equity</td></tr>
+        <tr><td><strong>Tax Treatment</strong></td><td>Dividends: DDT scrapped (taxed in investor hands)</td><td>Interest: deductible for issuer</td></tr>
+        <tr><td><strong>Typical Tenor</strong></td><td>Perpetual</td><td>1–30 years</td></tr>
+        <tr><td><strong>Key Regulator</strong></td><td>SEBI (ICDR Regulations)</td><td>SEBI + RBI (for banks)</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-title">Quick Check</div>
+    <div class="quiz-block" id="q4a">
+      <div class="quiz-q">A listed company needs ₹2,000 Cr urgently (within 6 weeks) from institutional investors only. Which route is most efficient?</div>
+      <div class="quiz-opt">
+        <button class="quiz-btn" onclick="checkQ('q4a',this,'wrong')">IPO</button>
+        <button class="quiz-btn" onclick="checkQ('q4a',this,'wrong')">Rights Issue</button>
+        <button class="quiz-btn" onclick="checkQ('q4a',this,'correct')">QIP (Qualified Institutional Placement)</button>
+        <button class="quiz-btn" onclick="checkQ('q4a',this,'wrong')">FPO</button>
+      </div>
+      <div class="quiz-reveal" id="q4a-reveal">QIP is the fastest institutional equity raise for listed companies — no retail process, no SEBI re-approval, and execution within 4–6 weeks from board approval. The SEBI floor price = 90% of the 2-week average CMP, offering a clean institutional-only placement.</div>
+    </div>
+
+    <div class="cta-box">
+      <div class="cta-title">Model QIP & Rights Issue Mechanics</div>
+      <div class="cta-sub">Compute SEBI floor price, dilution %, EPS impact, and promoter holding changes for any Nifty 50 company.</div>
+      <a class="cta-btn" href="/valuation-toolkit/domains/capital-markets/calculators/qip-rights.html">Open Calculator →</a>
+    </div>
+  </div>
+</div>
+
+</div><!-- /modules -->
+
+<script>
+/* Render G-sec curve SVG in Module 3 */
+var GSEC_CURVE=[
+  {tenor:'3M',yield:6.72},{tenor:'6M',yield:6.78},{tenor:'1Y',yield:6.85},{tenor:'2Y',yield:6.92},
+  {tenor:'3Y',yield:6.98},{tenor:'5Y',yield:7.08},{tenor:'7Y',yield:7.18},{tenor:'10Y',yield:7.25},
+  {tenor:'15Y',yield:7.38},{tenor:'30Y',yield:7.48}
+];
+
+(function(){
+  var W=680,H=150,padL=44,padR=16,padT=10,padB=28;
+  var yMin=6.5,yMax=7.6;
+  var n=GSEC_CURVE.length;
+  function xP(i){return padL+Math.round((i/(n-1))*(W-padL-padR));}
+  function yP(y){return padT+Math.round(((yMax-y)/(yMax-yMin))*(H-padT-padB));}
+  var path='M';
+  GSEC_CURVE.forEach(function(pt,i){path+=(i?'L':'')+xP(i)+' '+yP(pt.yield)+' ';});
+  var gridLines='',ticks='',dots='';
+  [6.6,6.8,7.0,7.2,7.4].forEach(function(yv){
+    var y=yP(yv);
+    gridLines+='<line x1="'+padL+'" y1="'+y+'" x2="'+(W-padR)+'" y2="'+y+'" stroke="#f3f4f6" stroke-width="1"/>';
+    gridLines+='<text x="'+(padL-5)+'" y="'+(y+3)+'" text-anchor="end" font-size="9" fill="#9ca3af">'+yv.toFixed(1)+'</text>';
+  });
+  GSEC_CURVE.forEach(function(pt,i){
+    dots+='<circle cx="'+xP(i)+'" cy="'+yP(pt.yield)+'" r="3" fill="#2563eb"/>';
+    ticks+='<text x="'+xP(i)+'" y="'+(H-padB+14)+'" text-anchor="middle" font-size="9" fill="#9ca3af">'+pt.tenor+'</text>';
+  });
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" width="100%" style="max-height:150px">'
+    +gridLines
+    +'<path d="'+path+'" fill="none" stroke="#2563eb" stroke-width="2.5" stroke-linejoin="round"/>'
+    +dots+ticks+'</svg>';
+  var leg='<div class="curve-legend"><span><span class="legend-dot" style="background:#2563eb"></span>G-sec (sovereign, risk-free)</span><span style="color:var(--muted);font-size:11px">Steepness (30Y–3M): 76 bps</span></div>';
+  var box=document.getElementById('curveBox');
+  if(box) box.innerHTML=svg+leg;
+})();
+
+/* Module toggle */
+function toggleModule(id){
+  var el=document.getElementById(id);
+  var isOpen=el.classList.contains('open');
+  el.classList.toggle('open',!isOpen);
+  var prog=document.getElementById('prog'+id.replace('m',''));
+  if(!isOpen) prog.classList.add('done');
+}
+
+function openModule(id){
+  var el=document.getElementById(id);
+  if(!el.classList.contains('open')) el.classList.add('open');
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+  var prog=document.getElementById('prog'+id.replace('m',''));
+  prog.classList.add('done');
+}
+
+/* Quiz */
+function checkQ(qid,btn,result){
+  var block=document.getElementById(qid);
+  var btns=block.querySelectorAll('.quiz-btn');
+  btns.forEach(function(b){b.disabled=true;});
+  btn.classList.add(result);
+  var reveal=document.getElementById(qid+'-reveal');
+  if(reveal) reveal.style.display='block';
+}
+</script>
+</body>
+</html>
