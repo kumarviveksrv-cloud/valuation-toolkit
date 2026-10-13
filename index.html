@@ -62,9 +62,9 @@ a{text-decoration:none;color:inherit}
 .phase-block{margin-bottom:60px}
 .phase-header{display:flex;align-items:center;gap:12px;margin-bottom:22px;padding-bottom:14px;border-bottom:1.5px solid var(--border)}
 .phase-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;font-family:var(--mono);padding:4px 9px;border-radius:5px;flex-shrink:0}
-.phase-1 .phase-label{background:#dcfce7;color:#15803d}
-.phase-2 .phase-label{background:#fef9c3;color:#a16207}
-.phase-3 .phase-label{background:#fee2e2;color:#b91c1c}
+.phase-1 .phase-label{background:#dbeafe;color:#1d4ed8}
+.phase-2 .phase-label{background:#d1fae5;color:#065f46}
+.phase-3 .phase-label{background:#ede9fe;color:#6d28d9}
 .phase-desc{font-size:13px;color:var(--muted)}
 .phase-count{margin-left:auto;font-size:11px;color:var(--muted);font-family:var(--mono);flex-shrink:0}
 
@@ -192,7 +192,7 @@ a{text-decoration:none;color:inherit}
 
 <!-- HERO -->
 <div class="hero">
-  <div class="hero-badge"><span></span>1 of 15 domains live now</div>
+  <div class="hero-badge"><span></span>All 15 domains live</div>
   <h1>Finance's missing<br><em>hands-on toolkit.</em></h1>
   <p class="hero-sub">Pick a domain. Master its calculators. Move to the next. Every module uses real Indian and global companies — not textbook examples.</p>
 </div>
@@ -212,27 +212,27 @@ a{text-decoration:none;color:inherit}
 
   <div class="phase-block phase-1">
     <div class="phase-header">
-      <span class="phase-label">Phase 1 · Can build now</span>
-      <span class="phase-desc">Core domains — full calculator + learning suite</span>
-      <span class="phase-count">1 / 6 live</span>
+      <span class="phase-label">Banking &amp; Markets</span>
+      <span class="phase-desc">Capital formation, deal execution, and market structuring</span>
+      <span class="phase-count">5 / 5 live</span>
     </div>
     <div class="domain-grid" id="grid-1"></div>
   </div>
 
   <div class="phase-block phase-2">
     <div class="phase-header">
-      <span class="phase-label">Phase 2 · Medium complexity</span>
-      <span class="phase-desc">Require data integration and sector-specific models</span>
-      <span class="phase-count">0 / 6 live</span>
+      <span class="phase-label">Investing</span>
+      <span class="phase-desc">Capital deployment and portfolio management across strategies</span>
+      <span class="phase-count">5 / 5 live</span>
     </div>
     <div class="domain-grid" id="grid-2"></div>
   </div>
 
   <div class="phase-block phase-3">
     <div class="phase-header">
-      <span class="phase-label">Phase 3 · Data-heavy</span>
-      <span class="phase-desc">Real-time data infrastructure required</span>
-      <span class="phase-count">0 / 3 live</span>
+      <span class="phase-label">Research &amp; Advisory</span>
+      <span class="phase-desc">Analysis, valuation, and independent advisory</span>
+      <span class="phase-count">5 / 5 live</span>
     </div>
     <div class="domain-grid" id="grid-3"></div>
   </div>
@@ -260,7 +260,7 @@ a{text-decoration:none;color:inherit}
 
 <script>
 const DOMAINS = [
-  // Phase 1
+  // Track 1: Banking & Markets
   {
     id:'investment-banking', phase:1,
     name:'Investment Banking', icon:'🏦',
@@ -268,10 +268,16 @@ const DOMAINS = [
     calcs:6, modules:4, live:true, url:'/valuation-toolkit/domains/investment-banking/'
   },
   {
-    id:'valuation-advisory', phase:1,
-    name:'Valuation Advisory', icon:'📊',
-    tagline:'DCF, WACC, Comps, EV Bridge, SOTP, Football Field, NAV. The full valuation stack.',
-    calcs:7, modules:5, live:true, url:'/valuation-toolkit/domains/valuation-advisory/'
+    id:'capital-markets', phase:1,
+    name:'Capital Markets', icon:'📡',
+    tagline:'IPO pricing, book building, secondary issuances, and market microstructure.',
+    calcs:6, modules:4, live:true, url:'/valuation-toolkit/domains/capital-markets/'
+  },
+  {
+    id:'mergers-acquisitions', phase:1,
+    name:'M&A', icon:'🤝',
+    tagline:'Accretion/dilution, synergy modeling, purchase price allocation, deal structures.',
+    calcs:5, modules:4, live:true, url:'/valuation-toolkit/domains/ma/'
   },
   {
     id:'corporate-finance', phase:1,
@@ -280,47 +286,29 @@ const DOMAINS = [
     calcs:8, modules:4, live:true, url:'/valuation-toolkit/domains/corporate-finance/'
   },
   {
-    id:'private-equity', phase:1,
+    id:'structured-finance', phase:1,
+    name:'Structured Finance', icon:'🧩',
+    tagline:'ABS/MBS modeling, CDO waterfalls, securitization, and tranche analysis.',
+    calcs:7, modules:4, live:true, url:'/valuation-toolkit/domains/structured-finance/'
+  },
+  // Track 2: Investing
+  {
+    id:'private-equity', phase:2,
     name:'Private Equity', icon:'🎯',
     tagline:'LBO modeling, IRR analysis, fund economics, and portfolio construction.',
     calcs:6, modules:5, live:true, url:'/valuation-toolkit/domains/pe/'
   },
   {
-    id:'venture-capital', phase:1,
+    id:'venture-capital', phase:2,
     name:'Venture Capital', icon:'🚀',
     tagline:'Pre/post-money, cap table waterfall, VC returns, and term sheet economics.',
     calcs:7, modules:4, live:true, url:'/valuation-toolkit/domains/vc/'
   },
   {
-    id:'mergers-acquisitions', phase:1,
-    name:'M&A', icon:'🤝',
-    tagline:'Accretion/dilution, synergy modeling, purchase price allocation, deal structures.',
-    calcs:5, modules:4, live:true, url:'/valuation-toolkit/domains/ma/'
-  },
-  // Phase 2
-  {
-    id:'equity-research', phase:2,
-    name:'Equity Research', icon:'🔍',
-    tagline:'Sector deep-dives, earnings models, target price derivation, and analyst notes.',
-    calcs:6, modules:5, live:true, url:'/valuation-toolkit/domains/equity-research/'
-  },
-  {
-    id:'credit-analysis', phase:2,
-    name:'Credit Analysis', icon:'📉',
-    tagline:'Credit scoring, debt capacity, covenant analysis, and rating agency models.',
-    calcs:7, modules:4, live:true, url:'/valuation-toolkit/domains/credit-analysis/'
-  },
-  {
-    id:'transaction-advisory', phase:2,
-    name:'Transaction Advisory', icon:'⚖️',
-    tagline:'Buy-side diligence, sell-side preparation, and SPA negotiation frameworks.',
-    calcs:5, modules:3, live:true, url:'/valuation-toolkit/domains/transaction-advisory/'
-  },
-  {
-    id:'financial-due-diligence', phase:2,
-    name:'Financial Due Diligence', icon:'🧾',
-    tagline:'Quality of earnings, normalized EBITDA, working capital peg, and red flags.',
-    calcs:5, modules:3, live:true, url:'/valuation-toolkit/domains/financial-due-diligence/'
+    id:'hedge-funds', phase:2,
+    name:'Hedge Funds', icon:'🛡️',
+    tagline:'Long/short equity, event-driven strategies, risk arbitrage, and alpha generation.',
+    calcs:7, modules:4, live:true, url:'/valuation-toolkit/domains/hedge-funds/'
   },
   {
     id:'asset-management', phase:2,
@@ -334,24 +322,36 @@ const DOMAINS = [
     tagline:'SAA/TAA, rebalancing models, client mandate analysis, performance reporting.',
     calcs:5, modules:3, live:true, url:'/valuation-toolkit/domains/investment-management/'
   },
-  // Phase 3
+  // Track 3: Research & Advisory
   {
-    id:'capital-markets', phase:3,
-    name:'Capital Markets', icon:'📡',
-    tagline:'IPO pricing, book building, secondary issuances, and market microstructure.',
-    calcs:6, modules:4, live:true, url:'/valuation-toolkit/domains/capital-markets/'
+    id:'valuation-advisory', phase:3,
+    name:'Valuation Advisory', icon:'📊',
+    tagline:'DCF, WACC, Comps, EV Bridge, SOTP, Football Field, NAV. The full valuation stack.',
+    calcs:7, modules:5, live:true, url:'/valuation-toolkit/domains/valuation-advisory/'
   },
   {
-    id:'hedge-funds', phase:3,
-    name:'Hedge Funds', icon:'🛡️',
-    tagline:'Long/short equity, event-driven strategies, risk arbitrage, and alpha generation.',
-    calcs:7, modules:4, live:true, url:'/valuation-toolkit/domains/hedge-funds/'
+    id:'equity-research', phase:3,
+    name:'Equity Research', icon:'🔍',
+    tagline:'Sector deep-dives, earnings models, target price derivation, and analyst notes.',
+    calcs:6, modules:5, live:true, url:'/valuation-toolkit/domains/equity-research/'
   },
   {
-    id:'structured-finance', phase:3,
-    name:'Structured Finance', icon:'🧩',
-    tagline:'ABS/MBS modeling, CDO waterfalls, securitization, and tranche analysis.',
-    calcs:7, modules:4, live:true, url:'/valuation-toolkit/domains/structured-finance/'
+    id:'credit-analysis', phase:3,
+    name:'Credit Analysis', icon:'📉',
+    tagline:'Credit scoring, debt capacity, covenant analysis, and rating agency models.',
+    calcs:7, modules:4, live:true, url:'/valuation-toolkit/domains/credit-analysis/'
+  },
+  {
+    id:'transaction-advisory', phase:3,
+    name:'Transaction Advisory', icon:'⚖️',
+    tagline:'Buy-side diligence, sell-side preparation, and SPA negotiation frameworks.',
+    calcs:5, modules:3, live:true, url:'/valuation-toolkit/domains/transaction-advisory/'
+  },
+  {
+    id:'financial-due-diligence', phase:3,
+    name:'Financial Due Diligence', icon:'🧾',
+    tagline:'Quality of earnings, normalized EBITDA, working capital peg, and red flags.',
+    calcs:5, modules:3, live:true, url:'/valuation-toolkit/domains/financial-due-diligence/'
   }
 ];
 
