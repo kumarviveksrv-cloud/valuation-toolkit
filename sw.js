@@ -1,8 +1,8 @@
-// ValuationDesk Service Worker v3.0
+// ValuationDesk Service Worker v4.0
 // Configured for GitHub Pages subfolder: /valuation-toolkit/
 
 const BASE = '/valuation-toolkit';
-const CACHE_NAME = 'valuationdesk-v3';
+const CACHE_NAME = 'valuationdesk-v4';
 
 const STATIC_ASSETS = [
   BASE + '/',
@@ -44,6 +44,14 @@ const STATIC_ASSETS = [
   BASE + '/domains/corporate-finance/calculators/breakeven-cvp.html',
   BASE + '/domains/corporate-finance/calculators/roic-eva.html',
   BASE + '/domains/corporate-finance/learn/index.html',
+  BASE + '/domains/ma/index.html',
+  BASE + '/domains/ma/calculators/index.html',
+  BASE + '/domains/ma/calculators/accretion-dilution.html',
+  BASE + '/domains/ma/calculators/deal-premium.html',
+  BASE + '/domains/ma/calculators/synergy.html',
+  BASE + '/domains/ma/calculators/merger-model.html',
+  BASE + '/domains/ma/calculators/deal-financing.html',
+  BASE + '/domains/ma/learn/index.html',
 ];
 
 // Install — cache all static assets

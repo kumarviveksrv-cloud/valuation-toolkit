@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>M&A — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-pro{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+
+.hero{background:#0a0a0a;color:#fff;padding:60px 24px}
+.hero-inner{max-width:900px;margin:0 auto}
+.hero-eyebrow{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6b7280;margin-bottom:14px}
+.hero h1{font-size:clamp(28px,4.5vw,48px);font-weight:900;letter-spacing:-.03em;line-height:1.08;margin-bottom:14px}
+.hero h1 span{color:#9ca3af}
+.hero p{font-size:15px;color:#9ca3af;line-height:1.65;max-width:540px;margin-bottom:28px}
+.hero-stats{display:flex;gap:32px;flex-wrap:wrap}
+.hero-stat .s-num{font-size:28px;font-weight:900;letter-spacing:-.02em}
+.hero-stat .s-label{font-size:12px;color:#6b7280;margin-top:2px}
+
+.main{max-width:900px;margin:0 auto;padding:48px 24px 80px}
+
+.section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:18px}
+
+.calc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:48px}
+.calc-card{border:1px solid var(--border);border-radius:10px;padding:20px;background:#fff;display:flex;flex-direction:column;gap:10px;transition:all .15s}
+.calc-card:hover{border-color:#aaa;box-shadow:0 4px 12px rgba(0,0,0,.06);transform:translateY(-1px)}
+.calc-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.calc-icon{font-size:22px}
+.badge{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:3px 8px;border-radius:4px;flex-shrink:0}
+.badge-free{background:#dcfce7;color:#15803d}
+.badge-pro{background:#fef3c7;color:#92400e}
+.calc-name{font-size:15px;font-weight:800;line-height:1.25}
+.calc-desc{font-size:13px;color:var(--muted);line-height:1.55}
+.calc-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--text);margin-top:auto}
+.calc-link:hover{opacity:.7}
+
+.learn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:48px}
+.learn-card{border:1px solid var(--border);border-radius:10px;padding:18px;background:var(--card)}
+.learn-num{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.learn-title{font-size:14px;font-weight:700;line-height:1.35;margin-bottom:6px}
+.learn-sub{font-size:12px;color:var(--muted)}
+
+.pro-strip{background:var(--text);color:#fff;border-radius:12px;padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:48px}
+.pro-strip h3{font-size:18px;font-weight:800;margin-bottom:4px}
+.pro-strip p{font-size:13px;color:#9ca3af;max-width:420px}
+.pro-strip-btn{background:#fff;color:var(--text);border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-left">
+    <a href="/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">›</span>
+    <a href="/">Home</a>
+    <span class="nav-sep">›</span>
+    <span>M&A</span>
+  </div>
+  <button class="nav-pro" onclick="alert('Pro unlock coming soon — ₹799/mo for all 15 domains.')">Go Pro — ₹799/mo</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Domain 04 · Mergers & Acquisitions</div>
+    <h1>Where Deals <span>Get Built</span></h1>
+    <p>From accretion/dilution to synergy capture and deal financing — the M&A toolkit IB analysts use from day one of a live deal.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="s-num">5</div><div class="s-label">Calculators</div></div>
+      <div class="hero-stat"><div class="s-num">4</div><div class="s-label">Learning Modules</div></div>
+      <div class="hero-stat"><div class="s-num">1</div><div class="s-label">Free Calculator</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <div class="section-title">Calculators</div>
+  <div class="calc-grid">
+    <div class="calc-card">
+      <div class="calc-card-top">
+        <div class="calc-icon">📈</div>
+        <div class="badge badge-free">Free</div>
+      </div>
+      <div class="calc-name">Accretion / Dilution</div>
+      <div class="calc-desc">Does the deal add to or reduce acquirer EPS? The first question every IB analyst answers on a new mandate.</div>
+      <a class="calc-link" href="/domains/ma/calculators/accretion-dilution.html">Open Calculator →</a>
+    </div>
+    <div class="calc-card">
+      <div class="calc-card-top">
+        <div class="calc-icon">💰</div>
+        <div class="badge badge-pro">Pro</div>
+      </div>
+      <div class="calc-name">Deal Premium Analyzer</div>
+      <div class="calc-desc">Compute the offer premium vs undisturbed price and benchmark against historical sector deal premiums.</div>
+      <a class="calc-link" href="/domains/ma/calculators/deal-premium.html">Open Calculator →</a>
+    </div>
+    <div class="calc-card">
+      <div class="calc-card-top">
+        <div class="calc-icon">⚡</div>
+        <div class="badge badge-pro">Pro</div>
+      </div>
+      <div class="calc-name">Synergy Calculator</div>
+      <div class="calc-desc">Model revenue synergies, cost synergies, and capex savings. Compute the PV of synergies and payback period.</div>
+      <a class="calc-link" href="/domains/ma/calculators/synergy.html">Open Calculator →</a>
+    </div>
+    <div class="calc-card">
+      <div class="calc-card-top">
+        <div class="calc-icon">🔀</div>
+        <div class="badge badge-pro">Pro</div>
+      </div>
+      <div class="calc-name">Merger Model</div>
+      <div class="calc-desc">Combined P&L, purchase price allocation, goodwill calculation, and exchange ratio analysis for all-stock deals.</div>
+      <a class="calc-link" href="/domains/ma/calculators/merger-model.html">Open Calculator →</a>
+    </div>
+    <div class="calc-card">
+      <div class="calc-card-top">
+        <div class="calc-icon">🏦</div>
+        <div class="badge badge-pro">Pro</div>
+      </div>
+      <div class="calc-name">Deal Financing Mix</div>
+      <div class="calc-desc">Optimise the cash / stock / debt mix. See how each financing choice changes accretion, leverage, and dilution.</div>
+      <a class="calc-link" href="/domains/ma/calculators/deal-financing.html">Open Calculator →</a>
+    </div>
+  </div>
+
+  <div class="pro-strip">
+    <div>
+      <h3>Unlock all 4 Pro M&A Calculators</h3>
+      <p>Full deal modeling — synergies, financing mix, merger model, and deal premium analysis. Monthly only, cancel anytime.</p>
+    </div>
+    <button class="pro-strip-btn" onclick="alert('Pro unlock coming soon — ₹799/mo for all 15 domains.')">Unlock Pro — ₹799/mo →</button>
+  </div>
+
+  <div class="section-title">Learning Modules</div>
+  <div class="learn-grid">
+    <div class="learn-card">
+      <div class="learn-num">Module 1</div>
+      <div class="learn-title">M&A Deal Mechanics: Why Companies Buy Each Other</div>
+      <div class="learn-sub">Strategic rationale, deal types, regulatory landscape</div>
+    </div>
+    <div class="learn-card">
+      <div class="learn-num">Module 2</div>
+      <div class="learn-title">Accretion/Dilution: The IB Analyst's First Test</div>
+      <div class="learn-sub">EPS impact, PE differential, synergy payback</div>
+    </div>
+    <div class="learn-card">
+      <div class="learn-num">Module 3</div>
+      <div class="learn-title">Synergies: The Promise vs the Reality</div>
+      <div class="learn-sub">Revenue vs cost synergies, capture rates, integration costs</div>
+    </div>
+    <div class="learn-card">
+      <div class="learn-num">Module 4</div>
+      <div class="learn-title">Deal Structuring: Cash, Stock, Debt and Why It Matters</div>
+      <div class="learn-sub">Financing trade-offs, purchase price allocation, goodwill</div>
+    </div>
+  </div>
+
+  <a href="/domains/ma/learn/" style="display:inline-flex;align-items:center;gap:6px;background:var(--text);color:#fff;padding:11px 20px;border-radius:8px;font-size:13px;font-weight:700">Read Learning Modules →</a>
+</div>
+
+</body>
+</html>

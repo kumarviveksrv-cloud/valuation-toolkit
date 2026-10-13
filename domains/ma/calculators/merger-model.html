@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Merger Model — M&A — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-pro{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+.main{max-width:720px;margin:0 auto;padding:32px 24px 80px}
+h1{font-size:clamp(18px,3vw,24px);font-weight:900;letter-spacing:-.02em;margin-bottom:4px}
+.sub{font-size:13px;color:var(--muted);margin-bottom:28px}
+.steps{display:flex;gap:0;margin-bottom:28px;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.step{flex:1;padding:10px 14px;font-size:12px;font-weight:700;color:var(--muted);background:#fff;text-align:center;border-right:1px solid var(--border)}
+.step:last-child{border-right:none}
+.step.active{background:var(--text);color:#fff}
+.step.done{background:#f0fdf4;color:var(--green)}
+.card{border:1px solid var(--border);border-radius:10px;padding:24px;margin-bottom:16px}
+.search-row{display:flex;gap:10px;margin-bottom:16px}
+.search-input{flex:1;border:1px solid var(--border);border-radius:7px;padding:10px 14px;font-size:14px;font-family:'Inter',sans-serif;outline:none}
+.search-input:focus{border-color:#aaa}
+.sector-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.sf{padding:5px 12px;border-radius:20px;border:1px solid var(--border);font-size:11px;font-weight:700;cursor:pointer;background:#fff}
+.sf.active{background:var(--text);color:#fff;border-color:var(--text)}
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;max-height:320px;overflow-y:auto}
+.co-btn{border:1px solid var(--border);border-radius:8px;padding:10px 12px;background:#fff;cursor:pointer;text-align:left;transition:all .12s}
+.co-btn:hover{border-color:#aaa;background:var(--card)}
+.co-btn.selected{border-color:var(--text);background:var(--text);color:#fff}
+.co-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.co-meta{font-size:11px;opacity:.6}
+.btn-primary{background:var(--text);color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-primary:hover{opacity:.85}
+.btn-sec{background:#fff;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:11px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-sec:hover{background:var(--card)}
+.btn-row{display:flex;gap:10px;margin-top:20px}
+.context-eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.context-headline{font-size:18px;font-weight:900;letter-spacing:-.02em;margin-bottom:12px}
+.context-body{font-size:14px;color:#374151;line-height:1.65;margin-bottom:16px}
+.formula-box{background:#0a0a0a;color:#e2e8f0;border-radius:8px;padding:16px;margin:16px 0;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.8}
+.formula-box .hl{color:#86efac}
+.insight-card{background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:14px 16px;margin-top:16px}
+.insight-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin-bottom:4px}
+.insight-text{font-size:13px;color:#14532d;line-height:1.55}
+.bench-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:16px}
+.bench-table th{text-align:left;padding:8px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-bottom:2px solid var(--border)}
+.bench-table td{padding:8px 10px;border-bottom:1px solid var(--border)}
+.bench-table tr:last-child td{border-bottom:none}
+.callout{border-left:3px solid var(--text);padding:10px 14px;background:var(--card);border-radius:0 6px 6px 0;margin:14px 0;font-size:13px;line-height:1.55;color:#374151}
+.pro-gate{border:2px dashed var(--border);border-radius:10px;padding:32px 24px;text-align:center}
+.pro-gate-icon{font-size:28px;margin-bottom:12px}
+.pro-gate-title{font-size:17px;font-weight:800;margin-bottom:6px}
+.pro-gate-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.55}
+.pro-features{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:24px;text-align:left;max-width:380px;margin-left:auto;margin-right:auto}
+.pro-features li{font-size:13px;color:#374151;display:flex;align-items:center;gap:8px}
+.pro-features li::before{content:"→";font-weight:700;color:var(--text)}
+.pro-btn{background:var(--text);color:#fff;border:none;border-radius:8px;padding:13px 28px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;display:block;margin:0 auto 8px}
+.pro-note{font-size:11px;color:var(--muted)}
+.section-label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:18px 0 8px}
+.ppa-flow{display:flex;flex-direction:column;gap:4px;margin:14px 0}
+.ppa-row{display:flex;align-items:center;padding:8px 12px;border-radius:6px;font-size:13px;justify-content:space-between}
+.ppa-row.header{background:var(--text);color:#fff;font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+.ppa-row.item{background:var(--card);border:1px solid var(--border)}
+.ppa-row.subtotal{background:#e5e7eb;font-weight:700}
+.ppa-row.result{background:#0a0a0a;color:#86efac;font-weight:700;font-size:14px}
+.ppa-label{flex:1}
+.ppa-value{font-family:'JetBrains Mono',monospace;font-size:12px}
+.concept-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.concept-box{border:1px solid var(--border);border-radius:8px;padding:14px}
+.concept-title{font-size:12px;font-weight:800;margin-bottom:5px}
+.concept-text{font-size:12px;color:var(--muted);line-height:1.5}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-left">
+    <a href="/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">›</span>
+    <a href="/domains/ma/">M&A</a>
+    <span class="nav-sep">›</span>
+    <a href="/domains/ma/calculators/">Calculators</a>
+    <span class="nav-sep">›</span>
+    <span>Merger Model</span>
+  </div>
+  <button class="nav-pro" onclick="unlockPro()">Go Pro — ₹799/mo</button>
+</nav>
+
+<div class="main">
+  <h1>Merger Model</h1>
+  <p class="sub">Combined P&L, purchase price allocation, goodwill, and exchange ratio analysis.</p>
+
+  <div class="steps">
+    <div class="step active" id="s1tab">1 · Pick Company</div>
+    <div class="step" id="s2tab">2 · Model Concepts</div>
+    <div class="step" id="s3tab">3 · Build Model</div>
+    <div class="step" id="s4tab">4 · Combined P&L</div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div id="step1">
+    <div class="card">
+      <div class="section-label">Select an acquirer company</div>
+      <div class="search-row">
+        <input class="search-input" id="searchInput" placeholder="Search company or ticker…" oninput="filterCos()">
+      </div>
+      <div class="sector-filters" id="sectorFilters"></div>
+      <div class="company-grid" id="coGrid"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="goStep2()" id="nextBtn1" disabled>Next: Model Concepts →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div id="step2" style="display:none">
+    <div class="card">
+      <div class="context-eyebrow" id="s2eyebrow">Merger Model</div>
+      <div class="context-headline">How a Merger Model Works</div>
+
+      <div class="context-body">
+        A merger model combines the acquirer's and target's financial statements to test accretion/dilution, allocate the purchase price, and determine the exchange ratio for stock deals. It is the central analytical output every IB team builds on a live mandate.
+      </div>
+
+      <div class="formula-box">
+<span class="hl">Purchase Price Allocation (PPA):</span>
+  Fair Value of Assets     = Book Value + Step-Up
+  Identifiable Intangibles = Brand + IP + Customer lists
+  Goodwill                 = Purchase Price − FV of Net Assets
+<br>
+<span class="hl">Exchange Ratio (Stock Deals):</span>
+  Exchange Ratio = Offer Price per Target Share ÷ Acquirer Share Price
+  New Shares Issued = Target Shares Outstanding × Exchange Ratio
+<br>
+<span class="hl">Goodwill:</span>
+  Goodwill = Enterprise Value − FV of Identifiable Net Assets
+      </div>
+
+      <div class="section-label" style="margin-top:4px">Purchase Price Allocation — Illustrative Flow</div>
+      <div class="ppa-flow">
+        <div class="ppa-row header"><span class="ppa-label">Line Item</span><span class="ppa-value">₹ Cr (Illustrative)</span></div>
+        <div class="ppa-row item"><span class="ppa-label">Purchase Price (EV)</span><span class="ppa-value">10,000</span></div>
+        <div class="ppa-row item"><span class="ppa-label">Less: Net Debt</span><span class="ppa-value">(2,000)</span></div>
+        <div class="ppa-row subtotal"><span class="ppa-label">Equity Purchase Price</span><span class="ppa-value">8,000</span></div>
+        <div class="ppa-row item"><span class="ppa-label">Book Value of Equity</span><span class="ppa-value">3,000</span></div>
+        <div class="ppa-row item"><span class="ppa-label">PP&amp;E Step-Up</span><span class="ppa-value">500</span></div>
+        <div class="ppa-row item"><span class="ppa-label">Identifiable Intangibles (Brand, IP)</span><span class="ppa-value">1,500</span></div>
+        <div class="ppa-row item"><span class="ppa-label">Deferred Tax Liability</span><span class="ppa-value">(450)</span></div>
+        <div class="ppa-row subtotal"><span class="ppa-label">Fair Value of Net Assets</span><span class="ppa-value">4,550</span></div>
+        <div class="ppa-row result"><span class="ppa-label">Goodwill (Residual)</span><span class="ppa-value">3,450</span></div>
+      </div>
+
+      <div class="callout">
+        Goodwill is not amortised under IND AS 103 but is tested for impairment annually. A large goodwill balance signals the acquirer paid well above book — markets watch for future write-downs as a deal quality signal.
+      </div>
+
+      <div class="concept-grid">
+        <div class="concept-box">
+          <div class="concept-title">Identifiable Intangibles</div>
+          <div class="concept-text">Brand, patents, customer lists, non-compete agreements — must be separately valued and amortised (typically 5–20 years).</div>
+        </div>
+        <div class="concept-box">
+          <div class="concept-title">Exchange Ratio</div>
+          <div class="concept-text">In all-stock deals, the ratio of acquirer shares given per target share. Collar structures protect against price moves between announcement and close.</div>
+        </div>
+        <div class="concept-box">
+          <div class="concept-title">D&A Step-Up</div>
+          <div class="concept-text">Post-acquisition amortisation of intangibles reduces reported net income. This non-cash charge is the primary reason PPA reduces EPS in stock deals.</div>
+        </div>
+        <div class="concept-box">
+          <div class="concept-title">Deferred Tax Liability</div>
+          <div class="concept-text">Asset step-ups create a temporary taxable difference. The DTL is recognised at close and reverses as assets are depreciated or sold.</div>
+        </div>
+      </div>
+
+      <div class="section-label" style="margin-top:20px">Sector: Typical Goodwill as % of Deal Value</div>
+      <table class="bench-table">
+        <thead><tr><th>Sector</th><th>Goodwill / EV</th><th>Driver</th></tr></thead>
+        <tbody id="benchBody"></tbody>
+      </table>
+
+      <div class="insight-card" id="s2insight">
+        <div class="insight-label">Sector Insight</div>
+        <div class="insight-text" id="s2insightText"></div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-sec" onclick="goStep1()">← Back</button>
+      <button class="btn-primary" onclick="goStep3()">Next: Build Model →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3 — PRO GATE -->
+  <div id="step3" style="display:none">
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <div class="pro-gate-title">Merger Model Builder — Pro</div>
+      <div class="pro-gate-sub">Input acquirer and target P&L, deal structure, and financing to build a complete merger model with PPA and exchange ratio analysis.</div>
+      <ul class="pro-features">
+        <li>Acquirer &amp; target revenue, EBITDA, D&amp;A, net income inputs</li>
+        <li>Purchase price allocation with intangible step-ups</li>
+        <li>Goodwill calculation and impairment sensitivity</li>
+        <li>Exchange ratio computation for all-stock or mixed deals</li>
+        <li>D&amp;A step-up impact on combined P&amp;L</li>
+        <li>Pro-forma accretion/dilution with PPA adjustments</li>
+        <li>Collar structure analysis for stock deals</li>
+        <li>Deferred tax liability calculation</li>
+        <li>Export to PDF / Excel</li>
+      </ul>
+      <button class="pro-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+      <div class="pro-note">Monthly only · Cancel anytime · All 15 domains included</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-sec" onclick="goStep2()">← Back</button>
+    </div>
+  </div>
+
+  <!-- STEP 4 — PRO GATE -->
+  <div id="step4" style="display:none">
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <div class="pro-gate-title">Combined P&L — Pro</div>
+      <div class="pro-gate-sub">Full pro-forma combined P&L with PPA adjustments, goodwill, and exchange ratio analysis.</div>
+      <button class="pro-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+      <div class="pro-note">Monthly only · Cancel anytime · All 15 domains included</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const COMPANIES = [
+  {name:'Reliance Industries',ticker:'RIL',sector:'Conglomerate'},
+  {name:'Tata Consultancy Services',ticker:'TCS',sector:'Technology'},
+  {name:'Infosys',ticker:'INFY',sector:'Technology'},
+  {name:'HDFC Bank',ticker:'HDFCBANK',sector:'Banking/NBFC'},
+  {name:'ICICI Bank',ticker:'ICICIBANK',sector:'Banking/NBFC'},
+  {name:'Hindustan Unilever',ticker:'HUL',sector:'FMCG/Consumer'},
+  {name:'ITC Limited',ticker:'ITC',sector:'FMCG/Consumer'},
+  {name:'Bharti Airtel',ticker:'AIRTEL',sector:'Telecom'},
+  {name:'Wipro',ticker:'WIPRO',sector:'Technology'},
+  {name:'Asian Paints',ticker:'ASIANPAINT',sector:'Chemicals'},
+  {name:'Bajaj Finance',ticker:'BAJFINANCE',sector:'Banking/NBFC'},
+  {name:'Maruti Suzuki',ticker:'MARUTI',sector:'Automobiles'},
+  {name:'Sun Pharmaceutical',ticker:'SUNPHARMA',sector:'Healthcare/Pharma'},
+  {name:"Dr. Reddy's Labs",ticker:'DRREDDY',sector:'Healthcare/Pharma'},
+  {name:'Titan Company',ticker:'TITAN',sector:'FMCG/Consumer'},
+  {name:'Larsen & Toubro',ticker:'LT',sector:'Infrastructure'},
+  {name:'UltraTech Cement',ticker:'ULTRACEMCO',sector:'Conglomerate'},
+  {name:'Nestle India',ticker:'NESTLEIND',sector:'FMCG/Consumer'},
+  {name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',sector:'Banking/NBFC'},
+  {name:'Axis Bank',ticker:'AXISBANK',sector:'Banking/NBFC'},
+  {name:'State Bank of India',ticker:'SBIN',sector:'Banking/NBFC'},
+  {name:'ONGC',ticker:'ONGC',sector:'Oil & Gas'},
+  {name:'Coal India',ticker:'COALINDIA',sector:'Metals & Mining'},
+  {name:'JSW Steel',ticker:'JSWSTEEL',sector:'Metals & Mining'},
+  {name:'Tata Steel',ticker:'TATASTEEL',sector:'Metals & Mining'},
+  {name:'Power Grid Corp',ticker:'POWERGRID',sector:'Power/Utilities'},
+  {name:'NTPC',ticker:'NTPC',sector:'Power/Utilities'},
+  {name:'DLF',ticker:'DLF',sector:'Real Estate'},
+  {name:'Godrej Properties',ticker:'GODREJPROP',sector:'Real Estate'},
+  {name:'Zee Entertainment',ticker:'ZEEL',sector:'Media'}
+];
+
+const SECTOR_CONTEXT = {
+  'Technology':      {goodwill:'45–65% of EV',driver:'IP and talent moats',insight:'Tech acquisitions carry the highest goodwill ratios because acquirers pay for future earnings power and IP, not hard assets. Intangible amortisation post-PPA can suppress combined EPS by 8–15% in year one.'},
+  'Banking/NBFC':    {goodwill:'15–30% of EV',driver:'Deposit franchise and branch network',insight:'Banking PPA is unique: financial instruments are carried at fair value, so step-ups are minimal. Goodwill is lower but core deposit intangibles and customer relationship values are separately identified.'},
+  'Healthcare/Pharma':{goodwill:'35–55% of EV',driver:'ANDA pipeline and brand portfolio',insight:'Pharma PPA requires valuing in-process R&D (IPR&D), which is expensed immediately under IND AS, creating a one-time drag. Branded product intangibles are amortised over 10–15 year useful lives.'},
+  'FMCG/Consumer':   {goodwill:'30–50% of EV',driver:'Brand equity and distribution rights',insight:'FMCG mergers allocate significant value to brand intangibles (amortised over 20–40 years) and distribution networks. The D&A step-up from brand amortisation is the primary EPS drag.'},
+  'Oil & Gas':       {goodwill:'10–25% of EV',driver:'Proved reserves and concession value',insight:'Oil & Gas PPA focuses on proved, probable and possible (3P) reserve valuation. Intangibles are minimal — most step-up goes to PP&E (exploration and development assets).'},
+  'Metals & Mining': {goodwill:'10–20% of EV',driver:'Mineral rights and ore reserves',insight:'Mining PPA is largely PP&E step-up for mineral rights. Goodwill is modest as hard asset values underpin the deal. Depletion accounting (not depreciation) applies to wasting assets.'},
+  'Telecom':         {goodwill:'30–45% of EV',driver:'Spectrum licences and subscriber base',insight:'Telecom PPA identifies spectrum licences (amortised over licence life), customer relationships, and brand. Spectrum values at auction price drive most of the intangible allocation.'},
+  'Automobiles':     {goodwill:'25–40% of EV',driver:'Platform IP and brand',insight:'Auto PPA identifies technology platforms, dealer agreements, and brand as key intangibles. EV acquisitions carry higher goodwill due to battery IP and software platform premiums.'},
+  'Power/Utilities': {goodwill:'5–15% of EV',driver:'Power purchase agreements and licences',insight:'Utility mergers are largely asset deals with minimal goodwill. PPAs (power purchase agreements) are valued as contract intangibles but regulators cap tariff returns, limiting surplus.'},
+  'Real Estate':     {goodwill:'5–15% of EV',driver:'Land bank and development rights',insight:'Real estate deals are predominantly asset acquisitions. Land is not depreciated; development rights are capitalised. Goodwill rarely arises as land fair values are observable.'},
+  'Media':           {goodwill:'35–55% of EV',driver:'Content library and subscriber relationships',insight:'Media PPA involves content library valuation (on an income basis, amortised over 5–10 years) and subscriber intangibles. OTT content libraries are the highest-value intangible in current media deals.'},
+  'Chemicals':       {goodwill:'20–35% of EV',driver:'Specialty formulations and customer relationships',insight:'Chemical PPA allocates to customer relationships (3–7 year amortisation) and proprietary formulations (patents, trade secrets). Commodity chemical deals carry very low goodwill.'},
+  'Infrastructure':  {goodwill:'10–20% of EV',driver:'Order book and concession licences',insight:'Infra PPA is primarily PP&E step-up (for the concession asset) and order book backlog (amortised as contracts are executed). Goodwill is low in most cases.'},
+  'Conglomerate':    {goodwill:'20–40% of EV',driver:'Multiple business units',insight:'Conglomerate PPA must allocate across multiple reporting units. Goodwill is tested at business unit level — a weak subsidiary can trigger write-downs without affecting the whole group.'}
+};
+
+const BENCH_DATA = [
+  {sector:'Technology',gw:'45–65%',driver:'IP and talent'},
+  {sector:'Media',gw:'35–55%',driver:'Content library and subs'},
+  {sector:'Healthcare/Pharma',gw:'35–55%',driver:'ANDA pipeline and brand'},
+  {sector:'FMCG/Consumer',gw:'30–50%',driver:'Brand equity'},
+  {sector:'Telecom',gw:'30–45%',driver:'Spectrum licences'},
+  {sector:'Automobiles',gw:'25–40%',driver:'Platform IP and brand'},
+  {sector:'Chemicals',gw:'20–35%',driver:'Customer relationships'},
+  {sector:'Banking/NBFC',gw:'15–30%',driver:'Deposit franchise'},
+  {sector:'Conglomerate',gw:'20–40%',driver:'Multiple business units'},
+  {sector:'Oil & Gas',gw:'10–25%',driver:'Proved reserves'},
+  {sector:'Metals & Mining',gw:'10–20%',driver:'Mineral rights'},
+  {sector:'Power/Utilities',gw:'5–15%',driver:'PPA contracts'},
+];
+
+let selectedCo=null,activeSector='All';
+const sectors=['All','Technology','Banking/NBFC','Healthcare/Pharma','FMCG/Consumer','Oil & Gas','Metals & Mining','Telecom','Automobiles','Power/Utilities','Real Estate','Media','Chemicals','Infrastructure','Conglomerate'];
+function renderFilters(){document.getElementById('sectorFilters').innerHTML=sectors.map(s=>`<button class="sf${s===activeSector?' active':''}" onclick="setSector('${s}')">${s}</button>`).join('');}
+function setSector(s){activeSector=s;renderFilters();filterCos();}
+function filterCos(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const f=COMPANIES.filter(c=>(activeSector==='All'||c.sector===activeSector)&&(!q||c.name.toLowerCase().includes(q)||c.ticker.toLowerCase().includes(q)));
+  document.getElementById('coGrid').innerHTML=f.map(c=>`<button class="co-btn${selectedCo&&selectedCo.ticker===c.ticker?' selected':''}" onclick="selectCo('${c.ticker}')"><div class="co-name">${c.name}</div><div class="co-meta">${c.ticker} · ${c.sector}</div></button>`).join('');
+}
+function selectCo(ticker){selectedCo=COMPANIES.find(c=>c.ticker===ticker);filterCos();document.getElementById('nextBtn1').disabled=false;}
+function goStep1(){showStep(1);}
+function goStep2(){
+  if(!selectedCo) return;
+  const ctx=SECTOR_CONTEXT[selectedCo.sector]||SECTOR_CONTEXT['Conglomerate'];
+  document.getElementById('s2eyebrow').textContent=selectedCo.ticker+' · '+selectedCo.sector;
+  document.getElementById('s2insightText').textContent=ctx.insight;
+  document.getElementById('benchBody').innerHTML=BENCH_DATA.map(b=>`<tr${b.sector.includes(selectedCo.sector)?` class="highlight"`:''}><td>${b.sector}</td><td>${b.gw}</td><td>${b.driver}</td></tr>`).join('');
+  showStep(2);
+}
+function goStep3(){showStep(3);}
+function showStep(n){
+  for(let i=1;i<=4;i++){document.getElementById('step'+i).style.display=i===n?'block':'none';document.getElementById('s'+i+'tab').className='step'+(i===n?' active':i<n?' done':'');}
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+renderFilters();filterCos();
+</script>
+</body>
+</html>

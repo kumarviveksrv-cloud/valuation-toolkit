@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Synergy Calculator — M&A — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-pro{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+.main{max-width:720px;margin:0 auto;padding:32px 24px 80px}
+h1{font-size:clamp(18px,3vw,24px);font-weight:900;letter-spacing:-.02em;margin-bottom:4px}
+.sub{font-size:13px;color:var(--muted);margin-bottom:28px}
+.steps{display:flex;gap:0;margin-bottom:28px;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.step{flex:1;padding:10px 14px;font-size:12px;font-weight:700;color:var(--muted);background:#fff;text-align:center;border-right:1px solid var(--border)}
+.step:last-child{border-right:none}
+.step.active{background:var(--text);color:#fff}
+.step.done{background:#f0fdf4;color:var(--green)}
+.card{border:1px solid var(--border);border-radius:10px;padding:24px;margin-bottom:16px}
+.search-row{display:flex;gap:10px;margin-bottom:16px}
+.search-input{flex:1;border:1px solid var(--border);border-radius:7px;padding:10px 14px;font-size:14px;font-family:'Inter',sans-serif;outline:none}
+.search-input:focus{border-color:#aaa}
+.sector-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.sf{padding:5px 12px;border-radius:20px;border:1px solid var(--border);font-size:11px;font-weight:700;cursor:pointer;background:#fff}
+.sf.active{background:var(--text);color:#fff;border-color:var(--text)}
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;max-height:320px;overflow-y:auto}
+.co-btn{border:1px solid var(--border);border-radius:8px;padding:10px 12px;background:#fff;cursor:pointer;text-align:left;transition:all .12s}
+.co-btn:hover{border-color:#aaa;background:var(--card)}
+.co-btn.selected{border-color:var(--text);background:var(--text);color:#fff}
+.co-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.co-meta{font-size:11px;opacity:.6}
+.btn-primary{background:var(--text);color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-primary:hover{opacity:.85}
+.btn-sec{background:#fff;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:11px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-sec:hover{background:var(--card)}
+.btn-row{display:flex;gap:10px;margin-top:20px}
+.context-eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.context-headline{font-size:18px;font-weight:900;letter-spacing:-.02em;margin-bottom:12px}
+.context-body{font-size:14px;color:#374151;line-height:1.65;margin-bottom:16px}
+.formula-box{background:#0a0a0a;color:#e2e8f0;border-radius:8px;padding:16px;margin:16px 0;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.8}
+.formula-box .hl{color:#86efac}
+.insight-card{background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:14px 16px;margin-top:16px}
+.insight-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin-bottom:4px}
+.insight-text{font-size:13px;color:#14532d;line-height:1.55}
+.bench-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:16px}
+.bench-table th{text-align:left;padding:8px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-bottom:2px solid var(--border)}
+.bench-table td{padding:8px 10px;border-bottom:1px solid var(--border)}
+.bench-table tr:last-child td{border-bottom:none}
+.bench-table tr.highlight td{background:#f0fdf4;font-weight:700}
+.callout{border-left:3px solid var(--text);padding:10px 14px;background:var(--card);border-radius:0 6px 6px 0;margin:14px 0;font-size:13px;line-height:1.55;color:#374151}
+.callout-amber{border-left:3px solid var(--amber);padding:10px 14px;background:#fffbeb;border-radius:0 6px 6px 0;margin:14px 0;font-size:13px;line-height:1.55;color:#78350f}
+.pro-gate{border:2px dashed var(--border);border-radius:10px;padding:32px 24px;text-align:center}
+.pro-gate-icon{font-size:28px;margin-bottom:12px}
+.pro-gate-title{font-size:17px;font-weight:800;margin-bottom:6px}
+.pro-gate-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.55}
+.pro-features{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:24px;text-align:left;max-width:360px;margin-left:auto;margin-right:auto}
+.pro-features li{font-size:13px;color:#374151;display:flex;align-items:center;gap:8px}
+.pro-features li::before{content:"→";font-weight:700;color:var(--text)}
+.pro-btn{background:var(--text);color:#fff;border:none;border-radius:8px;padding:13px 28px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;display:block;margin:0 auto 8px}
+.pro-note{font-size:11px;color:var(--muted)}
+.section-label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:18px 0 8px}
+.concept-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.concept-box{border:1px solid var(--border);border-radius:8px;padding:14px}
+.concept-box.green{border-color:#86efac;background:#f0fdf4}
+.concept-box.red{border-color:#fca5a5;background:#fef2f2}
+.concept-title{font-size:12px;font-weight:800;margin-bottom:5px}
+.concept-text{font-size:12px;color:var(--muted);line-height:1.5}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.stat-box{background:var(--card);border-radius:8px;padding:14px;text-align:center}
+.stat-num{font-size:22px;font-weight:900;letter-spacing:-.02em}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:3px}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-left">
+    <a href="/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">›</span>
+    <a href="/domains/ma/">M&A</a>
+    <span class="nav-sep">›</span>
+    <a href="/domains/ma/calculators/">Calculators</a>
+    <span class="nav-sep">›</span>
+    <span>Synergy Calculator</span>
+  </div>
+  <button class="nav-pro" onclick="unlockPro()">Go Pro — ₹799/mo</button>
+</nav>
+
+<div class="main">
+  <h1>Synergy Calculator</h1>
+  <p class="sub">Model revenue and cost synergies, integration costs, and present value of combined synergy capture.</p>
+
+  <div class="steps">
+    <div class="step active" id="s1tab">1 · Pick Company</div>
+    <div class="step" id="s2tab">2 · Synergy Context</div>
+    <div class="step" id="s3tab">3 · Model Synergies</div>
+    <div class="step" id="s4tab">4 · PV Analysis</div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div id="step1">
+    <div class="card">
+      <div class="section-label">Select an acquirer company to benchmark</div>
+      <div class="search-row">
+        <input class="search-input" id="searchInput" placeholder="Search company or ticker…" oninput="filterCos()">
+      </div>
+      <div class="sector-filters" id="sectorFilters"></div>
+      <div class="company-grid" id="coGrid"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="goStep2()" id="nextBtn1" disabled>Next: Synergy Context →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div id="step2" style="display:none">
+    <div class="card">
+      <div class="context-eyebrow" id="s2eyebrow">Synergy Analysis</div>
+      <div class="context-headline" id="s2headline">The Promise vs. the Reality</div>
+
+      <div class="context-body">
+        Synergies are the most cited — and most abused — rationale in M&A. They come in two flavours: <strong>revenue synergies</strong> (harder to achieve, often overstated) and <strong>cost synergies</strong> (more predictable, but still take 12–24 months to fully capture).
+      </div>
+
+      <div class="concept-grid">
+        <div class="concept-box green">
+          <div class="concept-title">Revenue Synergies</div>
+          <div class="concept-text">Cross-selling, new geographies, pricing power, bundled products. Typically 2–5% of combined revenue. Take 2–4 years to fully materialise.</div>
+        </div>
+        <div class="concept-box green">
+          <div class="concept-title">Cost Synergies</div>
+          <div class="concept-text">Headcount reduction, shared procurement, consolidated facilities, IT rationalisation. Often 5–15% of combined EBITDA. Faster to realise.</div>
+        </div>
+        <div class="concept-box red">
+          <div class="concept-title">Integration Costs</div>
+          <div class="concept-text">One-time restructuring, severance, system integration, consultant fees. Typically 20–60% of annual synergies. Must be netted against PV.</div>
+        </div>
+        <div class="concept-box red">
+          <div class="concept-title">Capture Rate Risk</div>
+          <div class="concept-text">McKinsey data: 60–70% of synergy targets are never achieved. Culture clashes and execution failures are the most common culprits.</div>
+        </div>
+      </div>
+
+      <div class="formula-box">
+<span class="hl">PV of Synergies</span>  = Σ [Annual Synergy × Capture Rate × (1−Tax)] ÷ (1+WACC)^t
+<br><br>
+<span class="hl">Payback Period</span>   = Integration Costs ÷ Annual After-Tax Synergies
+<br><br>
+<span class="hl">Net Synergy Value</span> = PV of Synergies − PV of Integration Costs
+      </div>
+
+      <div class="callout-amber">
+        <strong>The IB rule of thumb:</strong> never pay more than 50% of the PV of synergies upfront as premium. The rest should accrue to the acquirer's shareholders.
+      </div>
+
+      <div class="section-label" style="margin-top:20px">Synergy Benchmarks by Sector (% of combined EBITDA)</div>
+      <table class="bench-table" id="benchTable">
+        <thead><tr><th>Sector</th><th>Revenue Synergy</th><th>Cost Synergy</th><th>Typical Payback</th></tr></thead>
+        <tbody id="benchBody"></tbody>
+      </table>
+
+      <div class="insight-card" id="s2insight">
+        <div class="insight-label">Sector Insight</div>
+        <div class="insight-text" id="s2insightText"></div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-sec" onclick="goStep1()">← Back</button>
+      <button class="btn-primary" onclick="goStep3()">Next: Model Synergies →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3 — PRO GATE -->
+  <div id="step3" style="display:none">
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <div class="pro-gate-title">Synergy Modeler — Pro</div>
+      <div class="pro-gate-sub">Input revenue synergies, cost synergies, integration costs, and see annual ramp-up schedules with full PV calculation.</div>
+      <ul class="pro-features">
+        <li>Revenue synergy inputs (cross-sell, new geo, pricing)</li>
+        <li>Cost synergy inputs (headcount, procurement, facilities)</li>
+        <li>Integration cost modeler (one-time + recurring)</li>
+        <li>3-year synergy ramp-up schedule</li>
+        <li>Capture rate sensitivity (50%, 70%, 90%)</li>
+        <li>PV of synergies with WACC sensitivity</li>
+        <li>Payback period and net synergy value</li>
+        <li>% of deal premium justified by synergies</li>
+        <li>Export to PDF / Excel</li>
+      </ul>
+      <button class="pro-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+      <div class="pro-note">Monthly only · Cancel anytime · All 15 domains included</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-sec" onclick="goStep2()">← Back</button>
+    </div>
+  </div>
+
+  <!-- STEP 4 — PRO GATE -->
+  <div id="step4" style="display:none">
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <div class="pro-gate-title">PV Analysis — Pro</div>
+      <div class="pro-gate-sub">Full synergy NPV, capture rate scenarios, and payback period analysis.</div>
+      <button class="pro-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+      <div class="pro-note">Monthly only · Cancel anytime · All 15 domains included</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const COMPANIES = [
+  {name:'Reliance Industries',ticker:'RIL',sector:'Conglomerate'},
+  {name:'Tata Consultancy Services',ticker:'TCS',sector:'Technology'},
+  {name:'Infosys',ticker:'INFY',sector:'Technology'},
+  {name:'HDFC Bank',ticker:'HDFCBANK',sector:'Banking/NBFC'},
+  {name:'ICICI Bank',ticker:'ICICIBANK',sector:'Banking/NBFC'},
+  {name:'Hindustan Unilever',ticker:'HUL',sector:'FMCG/Consumer'},
+  {name:'ITC Limited',ticker:'ITC',sector:'FMCG/Consumer'},
+  {name:'Bharti Airtel',ticker:'AIRTEL',sector:'Telecom'},
+  {name:'Wipro',ticker:'WIPRO',sector:'Technology'},
+  {name:'Asian Paints',ticker:'ASIANPAINT',sector:'Chemicals'},
+  {name:'Bajaj Finance',ticker:'BAJFINANCE',sector:'Banking/NBFC'},
+  {name:'Maruti Suzuki',ticker:'MARUTI',sector:'Automobiles'},
+  {name:'Sun Pharmaceutical',ticker:'SUNPHARMA',sector:'Healthcare/Pharma'},
+  {name:"Dr. Reddy's Labs",ticker:'DRREDDY',sector:'Healthcare/Pharma'},
+  {name:'Titan Company',ticker:'TITAN',sector:'FMCG/Consumer'},
+  {name:'Larsen & Toubro',ticker:'LT',sector:'Infrastructure'},
+  {name:'UltraTech Cement',ticker:'ULTRACEMCO',sector:'Conglomerate'},
+  {name:'Nestle India',ticker:'NESTLEIND',sector:'FMCG/Consumer'},
+  {name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',sector:'Banking/NBFC'},
+  {name:'Axis Bank',ticker:'AXISBANK',sector:'Banking/NBFC'},
+  {name:'State Bank of India',ticker:'SBIN',sector:'Banking/NBFC'},
+  {name:'ONGC',ticker:'ONGC',sector:'Oil & Gas'},
+  {name:'Coal India',ticker:'COALINDIA',sector:'Metals & Mining'},
+  {name:'JSW Steel',ticker:'JSWSTEEL',sector:'Metals & Mining'},
+  {name:'Tata Steel',ticker:'TATASTEEL',sector:'Metals & Mining'},
+  {name:'Power Grid Corp',ticker:'POWERGRID',sector:'Power/Utilities'},
+  {name:'NTPC',ticker:'NTPC',sector:'Power/Utilities'},
+  {name:'DLF',ticker:'DLF',sector:'Real Estate'},
+  {name:'Godrej Properties',ticker:'GODREJPROP',sector:'Real Estate'},
+  {name:'Zee Entertainment',ticker:'ZEEL',sector:'Media'}
+];
+
+const SECTOR_CONTEXT = {
+  'Technology':       {revSyn:'3–6% of rev',costSyn:'8–15% of EBITDA',payback:'2–3 yrs',insight:'IT mergers capture synergies quickly through shared delivery centres and talent rationalisation. Revenue synergies from cross-selling digital services to combined client bases are strong but take 18–24 months to evidence.'},
+  'Banking/NBFC':     {revSyn:'2–4% of rev',costSyn:'10–20% of opex',payback:'2–4 yrs',insight:'Banking mergers achieve cost synergies through branch rationalisation, ATM network overlap, and back-office consolidation. Core banking integration is expensive and typically takes 36 months.'},
+  'Healthcare/Pharma':{revSyn:'2–5% of rev',costSyn:'6–12% of EBITDA',payback:'2–4 yrs',insight:'Pharma synergies are R&D focused — shared ANDA pipeline and combined MR forces. Revenue synergies from geographic expansion in tier 2/3 are high potential but slow to materialise.'},
+  'FMCG/Consumer':    {revSyn:'3–6% of rev',costSyn:'5–10% of EBITDA',payback:'2–3 yrs',insight:'FMCG synergies come from distribution network consolidation and raw material procurement leverage. Rural distribution is the highest-value synergy in Indian FMCG deals.'},
+  'Oil & Gas':        {revSyn:'1–3% of rev',costSyn:'5–12% of EBITDA',payback:'3–5 yrs',insight:'Energy synergies focus on logistics (shared pipelines, terminals), procurement, and trading desks. Revenue synergies are minimal as oil prices are externally set.'},
+  'Metals & Mining':  {revSyn:'1–2% of rev',costSyn:'8–14% of EBITDA',payback:'3–5 yrs',insight:'Mining mergers capture scale in procurement (explosives, tyres, energy) and shared mine infrastructure. Logistics cost synergies via captive rail/port access can be substantial.'},
+  'Telecom':          {revSyn:'1–3% of rev',costSyn:'15–25% of EBITDA',payback:'2–4 yrs',insight:'Telecom is the poster child of cost synergies — tower sharing, spectrum optimisation, and vendor renegotiation. Vodafone-Idea targeted ₹8,400 Cr in synergies; Airtel-Telenor over ₹2,000 Cr.'},
+  'Automobiles':      {revSyn:'2–5% of rev',costSyn:'5–10% of EBITDA',payback:'3–5 yrs',insight:'Auto synergies come from platform sharing, dealer network overlap, and powertrain R&D cost sharing. EV acquisitions add battery tech synergies that can justify 10–20% cost reduction.'},
+  'Power/Utilities':  {revSyn:'0–2% of rev',costSyn:'5–10% of EBITDA',payback:'4–7 yrs',insight:'Utility synergies are modest and heavily regulated. Procurement scale and shared O&M teams offer cost reduction. Revenue synergies are almost nil in regulated tariff environments.'},
+  'Real Estate':      {revSyn:'2–4% of rev',costSyn:'4–8% of EBITDA',payback:'3–5 yrs',insight:'Real estate synergies come from shared construction procurement, project management, and brand extension into new geographies. Land monetisation timing is the key variable.'},
+  'Media':            {revSyn:'4–8% of rev',costSyn:'10–18% of EBITDA',payback:'2–4 yrs',insight:'Media mergers deliver content library cross-licensing, shared distribution, and combined ad sales. OTT content synergies from shared production infrastructure are the highest-growth opportunity.'},
+  'Chemicals':        {revSyn:'2–4% of rev',costSyn:'6–11% of EBITDA',payback:'2–3 yrs',insight:'Chemical mergers capture raw material procurement synergies, shared R&D, and geographic distribution leverage. China+1 consolidations add export capacity synergies.'},
+  'Infrastructure':   {revSyn:'1–3% of rev',costSyn:'5–10% of EBITDA',payback:'3–5 yrs',insight:'Infra synergies come from equipment pooling, shared engineering teams, and back-office consolidation. Order book strength adds revenue visibility that improves combined working capital terms.'},
+  'Conglomerate':     {revSyn:'2–4% of rev',costSyn:'6–12% of EBITDA',payback:'2–4 yrs',insight:'Conglomerate M&A synergies are complex and span multiple businesses. Shared captive financing, group procurement, and brand halo effects are the primary levers.'}
+};
+
+const BENCH_DATA = [
+  {sector:'Telecom',rev:'1–3%',cost:'15–25%',payback:'2–4 yrs'},
+  {sector:'Banking/NBFC',rev:'2–4%',cost:'10–20%',payback:'2–4 yrs'},
+  {sector:'Technology',rev:'3–6%',cost:'8–15%',payback:'2–3 yrs'},
+  {sector:'Media',rev:'4–8%',cost:'10–18%',payback:'2–4 yrs'},
+  {sector:'Metals & Mining',rev:'1–2%',cost:'8–14%',payback:'3–5 yrs'},
+  {sector:'Healthcare/Pharma',rev:'2–5%',cost:'6–12%',payback:'2–4 yrs'},
+  {sector:'Chemicals',rev:'2–4%',cost:'6–11%',payback:'2–3 yrs'},
+  {sector:'FMCG/Consumer',rev:'3–6%',cost:'5–10%',payback:'2–3 yrs'},
+  {sector:'Automobiles',rev:'2–5%',cost:'5–10%',payback:'3–5 yrs'},
+  {sector:'Oil & Gas',rev:'1–3%',cost:'5–12%',payback:'3–5 yrs'},
+  {sector:'Power/Utilities',rev:'0–2%',cost:'5–10%',payback:'4–7 yrs'},
+];
+
+let selectedCo = null;
+let activeSector = 'All';
+const sectors = ['All','Technology','Banking/NBFC','Healthcare/Pharma','FMCG/Consumer','Oil & Gas','Metals & Mining','Telecom','Automobiles','Power/Utilities','Real Estate','Media','Chemicals','Infrastructure','Conglomerate'];
+
+function renderFilters(){
+  const el = document.getElementById('sectorFilters');
+  el.innerHTML = sectors.map(s=>`<button class="sf${s===activeSector?' active':''}" onclick="setSector('${s}')">${s}</button>`).join('');
+}
+function setSector(s){activeSector=s;renderFilters();filterCos();}
+function filterCos(){
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = COMPANIES.filter(c=>{
+    const matchSec = activeSector==='All'||c.sector===activeSector;
+    const matchQ = !q||c.name.toLowerCase().includes(q)||c.ticker.toLowerCase().includes(q);
+    return matchSec&&matchQ;
+  });
+  document.getElementById('coGrid').innerHTML = filtered.map(c=>`
+    <button class="co-btn${selectedCo&&selectedCo.ticker===c.ticker?' selected':''}" onclick="selectCo('${c.ticker}')">
+      <div class="co-name">${c.name}</div>
+      <div class="co-meta">${c.ticker} · ${c.sector}</div>
+    </button>`).join('');
+}
+function selectCo(ticker){selectedCo=COMPANIES.find(c=>c.ticker===ticker);filterCos();document.getElementById('nextBtn1').disabled=false;}
+function goStep1(){showStep(1);}
+function goStep2(){
+  if(!selectedCo) return;
+  const ctx = SECTOR_CONTEXT[selectedCo.sector]||SECTOR_CONTEXT['Conglomerate'];
+  document.getElementById('s2eyebrow').textContent = selectedCo.ticker+' · '+selectedCo.sector;
+  document.getElementById('s2headline').textContent = 'Synergies in '+selectedCo.sector+' Deals';
+  document.getElementById('s2insightText').textContent = ctx.insight;
+  document.getElementById('benchBody').innerHTML = BENCH_DATA.map(b=>`
+    <tr${b.sector.includes(selectedCo.sector)?` class="highlight"`:''}><td>${b.sector}</td><td>${b.rev}</td><td>${b.cost}</td><td>${b.payback}</td></tr>`).join('');
+  showStep(2);
+}
+function goStep3(){showStep(3);}
+function showStep(n){
+  for(let i=1;i<=4;i++){
+    document.getElementById('step'+i).style.display=i===n?'block':'none';
+    const tab=document.getElementById('s'+i+'tab');
+    tab.className='step'+(i===n?' active':i<n?' done':'');
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+renderFilters();filterCos();
+</script>
+</body>
+</html>

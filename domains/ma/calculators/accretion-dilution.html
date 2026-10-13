@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Accretion/Dilution Calculator — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+a{color:inherit;text-decoration:none}
+
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-cta{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+
+.hero{padding:40px 24px 32px;max-width:860px;margin:0 auto}
+.hero-eyebrow{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.hero h1{font-size:clamp(22px,3.5vw,30px);font-weight:900;letter-spacing:-.02em;line-height:1.15;margin-bottom:10px}
+.hero p{font-size:14px;color:var(--muted);line-height:1.6;max-width:560px}
+.free-tag{display:inline-block;background:#dcfce7;color:#15803d;font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;padding:3px 8px;border-radius:4px;margin-bottom:12px}
+
+.steps-wrap{max-width:860px;margin:0 auto;padding:0 24px 80px}
+.step{display:none}
+.step.active{display:block}
+
+.step-header{display:flex;align-items:center;gap:12px;margin-bottom:24px}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--text);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-title{font-size:15px;font-weight:700}
+.step-sub{font-size:12px;color:var(--muted);margin-top:1px}
+
+.search-bar{width:100%;border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:14px;font-family:'Inter',sans-serif;outline:none;margin-bottom:14px}
+.search-bar:focus{border-color:var(--text)}
+.filter-pills{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.pill{padding:5px 12px;border-radius:20px;border:1px solid var(--border);font-size:12px;font-weight:500;cursor:pointer;background:#fff;transition:all .15s}
+.pill.active,.pill:hover{background:var(--text);color:#fff;border-color:var(--text)}
+
+.co-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:24px}
+.co-card{border:1.5px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;transition:all .15s;background:#fff}
+.co-card:hover{border-color:#aaa;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.co-card.selected{border-color:var(--text);background:#f9fafb}
+.co-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.co-meta{font-size:11px;color:var(--muted)}
+
+.btn{display:inline-flex;align-items:center;gap:6px;padding:11px 22px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .15s;font-family:'Inter',sans-serif}
+.btn-primary{background:var(--text);color:#fff}
+.btn-primary:hover{opacity:.88}
+.btn-primary:disabled{opacity:.35;cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover{border-color:#aaa;color:var(--text)}
+.btn-row{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+
+/* CONTEXT CARD */
+.ctx-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:20px}
+.ctx-title{font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px;color:var(--muted)}
+.ctx-insight{font-size:14px;line-height:1.65;color:var(--text);margin-bottom:20px}
+
+/* FORMULA BOX */
+.formula-box{background:#0a0a0a;color:#f1f5f9;border-radius:8px;padding:18px 20px;font-family:'JetBrains Mono',monospace;font-size:12px;margin-bottom:20px;line-height:1.9}
+.f-comment{color:#6b7280;font-size:11px}
+.f-label{color:#94a3b8;font-size:11px}
+.f-eq{color:#fbbf24}
+.f-green{color:#4ade80}
+.f-red{color:#f87171}
+
+/* SECTOR TABLE */
+.sec-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px}
+.sec-table th{background:var(--card);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+.sec-table td{padding:10px 12px;border-bottom:1px solid var(--border)}
+.sec-table tr:last-child td{border-bottom:none}
+.td-sec{font-weight:600}
+.td-pos{color:var(--green);font-weight:700}
+.td-neg{color:var(--red);font-weight:700}
+
+/* STAT BOXES */
+.stat-boxes{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.stat-box{border:1px solid var(--border);border-radius:8px;padding:14px;background:#fff}
+.stat-label{font-size:11px;color:var(--muted);font-weight:500;margin-bottom:4px}
+.stat-value{font-size:18px;font-weight:800;letter-spacing:-.01em}
+.stat-sub{font-size:11px;color:var(--muted);margin-top:3px}
+
+/* INPUTS */
+.input-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-bottom:20px}
+.input-group{display:flex;flex-direction:column;gap:5px}
+.input-label{font-size:12px;font-weight:600;color:var(--text)}
+.input-hint{font-size:11px;color:var(--muted)}
+.input-field{border:1px solid var(--border);border-radius:7px;padding:9px 12px;font-size:14px;font-family:'Inter',sans-serif;outline:none;width:100%}
+.input-field:focus{border-color:var(--text)}
+.input-prefix{position:relative}
+.input-prefix .prefix{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--muted);pointer-events:none}
+.input-prefix input{padding-left:24px}
+
+/* SECTION DIVIDER */
+.section-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding:12px 0 8px;border-top:1px solid var(--border);margin-top:4px}
+
+/* LOADING */
+.loading-overlay{position:fixed;inset:0;background:#fff;z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px}
+.loading-overlay.hidden{display:none}
+.loading-logo{font-size:14px;font-weight:800;color:var(--text);letter-spacing:-.01em}
+.loading-msg{font-size:13px;color:var(--muted);min-height:20px;text-align:center}
+.progress-bar-wrap{width:260px;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.progress-bar{height:100%;background:var(--text);border-radius:2px;transition:width .4s ease}
+
+/* RESULTS */
+.result-hero{border-radius:12px;padding:24px;margin-bottom:20px;text-align:center}
+.result-hero.accretive{background:#f0fdf4;border:2px solid #86efac}
+.result-hero.dilutive{background:#fef2f2;border:2px solid #fca5a5}
+.result-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px}
+.result-label.accretive{color:#15803d}
+.result-label.dilutive{color:#991b1b}
+.result-value{font-size:42px;font-weight:900;letter-spacing:-.03em;margin-bottom:4px}
+.result-value.accretive{color:var(--green)}
+.result-value.dilutive{color:var(--red)}
+.result-sub{font-size:13px;color:var(--muted)}
+
+.result-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+.result-box{border:1px solid var(--border);border-radius:8px;padding:14px;background:#fff}
+.result-box-label{font-size:11px;color:var(--muted);font-weight:500;margin-bottom:4px}
+.result-box-value{font-size:17px;font-weight:800}
+
+.insight-card{background:#0a0a0a;color:#f9fafb;border-radius:10px;padding:18px 20px;margin-bottom:20px;font-size:13px;line-height:1.65}
+.insight-card .insight-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;color:#6b7280;margin-bottom:6px}
+
+.bridge-table{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px}
+.bridge-table td{padding:9px 14px;border-bottom:1px solid var(--border)}
+.bridge-table tr:last-child td{border-bottom:none}
+.bridge-table .b-label{color:var(--muted)}
+.bridge-table .b-val{text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700}
+.bridge-table .b-total{font-weight:800;font-size:14px}
+.bridge-table .b-line td{border-top:2px solid var(--border)}
+
+/* SAVE VAULT */
+.vault-btn{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--border);border-radius:7px;padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;background:#fff;color:var(--text);font-family:'Inter',sans-serif}
+.vault-btn:hover{background:var(--card)}
+</style>
+</head>
+<body>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-logo">ValuationDesk</div>
+  <div class="progress-bar-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
+  <div class="loading-msg" id="loadingMsg">Initialising deal analysis engine…</div>
+</div>
+
+<nav>
+  <div class="nav-left">
+    <a href="/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">›</span>
+    <a href="/domains/ma/">M&A</a>
+    <span class="nav-sep">›</span>
+    <span>Accretion / Dilution</span>
+  </div>
+  <button class="nav-cta" onclick="alert('Pro unlock coming soon — ₹799/mo for all 15 domains.')">Go Pro — ₹799/mo</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-eyebrow">M&A · Free Calculator</div>
+  <span class="free-tag">Free — No account needed</span>
+  <h1>Accretion / Dilution Calculator</h1>
+  <p>The first question every IB analyst answers when a new deal lands: does this acquisition add to or reduce the acquirer's EPS? Model the deal, enter your assumptions, and get the verdict.</p>
+</div>
+
+<div class="steps-wrap">
+
+  <!-- STEP 1: ACQUIRER -->
+  <div class="step active" id="step1">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Pick the Acquirer</div>
+        <div class="step-sub">Select which company is making the acquisition</div>
+      </div>
+    </div>
+    <input class="search-bar" id="searchInput" placeholder="Search by name or ticker…" oninput="filterCompanies()">
+    <div class="filter-pills" id="filterPills"></div>
+    <div class="co-grid" id="coGrid"></div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="step1Btn" onclick="goStep2()" disabled>See Sector Context →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: CONTEXT -->
+  <div class="step" id="step2">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">M&A Context — <span id="s2CoName"></span></div>
+        <div class="step-sub">Sector M&A activity, deal multiples, and accretion norms</div>
+      </div>
+    </div>
+
+    <div class="ctx-card">
+      <div class="ctx-title">Sector M&A Dynamics</div>
+      <div class="ctx-insight" id="s2Insight"></div>
+
+      <div class="formula-box">
+        <div><span class="f-eq">Acquirer Pro-Forma EPS</span> <span class="f-label">= (Acquirer Net Income + Target Net Income + Synergies − Interest on Debt − Issuance Costs) ÷ Pro-Forma Shares</span></div>
+        <div class="f-comment">─────────────────────────────────────────────────────────────</div>
+        <div><span class="f-eq">Accretion / Dilution %</span> <span class="f-label">= (Pro-Forma EPS − Standalone EPS) ÷ Standalone EPS × 100</span></div>
+        <div class="f-comment">─────────────────────────────────────────────────────────────</div>
+        <div><span class="f-green">Accretive</span> <span class="f-label">→ Pro-Forma EPS &gt; Standalone EPS (deal adds earnings per share)</span></div>
+        <div><span class="f-red">Dilutive</span>   <span class="f-label">→ Pro-Forma EPS &lt; Standalone EPS (deal reduces earnings per share)</span></div>
+      </div>
+    </div>
+
+    <div class="stat-boxes">
+      <div class="stat-box">
+        <div class="stat-label">Typical Deal Multiple</div>
+        <div class="stat-value" id="s2Multiple">—</div>
+        <div class="stat-sub">EV/EBITDA paid in sector</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Deal Premium Range</div>
+        <div class="stat-value" id="s2Premium">—</div>
+        <div class="stat-sub">Over undisturbed price</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-label">Financing Norm</div>
+        <div class="stat-value" id="s2Financing">—</div>
+        <div class="stat-sub">Typical deal structure</div>
+      </div>
+    </div>
+
+    <div class="ctx-card" style="padding:0;overflow:hidden">
+      <div class="ctx-title" style="padding:16px 20px 0">Sector M&A Benchmarks</div>
+      <table class="sec-table">
+        <thead><tr><th>Sector</th><th>Typical EV/EBITDA</th><th>Deal Premium</th><th>A/D Tendency</th></tr></thead>
+        <tbody>
+          <tr><td class="td-sec">Technology</td><td>15–25×</td><td>30–50%</td><td>Dilutive near-term; accretive post-synergy</td></tr>
+          <tr><td class="td-sec">Banking / NBFC</td><td>1.5–3.0× P/B</td><td>15–35%</td><td>Generally accretive if book premium &lt;1.5×</td></tr>
+          <tr><td class="td-sec">FMCG</td><td>18–30×</td><td>25–45%</td><td>Dilutive; justified by brand acqui-hire</td></tr>
+          <tr><td class="td-sec">Auto</td><td>6–12×</td><td>20–35%</td><td>Mixed — synergy capture determines outcome</td></tr>
+          <tr><td class="td-sec">Pharma</td><td>10–20×</td><td>30–50%</td><td>Dilutive initially; pipeline synergies drive value</td></tr>
+          <tr><td class="td-sec">Infrastructure</td><td>10–16×</td><td>15–30%</td><td>Accretive — EBITDA yield &gt; cost of debt</td></tr>
+          <tr><td class="td-sec">Energy</td><td>5–9×</td><td>15–25%</td><td>Accretive if commodity cycle timed well</td></tr>
+          <tr><td class="td-sec">Telecom</td><td>5–8×</td><td>10–25%</td><td>Accretive post-spectrum+network consolidation</td></tr>
+          <tr><td class="td-sec">Consumer</td><td>12–22×</td><td>25–45%</td><td>Dilutive; justified by brand extension</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goStep3()">Model the Deal →</button>
+      <button class="btn btn-ghost" onclick="resetToStep1()">← Change Acquirer</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: INPUTS -->
+  <div class="step" id="step3">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Deal Assumptions — <span id="s3CoName"></span></div>
+        <div class="step-sub">Enter acquirer and target financials to model accretion/dilution</div>
+      </div>
+    </div>
+
+    <div class="ctx-card">
+      <div class="section-label">Acquirer — Standalone</div>
+      <div class="input-grid" style="margin-top:12px">
+        <div class="input-group">
+          <div class="input-label">Acquirer Net Income (₹ Cr)</div>
+          <div class="input-hint">Last twelve months net profit</div>
+          <div class="input-prefix"><span class="prefix">₹</span><input class="input-field" type="number" id="acqNI" placeholder="e.g. 15000" min="0"></div>
+        </div>
+        <div class="input-group">
+          <div class="input-label">Acquirer Shares Outstanding (Cr)</div>
+          <div class="input-hint">Current share count in crores</div>
+          <input class="input-field" type="number" id="acqShares" placeholder="e.g. 250" min="0">
+        </div>
+        <div class="input-group">
+          <div class="input-label">Acquirer Share Price (₹)</div>
+          <div class="input-hint">Current market price</div>
+          <div class="input-prefix"><span class="prefix">₹</span><input class="input-field" type="number" id="acqPrice" placeholder="e.g. 3400" min="0"></div>
+        </div>
+      </div>
+
+      <div class="section-label">Target — Acquisition</div>
+      <div class="input-grid" style="margin-top:12px">
+        <div class="input-group">
+          <div class="input-label">Target Net Income (₹ Cr)</div>
+          <div class="input-hint">Target's LTM net profit</div>
+          <div class="input-prefix"><span class="prefix">₹</span><input class="input-field" type="number" id="tgtNI" placeholder="e.g. 3000" min="0"></div>
+        </div>
+        <div class="input-group">
+          <div class="input-label">Purchase Price (₹ Cr)</div>
+          <div class="input-hint">Total deal value (equity consideration)</div>
+          <div class="input-prefix"><span class="prefix">₹</span><input class="input-field" type="number" id="dealPrice" placeholder="e.g. 45000" min="0"></div>
+        </div>
+        <div class="input-group">
+          <div class="input-label">Target Net Debt (₹ Cr)</div>
+          <div class="input-hint">Debt assumed minus cash acquired (can be negative)</div>
+          <div class="input-prefix"><span class="prefix">₹</span><input class="input-field" type="number" id="tgtDebt" placeholder="e.g. 2000"></div>
+        </div>
+      </div>
+
+      <div class="section-label">Financing Structure</div>
+      <div class="input-grid" style="margin-top:12px">
+        <div class="input-group">
+          <div class="input-label">% Cash Consideration</div>
+          <div class="input-hint">Funded by acquirer's existing cash</div>
+          <input class="input-field" type="number" id="pctCash" placeholder="e.g. 30" min="0" max="100" value="0">
+        </div>
+        <div class="input-group">
+          <div class="input-label">% Stock Consideration</div>
+          <div class="input-hint">New acquirer shares issued to target shareholders</div>
+          <input class="input-field" type="number" id="pctStock" placeholder="e.g. 70" min="0" max="100" value="100">
+        </div>
+        <div class="input-group">
+          <div class="input-label">% Debt Financing</div>
+          <div class="input-hint">New debt raised to fund cash portion</div>
+          <input class="input-field" type="number" id="pctDebt" placeholder="e.g. 0" min="0" max="100" value="0">
+        </div>
+      </div>
+
+      <div class="input-grid">
+        <div class="input-group">
+          <div class="input-label">Cost of Debt (% p.a.)</div>
+          <div class="input-hint">Pre-tax interest rate on acquisition debt</div>
+          <input class="input-field" type="number" id="debtRate" placeholder="e.g. 8" min="0" value="8">
+        </div>
+        <div class="input-group">
+          <div class="input-label">Tax Rate (%)</div>
+          <div class="input-hint">Effective corporate tax rate</div>
+          <input class="input-field" type="number" id="taxRate" placeholder="e.g. 25" min="0" value="25">
+        </div>
+        <div class="input-group">
+          <div class="input-label">Annual Synergies (₹ Cr)</div>
+          <div class="input-hint">After-tax cost + revenue synergies in Year 1</div>
+          <div class="input-prefix"><span class="prefix">₹</span><input class="input-field" type="number" id="synergies" placeholder="e.g. 500" min="0" value="0"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="runAnalysis()">Calculate Accretion / Dilution →</button>
+      <button class="btn btn-ghost" onclick="goStep2()">← Back</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: RESULTS -->
+  <div class="step" id="step4">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-title">Deal Verdict — <span id="s4CoName"></span></div>
+        <div class="step-sub">Accretion/dilution analysis for this transaction</div>
+      </div>
+    </div>
+
+    <div id="resultHero" class="result-hero">
+      <div id="resultLabel" class="result-label"></div>
+      <div id="resultValue" class="result-value"></div>
+      <div id="resultSub" class="result-sub"></div>
+    </div>
+
+    <div class="result-grid">
+      <div class="result-box">
+        <div class="result-box-label">Acquirer Standalone EPS (₹)</div>
+        <div class="result-box-value" id="r-acqEPS">—</div>
+      </div>
+      <div class="result-box">
+        <div class="result-box-label">Pro-Forma EPS (₹)</div>
+        <div class="result-box-value" id="r-pfEPS">—</div>
+      </div>
+      <div class="result-box">
+        <div class="result-box-label">New Shares Issued (Cr)</div>
+        <div class="result-box-value" id="r-newShares">—</div>
+      </div>
+      <div class="result-box">
+        <div class="result-box-label">Interest Cost After Tax (₹ Cr)</div>
+        <div class="result-box-value" id="r-interestCost">—</div>
+      </div>
+      <div class="result-box">
+        <div class="result-box-label">Implied EV/Net Income</div>
+        <div class="result-box-value" id="r-impliedMult">—</div>
+      </div>
+      <div class="result-box">
+        <div class="result-box-label">Pro-Forma Shares (Cr)</div>
+        <div class="result-box-value" id="r-pfShares">—</div>
+      </div>
+    </div>
+
+    <div class="ctx-card" style="padding:0;overflow:hidden">
+      <div class="ctx-title" style="padding:16px 20px 0">EPS Bridge</div>
+      <table class="bridge-table">
+        <tbody id="epsBridge"></tbody>
+      </table>
+    </div>
+
+    <div class="insight-card" id="dealInsight">
+      <div class="insight-label">Deal Interpretation</div>
+      <div id="insightText"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="vault-btn" onclick="saveToVault()">🔒 Save to Vault</button>
+      <button class="btn btn-ghost" onclick="goStep3()">← Change Assumptions</button>
+      <button class="btn btn-ghost" onclick="resetToStep1()">New Deal</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const COMPANIES = [
+  {name:'Reliance Industries',ticker:'RIL',sector:'Energy',market:'NSE'},
+  {name:'TCS',ticker:'TCS',sector:'Technology',market:'NSE'},
+  {name:'HDFC Bank',ticker:'HDFCBANK',sector:'Banking',market:'NSE'},
+  {name:'Infosys',ticker:'INFY',sector:'Technology',market:'NSE'},
+  {name:'ICICI Bank',ticker:'ICICIBANK',sector:'Banking',market:'NSE'},
+  {name:'Hindustan Unilever',ticker:'HINDUNILVR',sector:'FMCG',market:'NSE'},
+  {name:'ITC',ticker:'ITC',sector:'FMCG',market:'NSE'},
+  {name:'Bajaj Finance',ticker:'BAJFINANCE',sector:'NBFC',market:'NSE'},
+  {name:'Bharti Airtel',ticker:'BHARTIARTL',sector:'Telecom',market:'NSE'},
+  {name:'Wipro',ticker:'WIPRO',sector:'Technology',market:'NSE'},
+  {name:'Asian Paints',ticker:'ASIANPAINT',sector:'Consumer',market:'NSE'},
+  {name:'Maruti Suzuki',ticker:'MARUTI',sector:'Auto',market:'NSE'},
+  {name:'Sun Pharma',ticker:'SUNPHARMA',sector:'Pharma',market:'NSE'},
+  {name:'Larsen & Toubro',ticker:'LT',sector:'Infrastructure',market:'NSE'},
+  {name:'Tata Motors',ticker:'TATAMOTORS',sector:'Auto',market:'NSE'},
+  {name:'Apple',ticker:'AAPL',sector:'Technology',market:'NASDAQ'},
+  {name:'Microsoft',ticker:'MSFT',sector:'Technology',market:'NASDAQ'},
+  {name:'Alphabet',ticker:'GOOGL',sector:'Technology',market:'NASDAQ'},
+  {name:'Amazon',ticker:'AMZN',sector:'Technology',market:'NASDAQ'},
+  {name:'Meta Platforms',ticker:'META',sector:'Technology',market:'NASDAQ'},
+  {name:'JPMorgan Chase',ticker:'JPM',sector:'Banking',market:'NYSE'},
+  {name:'Johnson & Johnson',ticker:'JNJ',sector:'Pharma',market:'NYSE'},
+  {name:'Procter & Gamble',ticker:'PG',sector:'FMCG',market:'NYSE'},
+  {name:'Berkshire Hathaway',ticker:'BRK.B',sector:'Conglomerate',market:'NYSE'},
+  {name:'ExxonMobil',ticker:'XOM',sector:'Energy',market:'NYSE'},
+  {name:'Tesla',ticker:'TSLA',sector:'Auto',market:'NASDAQ'},
+  {name:'LVMH',ticker:'MC',sector:'Consumer',market:'EPA'},
+  {name:'Toyota',ticker:'TM',sector:'Auto',market:'NYSE'},
+  {name:'Samsung',ticker:'005930',sector:'Technology',market:'KRX'},
+  {name:'Nestlé',ticker:'NESN',sector:'FMCG',market:'SIX'},
+];
+
+const SECTOR_CONTEXT = {
+  Technology:{
+    multiple:'15–25× EV/EBITDA',
+    premium:'30–50%',
+    financing:'Cash + Debt (acquirers use balance sheet)',
+    insight:'Technology M&A is typically dilutive in Year 1 because tech targets trade at premium multiples that exceed the acquirer\'s own P/E ratio. The canonical logic: if Target P/E (30×) > Acquirer P/E (22×), an all-stock deal is inherently dilutive — you are giving away more earnings yield than you are acquiring. Tech deals are justified by synergies (engineering talent, IP consolidation, product cross-sell) and long-term ROIC improvement once integration costs normalise. TCS has historically been disciplined on acquisition multiples; Microsoft and Alphabet routinely pay 20–30× revenue for strategic assets where near-term accretion is irrelevant.'
+  },
+  Banking:{
+    multiple:'1.5–3.0× P/Book',
+    premium:'15–35%',
+    financing:'All-stock (regulatory capital constraints)',
+    insight:'Bank M&A is assessed on price-to-book rather than EV/EBITDA because banks\' balance sheets are their business. A deal is accretive when the acquirer\'s P/B multiple exceeds the premium-adjusted P/B of the target — the PE ratio differential rule applies but must be expressed in ROE and cost-of-equity terms. HDFC-HDFC Bank merger is the landmark Indian case: the deal improved the combined entity\'s CASA ratio and eliminated holding company discount, making it strategically accretive even if the accounting impacts were complex in Year 1. Regulatory approval timelines (RBI) add significant deal uncertainty.'
+  },
+  NBFC:{
+    multiple:'2–4× P/Book',
+    premium:'20–40%',
+    financing:'All-stock preferred',
+    insight:'NBFC acquisitions are typically accretive when the acquirer has a lower cost of funds than the target — the funding advantage flows directly to NIM expansion. Bajaj Finance\'s acquisitions are evaluated on AUM accretion and NIM improvement rather than EPS in Year 1. The key risk is asset quality: acquiring an NBFC with hidden NPAs or aggressive recognition practices can turn an accretive deal into a value destroyer in Year 2–3 as provisions rise. Due diligence on the loan book is the critical gate.'
+  },
+  FMCG:{
+    multiple:'18–30× EV/EBITDA',
+    premium:'25–45%',
+    financing:'Cash (strong FCF generation)',
+    insight:'FMCG M&A is almost always dilutive in Year 1 because target EBITDA multiples (20–25×) far exceed most acquirers\' EPS yield (~4–5%). The strategic justification is brand acquisition: paying ₹30,000 Cr for a brand doing ₹2,000 Cr EBITDA (15× implicit multiple) gets expensive fast. HUL\'s acquisition of GSK Consumer Healthcare (Horlicks) at ~4.5× revenue is the benchmark Indian deal — dilutive initially but strategically validated by distribution synergies and brand extension. P&G\'s playbook is more conservative: it typically prefers organic growth over expensive acquisitions.'
+  },
+  Auto:{
+    multiple:'6–12× EV/EBITDA',
+    premium:'20–35%',
+    financing:'Cash + Debt (standard LBO-style)',
+    insight:'Auto M&A is driven by technology adjacency (EV platforms, software, battery tech) and geographic expansion. Traditional auto multiples (6–10× EV/EBITDA) make deals achievable at modest premiums without catastrophic dilution. Tata Motors\' acquisition of Jaguar Land Rover from Ford at approximately 2.5× EV/Sales remains the defining Indian auto M&A case study — accretive post-restructuring despite appearing distressed at acquisition. The EV transition is creating a new wave of M&A as OEMs target battery, motor, and software capabilities they lack organically.'
+  },
+  Pharma:{
+    multiple:'10–20× EV/EBITDA',
+    premium:'30–50%',
+    financing:'Cash + Debt (large pharma has balance sheet capacity)',
+    insight:'Pharma M&A is pipeline-driven: acquirers pay premiums for late-stage assets that wouldn\'t exist in their own pipeline for 5+ years. The accretion/dilution test is necessary but insufficient — a deal that appears dilutive for 3 years can be massively value-accretive when an acquired molecule achieves blockbuster approval. Sun Pharma\'s acquisition of Ranbaxy (2014) is the landmark Indian case: the deal was immediately complex on accretion due to USFDA issues, but strategic positioning in the US generics market was the real bet. Patent expiry timing drives deal windows in this sector.'
+  },
+  Infrastructure:{
+    multiple:'10–16× EV/EBITDA',
+    premium:'15–30%',
+    financing:'Debt-heavy (infrastructure assets support leverage)',
+    insight:'Infrastructure M&A tends to be accretive when EBITDA yield (1/EV multiple) exceeds the blended cost of acquisition financing. At 12× EV/EBITDA, the implied EBITDA yield is ~8.3%. If 70% of the deal is financed at 7% debt (after-tax ~5%) and 30% equity cost is 12%, the blended cost is ~7%. The 1.3% positive spread creates accretion. L&T\'s acquisition of various EPC and IT services companies has followed this logic. The predictability of infrastructure cash flows (concession agreements, regulated returns) makes the accretion test more reliable than in cyclical sectors.'
+  },
+  Energy:{
+    multiple:'5–9× EV/EBITDA',
+    premium:'15–25%',
+    financing:'Mix of cash, stock, and debt',
+    insight:'Energy M&A accretion is heavily influenced by the commodity price cycle at time of acquisition. Deals done at cycle lows tend to look expensive immediately but become accretive as commodity prices recover; cycle-top deals reverse this. Reliance\'s strategy has been to acquire midstream and downstream assets (retail, digital) that have defensive cash flows, rather than E&P assets with commodity exposure. ExxonMobil\'s acquisition of Pioneer Natural Resources (2023) at ~5× EV/EBITDA was modestly dilutive in Year 1 but accretive by Year 2 as Permian synergies accelerated.'
+  },
+  Telecom:{
+    multiple:'5–8× EV/EBITDA',
+    premium:'10–25%',
+    financing:'Heavily debt-financed',
+    insight:'Telecom M&A is almost entirely about cost and spectrum consolidation — two players in the same geography eliminates duplicate network capex, customer acquisition costs, and regulatory complexity. Deals are typically accretive in Year 3+ once integration is complete but dilutive (often severely) in Year 1–2 due to integration costs and deal financing burden. The Vodafone-Idea merger is the cautionary tale: revenue share erosion and debt burden overwhelmed the theoretical synergy case. Airtel\'s discipline in not overpaying for Vodafone-Idea\'s spectrum is the contrarian lesson.'
+  },
+  Consumer:{
+    multiple:'12–22× EV/EBITDA',
+    premium:'25–45%',
+    financing:'Cash preferred (strong acquirer balance sheets)',
+    insight:'Premium consumer brand M&A (LVMH, Asian Paints) justifies high multiples through brand durability and pricing power. LVMH\'s acquisition of Bulgari at 26× EV/EBITDA appeared wildly dilutive in Year 1 — but Bulgari\'s revenues grew from €1.1Bn to over €2.5Bn under LVMH\'s distribution and marketing. The accretion test at acquisition date gives you a snapshot; the real question is whether the acquirer can accelerate the target\'s growth rate through its platform. For consumer brands, the answer is often yes — but only for acquirers with proven brand-building capabilities.'
+  },
+  Conglomerate:{
+    multiple:'Segment-dependent',
+    premium:'20–35%',
+    financing:'Mixed',
+    insight:'Conglomerates\' accretion/dilution analysis must be done at the deal level, not the group level. Berkshire Hathaway\'s acquisition of Pilot Travel Centers, BNSF Railway, or Berkshire Energy each requires standalone accretion analysis — the conglomerate wrapper adds no magic. Indian conglomerates (Tata Group, Reliance) face the same discipline: does this specific acquisition earn above the acquirer\'s WACC? The risk is that conglomerate headquarters approves below-WACC acquisitions because the impact on consolidated EPS appears small — this is how value erosion compounds quietly.'
+  },
+  default:{
+    multiple:'10–15× EV/EBITDA',
+    premium:'20–35%',
+    financing:'Mixed cash and stock',
+    insight:'Accretion/dilution analysis answers whether the acquiring company\'s earnings per share increases (accretive) or decreases (dilutive) as a result of a transaction. The key driver is the PE ratio differential between acquirer and target: if the acquirer\'s P/E exceeds the effective P/E being paid for the target (including synergies), the deal will be accretive. If the target\'s implied P/E is higher, the deal will be dilutive in Year 1 — which is common in growth-sector acquisitions where synergies are the real justification.'
+  }
+};
+
+let selectedCo = null;
+let activeFilter = 'All';
+const sectors = ['All',...new Set(COMPANIES.map(c=>c.sector))];
+
+function renderGrid(list){
+  const g = document.getElementById('coGrid');
+  g.innerHTML = list.map(c=>`
+    <div class="co-card${selectedCo===c.ticker?' selected':''}" onclick="selectCo('${c.ticker}')">
+      <div class="co-name">${c.name}</div>
+      <div class="co-meta">${c.ticker} · ${c.sector} · ${c.market}</div>
+    </div>`).join('');
+}
+function buildPills(){
+  document.getElementById('filterPills').innerHTML = sectors.map(s=>`
+    <div class="pill${s===activeFilter?' active':''}" onclick="setFilter('${s}',this)">${s}</div>`).join('');
+}
+function filterCompanies(){
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  renderGrid(COMPANIES.filter(c=>{
+    return (activeFilter==='All'||c.sector===activeFilter) &&
+           (!q||c.name.toLowerCase().includes(q)||c.ticker.toLowerCase().includes(q));
+  }));
+}
+function setFilter(f,el){
+  activeFilter=f;
+  document.querySelectorAll('.pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  filterCompanies();
+}
+function selectCo(ticker){
+  selectedCo=ticker;
+  filterCompanies();
+  document.getElementById('step1Btn').disabled=false;
+}
+function goStep2(){
+  if(!selectedCo) return;
+  const co=COMPANIES.find(c=>c.ticker===selectedCo);
+  const ctx=SECTOR_CONTEXT[co.sector]||SECTOR_CONTEXT.default;
+  document.getElementById('s2CoName').textContent=co.name;
+  document.getElementById('s2Insight').textContent=ctx.insight;
+  document.getElementById('s2Multiple').textContent=ctx.multiple;
+  document.getElementById('s2Premium').textContent=ctx.premium;
+  document.getElementById('s2Financing').textContent=ctx.financing;
+  showStep('step2');
+}
+function goStep3(){
+  const co=COMPANIES.find(c=>c.ticker===selectedCo);
+  document.getElementById('s3CoName').textContent=co.name;
+  showStep('step3');
+}
+function resetToStep1(){ showStep('step1'); }
+
+function n(id){ return parseFloat(document.getElementById(id).value)||0; }
+
+function runAnalysis(){
+  const acqNI=n('acqNI'), acqShares=n('acqShares'), acqPrice=n('acqPrice');
+  const tgtNI=n('tgtNI'), dealPrice=n('dealPrice'), tgtDebt=n('tgtDebt');
+  const pctCash=n('pctCash')/100, pctStock=n('pctStock')/100, pctDebt=n('pctDebt')/100;
+  const debtRate=n('debtRate')/100, taxRate=n('taxRate')/100, synergies=n('synergies');
+
+  if(!acqNI||!acqShares||!acqPrice||!tgtNI||!dealPrice){
+    alert('Please fill in all required fields (acquirer NI, shares, price; target NI, deal price).');
+    return;
+  }
+  if(Math.abs((pctCash+pctStock+pctDebt)-1)>0.01){
+    alert('Cash + Stock + Debt financing must sum to 100%.');
+    return;
+  }
+
+  // Acquirer standalone EPS
+  const acqEPS = acqNI / acqShares;
+
+  // New shares issued (for stock portion)
+  const stockConsideration = dealPrice * pctStock;
+  const newShares = stockConsideration / acqPrice;
+  const pfShares = acqShares + newShares;
+
+  // Debt issued (for debt portion)
+  const debtAmount = dealPrice * pctDebt;
+  const interestCost = debtAmount * debtRate * (1 - taxRate); // after-tax
+
+  // Pro-forma earnings
+  const pfNI = acqNI + tgtNI + synergies - interestCost;
+  const pfEPS = pfNI / pfShares;
+
+  // Accretion / dilution
+  const adPct = ((pfEPS - acqEPS) / acqEPS) * 100;
+  const isAccretive = adPct >= 0;
+
+  // Implied multiple
+  const totalEV = dealPrice + tgtDebt;
+  const impliedMult = tgtNI > 0 ? (totalEV / tgtNI).toFixed(1) + '× Net Income' : 'N/A';
+
+  // Display
+  const co=COMPANIES.find(c=>c.ticker===selectedCo);
+  document.getElementById('s4CoName').textContent=co.name;
+
+  const heroEl=document.getElementById('resultHero');
+  const labelEl=document.getElementById('resultLabel');
+  const valEl=document.getElementById('resultValue');
+  const subEl=document.getElementById('resultSub');
+
+  heroEl.className='result-hero '+(isAccretive?'accretive':'dilutive');
+  labelEl.className='result-label '+(isAccretive?'accretive':'dilutive');
+  labelEl.textContent=isAccretive?'Accretive Deal':'Dilutive Deal';
+  valEl.className='result-value '+(isAccretive?'accretive':'dilutive');
+  valEl.textContent=(isAccretive?'+':'')+adPct.toFixed(1)+'%';
+  subEl.textContent='Pro-Forma EPS vs Standalone EPS';
+
+  document.getElementById('r-acqEPS').textContent='₹'+acqEPS.toFixed(2);
+  document.getElementById('r-pfEPS').textContent='₹'+pfEPS.toFixed(2);
+  document.getElementById('r-newShares').textContent=newShares.toFixed(1);
+  document.getElementById('r-interestCost').textContent='₹'+interestCost.toFixed(0)+' Cr';
+  document.getElementById('r-impliedMult').textContent=impliedMult;
+  document.getElementById('r-pfShares').textContent=pfShares.toFixed(1);
+
+  // EPS bridge
+  const rows=[
+    ['Acquirer Standalone Net Income','₹'+acqNI.toFixed(0)+' Cr',false],
+    ['(+) Target Net Income','₹'+tgtNI.toFixed(0)+' Cr',false],
+    ['(+) Synergies','₹'+synergies.toFixed(0)+' Cr',false],
+    ['(−) Interest on Acquisition Debt (after-tax)','₹'+interestCost.toFixed(0)+' Cr',false],
+    ['Pro-Forma Net Income','₹'+pfNI.toFixed(0)+' Cr',true],
+    ['÷ Pro-Forma Shares Outstanding',pfShares.toFixed(1)+' Cr',false],
+    ['= Pro-Forma EPS','₹'+pfEPS.toFixed(2),true],
+    ['Standalone EPS','₹'+acqEPS.toFixed(2),false],
+    ['Accretion / (Dilution)',(isAccretive?'+':'')+adPct.toFixed(1)+'%',true],
+  ];
+  document.getElementById('epsBridge').innerHTML=rows.map((r,i)=>{
+    const lineClass = (i===4||i===6||i===8)?'b-line':'';
+    return `<tr class="${lineClass}"><td class="b-label">${r[0]}</td><td class="b-val ${r[2]?'b-total':''}">${r[1]}</td></tr>`;
+  }).join('');
+
+  // Insight text
+  let txt='';
+  if(isAccretive){
+    txt=`This deal is accretive — the acquirer's earnings per share increases by ${adPct.toFixed(1)}% to ₹${pfEPS.toFixed(2)}. `;
+    if(pctStock>0.5) txt+=`The all/majority-stock structure works because the acquirer's P/E implies an earnings yield that justifies the consideration paid. `;
+    if(synergies>0) txt+=`Synergies of ₹${synergies.toFixed(0)} Cr contribute meaningfully — remove them (synergy-free analysis) and test whether the deal still passes. `;
+    txt+=`The deal is positive on the EPS metric, but verify the ROIC test: does the acquisition earn above the acquirer's WACC? EPS accretion can co-exist with value destruction if the implied return on capital falls below the cost of capital.`;
+  } else {
+    txt=`This deal is dilutive — the acquirer's EPS falls by ${Math.abs(adPct).toFixed(1)}% to ₹${pfEPS.toFixed(2)}. `;
+    if(adPct>-10) txt+=`The dilution is modest and may be acceptable if synergies are well-founded and management can articulate a credible 3-year accretion path. `;
+    else txt+=`The dilution is significant. Management will need to provide a compelling synergy case and accretion timeline to justify this to shareholders. `;
+    if(pctStock>0.5) txt+=`The stock consideration creates new shares at the acquirer's P/E, which is a high cost of capital for funding an acquisition — consider why debt wasn't used instead. `;
+    txt+=`Dilutive deals aren't automatically bad — many value-creating acquisitions are dilutive in Year 1 (especially tech/pharma) when synergies are backloaded. The test is: does the NPV of expected synergies exceed the implied premium paid?`;
+  }
+  document.getElementById('insightText').textContent=txt;
+
+  showStep('step4');
+}
+
+function saveToVault(){
+  const co=COMPANIES.find(c=>c.ticker===selectedCo)||{name:'Unknown'};
+  const existing=JSON.parse(localStorage.getItem('vd_vault')||'[]');
+  existing.unshift({
+    type:'Accretion/Dilution',
+    co:co.name,
+    ticker:co.ticker,
+    date:new Date().toLocaleDateString('en-IN'),
+    verdict:document.getElementById('resultLabel').textContent,
+    value:document.getElementById('resultValue').textContent,
+  });
+  localStorage.setItem('vd_vault',JSON.stringify(existing.slice(0,50)));
+  alert('Saved to Vault!');
+}
+
+function showStep(id){
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// LOADING SEQUENCE
+const MSGS=[
+  'Loading deal universe…',
+  'Calibrating EPS bridge logic…',
+  'Mapping sector M&A benchmarks…',
+  'Building financing structure model…',
+  'Ready.',
+];
+let msgIdx=0, prog=0;
+function tick(){
+  if(prog>=100){
+    document.getElementById('loadingOverlay').classList.add('hidden');
+    return;
+  }
+  prog=Math.min(prog+(Math.random()*18+8), 100);
+  document.getElementById('progressBar').style.width=prog+'%';
+  if(msgIdx<MSGS.length-1 && prog>msgIdx*22){
+    document.getElementById('loadingMsg').textContent=MSGS[msgIdx++];
+  }
+  if(prog>=100) document.getElementById('loadingMsg').textContent=MSGS[MSGS.length-1];
+  setTimeout(tick, prog<90?260:180);
+}
+
+buildPills();
+renderGrid(COMPANIES);
+tick();
+</script>
+</body>
+</html>

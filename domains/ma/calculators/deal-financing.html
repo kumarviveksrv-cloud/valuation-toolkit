@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deal Financing Mix — M&A — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-pro{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+.main{max-width:720px;margin:0 auto;padding:32px 24px 80px}
+h1{font-size:clamp(18px,3vw,24px);font-weight:900;letter-spacing:-.02em;margin-bottom:4px}
+.sub{font-size:13px;color:var(--muted);margin-bottom:28px}
+.steps{display:flex;gap:0;margin-bottom:28px;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.step{flex:1;padding:10px 14px;font-size:12px;font-weight:700;color:var(--muted);background:#fff;text-align:center;border-right:1px solid var(--border)}
+.step:last-child{border-right:none}
+.step.active{background:var(--text);color:#fff}
+.step.done{background:#f0fdf4;color:var(--green)}
+.card{border:1px solid var(--border);border-radius:10px;padding:24px;margin-bottom:16px}
+.search-row{display:flex;gap:10px;margin-bottom:16px}
+.search-input{flex:1;border:1px solid var(--border);border-radius:7px;padding:10px 14px;font-size:14px;font-family:'Inter',sans-serif;outline:none}
+.search-input:focus{border-color:#aaa}
+.sector-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.sf{padding:5px 12px;border-radius:20px;border:1px solid var(--border);font-size:11px;font-weight:700;cursor:pointer;background:#fff}
+.sf.active{background:var(--text);color:#fff;border-color:var(--text)}
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;max-height:320px;overflow-y:auto}
+.co-btn{border:1px solid var(--border);border-radius:8px;padding:10px 12px;background:#fff;cursor:pointer;text-align:left;transition:all .12s}
+.co-btn:hover{border-color:#aaa;background:var(--card)}
+.co-btn.selected{border-color:var(--text);background:var(--text);color:#fff}
+.co-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.co-meta{font-size:11px;opacity:.6}
+.btn-primary{background:var(--text);color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-primary:hover{opacity:.85}
+.btn-sec{background:#fff;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:11px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-sec:hover{background:var(--card)}
+.btn-row{display:flex;gap:10px;margin-top:20px}
+.context-eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.context-headline{font-size:18px;font-weight:900;letter-spacing:-.02em;margin-bottom:12px}
+.context-body{font-size:14px;color:#374151;line-height:1.65;margin-bottom:16px}
+.formula-box{background:#0a0a0a;color:#e2e8f0;border-radius:8px;padding:16px;margin:16px 0;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.8}
+.formula-box .hl{color:#86efac}
+.insight-card{background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:14px 16px;margin-top:16px}
+.insight-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin-bottom:4px}
+.insight-text{font-size:13px;color:#14532d;line-height:1.55}
+.callout{border-left:3px solid var(--text);padding:10px 14px;background:var(--card);border-radius:0 6px 6px 0;margin:14px 0;font-size:13px;line-height:1.55;color:#374151}
+.pro-gate{border:2px dashed var(--border);border-radius:10px;padding:32px 24px;text-align:center}
+.pro-gate-icon{font-size:28px;margin-bottom:12px}
+.pro-gate-title{font-size:17px;font-weight:800;margin-bottom:6px}
+.pro-gate-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.55}
+.pro-features{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:24px;text-align:left;max-width:380px;margin-left:auto;margin-right:auto}
+.pro-features li{font-size:13px;color:#374151;display:flex;align-items:center;gap:8px}
+.pro-features li::before{content:"→";font-weight:700;color:var(--text)}
+.pro-btn{background:var(--text);color:#fff;border:none;border-radius:8px;padding:13px 28px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;display:block;margin:0 auto 8px}
+.pro-note{font-size:11px;color:var(--muted)}
+.section-label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:18px 0 8px}
+.fin-compare{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.fin-box{border-radius:8px;padding:14px;border:1px solid var(--border)}
+.fin-box.cash{border-color:#86efac;background:#f0fdf4}
+.fin-box.stock{border-color:#93c5fd;background:#eff6ff}
+.fin-box.debt{border-color:#fca5a5;background:#fef2f2}
+.fin-title{font-size:13px;font-weight:800;margin-bottom:8px}
+.fin-pros{list-style:none;display:flex;flex-direction:column;gap:4px}
+.fin-pros li{font-size:11px;color:var(--muted);display:flex;gap:5px;align-items:flex-start}
+.fin-pros li::before{content:"✓";font-weight:700;font-size:11px;flex-shrink:0}
+.fin-cons{list-style:none;display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.fin-cons li{font-size:11px;color:var(--muted);display:flex;gap:5px;align-items:flex-start}
+.fin-cons li::before{content:"✗";font-weight:700;font-size:11px;flex-shrink:0}
+.bench-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:16px}
+.bench-table th{text-align:left;padding:8px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-bottom:2px solid var(--border)}
+.bench-table td{padding:8px 10px;border-bottom:1px solid var(--border)}
+.bench-table tr:last-child td{border-bottom:none}
+.bench-table tr.highlight td{background:#f0fdf4;font-weight:700}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-left">
+    <a href="/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">›</span>
+    <a href="/domains/ma/">M&A</a>
+    <span class="nav-sep">›</span>
+    <a href="/domains/ma/calculators/">Calculators</a>
+    <span class="nav-sep">›</span>
+    <span>Deal Financing Mix</span>
+  </div>
+  <button class="nav-pro" onclick="unlockPro()">Go Pro — ₹799/mo</button>
+</nav>
+
+<div class="main">
+  <h1>Deal Financing Mix Optimizer</h1>
+  <p class="sub">Cash vs stock vs debt — how financing choice changes accretion, balance sheet impact, and dilution.</p>
+
+  <div class="steps">
+    <div class="step active" id="s1tab">1 · Pick Company</div>
+    <div class="step" id="s2tab">2 · Financing Concepts</div>
+    <div class="step" id="s3tab">3 · Optimize Mix</div>
+    <div class="step" id="s4tab">4 · Scenario Output</div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div id="step1">
+    <div class="card">
+      <div class="section-label">Select an acquirer company</div>
+      <div class="search-row">
+        <input class="search-input" id="searchInput" placeholder="Search company or ticker…" oninput="filterCos()">
+      </div>
+      <div class="sector-filters" id="sectorFilters"></div>
+      <div class="company-grid" id="coGrid"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="goStep2()" id="nextBtn1" disabled>Next: Financing Concepts →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div id="step2" style="display:none">
+    <div class="card">
+      <div class="context-eyebrow" id="s2eyebrow">Financing Structure</div>
+      <div class="context-headline">Cash, Stock, or Debt — the Most Consequential M&A Decision</div>
+
+      <div class="context-body">
+        How a deal is financed is as important as the price paid. Cash is certain but depletes reserves. Stock shares the upside with target shareholders but dilutes the acquirer. Debt amplifies accretion at the cost of leverage — and rating risk.
+      </div>
+
+      <div class="fin-compare">
+        <div class="fin-box cash">
+          <div class="fin-title">💵 Cash</div>
+          <ul class="fin-pros">
+            <li>Target shareholders get certainty</li>
+            <li>No acquirer dilution</li>
+            <li>Deal closes faster</li>
+          </ul>
+          <ul class="fin-cons">
+            <li>Depletes cash reserves</li>
+            <li>No upside sharing for target</li>
+            <li>Tax event for target holders</li>
+          </ul>
+        </div>
+        <div class="fin-box stock">
+          <div class="fin-title">📈 Stock</div>
+          <ul class="fin-pros">
+            <li>Preserves cash</li>
+            <li>Tax-deferred for target (IND AS)</li>
+            <li>Aligns incentives post-deal</li>
+          </ul>
+          <ul class="fin-cons">
+            <li>Dilutes acquirer EPS</li>
+            <li>Signals overvalued stock?</li>
+            <li>More complex to execute</li>
+          </ul>
+        </div>
+        <div class="fin-box debt">
+          <div class="fin-title">🏦 Debt</div>
+          <ul class="fin-pros">
+            <li>Interest is tax-deductible</li>
+            <li>No equity dilution</li>
+            <li>Leverages low-rate environments</li>
+          </ul>
+          <ul class="fin-cons">
+            <li>Increases leverage ratios</li>
+            <li>Rating downgrade risk</li>
+            <li>Covenant restrictions</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="formula-box">
+<span class="hl">All-Cash Effect:</span>     No new shares; EPS impact = +Target NI − Lost Interest Income
+<span class="hl">All-Stock Effect:</span>     New shares = Deal Value ÷ Acquirer Price; EPS diluted by share count
+<span class="hl">All-Debt Effect:</span>      No new shares; EPS impact = +Target NI − After-Tax Interest on Debt
+<br>
+<span class="hl">Leverage Impact:</span>     Net Debt / EBITDA post-deal; lenders watch this ratio closely
+<span class="hl">DSCR:</span>                 (EBITDA − Capex) ÷ Debt Service; must stay above covenant minimum
+      </div>
+
+      <div class="callout">
+        The <strong>accretion/dilution test</strong> favors debt when the acquirer's cost of debt &lt; target's earnings yield. It favors stock when the acquirer's P/E &gt; target's P/E. This is the core logic of the financing choice.
+      </div>
+
+      <div class="section-label" style="margin-top:20px">Typical Financing Mix by Sector (India M&A, 2015–2025)</div>
+      <table class="bench-table">
+        <thead><tr><th>Sector</th><th>Cash %</th><th>Stock %</th><th>Debt %</th><th>Key Constraint</th></tr></thead>
+        <tbody id="benchBody"></tbody>
+      </table>
+
+      <div class="insight-card" id="s2insight">
+        <div class="insight-label">Sector Insight</div>
+        <div class="insight-text" id="s2insightText"></div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-sec" onclick="goStep1()">← Back</button>
+      <button class="btn-primary" onclick="goStep3()">Next: Optimize Mix →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3 — PRO GATE -->
+  <div id="step3" style="display:none">
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <div class="pro-gate-title">Financing Mix Optimizer — Pro</div>
+      <div class="pro-gate-sub">Input the deal size and acquirer financials to see how different cash / stock / debt mixes change accretion, leverage, and dilution — side by side.</div>
+      <ul class="pro-features">
+        <li>3-scenario comparison (all-cash / all-stock / mixed)</li>
+        <li>Accretion / dilution per financing scenario</li>
+        <li>Post-deal leverage ratios (Net Debt/EBITDA, DSCR)</li>
+        <li>Diluted share count and EPS per scenario</li>
+        <li>Interest coverage ratio impact</li>
+        <li>Rating impact estimate (BBB → BB scenarios)</li>
+        <li>Optimal mix recommendation based on credit capacity</li>
+        <li>Export to PDF / Excel</li>
+      </ul>
+      <button class="pro-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+      <div class="pro-note">Monthly only · Cancel anytime · All 15 domains included</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-sec" onclick="goStep2()">← Back</button>
+    </div>
+  </div>
+
+  <!-- STEP 4 — PRO GATE -->
+  <div id="step4" style="display:none">
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <div class="pro-gate-title">Scenario Output — Pro</div>
+      <div class="pro-gate-sub">Side-by-side financing scenarios with EPS, leverage, and dilution impact.</div>
+      <button class="pro-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+      <div class="pro-note">Monthly only · Cancel anytime · All 15 domains included</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const COMPANIES = [
+  {name:'Reliance Industries',ticker:'RIL',sector:'Conglomerate'},
+  {name:'Tata Consultancy Services',ticker:'TCS',sector:'Technology'},
+  {name:'Infosys',ticker:'INFY',sector:'Technology'},
+  {name:'HDFC Bank',ticker:'HDFCBANK',sector:'Banking/NBFC'},
+  {name:'ICICI Bank',ticker:'ICICIBANK',sector:'Banking/NBFC'},
+  {name:'Hindustan Unilever',ticker:'HUL',sector:'FMCG/Consumer'},
+  {name:'ITC Limited',ticker:'ITC',sector:'FMCG/Consumer'},
+  {name:'Bharti Airtel',ticker:'AIRTEL',sector:'Telecom'},
+  {name:'Wipro',ticker:'WIPRO',sector:'Technology'},
+  {name:'Asian Paints',ticker:'ASIANPAINT',sector:'Chemicals'},
+  {name:'Bajaj Finance',ticker:'BAJFINANCE',sector:'Banking/NBFC'},
+  {name:'Maruti Suzuki',ticker:'MARUTI',sector:'Automobiles'},
+  {name:'Sun Pharmaceutical',ticker:'SUNPHARMA',sector:'Healthcare/Pharma'},
+  {name:"Dr. Reddy's Labs",ticker:'DRREDDY',sector:'Healthcare/Pharma'},
+  {name:'Titan Company',ticker:'TITAN',sector:'FMCG/Consumer'},
+  {name:'Larsen & Toubro',ticker:'LT',sector:'Infrastructure'},
+  {name:'UltraTech Cement',ticker:'ULTRACEMCO',sector:'Conglomerate'},
+  {name:'Nestle India',ticker:'NESTLEIND',sector:'FMCG/Consumer'},
+  {name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',sector:'Banking/NBFC'},
+  {name:'Axis Bank',ticker:'AXISBANK',sector:'Banking/NBFC'},
+  {name:'State Bank of India',ticker:'SBIN',sector:'Banking/NBFC'},
+  {name:'ONGC',ticker:'ONGC',sector:'Oil & Gas'},
+  {name:'Coal India',ticker:'COALINDIA',sector:'Metals & Mining'},
+  {name:'JSW Steel',ticker:'JSWSTEEL',sector:'Metals & Mining'},
+  {name:'Tata Steel',ticker:'TATASTEEL',sector:'Metals & Mining'},
+  {name:'Power Grid Corp',ticker:'POWERGRID',sector:'Power/Utilities'},
+  {name:'NTPC',ticker:'NTPC',sector:'Power/Utilities'},
+  {name:'DLF',ticker:'DLF',sector:'Real Estate'},
+  {name:'Godrej Properties',ticker:'GODREJPROP',sector:'Real Estate'},
+  {name:'Zee Entertainment',ticker:'ZEEL',sector:'Media'}
+];
+
+const SECTOR_CONTEXT = {
+  'Technology':      {cash:'20%',stock:'55%',debt:'25%',constraint:'Low leverage preference, stock signals confidence',insight:'IT acquirers heavily favour stock deals — TCS-iGate, Infosys-WONGDOODY were mixed stock/cash. High cash generation supports 20–25% debt component. Offshore IT rarely needs leverage.'},
+  'Banking/NBFC':    {cash:'10%',stock:'70%',debt:'20%',constraint:'RBI approval; share swap common',insight:'Banking mergers in India are predominantly share-swap driven. SBI-SBI Associates, HDFC-HDFC Bank were all-stock mergers. RBI caps debt financing to protect capital adequacy.'},
+  'Healthcare/Pharma':{cash:'35%',stock:'35%',debt:'30%',constraint:'High PE valuations limit stock economics',insight:'Indian pharma acquirers mix cash and debt. Sun Pharma-Ranbaxy was a share swap. PE-backed acquisitions of hospital chains are primarily debt-financed through LBOs.'},
+  'FMCG/Consumer':   {cash:'45%',stock:'20%',debt:'35%',constraint:'Cash-rich acquirers prefer cash deals',insight:'HUL, ITC, and Nestle have strong cash positions and prefer cash deals. Stock deals are rare — FMCG management avoids diluting existing shareholders. Debt is used for bolt-on acquisitions.'},
+  'Oil & Gas':       {cash:'30%',stock:'20%',debt:'50%',constraint:'Asset-heavy deals require significant debt',insight:'Energy acquisitions are highly leveraged due to asset value. ONGC-HPCL was structured with significant debt. Oil majors use acquisition financing backed by the acquired reserves.'},
+  'Metals & Mining': {cash:'25%',stock:'20%',debt:'55%',constraint:'Commodity cycle drives leverage appetite',insight:'Tata Steel-Corus (2007) was 80% debt-financed — the template for highly levered mining deals. At commodity peaks, leverage is high; bust cycles force deleveraging. A dangerous financing structure.'},
+  'Telecom':         {cash:'20%',stock:'30%',debt:'50%',constraint:'Spectrum-heavy deals require debt',insight:'Airtel-Telenor and Vodafone-Idea deals were structured with significant debt for spectrum acquisition. India telecom sector carries Net Debt/EBITDA of 3–5x, limiting further leverage capacity.'},
+  'Automobiles':     {cash:'35%',stock:'25%',debt:'40%',constraint:'EV acquisition budgets drive cash use',insight:'Tata Motors-JLR was a leveraged deal that stressed the balance sheet for years. Auto acquirers now prefer moderate leverage (2–3x ND/EBITDA) after that lesson. EV acquisitions use more cash.'},
+  'Power/Utilities': {cash:'15%',stock:'20%',debt:'65%',constraint:'Regulated returns support high leverage',insight:'Power projects are among the most leveraged deals — 70:30 debt:equity is standard. Regulated cash flows support high leverage. AdaniGreen acquisitions follow this structure consistently.'},
+  'Real Estate':     {cash:'40%',stock:'20%',debt:'40%',constraint:'Land bank acquisition is cash-intensive',insight:'Real estate M&A is primarily cash and construction-linked debt. Share swaps are rare. DLF-Hines and Godrej-land bank deals use cash or project-specific debt structured on the acquired asset.'},
+  'Media':           {cash:'30%',stock:'40%',debt:'30%',constraint:'OTT wars driving stock deal creativity',insight:'Zee-Sony was an all-share merger. OTT acquisitions are mostly cash or mixed. Content library acquisitions are financed with cash and credit facilities backed by library cash flows.'},
+  'Chemicals':       {cash:'40%',stock:'20%',debt:'40%',constraint:'China+1 acquisitions prefer cash',insight:'Indian specialty chemical companies are acquiring global capacity with cash reserves built from export growth. Debt is used selectively for larger capacity builds outside India.'},
+  'Infrastructure':  {cash:'20%',stock:'20%',debt:'60%',constraint:'EPC company balance sheets are asset-light',insight:'Road, port, and energy infrastructure deals are structured with project finance debt at 65–75% leverage. L&T, Adani, and IRB use infrastructure-specific financing structures.'},
+  'Conglomerate':    {cash:'30%',stock:'30%',debt:'40%',constraint:'Group treasury funds cash component',insight:'Conglomerates like Tata and Reliance use a mix of group treasury cash, holding company debt, and subsidiary shares. Cross-group share swaps are common for internal restructuring.'}
+};
+
+const BENCH_DATA = [
+  {sector:'Power/Utilities',cash:'15%',stock:'20%',debt:'65%',constraint:'Regulated returns support leverage'},
+  {sector:'Infrastructure',cash:'20%',stock:'20%',debt:'60%',constraint:'Project finance structures'},
+  {sector:'Metals & Mining',cash:'25%',stock:'20%',debt:'55%',constraint:'Commodity cycle risk'},
+  {sector:'Telecom',cash:'20%',stock:'30%',debt:'50%',constraint:'Spectrum debt requirements'},
+  {sector:'Oil & Gas',cash:'30%',stock:'20%',debt:'50%',constraint:'Asset-backed financing'},
+  {sector:'Automobiles',cash:'35%',stock:'25%',debt:'40%',constraint:'Post-JLR leverage discipline'},
+  {sector:'Real Estate',cash:'40%',stock:'20%',debt:'40%',constraint:'Land acquisition is cash-heavy'},
+  {sector:'Healthcare/Pharma',cash:'35%',stock:'35%',debt:'30%',constraint:'High PE limits stock deals'},
+  {sector:'Chemicals',cash:'40%',stock:'20%',debt:'40%',constraint:'Export-driven cash build'},
+  {sector:'Technology',cash:'20%',stock:'55%',debt:'25%',constraint:'Low leverage preference'},
+  {sector:'FMCG/Consumer',cash:'45%',stock:'20%',debt:'35%',constraint:'Cash-rich acquirers'},
+  {sector:'Banking/NBFC',cash:'10%',stock:'70%',debt:'20%',constraint:'RBI capital rules'},
+];
+
+let selectedCo=null,activeSector='All';
+const sectors=['All','Technology','Banking/NBFC','Healthcare/Pharma','FMCG/Consumer','Oil & Gas','Metals & Mining','Telecom','Automobiles','Power/Utilities','Real Estate','Media','Chemicals','Infrastructure','Conglomerate'];
+function renderFilters(){document.getElementById('sectorFilters').innerHTML=sectors.map(s=>`<button class="sf${s===activeSector?' active':''}" onclick="setSector('${s}')">${s}</button>`).join('');}
+function setSector(s){activeSector=s;renderFilters();filterCos();}
+function filterCos(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const f=COMPANIES.filter(c=>(activeSector==='All'||c.sector===activeSector)&&(!q||c.name.toLowerCase().includes(q)||c.ticker.toLowerCase().includes(q)));
+  document.getElementById('coGrid').innerHTML=f.map(c=>`<button class="co-btn${selectedCo&&selectedCo.ticker===c.ticker?' selected':''}" onclick="selectCo('${c.ticker}')"><div class="co-name">${c.name}</div><div class="co-meta">${c.ticker} · ${c.sector}</div></button>`).join('');
+}
+function selectCo(ticker){selectedCo=COMPANIES.find(c=>c.ticker===ticker);filterCos();document.getElementById('nextBtn1').disabled=false;}
+function goStep1(){showStep(1);}
+function goStep2(){
+  if(!selectedCo) return;
+  const ctx=SECTOR_CONTEXT[selectedCo.sector]||SECTOR_CONTEXT['Conglomerate'];
+  document.getElementById('s2eyebrow').textContent=selectedCo.ticker+' · '+selectedCo.sector;
+  document.getElementById('s2insightText').textContent=ctx.insight;
+  document.getElementById('benchBody').innerHTML=BENCH_DATA.map(b=>`<tr${b.sector.includes(selectedCo.sector)?` class="highlight"`:''}><td>${b.sector}</td><td>${b.cash}</td><td>${b.stock}</td><td>${b.debt}</td><td style="font-size:11px;color:var(--muted)">${b.constraint}</td></tr>`).join('');
+  showStep(2);
+}
+function goStep3(){showStep(3);}
+function showStep(n){
+  for(let i=1;i<=4;i++){document.getElementById('step'+i).style.display=i===n?'block':'none';document.getElementById('s'+i+'tab').className='step'+(i===n?' active':i<n?' done':'');}
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+renderFilters();filterCos();
+</script>
+</body>
+</html>

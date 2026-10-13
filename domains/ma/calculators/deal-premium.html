@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deal Premium Analyzer — M&A — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-pro{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+.main{max-width:720px;margin:0 auto;padding:32px 24px 80px}
+h1{font-size:clamp(18px,3vw,24px);font-weight:900;letter-spacing:-.02em;margin-bottom:4px}
+.sub{font-size:13px;color:var(--muted);margin-bottom:28px}
+.steps{display:flex;gap:0;margin-bottom:28px;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.step{flex:1;padding:10px 14px;font-size:12px;font-weight:700;color:var(--muted);background:#fff;text-align:center;border-right:1px solid var(--border)}
+.step:last-child{border-right:none}
+.step.active{background:var(--text);color:#fff}
+.step.done{background:#f0fdf4;color:var(--green)}
+.card{border:1px solid var(--border);border-radius:10px;padding:24px;margin-bottom:16px}
+.search-row{display:flex;gap:10px;margin-bottom:16px}
+.search-input{flex:1;border:1px solid var(--border);border-radius:7px;padding:10px 14px;font-size:14px;font-family:'Inter',sans-serif;outline:none}
+.search-input:focus{border-color:#aaa}
+.sector-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+.sf{padding:5px 12px;border-radius:20px;border:1px solid var(--border);font-size:11px;font-weight:700;cursor:pointer;background:#fff}
+.sf.active{background:var(--text);color:#fff;border-color:var(--text)}
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;max-height:320px;overflow-y:auto}
+.co-btn{border:1px solid var(--border);border-radius:8px;padding:10px 12px;background:#fff;cursor:pointer;text-align:left;transition:all .12s}
+.co-btn:hover{border-color:#aaa;background:var(--card)}
+.co-btn.selected{border-color:var(--text);background:var(--text);color:#fff}
+.co-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.co-meta{font-size:11px;opacity:.6}
+.btn-primary{background:var(--text);color:#fff;border:none;border-radius:8px;padding:12px 24px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-primary:hover{opacity:.85}
+.btn-sec{background:#fff;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:11px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-sec:hover{background:var(--card)}
+.btn-row{display:flex;gap:10px;margin-top:20px}
+.context-eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.context-headline{font-size:18px;font-weight:900;letter-spacing:-.02em;margin-bottom:12px}
+.context-body{font-size:14px;color:#374151;line-height:1.65;margin-bottom:16px}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px}
+.stat-box{background:var(--card);border-radius:8px;padding:14px;text-align:center}
+.stat-num{font-size:22px;font-weight:900;letter-spacing:-.02em}
+.stat-lbl{font-size:11px;color:var(--muted);margin-top:3px}
+.formula-box{background:#0a0a0a;color:#e2e8f0;border-radius:8px;padding:16px;margin:16px 0;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.8}
+.formula-box .hl{color:#86efac}
+.insight-card{background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:14px 16px;margin-top:16px}
+.insight-label{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin-bottom:4px}
+.insight-text{font-size:13px;color:#14532d;line-height:1.55}
+.bench-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:16px}
+.bench-table th{text-align:left;padding:8px 10px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-bottom:2px solid var(--border)}
+.bench-table td{padding:8px 10px;border-bottom:1px solid var(--border)}
+.bench-table tr:last-child td{border-bottom:none}
+.bench-table tr.highlight td{background:#f0fdf4;font-weight:700}
+.callout{border-left:3px solid var(--text);padding:10px 14px;background:var(--card);border-radius:0 6px 6px 0;margin:14px 0;font-size:13px;line-height:1.55;color:#374151}
+.pro-gate{border:2px dashed var(--border);border-radius:10px;padding:32px 24px;text-align:center}
+.pro-gate-icon{font-size:28px;margin-bottom:12px}
+.pro-gate-title{font-size:17px;font-weight:800;margin-bottom:6px}
+.pro-gate-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.55}
+.pro-features{list-style:none;display:flex;flex-direction:column;gap:6px;margin-bottom:24px;text-align:left;max-width:340px;margin-left:auto;margin-right:auto}
+.pro-features li{font-size:13px;color:#374151;display:flex;align-items:center;gap:8px}
+.pro-features li::before{content:"→";font-weight:700;color:var(--text)}
+.pro-btn{background:var(--text);color:#fff;border:none;border-radius:8px;padding:13px 28px;font-size:14px;font-weight:800;cursor:pointer;font-family:'Inter',sans-serif;display:block;margin:0 auto 8px}
+.pro-note{font-size:11px;color:var(--muted)}
+.section-label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:18px 0 8px}
+.concept-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}
+.concept-box{border:1px solid var(--border);border-radius:8px;padding:14px}
+.concept-title{font-size:12px;font-weight:800;margin-bottom:5px}
+.concept-text{font-size:12px;color:var(--muted);line-height:1.5}
+.premium-band{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}
+.pb{border-radius:8px;padding:12px 10px;text-align:center}
+.pb-num{font-size:18px;font-weight:900}
+.pb-lbl{font-size:10px;margin-top:3px;font-weight:600}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-left">
+    <a href="/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">›</span>
+    <a href="/domains/ma/">M&A</a>
+    <span class="nav-sep">›</span>
+    <a href="/domains/ma/calculators/">Calculators</a>
+    <span class="nav-sep">›</span>
+    <span>Deal Premium Analyzer</span>
+  </div>
+  <button class="nav-pro" onclick="unlockPro()">Go Pro — ₹799/mo</button>
+</nav>
+
+<div class="main">
+  <h1>Deal Premium Analyzer</h1>
+  <p class="sub">How much above the undisturbed price is the acquirer paying — and is it justified?</p>
+
+  <div class="steps">
+    <div class="step active" id="s1tab">1 · Pick Company</div>
+    <div class="step" id="s2tab">2 · Premium Context</div>
+    <div class="step" id="s3tab">3 · Analyze Deal</div>
+    <div class="step" id="s4tab">4 · Results</div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div id="step1">
+    <div class="card">
+      <div class="section-label">Select a target company to benchmark</div>
+      <div class="search-row">
+        <input class="search-input" id="searchInput" placeholder="Search company or ticker…" oninput="filterCos()">
+      </div>
+      <div class="sector-filters" id="sectorFilters"></div>
+      <div class="company-grid" id="coGrid"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="goStep2()" id="nextBtn1" disabled>Next: Premium Context →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div id="step2" style="display:none">
+    <div class="card">
+      <div class="context-eyebrow" id="s2eyebrow">M&A Premium Analysis</div>
+      <div class="context-headline" id="s2headline">What is a Deal Premium?</div>
+
+      <div class="context-body">
+        When a company acquires another, it almost always pays more than the current market price. This excess payment is the <strong>deal premium</strong> — it compensates target shareholders for giving up their stake and reflects the acquirer's expectations of synergies and control.
+      </div>
+
+      <div class="formula-box">
+<span class="hl">Deal Premium</span> = (Offer Price − Undisturbed Price) ÷ Undisturbed Price × 100
+<br><br>
+<span class="hl">1-Day Premium</span>  = vs. price one day before announcement
+<span class="hl">1-Week Premium</span> = vs. price one week before announcement
+<span class="hl">4-Week Premium</span> = vs. price 4 weeks before announcement
+      </div>
+
+      <div class="callout">
+        The "undisturbed" price is chosen based on when market speculation began leaking. If the stock ran up on rumours, analysts use the 4-week price to avoid overstating the premium.
+      </div>
+
+      <div class="concept-grid">
+        <div class="concept-box">
+          <div class="concept-title">Control Premium</div>
+          <div class="concept-text">The value of being able to direct the company's strategy. Typically 20–30% even without synergies.</div>
+        </div>
+        <div class="concept-box">
+          <div class="concept-title">Synergy Premium</div>
+          <div class="concept-text">The portion of the premium that synergies justify. Accretive deals require synergies to cover this cost.</div>
+        </div>
+        <div class="concept-box">
+          <div class="concept-title">Leaked Deals</div>
+          <div class="concept-text">Stock often runs before announcement. Always check 30-day price action to pick the right undisturbed price.</div>
+        </div>
+        <div class="concept-box">
+          <div class="concept-title">Walk-Away Price</div>
+          <div class="concept-text">The minimum price target shareholders will accept. Roughly undisturbed price × (1 + floor premium).</div>
+        </div>
+      </div>
+
+      <div class="section-label" style="margin-top:20px">Historical Deal Premiums by Sector (India & Global)</div>
+      <div class="premium-band">
+        <div class="pb" style="background:#dcfce7"><div class="pb-num" style="color:#15803d">20–30%</div><div class="pb-lbl" style="color:#166534">Low Premium</div></div>
+        <div class="pb" style="background:#fef9c3"><div class="pb-num" style="color:#854d0e">30–40%</div><div class="pb-lbl" style="color:#713f12">Typical</div></div>
+        <div class="pb" style="background:#fed7aa"><div class="pb-num" style="color:#9a3412">40–55%</div><div class="pb-lbl" style="color:#7c2d12">Rich</div></div>
+        <div class="pb" style="background:#fecaca"><div class="pb-num" style="color:#991b1b">55%+</div><div class="pb-lbl" style="color:#7f1d1d">Strategic / Distressed</div></div>
+      </div>
+
+      <table class="bench-table" id="benchTable">
+        <thead>
+          <tr>
+            <th>Sector</th>
+            <th>Typical Premium Range</th>
+            <th>Median</th>
+            <th>Key Driver</th>
+          </tr>
+        </thead>
+        <tbody id="benchBody"></tbody>
+      </table>
+
+      <div class="insight-card" id="s2insight">
+        <div class="insight-label">Sector Insight</div>
+        <div class="insight-text" id="s2insightText"></div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-sec" onclick="goStep1()">← Back</button>
+      <button class="btn-primary" onclick="goStep3()">Next: Analyze Deal →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3 — PRO GATE -->
+  <div id="step3" style="display:none">
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <div class="pro-gate-title">Deal Premium Calculator — Pro</div>
+      <div class="pro-gate-sub">Compute premiums across three time horizons, benchmark against sector comps, and find the synergy-implied and walk-away price.</div>
+      <ul class="pro-features">
+        <li>1-day, 1-week &amp; 4-week premium calculations</li>
+        <li>Implied EV/EBITDA at offer price</li>
+        <li>Premium vs sector median benchmark</li>
+        <li>Synergy-implied offer price</li>
+        <li>Walk-away price and floor analysis</li>
+        <li>Precedent deal comp table (10 deals)</li>
+        <li>Export to PDF / Excel</li>
+      </ul>
+      <button class="pro-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+      <div class="pro-note">Monthly only · Cancel anytime · All 15 domains included</div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-sec" onclick="goStep2()">← Back</button>
+    </div>
+  </div>
+
+  <!-- STEP 4 — PRO GATE -->
+  <div id="step4" style="display:none">
+    <div class="pro-gate">
+      <div class="pro-gate-icon">🔒</div>
+      <div class="pro-gate-title">Premium Results — Pro</div>
+      <div class="pro-gate-sub">Full deal premium analysis with sector benchmarking and precedent transaction comp table.</div>
+      <button class="pro-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+      <div class="pro-note">Monthly only · Cancel anytime · All 15 domains included</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const COMPANIES = [
+  {name:'Reliance Industries',ticker:'RIL',sector:'Conglomerate'},
+  {name:'Tata Consultancy Services',ticker:'TCS',sector:'Technology'},
+  {name:'Infosys',ticker:'INFY',sector:'Technology'},
+  {name:'HDFC Bank',ticker:'HDFCBANK',sector:'Banking/NBFC'},
+  {name:'ICICI Bank',ticker:'ICICIBANK',sector:'Banking/NBFC'},
+  {name:'Hindustan Unilever',ticker:'HUL',sector:'FMCG/Consumer'},
+  {name:'ITC Limited',ticker:'ITC',sector:'FMCG/Consumer'},
+  {name:'Bharti Airtel',ticker:'AIRTEL',sector:'Telecom'},
+  {name:'Wipro',ticker:'WIPRO',sector:'Technology'},
+  {name:'Asian Paints',ticker:'ASIANPAINT',sector:'Chemicals'},
+  {name:'Bajaj Finance',ticker:'BAJFINANCE',sector:'Banking/NBFC'},
+  {name:'Maruti Suzuki',ticker:'MARUTI',sector:'Automobiles'},
+  {name:'Sun Pharmaceutical',ticker:'SUNPHARMA',sector:'Healthcare/Pharma'},
+  {name:"Dr. Reddy's Labs",ticker:'DRREDDY',sector:'Healthcare/Pharma'},
+  {name:'Titan Company',ticker:'TITAN',sector:'FMCG/Consumer'},
+  {name:'Larsen & Toubro',ticker:'LT',sector:'Infrastructure'},
+  {name:'UltraTech Cement',ticker:'ULTRACEMCO',sector:'Conglomerate'},
+  {name:'Nestle India',ticker:'NESTLEIND',sector:'FMCG/Consumer'},
+  {name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',sector:'Banking/NBFC'},
+  {name:'Axis Bank',ticker:'AXISBANK',sector:'Banking/NBFC'},
+  {name:'State Bank of India',ticker:'SBIN',sector:'Banking/NBFC'},
+  {name:'ONGC',ticker:'ONGC',sector:'Oil & Gas'},
+  {name:'Coal India',ticker:'COALINDIA',sector:'Metals & Mining'},
+  {name:'JSW Steel',ticker:'JSWSTEEL',sector:'Metals & Mining'},
+  {name:'Tata Steel',ticker:'TATASTEEL',sector:'Metals & Mining'},
+  {name:'Power Grid Corp',ticker:'POWERGRID',sector:'Power/Utilities'},
+  {name:'NTPC',ticker:'NTPC',sector:'Power/Utilities'},
+  {name:'DLF',ticker:'DLF',sector:'Real Estate'},
+  {name:'Godrej Properties',ticker:'GODREJPROP',sector:'Real Estate'},
+  {name:'Zee Entertainment',ticker:'ZEEL',sector:'Media'}
+];
+
+const SECTOR_CONTEXT = {
+  'Technology':     {premiumRange:'30–50%',median:'38%',driver:'IP, talent & platform moats',insight:'Tech acquisitions attract high premiums driven by talent scarcity and recurring revenue multiples. India IT acquirers often pay 35–45% for mid-cap digital services targets.'},
+  'Banking/NBFC':   {premiumRange:'15–30%',median:'22%',driver:'Deposit franchise & branch network',insight:'Banking deals are constrained by regulatory valuation caps. RBI mergers typically see 15–25% premiums vs 30–40% in global banking.'},
+  'Healthcare/Pharma':{premiumRange:'30–55%',median:'42%',driver:'ANDA pipeline & branded portfolio',insight:'Pharma deals carry high premiums when an acquirer targets an ANDA or biosimilar pipeline. PE roll-ups in diagnostics attract 40–55% premiums.'},
+  'FMCG/Consumer':  {premiumRange:'25–40%',median:'32%',driver:'Brand equity & distribution reach',insight:'FMCG premiums reflect brand value and distribution network, which cannot be quickly replicated. Rural distribution capability commands a 5–10% premium uplift.'},
+  'Oil & Gas':      {premiumRange:'15–30%',median:'22%',driver:'Reserve base & production assets',insight:'Energy deal premiums track commodity cycles. At peak oil prices, upstream asset premiums can exceed 40%. Refining assets attract lower 15–20% premiums.'},
+  'Metals & Mining':{premiumRange:'15–30%',median:'22%',driver:'Ore reserves & logistics',insight:'Mining deals are cyclical. Premiums peak at commodity highs and collapse in downturns. Mine-mouth captive power and logistics synergies can add 5–8% to premiums.'},
+  'Telecom':        {premiumRange:'20–40%',median:'30%',driver:'Spectrum & subscriber base',insight:'Telecom consolidation in India has been transformative. Vodafone-Idea, Airtel-Telenor deals paid 25–35% premiums driven by spectrum synergy value.'},
+  'Automobiles':    {premiumRange:'20–40%',median:'28%',driver:'EV platform & dealer network',insight:'Auto sector sees moderate premiums, elevating sharply for EV-native targets. Platform sharing and EV IP premiums range 35–50% in global deals.'},
+  'Power/Utilities':{premiumRange:'10–25%',median:'17%',driver:'Contracted cash flows & PPA base',insight:'Utility premiums are low due to regulated returns. Renewable energy targets attract 20–30% premiums as power purchase agreements (PPAs) are valued at discount rates below WACC.'},
+  'Real Estate':    {premiumRange:'15–30%',median:'22%',driver:'Land bank & development pipeline',insight:'Real estate deal premiums reflect net asset value (NAV) uplift. Acquirers typically pay 15–25% over the RNAV, with mixed-use developments attracting the high end.'},
+  'Media':          {premiumRange:'25–45%',median:'35%',driver:'Content library & subscriber base',insight:'Media deals command strong premiums for content IP and streaming subscribers. OTT acquisitions globally average 35–45% premium — and Indian streaming is following suit.'},
+  'Chemicals':      {premiumRange:'20–35%',median:'27%',driver:'Specialty formulations & EBITDA margins',insight:'Specialty chemical deals attract 25–35% premiums as global China+1 demand drives consolidation. High-margin agrochemicals and electronic chemicals skew to the higher end.'},
+  'Infrastructure': {premiumRange:'15–28%',median:'20%',driver:'Order book & execution capability',insight:'Infrastructure M&A is driven by order book depth and execution track record. EPC companies trade at modest premiums; asset-heavy infra platforms (roads, ports) attract 20–28%.'},
+  'Conglomerate':   {premiumRange:'20–35%',median:'27%',driver:'Conglomerate discount removal',insight:'Conglomerate acquisitions often involve demergers and business separations. A carve-out target typically attracts a 20–30% premium as the buyer eliminates the conglomerate discount.'}
+};
+
+const BENCH_DATA = [
+  {sector:'Technology',range:'30–50%',median:'38%',driver:'IP & recurring revenue'},
+  {sector:'Healthcare/Pharma',range:'30–55%',median:'42%',driver:'Pipeline & branded portfolio'},
+  {sector:'Media & OTT',range:'25–45%',median:'35%',driver:'Content library & subs'},
+  {sector:'FMCG/Consumer',range:'25–40%',median:'32%',driver:'Brand & distribution'},
+  {sector:'Telecom',range:'20–40%',median:'30%',driver:'Spectrum & subscribers'},
+  {sector:'Chemicals',range:'20–35%',median:'27%',driver:'Specialty formulations'},
+  {sector:'Automobiles',range:'20–40%',median:'28%',driver:'EV platform & dealer network'},
+  {sector:'Oil & Gas',range:'15–30%',median:'22%',driver:'Reserve base'},
+  {sector:'Banking/NBFC',range:'15–30%',median:'22%',driver:'Deposit franchise'},
+  {sector:'Real Estate',range:'15–30%',median:'22%',driver:'Land bank & NAV'},
+  {sector:'Power/Utilities',range:'10–25%',median:'17%',driver:'PPA base & contracts'},
+];
+
+let selectedCo = null;
+let activeSector = 'All';
+const sectors = ['All','Technology','Banking/NBFC','Healthcare/Pharma','FMCG/Consumer','Oil & Gas','Metals & Mining','Telecom','Automobiles','Power/Utilities','Real Estate','Media','Chemicals','Infrastructure','Conglomerate'];
+
+function renderFilters(){
+  const el = document.getElementById('sectorFilters');
+  el.innerHTML = sectors.map(s=>`<button class="sf${s===activeSector?' active':''}" onclick="setSector('${s}')">${s}</button>`).join('');
+}
+
+function setSector(s){activeSector=s;renderFilters();filterCos();}
+
+function filterCos(){
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const filtered = COMPANIES.filter(c=>{
+    const matchSec = activeSector==='All'||c.sector===activeSector;
+    const matchQ = !q||c.name.toLowerCase().includes(q)||c.ticker.toLowerCase().includes(q);
+    return matchSec&&matchQ;
+  });
+  const grid = document.getElementById('coGrid');
+  grid.innerHTML = filtered.map(c=>`
+    <button class="co-btn${selectedCo&&selectedCo.ticker===c.ticker?' selected':''}" onclick="selectCo('${c.ticker}')">
+      <div class="co-name">${c.name}</div>
+      <div class="co-meta">${c.ticker} · ${c.sector}</div>
+    </button>`).join('');
+}
+
+function selectCo(ticker){
+  selectedCo = COMPANIES.find(c=>c.ticker===ticker);
+  filterCos();
+  document.getElementById('nextBtn1').disabled = false;
+}
+
+function goStep1(){
+  showStep(1);
+}
+
+function goStep2(){
+  if(!selectedCo) return;
+  const ctx = SECTOR_CONTEXT[selectedCo.sector]||SECTOR_CONTEXT['Conglomerate'];
+  document.getElementById('s2eyebrow').textContent = selectedCo.ticker+' · '+selectedCo.sector+' Sector';
+  document.getElementById('s2headline').textContent = 'Deal Premiums in '+selectedCo.sector;
+  document.getElementById('s2insightText').textContent = ctx.insight;
+
+  const tbody = document.getElementById('benchBody');
+  tbody.innerHTML = BENCH_DATA.map(b=>`
+    <tr${b.sector.includes(selectedCo.sector)?` class="highlight"`:''}><td>${b.sector}</td><td>${b.range}</td><td>${b.median}</td><td>${b.driver}</td></tr>
+  `).join('');
+
+  showStep(2);
+}
+
+function goStep3(){showStep(3);}
+
+function showStep(n){
+  for(let i=1;i<=4;i++){
+    const el = document.getElementById('step'+i);
+    const tab = document.getElementById('s'+i+'tab');
+    el.style.display = i===n?'block':'none';
+    tab.className = 'step'+(i===n?' active':i<n?' done':'');
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+
+renderFilters();
+filterCos();
+</script>
+</body>
+</html>

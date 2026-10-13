@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>M&A Learning Modules — ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text)}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:100}
+.nav-left{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+.nav-left a:hover{color:var(--text)}
+.nav-sep{color:var(--border)}
+.nav-logo{font-weight:800;font-size:15px;color:var(--text)}
+.nav-pro{background:var(--text);color:#fff;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none}
+.hero{background:#0a0a0a;color:#fff;padding:40px 24px}
+.hero-inner{max-width:860px;margin:0 auto}
+.hero-eyebrow{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6b7280;margin-bottom:10px}
+.hero h1{font-size:clamp(22px,3.5vw,34px);font-weight:900;letter-spacing:-.02em;margin-bottom:10px}
+.hero p{font-size:14px;color:#9ca3af;line-height:1.65;max-width:500px}
+.main{max-width:860px;margin:0 auto;padding:40px 24px 80px}
+.tab-bar{display:flex;gap:0;border-bottom:2px solid var(--border);margin-bottom:32px;overflow-x:auto}
+.tab{padding:12px 20px;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap}
+.tab.active{color:var(--text);border-bottom-color:var(--text)}
+.tab:hover:not(.active){color:var(--text)}
+.module{display:none}
+.module.active{display:block}
+.mod-eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.mod-title{font-size:clamp(20px,3vw,28px);font-weight:900;letter-spacing:-.02em;margin-bottom:14px;line-height:1.15}
+.mod-intro{font-size:15px;color:#374151;line-height:1.7;margin-bottom:24px}
+.section-h{font-size:16px;font-weight:800;margin:28px 0 12px}
+.body-text{font-size:14px;color:#374151;line-height:1.7;margin-bottom:14px}
+.formula-box{background:#0a0a0a;color:#e2e8f0;border-radius:8px;padding:18px;margin:16px 0;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.9}
+.formula-box .hl{color:#86efac}
+.formula-box .co{color:#9ca3af}
+.callout{border-left:3px solid var(--text);padding:12px 16px;background:var(--card);border-radius:0 6px 6px 0;margin:16px 0;font-size:14px;line-height:1.6;color:#374151}
+.callout-green{border-left:3px solid var(--green);padding:12px 16px;background:#f0fdf4;border-radius:0 6px 6px 0;margin:16px 0;font-size:14px;line-height:1.6;color:#14532d}
+.callout-amber{border-left:3px solid var(--amber);padding:12px 16px;background:#fffbeb;border-radius:0 6px 6px 0;margin:16px 0;font-size:14px;line-height:1.6;color:#78350f}
+.callout-red{border-left:3px solid var(--red);padding:12px 16px;background:#fef2f2;border-radius:0 6px 6px 0;margin:16px 0;font-size:14px;line-height:1.6;color:#7f1d1d}
+.data-table{width:100%;border-collapse:collapse;font-size:13px;margin:16px 0}
+.data-table th{text-align:left;padding:9px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-bottom:2px solid var(--border)}
+.data-table td{padding:9px 12px;border-bottom:1px solid var(--border);line-height:1.4}
+.data-table tr:last-child td{border-bottom:none}
+.data-table .num{font-family:'JetBrains Mono',monospace;font-size:12px}
+.data-table .g{color:var(--green);font-weight:700}
+.data-table .r{color:var(--red);font-weight:700}
+.data-table .a{color:var(--amber);font-weight:700}
+.concept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin:16px 0}
+.concept-box{border:1px solid var(--border);border-radius:8px;padding:16px;background:#fff}
+.concept-title{font-size:13px;font-weight:800;margin-bottom:6px}
+.concept-text{font-size:12px;color:var(--muted);line-height:1.55}
+.key-insight{background:#0a0a0a;color:#fff;border-radius:10px;padding:20px 24px;margin:24px 0}
+.ki-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6b7280;margin-bottom:8px}
+.ki-text{font-size:14px;color:#e5e7eb;line-height:1.65}
+.ki-text strong{color:#fff}
+.next-module{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--border);padding-top:24px;margin-top:32px}
+.next-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px}
+.next-title{font-size:15px;font-weight:800}
+.next-btn{background:var(--text);color:#fff;border:none;border-radius:8px;padding:11px 22px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;white-space:nowrap}
+.bridge-table{width:100%;border-collapse:collapse;font-size:13px;margin:16px 0}
+.bridge-table td{padding:9px 12px;border-bottom:1px solid var(--border)}
+.bridge-table tr:last-child td{border-bottom:none}
+.bridge-table .label{color:var(--muted);font-weight:500;width:55%}
+.bridge-table .val{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;text-align:right}
+.bridge-table .val.g{color:var(--green)}
+.bridge-table .val.r{color:var(--red)}
+.bridge-table .sep{background:var(--card);font-weight:800;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.fin-compare{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0}
+.fin-box{border-radius:8px;padding:14px;border:1px solid var(--border)}
+.fin-box.cash{border-color:#86efac;background:#f0fdf4}
+.fin-box.stock{border-color:#93c5fd;background:#eff6ff}
+.fin-box.debt{border-color:#fca5a5;background:#fef2f2}
+.fin-title{font-size:13px;font-weight:800;margin-bottom:8px}
+.fin-item{font-size:12px;color:var(--muted);margin-bottom:4px;display:flex;gap:6px}
+.fin-item::before{content:"→";font-weight:700;flex-shrink:0}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-left">
+    <a href="/" class="nav-logo">ValuationDesk</a>
+    <span class="nav-sep">›</span>
+    <a href="/domains/ma/">M&A</a>
+    <span class="nav-sep">›</span>
+    <span>Learning Modules</span>
+  </div>
+  <button class="nav-pro" onclick="alert('Pro unlock coming soon — ₹799/mo for all 15 domains.')">Go Pro — ₹799/mo</button>
+</nav>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Domain 04 · M&A — Learning Modules</div>
+    <h1>The M&A Playbook</h1>
+    <p>Four modules covering how deals are structured, tested, and financed — the conceptual foundation every IB analyst needs before touching a model.</p>
+  </div>
+</div>
+
+<div class="main">
+  <div class="tab-bar">
+    <div class="tab active" onclick="showModule(0,this)">1 · Deal Mechanics</div>
+    <div class="tab" onclick="showModule(1,this)">2 · Accretion / Dilution</div>
+    <div class="tab" onclick="showModule(2,this)">3 · Synergies</div>
+    <div class="tab" onclick="showModule(3,this)">4 · Deal Structuring</div>
+  </div>
+
+  <!-- MODULE 1 -->
+  <div class="module active" id="mod0">
+    <div class="mod-eyebrow">Module 1 of 4</div>
+    <div class="mod-title">M&A Deal Mechanics: Why Companies Buy Each Other</div>
+    <div class="mod-intro">
+      M&A is not just a financial transaction — it is a strategic bet on a future that cannot be achieved organically. Understanding the rationale behind deals separates analysts who build models from those who understand them.
+    </div>
+
+    <div class="section-h">Strategic Rationale: The "Why" Behind Every Deal</div>
+    <div class="body-text">
+      Every M&A transaction can be traced to one or more of these strategic drivers. Rarely is only one at work.
+    </div>
+    <div class="concept-grid">
+      <div class="concept-box">
+        <div class="concept-title">Scale &amp; Market Share</div>
+        <div class="concept-text">Combine revenue bases to achieve procurement leverage, spread fixed costs, and become too large for smaller competitors to displace.</div>
+      </div>
+      <div class="concept-box">
+        <div class="concept-title">Geographic Expansion</div>
+        <div class="concept-text">Enter new markets faster than organic growth allows. Buying an established player avoids the regulatory, distribution, and brand-building lead time.</div>
+      </div>
+      <div class="concept-box">
+        <div class="concept-title">Technology &amp; IP Acquisition</div>
+        <div class="concept-text">Buy the tech stack, talent, or patent portfolio that would take 3–5 years to build organically. Common in pharma, IT, and consumer tech.</div>
+      </div>
+      <div class="concept-box">
+        <div class="concept-title">Vertical Integration</div>
+        <div class="concept-text">Acquire a supplier or distributor to control the value chain, reduce input costs, and protect margins against commodity cycles or distribution choke points.</div>
+      </div>
+      <div class="concept-box">
+        <div class="concept-title">Talent Acqui-hire</div>
+        <div class="concept-text">Buy a company primarily for its engineering, R&D, or management team. The product may be shut down; the people are the asset being acquired.</div>
+      </div>
+      <div class="concept-box">
+        <div class="concept-title">Financial Engineering</div>
+        <div class="concept-text">Acquire a target to unlock tax shields, deploy excess cash on the balance sheet, or improve capital allocation metrics like ROIC and EPS.</div>
+      </div>
+    </div>
+
+    <div class="section-h">Types of Deals</div>
+    <table class="data-table">
+      <thead><tr><th>Deal Type</th><th>Description</th><th>Example</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Horizontal</strong></td><td>Acquirer buys a direct competitor</td><td>HDFC Bank + HDFC Ltd</td></tr>
+        <tr><td><strong>Vertical</strong></td><td>Acquirer buys supplier or customer</td><td>Reliance + Future Retail</td></tr>
+        <tr><td><strong>Conglomerate</strong></td><td>Acquirer buys unrelated business</td><td>Tata Group cross-sector acquisitions</td></tr>
+        <tr><td><strong>Reverse Merger</strong></td><td>Private co merges into listed shell to list</td><td>Reliance Jio merger structures</td></tr>
+        <tr><td><strong>Acqui-hire</strong></td><td>Buying company for its talent</td><td>India IT sector startup acquisitions</td></tr>
+        <tr><td><strong>Distressed / Turnaround</strong></td><td>Buying insolvent company via IBC/NCLT</td><td>JSW Steel buys BPSL via NCLT</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-h">The Regulatory Landscape</div>
+    <div class="body-text">
+      Indian M&A operates in a multi-regulator environment. The complexity increases significantly for cross-border or listed-company deals.
+    </div>
+    <div class="callout">
+      <strong>CCI (Competition Commission of India)</strong> — mandatory pre-merger notification when the combined entity crosses asset and turnover thresholds (₹2,000 Cr assets or ₹6,000 Cr turnover). CCI can block, modify, or impose remedies on deals that substantially lessen competition.
+    </div>
+    <div class="callout-amber">
+      <strong>SEBI Takeover Code (SEBI SAST 2011)</strong> — anyone acquiring 25%+ stake in a listed company must make an open offer for a minimum 26% of the target's shares at the higher of market price or negotiated price. Mandatory tender offers protect minority shareholders.
+    </div>
+    <div class="callout-amber">
+      <strong>IBC (Insolvency and Bankruptcy Code 2016)</strong> — for distressed acquisitions. Resolution professionals invite bids; the winning resolution plan is approved by the NCLT. Timeline: 180 days (extendable to 330). JSW Steel-Bhushan Power is the landmark case.
+    </div>
+    <div class="callout">
+      <strong>RBI &amp; FEMA</strong> — cross-border deals must comply with FDI sectoral caps, pricing guidelines, and remittance rules. Regulated sectors (banking, insurance, telecom) require additional regulatory clearances.
+    </div>
+
+    <div class="section-h">The M&A Process Timeline</div>
+    <table class="data-table">
+      <thead><tr><th>Phase</th><th>Activities</th><th>Timeline</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Strategy &amp; Screen</strong></td><td>Board approves M&A strategy; advisors screen universe of targets</td><td>1–3 months</td></tr>
+        <tr><td><strong>Approach &amp; NDA</strong></td><td>Confidential approach to target; Non-Disclosure Agreement signed</td><td>1–2 weeks</td></tr>
+        <tr><td><strong>Due Diligence</strong></td><td>Financial, legal, tax, operational, ESG DD by acquirer's advisors</td><td>4–8 weeks</td></tr>
+        <tr><td><strong>Valuation &amp; Bid</strong></td><td>DCF, comps, LBO modelling; bid letter submitted to target board</td><td>2–4 weeks</td></tr>
+        <tr><td><strong>Negotiation &amp; SPA</strong></td><td>Negotiate price, reps/warranties, MAC clauses, sign SPA</td><td>2–4 weeks</td></tr>
+        <tr><td><strong>Regulatory Approval</strong></td><td>CCI, SEBI (for listed), RBI (FDI), sectoral regulators</td><td>3–12 months</td></tr>
+        <tr><td><strong>Closing &amp; Integration</strong></td><td>Day 1 planning, integration management office (IMO) activation</td><td>Ongoing</td></tr>
+      </tbody>
+    </table>
+
+    <div class="key-insight">
+      <div class="ki-label">Key Insight</div>
+      <div class="ki-text">The <strong>average global M&A deal destroys value for the acquirer's shareholders</strong>. Studies show that 60–70% of acquirers underperform their peers in the 3 years post-close. The reasons are almost always overpaying, overestimating synergies, and underestimating integration complexity — not strategic logic. This is why the accretion/dilution test is non-negotiable.</div>
+    </div>
+
+    <div class="next-module">
+      <div>
+        <div class="next-label">Next Module</div>
+        <div class="next-title">Accretion/Dilution: The IB Analyst's First Test</div>
+      </div>
+      <button class="next-btn" onclick="showModule(1,document.querySelectorAll('.tab')[1])">Next →</button>
+    </div>
+  </div>
+
+  <!-- MODULE 2 -->
+  <div class="module" id="mod1">
+    <div class="mod-eyebrow">Module 2 of 4</div>
+    <div class="mod-title">Accretion / Dilution: The IB Analyst's First Test</div>
+    <div class="mod-intro">
+      Before any deck gets written or any synergy gets claimed, the analyst answers one question: does this deal increase or decrease the acquirer's earnings per share? This is the accretion/dilution test — and it is the first analytical hurdle every deal must clear.
+    </div>
+
+    <div class="section-h">What Accretion and Dilution Mean</div>
+    <div class="body-text">
+      A deal is <strong>accretive</strong> when the pro-forma (combined) EPS is higher than the acquirer's standalone EPS. It is <strong>dilutive</strong> when the combined EPS is lower. The market watches this number closely — a dilutive deal typically triggers an acquirer stock sell-off on announcement day.
+    </div>
+
+    <div class="formula-box">
+<span class="co">// Step 1: Standalone acquirer EPS</span>
+<span class="hl">Standalone EPS</span>  = Acquirer Net Income ÷ Shares Outstanding
+<br>
+<span class="co">// Step 2: New shares issued (for stock consideration)</span>
+<span class="hl">New Shares</span>      = Stock Consideration ÷ Acquirer Share Price
+<span class="hl">PF Share Count</span>  = Acquirer Shares + New Shares
+<br>
+<span class="co">// Step 3: After-tax interest cost (for debt consideration)</span>
+<span class="hl">Interest Cost</span>   = Debt Amount × Cost of Debt × (1 − Tax Rate)
+<br>
+<span class="co">// Step 4: Pro-forma net income</span>
+<span class="hl">PF Net Income</span>   = Acquirer NI + Target NI + Synergies − Interest Cost
+<br>
+<span class="co">// Step 5: Pro-forma EPS and accretion/dilution</span>
+<span class="hl">PF EPS</span>          = PF Net Income ÷ PF Share Count
+<span class="hl">A/D %</span>           = (PF EPS − Standalone EPS) ÷ Standalone EPS × 100
+    </div>
+
+    <div class="section-h">The EPS Bridge: Walking Through the Logic</div>
+    <div class="body-text">
+      The best way to understand accretion/dilution is to walk an EPS bridge — each line shows how the combined entity's EPS is built from the two standalone companies.
+    </div>
+
+    <table class="bridge-table">
+      <tr class="sep"><td colspan="2" class="sep" style="padding:8px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)">EPS Bridge (Illustrative)</td></tr>
+      <tr><td class="label">Acquirer Standalone NI</td><td class="val">₹5,000 Cr</td></tr>
+      <tr><td class="label">Acquirer Shares Outstanding</td><td class="val">1,000 Cr</td></tr>
+      <tr><td class="label">Standalone EPS</td><td class="val">₹5.00</td></tr>
+      <tr class="sep"><td colspan="2" class="sep" style="padding:8px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)">Deal Adjustments</td></tr>
+      <tr><td class="label">+ Target Net Income</td><td class="val g">+₹1,200 Cr</td></tr>
+      <tr><td class="label">+ Annual Synergies (after-tax)</td><td class="val g">+₹300 Cr</td></tr>
+      <tr><td class="label">− Interest Cost on Acquisition Debt</td><td class="val r">−₹250 Cr</td></tr>
+      <tr><td class="label">Pro-Forma Net Income</td><td class="val" style="font-weight:800">₹6,250 Cr</td></tr>
+      <tr class="sep"><td colspan="2" class="sep" style="padding:8px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)">Share Count Impact</td></tr>
+      <tr><td class="label">+ New Shares Issued (stock consideration)</td><td class="val r">+150 Cr</td></tr>
+      <tr><td class="label">Pro-Forma Share Count</td><td class="val" style="font-weight:800">1,150 Cr</td></tr>
+      <tr class="sep"><td colspan="2" class="sep" style="padding:8px 12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)">Result</td></tr>
+      <tr style="background:#f0fdf4"><td class="label" style="font-weight:700;color:#15803d">Pro-Forma EPS</td><td class="val" style="color:#15803d;font-weight:800">₹5.43</td></tr>
+      <tr style="background:#f0fdf4"><td class="label" style="font-weight:700;color:#15803d">Accretion / Dilution</td><td class="val" style="color:#15803d;font-weight:800">+8.6% Accretive</td></tr>
+    </table>
+
+    <div class="section-h">The PE Differential Rule</div>
+    <div class="body-text">
+      There is a fast mental model: when is a stock-for-stock deal accretive?
+    </div>
+    <div class="callout-green">
+      <strong>PE Differential Rule:</strong> In an all-stock deal, the deal is accretive if the acquirer's P/E is higher than the implied P/E of the deal (offer price ÷ target EPS). When the acquirer trades at a higher multiple, it is "paying" with shares that carry more embedded earnings power per rupee than what it is buying.
+    </div>
+
+    <div class="formula-box">
+<span class="hl">Breakeven Synergies</span> = (Dilution in EPS × PF Shares) ÷ (1 − Tax Rate)
+<span class="co">// The minimum synergies needed to make a dilutive deal breakeven</span>
+<br>
+<span class="hl">Synergy Payback</span>    = Premium Paid ÷ Annual After-Tax Synergies
+<span class="co">// How many years before the premium is recovered from synergies</span>
+    </div>
+
+    <div class="section-h">What Drives Accretion vs Dilution?</div>
+    <table class="data-table">
+      <thead><tr><th>Factor</th><th>Drives Accretion</th><th>Drives Dilution</th></tr></thead>
+      <tbody>
+        <tr><td>Financing method</td><td class="g">Debt / Cash</td><td class="r">Stock (if acquirer P/E &lt; deal P/E)</td></tr>
+        <tr><td>Acquirer P/E vs deal P/E</td><td class="g">Acquirer P/E &gt; Deal P/E</td><td class="r">Acquirer P/E &lt; Deal P/E</td></tr>
+        <tr><td>Synergies</td><td class="g">Large, fast-capture synergies</td><td class="r">No synergies, or diluted by integration costs</td></tr>
+        <tr><td>Premium paid</td><td class="g">Low premium (below 20%)</td><td class="r">High premium (40%+) without synergies</td></tr>
+        <tr><td>Cost of debt</td><td class="g">Low cost of debt (below target earnings yield)</td><td class="r">High cost of debt (above target earnings yield)</td></tr>
+        <tr><td>PPA / D&amp;A step-up</td><td class="g">Asset-light target (minimal intangibles)</td><td class="r">Large intangible amortisation post-PPA</td></tr>
+      </tbody>
+    </table>
+
+    <div class="key-insight">
+      <div class="ki-label">Key Insight</div>
+      <div class="ki-text">The accretion/dilution test is a <strong>year-one snapshot</strong>, not a long-term verdict. A deal can be dilutive in year one and accretive by year three as synergies ramp up. Conversely, a deal that looks accretive upfront can turn dilutive if synergies fail to materialise or PPA amortisation is larger than modelled. Always check what assumptions the breakeven requires.</div>
+    </div>
+
+    <div class="next-module">
+      <div>
+        <div class="next-label">Next Module</div>
+        <div class="next-title">Synergies: The Promise vs the Reality</div>
+      </div>
+      <button class="next-btn" onclick="showModule(2,document.querySelectorAll('.tab')[2])">Next →</button>
+    </div>
+  </div>
+
+  <!-- MODULE 3 -->
+  <div class="module" id="mod2">
+    <div class="mod-eyebrow">Module 3 of 4</div>
+    <div class="mod-title">Synergies: The Promise vs. the Reality</div>
+    <div class="mod-intro">
+      Synergies are the most cited justification for paying a premium in M&A — and the most frequently overstated. Understanding how to model, value, and pressure-test synergies is what separates a credible deal from a banker-inflated one.
+    </div>
+
+    <div class="section-h">Types of Synergies</div>
+    <div class="concept-grid">
+      <div class="concept-box">
+        <div class="concept-title">Cost Synergies</div>
+        <div class="concept-text">Headcount reduction, shared procurement, facility rationalisation, IT consolidation, overlapping vendor contracts. More predictable. 80% of deal synergy value typically comes from here.</div>
+      </div>
+      <div class="concept-box">
+        <div class="concept-title">Revenue Synergies</div>
+        <div class="concept-text">Cross-sell, new geographies, bundled pricing, brand extension. Less predictable — customer attrition and execution risk make these the most commonly missed synergy type.</div>
+      </div>
+      <div class="concept-box">
+        <div class="concept-title">Financial Synergies</div>
+        <div class="concept-text">Tax shield from debt, improved debt rating, lower borrowing cost at scale, deployment of excess cash. Often overlooked but material in large corporate mergers.</div>
+      </div>
+      <div class="concept-box">
+        <div class="concept-title">Integration Costs</div>
+        <div class="concept-text">Severance, system integration, rebranding, consultant fees. One-time costs that offset synergy PV. Often understated by management teams and inflated by integration firms.</div>
+      </div>
+    </div>
+
+    <div class="section-h">The PV of Synergies Framework</div>
+    <div class="formula-box">
+<span class="co">// Annual synergy (after-tax, adjusted for capture rate)</span>
+<span class="hl">After-Tax Synergy</span>  = Gross Synergy × Capture Rate × (1 − Tax Rate)
+<br>
+<span class="co">// Present value of synergy stream (simplified growing annuity)</span>
+<span class="hl">PV of Synergies</span>    = Σ [After-Tax Synergyt ÷ (1 + WACC)^t]
+<br>
+<span class="co">// Payback on the premium</span>
+<span class="hl">Payback Period</span>     = Premium Paid ÷ Annual After-Tax Synergies
+<br>
+<span class="co">// Net synergy value (after integration costs)</span>
+<span class="hl">Net Synergy Value</span>  = PV of Synergies − PV of Integration Costs
+    </div>
+
+    <div class="callout-amber">
+      <strong>The 50% rule:</strong> As a rule of thumb, the acquirer should not pay more than 50% of the PV of synergies as a premium. The remaining synergy value should accrue to the acquirer's shareholders — otherwise, the target's shareholders capture all the value and the acquirer breaks even at best.
+    </div>
+
+    <div class="section-h">Capture Rates: The Missing Assumption</div>
+    <div class="body-text">
+      Synergy models almost always show 100% capture. Reality doesn't. McKinsey data across 1,000 deals shows:
+    </div>
+    <table class="data-table">
+      <thead><tr><th>Synergy Type</th><th>Typical Capture Rate</th><th>Why it Misses</th></tr></thead>
+      <tbody>
+        <tr><td>Cost synergies</td><td class="a">65–75%</td><td>Headcount harder to cut than assumed; IT integration costly</td></tr>
+        <tr><td>Revenue synergies</td><td class="r">30–50%</td><td>Customer overlap, product mismatch, channel conflict</td></tr>
+        <tr><td>Procurement synergies</td><td class="g">75–85%</td><td>Most predictable — volume leverage contracts are quantifiable</td></tr>
+        <tr><td>Integration timing</td><td class="r">Delayed 6–18 months</td><td>Cultural issues, system complexity, regulatory approval time</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-h">Ramp-Up Schedule</div>
+    <div class="body-text">
+      Synergies don't arrive on Day 1. A realistic ramp-up is critical for accurate year-by-year accretion modelling.
+    </div>
+    <table class="data-table">
+      <thead><tr><th>Year</th><th>Cost Synergy Capture</th><th>Revenue Synergy Capture</th></tr></thead>
+      <tbody>
+        <tr><td>Year 1</td><td class="a">20–30%</td><td class="r">5–10%</td></tr>
+        <tr><td>Year 2</td><td class="a">55–70%</td><td class="a">20–30%</td></tr>
+        <tr><td>Year 3 (Run-rate)</td><td class="g">80–95%</td><td class="a">40–60%</td></tr>
+      </tbody>
+    </table>
+
+    <div class="key-insight">
+      <div class="ki-label">Key Insight</div>
+      <div class="ki-text">The most dangerous synergy in any deal deck is one that was reverse-engineered from the premium. When a banker works backwards from "what synergies are needed to justify this price," the model passes the test on paper but fails in execution. <strong>Always ask where synergy estimates came from — bottom-up operational analysis or top-down premium justification.</strong> The answer tells you everything about deal quality.</div>
+    </div>
+
+    <div class="next-module">
+      <div>
+        <div class="next-label">Next Module</div>
+        <div class="next-title">Deal Structuring: Cash, Stock, Debt and Why It Matters</div>
+      </div>
+      <button class="next-btn" onclick="showModule(3,document.querySelectorAll('.tab')[3])">Next →</button>
+    </div>
+  </div>
+
+  <!-- MODULE 4 -->
+  <div class="module" id="mod3">
+    <div class="mod-eyebrow">Module 4 of 4</div>
+    <div class="mod-title">Deal Structuring: Cash, Stock, Debt and Why It Matters</div>
+    <div class="mod-intro">
+      The financing decision is as consequential as the price decision. The same deal, financed differently, can be accretive or dilutive, investment-grade or junk, tax-efficient or costly. This module covers how structuring decisions ripple through the entire deal analysis.
+    </div>
+
+    <div class="section-h">The Financing Trade-off Matrix</div>
+    <div class="fin-compare">
+      <div class="fin-box cash">
+        <div class="fin-title">💵 All-Cash</div>
+        <div class="fin-item">No dilution to acquirer shareholders</div>
+        <div class="fin-item">Target gets certainty and liquidity</div>
+        <div class="fin-item">Creates taxable event for target holders</div>
+        <div class="fin-item">Depletes acquirer's cash/flexibility</div>
+        <div class="fin-item">Best when acquirer has excess cash + target has low P/E</div>
+      </div>
+      <div class="fin-box stock">
+        <div class="fin-title">📈 All-Stock</div>
+        <div class="fin-item">Target shares future upside</div>
+        <div class="fin-item">Tax-deferred structure for target (share swap)</div>
+        <div class="fin-item">Signals acquirer may view stock as overvalued</div>
+        <div class="fin-item">Dilutes existing shareholders</div>
+        <div class="fin-item">Best when acquirer P/E &gt; target implied P/E</div>
+      </div>
+      <div class="fin-box debt">
+        <div class="fin-title">🏦 Debt-Financed</div>
+        <div class="fin-item">Interest is tax-deductible (tax shield)</div>
+        <div class="fin-item">No equity dilution</div>
+        <div class="fin-item">Increases leverage ratios and credit risk</div>
+        <div class="fin-item">Covenant restrictions can limit flexibility</div>
+        <div class="fin-item">Best when target generates strong, stable FCF</div>
+      </div>
+    </div>
+
+    <div class="section-h">Purchase Price Allocation (PPA)</div>
+    <div class="body-text">
+      Every acquisition triggers a purchase price allocation under IND AS 103, which requires the acquirer to fair-value all identifiable assets and liabilities. The residual is goodwill.
+    </div>
+    <table class="data-table">
+      <thead><tr><th>Allocation Step</th><th>What Gets Valued</th><th>P&amp;L Impact</th></tr></thead>
+      <tbody>
+        <tr><td><strong>PP&amp;E Step-Up</strong></td><td>Fixed assets revalued to fair value</td><td>Higher depreciation charge reduces reported earnings</td></tr>
+        <tr><td><strong>Intangibles Identified</strong></td><td>Brand, customer list, patents, non-compete</td><td>Amortised over 5–40 years — can significantly reduce EPS</td></tr>
+        <tr><td><strong>Inventory Step-Up</strong></td><td>Inventory at fair value (COGS uplift at close)</td><td>One-time drag in quarter of acquisition close</td></tr>
+        <tr><td><strong>Deferred Tax Liability</strong></td><td>DTL created on step-ups (temporary difference)</td><td>Reverses as assets depreciate; reduces effective tax rate</td></tr>
+        <tr><td><strong>Goodwill</strong></td><td>Residual after FV of net assets allocated</td><td>No amortisation (IND AS); annual impairment test</td></tr>
+      </tbody>
+    </table>
+
+    <div class="section-h">Collar Structures for Stock Deals</div>
+    <div class="body-text">
+      In all-stock or mixed deals, the exchange ratio is set at announcement. Between signing and closing (3–12 months), both share prices can move substantially. A collar protects both parties.
+    </div>
+    <div class="callout">
+      <strong>Fixed Exchange Ratio:</strong> Target gets a fixed number of acquirer shares. Target's effective price rises/falls with acquirer's stock. Target bears price risk.<br><br>
+      <strong>Fixed Value (Floating Ratio):</strong> Target gets a fixed dollar/rupee value. Exchange ratio adjusts as acquirer price moves. Acquirer bears dilution risk.<br><br>
+      <strong>Collar:</strong> Combines both — exchange ratio adjusts within a band (e.g., ±15%), with fixed ratios at the extremes. Shares risk between both parties.
+    </div>
+
+    <div class="section-h">Post-Deal Balance Sheet Considerations</div>
+    <table class="data-table">
+      <thead><tr><th>Metric</th><th>What Lenders Watch</th><th>Typical Threshold</th></tr></thead>
+      <tbody>
+        <tr><td>Net Debt / EBITDA</td><td>Core leverage ratio for investment grade</td><td>Below 3.0x for BBB; below 5.0x for BB</td></tr>
+        <tr><td>Interest Coverage (EBIT / Interest)</td><td>Ability to service debt from operations</td><td>Above 3.0x for investment grade</td></tr>
+        <tr><td>DSCR</td><td>(EBITDA − Capex) / Debt Service</td><td>Above 1.2x for project finance covenants</td></tr>
+        <tr><td>Goodwill / Total Assets</td><td>Impairment risk indicator</td><td>Above 40% flags balance sheet fragility</td></tr>
+        <tr><td>FCF Conversion</td><td>EBITDA → Free Cash Flow to service debt</td><td>Above 70% signals clean earnings quality</td></tr>
+      </tbody>
+    </table>
+
+    <div class="key-insight">
+      <div class="ki-label">Key Insight</div>
+      <div class="ki-text">The deal structure is often <strong>more negotiated than the price itself</strong>. A target that insists on cash is pricing in risk — they don't believe in the acquirer's synergy story or post-merger performance. A target that accepts stock believes (or is told by their banker) that the acquirer's future price appreciation will compensate them. <strong>Watch what form of consideration target shareholders accept — it reveals their conviction in the deal thesis better than any press release.</strong></div>
+    </div>
+
+    <div style="border-top:1px solid var(--border);padding-top:24px;margin-top:32px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+      <div>
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:4px">You've finished all 4 modules</div>
+        <div style="font-size:15px;font-weight:800">Now put it to work</div>
+      </div>
+      <a href="/domains/ma/calculators/accretion-dilution.html" style="background:var(--text);color:#fff;border-radius:8px;padding:11px 22px;font-size:13px;font-weight:700;display:inline-flex;align-items:center;gap:6px">Open A/D Calculator →</a>
+    </div>
+  </div>
+</div>
+
+<script>
+function showModule(idx, tabEl){
+  document.querySelectorAll('.module').forEach((m,i)=>m.classList.toggle('active',i===idx));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  tabEl.classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
