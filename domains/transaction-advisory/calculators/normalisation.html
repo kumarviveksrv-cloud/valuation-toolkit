@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Normalisation Adjustments — Transaction Advisory — ValuationDesk</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
+  --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--teal:#0d9488;
+  --violet:#7c3aed;
+  --accent:#2563eb;--accent-bg:#eff6ff;--accent-border:#bfdbfe;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);z-index:100}
+.nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-.5px}
+.nav-logo span{color:var(--blue)}
+.nav-links{display:flex;gap:1.5rem;align-items:center;font-size:.875rem;font-weight:500;color:var(--muted)}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--text);color:#fff;padding:.45rem 1rem;border-radius:6px;font-size:.8rem;font-weight:600}
+.nav-cta:hover{opacity:.85}
+
+.main{max-width:860px;margin:0 auto;padding:2rem;width:100%;flex:1}
+.breadcrumb{font-size:.8rem;color:var(--muted);margin-bottom:.75rem;display:flex;gap:.4rem;align-items:center}
+.breadcrumb a:hover{color:var(--text)}
+.calc-header{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1.75rem;flex-wrap:wrap}
+.calc-title-block h1{font-size:1.5rem;font-weight:900;letter-spacing:-.03em;margin-bottom:.3rem}
+.calc-title-block p{font-size:.875rem;color:var(--muted)}
+.tag-pro-lg{background:#f5f3ff;color:var(--violet);font-size:.75rem;font-weight:700;padding:.3rem .75rem;border-radius:999px;display:inline-block;margin-top:.4rem;border:1px solid #ddd6fe}
+
+/* STEPPER */
+.stepper{display:flex;align-items:center;gap:0;margin-bottom:2rem}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:var(--muted);flex-shrink:0;position:relative;z-index:1}
+.step-dot.active{border-color:var(--accent);background:var(--accent);color:#fff}
+.step-dot.done{border-color:var(--accent);background:var(--accent-bg);color:var(--accent)}
+.step-line{flex:1;height:2px;background:var(--border)}
+.step-line.done{background:var(--accent)}
+.step-labels{display:flex;justify-content:space-between;margin-top:.4rem;margin-bottom:1.5rem}
+.step-label{font-size:.7rem;font-weight:600;color:var(--muted);text-align:center;flex:1}
+.step-label.active{color:var(--accent)}
+
+/* STEPS */
+.step{display:none}
+.step.active{display:block}
+
+/* LOADING */
+.loading-wrap{text-align:center;padding:3rem 1rem}
+.loading-bar-wrap{background:var(--card);border-radius:999px;height:6px;max-width:320px;margin:1.5rem auto}
+.loading-bar{height:6px;border-radius:999px;background:linear-gradient(90deg,var(--accent),#60a5fa);width:0%;transition:width .4s ease}
+.loading-text{font-size:.875rem;color:var(--muted);margin-top:.75rem;font-weight:500}
+.loading-fact{font-size:.78rem;color:var(--muted);margin-top:.5rem;font-style:italic;max-width:340px;margin-left:auto;margin-right:auto}
+
+/* COMPANY GRID */
+.filter-row{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem}
+.filter-row input{flex:1;min-width:160px;border:1px solid var(--border);border-radius:7px;padding:.5rem .75rem;font-size:.85rem;font-family:'Inter',sans-serif}
+.filter-row input:focus{outline:none;border-color:var(--accent)}
+.sector-pills{display:flex;gap:.4rem;flex-wrap:wrap}
+.sector-pill{border:1px solid var(--border);background:var(--bg);border-radius:999px;padding:.25rem .65rem;font-size:.72rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s}
+.sector-pill.active{border-color:var(--accent);background:var(--accent-bg);color:var(--accent)}
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:.6rem;margin-bottom:1.5rem}
+.co-card{border:1.5px solid var(--border);border-radius:9px;padding:.75rem;cursor:pointer;transition:all .15s;background:var(--bg)}
+.co-card:hover{border-color:var(--accent);background:var(--accent-bg)}
+.co-card.selected{border-color:var(--accent);background:var(--accent-bg)}
+.co-name{font-weight:700;font-size:.82rem;margin-bottom:.2rem}
+.co-sector{font-size:.7rem;color:var(--muted)}
+.co-ticker{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--accent);font-weight:700}
+
+/* CONTEXT / TEACH CARD */
+.ctx-card{border:1px solid var(--accent-border);border-radius:12px;background:var(--accent-bg);padding:1.5rem;margin-bottom:1.5rem}
+.ctx-header{display:flex;align-items:flex-start;gap:1rem;margin-bottom:1rem}
+.ctx-icon{font-size:2rem;line-height:1}
+.ctx-company{font-size:1.1rem;font-weight:800;letter-spacing:-.02em}
+.ctx-sub{font-size:.82rem;color:var(--muted);margin-top:.15rem}
+.ctx-chips{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.75rem}
+.ctx-chip{background:#fff;border:1px solid var(--accent-border);border-radius:999px;padding:.2rem .65rem;font-size:.75rem;font-weight:600;color:var(--text)}
+.ctx-chip strong{color:var(--accent)}
+
+.teach-list{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.5rem}
+.teach-row{border:1px solid var(--border);border-radius:9px;overflow:hidden}
+.teach-q{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1rem;cursor:pointer;font-weight:600;font-size:.875rem;background:var(--card)}
+.teach-q:hover{background:#f3f4f6}
+.teach-a{display:none;padding:.85rem 1rem;font-size:.85rem;color:#374151;border-top:1px solid var(--border);line-height:1.6}
+.teach-a.open{display:block}
+
+/* TYPE BREAKDOWN */
+.type-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;margin-bottom:1.5rem}
+.type-card{border:1px solid var(--border);border-radius:10px;padding:1rem;background:var(--bg)}
+.type-card h4{font-size:.8rem;font-weight:700;margin-bottom:.4rem;display:flex;align-items:center;gap:.4rem}
+.type-card p{font-size:.75rem;color:var(--muted);line-height:1.5}
+.type-badge{display:inline-block;padding:.15rem .45rem;border-radius:4px;font-size:.68rem;font-weight:700}
+.badge-onetime{background:#fef9c3;color:#854d0e}
+.badge-runrate{background:#dbeafe;color:#1e40af}
+.badge-proforma{background:#dcfce7;color:#15803d}
+.badge-mgmt{background:#fce7f3;color:#9d174d}
+
+/* PRO GATE */
+.pro-gate{border:2px dashed var(--border);border-radius:14px;padding:2.5rem;text-align:center;background:var(--card)}
+.pro-lock{font-size:2.5rem;margin-bottom:.75rem}
+.pro-gate h3{font-size:1.1rem;font-weight:800;margin-bottom:.5rem}
+.pro-gate p{font-size:.875rem;color:var(--muted);margin-bottom:1.25rem;max-width:420px;margin-left:auto;margin-right:auto}
+.pro-features{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-bottom:1.5rem}
+.pro-feat{background:#fff;border:1px solid var(--border);border-radius:999px;padding:.25rem .75rem;font-size:.75rem;font-weight:600;color:var(--muted)}
+.pro-btn{background:var(--text);color:#fff;border:none;border-radius:8px;padding:.75rem 1.75rem;font-size:.9rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+.pro-btn:hover{opacity:.85}
+
+/* STEP BUTTONS */
+.step-btns{display:flex;justify-content:space-between;margin-top:1.5rem;gap:1rem}
+.btn-back{border:1.5px solid var(--border);background:var(--bg);border-radius:8px;padding:.65rem 1.25rem;font-size:.875rem;font-weight:600;cursor:pointer;color:var(--muted);font-family:'Inter',sans-serif}
+.btn-back:hover{border-color:var(--text);color:var(--text)}
+.btn-next{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:.65rem 1.5rem;font-size:.875rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-next:hover{opacity:.88}
+.btn-next:disabled{opacity:.4;cursor:not-allowed}
+
+.calc-nav{display:flex;justify-content:space-between;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);flex-wrap:wrap;gap:1rem}
+.calc-nav a{font-size:.875rem;font-weight:600;color:var(--muted)}
+.calc-nav a:hover{color:var(--text)}
+
+footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-size:.8rem;color:var(--muted);margin-top:auto}
+.footer-nav{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:.75rem}
+.footer-nav a:hover{color:var(--text)}
+
+@media(max-width:640px){
+  nav{padding:1rem}.nav-links{display:none}
+  .main{padding:1.5rem 1rem}
+  .type-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">Valuation<span>Desk</span></a>
+  <div class="nav-links">
+    <a href="/domains/transaction-advisory/">Transaction Advisory</a>
+    <a href="/domains/transaction-advisory/calculators/">Calculators</a>
+    <a href="/domains/transaction-advisory/learn/">Learn</a>
+  </div>
+  <a href="#" class="nav-cta" onclick="unlockPro();return false">Unlock Pro — ₹799/mo →</a>
+</nav>
+
+<div class="main">
+  <div class="breadcrumb">
+    <a href="/">Home</a> / <a href="/domains/transaction-advisory/">Transaction Advisory</a> / <a href="/domains/transaction-advisory/calculators/">Calculators</a> / Normalisation Adjustments
+  </div>
+
+  <div class="calc-header">
+    <div class="calc-title-block">
+      <h1>🔧 Normalisation Adjustments</h1>
+      <p>Classify and quantify adjustments by type — one-time, run-rate, pro-forma, management add-back.</p>
+      <span class="tag-pro-lg">PRO Calculator</span>
+    </div>
+  </div>
+
+  <!-- STEPPER -->
+  <div class="stepper">
+    <div class="step-dot active" id="dot1">1</div>
+    <div class="step-line" id="line12"></div>
+    <div class="step-dot" id="dot2">2</div>
+    <div class="step-line" id="line23"></div>
+    <div class="step-dot" id="dot3">3</div>
+    <div class="step-line" id="line34"></div>
+    <div class="step-dot" id="dot4">4</div>
+  </div>
+  <div class="step-labels">
+    <span class="step-label active" id="lbl1">Pick Company</span>
+    <span class="step-label" id="lbl2">Understand</span>
+    <span class="step-label" id="lbl3">Adjustment Model</span>
+    <span class="step-label" id="lbl4">Normalised Output</span>
+  </div>
+
+  <!-- STEP 1: PICK -->
+  <div class="step active" id="step1">
+    <div class="filter-row">
+      <input type="text" id="searchInput" placeholder="Search company or ticker…" oninput="filterGrid()"/>
+      <div class="sector-pills" id="sectorPills"></div>
+    </div>
+    <div class="company-grid" id="companyGrid"></div>
+    <div class="step-btns">
+      <span></span>
+      <button class="btn-next" id="nextBtn1" onclick="startLoading()" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: LOADING + CONTEXT -->
+  <div class="step" id="step2">
+    <div id="loadingDiv" class="loading-wrap">
+      <div style="font-size:2.5rem;margin-bottom:.75rem">🔧</div>
+      <div style="font-weight:700;font-size:1rem;margin-bottom:.5rem" id="loadingCompany"></div>
+      <div class="loading-bar-wrap"><div class="loading-bar" id="loadingBar"></div></div>
+      <div class="loading-text" id="loadingText">Pulling historical P&L…</div>
+      <div class="loading-fact" id="loadingFact"></div>
+    </div>
+    <div id="ctxDiv" style="display:none">
+      <div class="ctx-card" id="ctxCard"></div>
+
+      <div style="font-size:.75rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem">Adjustment Type Reference</div>
+      <div class="type-grid" id="typeGrid">
+        <div class="type-card">
+          <h4><span class="type-badge badge-onetime">one-time</span> One-Time Items</h4>
+          <p>Genuinely non-recurring charges or gains. Restructuring costs, legal settlements, asset write-downs, transaction expenses. Must pass the "will it happen again in 3 years?" test.</p>
+        </div>
+        <div class="type-card">
+          <h4><span class="type-badge badge-runrate">run-rate</span> Run-Rate Adjustments</h4>
+          <p>Annualise benefits or costs that started mid-year. A headcount reduction in October must be grossed up to a full year. The underlying change must be verified — not assumed.</p>
+        </div>
+        <div class="type-card">
+          <h4><span class="type-badge badge-proforma">pro-forma</span> Pro-Forma Adjustments</h4>
+          <p>Reflect events that changed the business structure mid-year — an acquisition, a new factory, a divested unit. Require verifiable evidence (commissioning certificate, SPA closing date).</p>
+        </div>
+        <div class="type-card">
+          <h4><span class="type-badge badge-mgmt">mgmt-addback</span> Management Add-Backs</h4>
+          <p>Items management wants excluded: ESOP, "non-cash" charges, litigation provisions. Buyers scrutinise these heavily — "non-cash" does not mean "not a real cost."</p>
+        </div>
+      </div>
+
+      <div class="teach-list" id="teachList"></div>
+      <div class="step-btns">
+        <button class="btn-back" onclick="showStep(1)">← Back</button>
+        <button class="btn-next" onclick="showStep(3)">Adjustment Model →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: ADJUSTMENT MODEL (PRO GATE) -->
+  <div class="step" id="step3">
+    <div class="pro-gate">
+      <div class="pro-lock">🔒</div>
+      <h3>Adjustment Model — Pro Feature</h3>
+      <p>Build a line-by-line adjustment model with type classification, sensitivity toggles, and real-time normalised EBITDA updates.</p>
+      <div class="pro-features">
+        <span class="pro-feat">Toggle each item on/off</span>
+        <span class="pro-feat">Override amounts</span>
+        <span class="pro-feat">Accept / challenge toggle</span>
+        <span class="pro-feat">Buyer vs. seller view</span>
+        <span class="pro-feat">% of reported sensitivity</span>
+        <span class="pro-feat">Peer sector comparison</span>
+      </div>
+      <button class="pro-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    </div>
+    <div class="step-btns">
+      <button class="btn-back" onclick="showStep(2)">← Back</button>
+      <button class="btn-next" onclick="showStep(4)">Normalised Output →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: NORMALISED OUTPUT (PRO GATE) -->
+  <div class="step" id="step4">
+    <div class="pro-gate">
+      <div class="pro-lock">🔒</div>
+      <h3>Normalised Output — Pro Feature</h3>
+      <p>See the full normalised P&L with a quality score, margin waterfall, and sector-relative benchmarking across all 30 companies.</p>
+      <div class="pro-features">
+        <span class="pro-feat">Normalised P&L waterfall</span>
+        <span class="pro-feat">Quality of earnings score (0–100)</span>
+        <span class="pro-feat">Cash vs. accrual gap analysis</span>
+        <span class="pro-feat">Sector peer normalised margins</span>
+        <span class="pro-feat">Adj % by type breakdown</span>
+        <span class="pro-feat">Exportable summary PDF</span>
+      </div>
+      <button class="pro-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    </div>
+    <div class="step-btns">
+      <button class="btn-back" onclick="showStep(3)">← Back</button>
+      <button class="btn-next" onclick="showStep(1)">New Company →</button>
+    </div>
+  </div>
+
+  <div class="calc-nav">
+    <a href="/domains/transaction-advisory/calculators/ebitda-bridge.html">← EBITDA Bridge</a>
+    <a href="/domains/transaction-advisory/calculators/working-capital-peg.html">Working Capital Peg →</a>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-nav">
+    <a href="/">Home</a>
+    <a href="/domains/transaction-advisory/">Transaction Advisory</a>
+    <a href="/domains/transaction-advisory/calculators/">Calculators</a>
+    <a href="/domains/transaction-advisory/learn/">Learn</a>
+  </div>
+  <div>© 2025 ValuationDesk · ₹799/month · No annual plan</div>
+</footer>
+
+<script>
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+
+/* ============================================================
+   DATA — 30 COMPANIES (identical to ebitda-bridge)
+============================================================ */
+const COMPANIES = [
+  {name:'TCS',ticker:'TCS',sector:'IT',revenue:240893,ebitdaReported:62632,ebitdaMargin:26.0,
+   adjItems:[
+     {label:'Restructuring charge (one-time)',amount:320,type:'one-time',note:'BaNCS platform migration costs; non-recurring'},
+     {label:'ESOP expense add-back',amount:180,type:'mgmt-addback',note:'Mgmt adds back; analysts typically keep in'},
+     {label:'Forex MTM loss',amount:-95,type:'one-time',note:'Mark-to-market hedging loss; volatile'}
+   ],nwcPct:8.2,cfRatio:0.94,accrualRatio:0.03},
+
+  {name:'Infosys',ticker:'INFY',sector:'IT',revenue:153670,ebitdaReported:33200,ebitdaMargin:21.6,
+   adjItems:[
+     {label:'Severance — headcount rationalisation',amount:450,type:'one-time',note:'One-time workforce adjustment'},
+     {label:'Legal settlement provision',amount:280,type:'one-time',note:'US visa settlement accrual'},
+     {label:'Run-rate savings from automation',amount:-500,type:'run-rate',note:'Annualise partial-year AI tooling savings'}
+   ],nwcPct:9.1,cfRatio:0.91,accrualRatio:0.04},
+
+  {name:'Wipro',ticker:'WIPRO',sector:'IT',revenue:90487,ebitdaReported:16660,ebitdaMargin:18.4,
+   adjItems:[
+     {label:'Acquisition integration costs',amount:390,type:'one-time',note:'Capco integration; non-recurring'},
+     {label:'Office consolidation write-off',amount:180,type:'one-time',note:'Lease exits in US/UK'},
+     {label:'CEO transition costs',amount:85,type:'one-time',note:'One-time leadership transition'}
+   ],nwcPct:11.3,cfRatio:0.87,accrualRatio:0.05},
+
+  {name:'HCL Technologies',ticker:'HCLTECH',sector:'IT',revenue:104057,ebitdaReported:22700,ebitdaMargin:21.8,
+   adjItems:[
+     {label:'Product division restructuring',amount:420,type:'one-time',note:'HCL Software reorganisation'},
+     {label:'Run-rate headcount savings',amount:-350,type:'run-rate',note:'Annualise H2 hiring freeze savings'}
+   ],nwcPct:10.5,cfRatio:0.90,accrualRatio:0.04},
+
+  {name:'Tech Mahindra',ticker:'TECHM',sector:'IT',revenue:51906,ebitdaReported:5700,ebitdaMargin:11.0,
+   adjItems:[
+     {label:'Telecom client bankruptcy provision',amount:650,type:'one-time',note:'Specific client exposure; one-time'},
+     {label:'Platform write-down',amount:430,type:'one-time',note:'Legacy platform impairment'},
+     {label:'New CEO integration spend',amount:200,type:'one-time',note:'Transformation programme costs'}
+   ],nwcPct:14.1,cfRatio:0.78,accrualRatio:0.09},
+
+  {name:'Hindustan Unilever',ticker:'HINDUNILVR',sector:'FMCG',revenue:60580,ebitdaReported:14350,ebitdaMargin:23.7,
+   adjItems:[
+     {label:'Brand divestiture gain',amount:-450,type:'one-time',note:'Gain on sale of non-core brand; not recurring'},
+     {label:'Supply chain disruption cost',amount:280,type:'one-time',note:'Palm oil sourcing disruption; one-time'},
+     {label:'Run-rate savings — pricing architecture',amount:-320,type:'run-rate',note:'Annualised benefit of grammage rationalisation'}
+   ],nwcPct:5.2,cfRatio:0.96,accrualRatio:0.02},
+
+  {name:'ITC',ticker:'ITC',sector:'FMCG',revenue:72278,ebitdaReported:24800,ebitdaMargin:34.3,
+   adjItems:[
+     {label:'Hotel business one-time renovation',amount:380,type:'one-time',note:'Non-FMCG segment capex expensed'},
+     {label:'NBFC subsidiary loss provision',amount:220,type:'one-time',note:'Financial services provision; ring-fenced'}
+   ],nwcPct:7.3,cfRatio:0.93,accrualRatio:0.03},
+
+  {name:'Nestle India',ticker:'NESTLEIND',sector:'FMCG',revenue:17354,ebitdaReported:4010,ebitdaMargin:23.1,
+   adjItems:[
+     {label:'One-time pricing correction',amount:180,type:'one-time',note:'Managed price rollback; non-recurring'},
+     {label:'Capacity expansion pre-operating cost',amount:90,type:'one-time',note:'New factory ramp-up costs'}
+   ],nwcPct:4.8,cfRatio:0.97,accrualRatio:0.02},
+
+  {name:'Dabur India',ticker:'DABUR',sector:'FMCG',revenue:12392,ebitdaReported:2285,ebitdaMargin:18.4,
+   adjItems:[
+     {label:'International subsidiary restructuring',amount:175,type:'one-time',note:'MENA operations reorg costs'},
+     {label:'Run-rate A&P normalisation',amount:-150,type:'run-rate',note:'Annualise lower ad spend post brand refresh'}
+   ],nwcPct:9.5,cfRatio:0.90,accrualRatio:0.05},
+
+  {name:'Marico',ticker:'MARICO',sector:'FMCG',revenue:9764,ebitdaReported:1685,ebitdaMargin:17.3,
+   adjItems:[
+     {label:'Coconut oil hedging loss',amount:130,type:'one-time',note:'Commodity MTM; non-recurring'},
+     {label:'D2C platform build cost',amount:85,type:'one-time',note:'One-time digital channel setup'}
+   ],nwcPct:8.7,cfRatio:0.92,accrualRatio:0.04},
+
+  {name:'HDFC Bank',ticker:'HDFCBANK',sector:'Financials',revenue:248600,ebitdaReported:null,ebitdaMargin:null,
+   adjItems:[],nwcPct:null,cfRatio:null,accrualRatio:null,isBank:true},
+
+  {name:'ICICI Bank',ticker:'ICICIBANK',sector:'Financials',revenue:176400,ebitdaReported:null,ebitdaMargin:null,
+   adjItems:[],nwcPct:null,cfRatio:null,accrualRatio:null,isBank:true},
+
+  {name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',sector:'Financials',revenue:98200,ebitdaReported:null,ebitdaMargin:null,
+   adjItems:[],nwcPct:null,cfRatio:null,accrualRatio:null,isBank:true},
+
+  {name:'Axis Bank',ticker:'AXISBANK',sector:'Financials',revenue:112300,ebitdaReported:null,ebitdaMargin:null,
+   adjItems:[],nwcPct:null,cfRatio:null,accrualRatio:null,isBank:true},
+
+  {name:'State Bank of India',ticker:'SBIN',sector:'Financials',revenue:328100,ebitdaReported:null,ebitdaMargin:null,
+   adjItems:[],nwcPct:null,cfRatio:null,accrualRatio:null,isBank:true},
+
+  {name:'Reliance Industries',ticker:'RELIANCE',sector:'Energy',revenue:964710,ebitdaReported:175800,ebitdaMargin:18.2,
+   adjItems:[
+     {label:'Retail mark-to-market inventory gain',amount:-2800,type:'one-time',note:'Crude oil inventory revaluation; non-recurring'},
+     {label:'O2C restructuring costs',amount:1200,type:'one-time',note:'Refining division reorganisation'},
+     {label:'Pro-forma Jio Platforms full-year',amount:-3500,type:'pro-forma',note:'Annualise partial-year digital platform EBITDA'}
+   ],nwcPct:12.8,cfRatio:0.82,accrualRatio:0.08},
+
+  {name:'ONGC',ticker:'ONGC',sector:'Energy',revenue:139234,ebitdaReported:52800,ebitdaMargin:37.9,
+   adjItems:[
+     {label:'Windfall tax one-time hit',amount:4200,type:'one-time',note:'Govt windfall levy; extraordinary'},
+     {label:'Subsidy burden true-up',amount:1800,type:'one-time',note:'Retrospective LPG subsidy adjustment'}
+   ],nwcPct:15.2,cfRatio:0.79,accrualRatio:0.11},
+
+  {name:'BPCL',ticker:'BPCL',sector:'Energy',revenue:466440,ebitdaReported:18900,ebitdaMargin:4.1,
+   adjItems:[
+     {label:'Inventory valuation loss',amount:2200,type:'one-time',note:'Crude price fall; unrealised inventory loss'},
+     {label:'Retail fuel margin subsidy normalisation',amount:-1500,type:'run-rate',note:'Annualise restoration of marketing margins'}
+   ],nwcPct:18.4,cfRatio:0.71,accrualRatio:0.14},
+
+  {name:'Coal India',ticker:'COALINDIA',sector:'Energy',revenue:147558,ebitdaReported:40200,ebitdaMargin:27.2,
+   adjItems:[
+     {label:'Mine closure provisioning (accelerated)',amount:1200,type:'one-time',note:'Provision pulled forward; timing only'},
+     {label:'SECL wage revision arrears',amount:950,type:'one-time',note:'Retrospective wage settlement'}
+   ],nwcPct:10.1,cfRatio:0.88,accrualRatio:0.06},
+
+  {name:'NTPC',ticker:'NTPC',sector:'Energy',revenue:168640,ebitdaReported:51200,ebitdaMargin:30.4,
+   adjItems:[
+     {label:'Stranded asset write-off (old plants)',amount:2100,type:'one-time',note:'Retirement of 40-year thermal units'},
+     {label:'Renewable capacity pro-forma EBITDA',amount:-1800,type:'pro-forma',note:'Annualise H2 solar commissioning'}
+   ],nwcPct:22.5,cfRatio:0.76,accrualRatio:0.13},
+
+  {name:'Tata Motors',ticker:'TATAMOTORS',sector:'Auto',revenue:437928,ebitdaReported:61400,ebitdaMargin:14.0,
+   adjItems:[
+     {label:'EV investment expensed (R&D)',amount:3200,type:'one-time',note:'Jaguar EV platform; partly capitalised going forward'},
+     {label:'China JV impairment',amount:1800,type:'one-time',note:'JLR-Chery JV write-down'},
+     {label:'UK pension past-service cost',amount:1400,type:'one-time',note:'Defined benefit actuarial catch-up'}
+   ],nwcPct:16.3,cfRatio:0.80,accrualRatio:0.10},
+
+  {name:'Maruti Suzuki',ticker:'MARUTI',sector:'Auto',revenue:132168,ebitdaReported:18200,ebitdaMargin:13.8,
+   adjItems:[
+     {label:'Gujarat facility ramp-up costs',amount:820,type:'one-time',note:'Pre-production startup costs; non-recurring'},
+     {label:'Supply chain premium freight costs',amount:560,type:'one-time',note:'Semiconductor shortage logistics; one-time'}
+   ],nwcPct:7.5,cfRatio:0.91,accrualRatio:0.04},
+
+  {name:'Bajaj Auto',ticker:'BAJAJAUTO',sector:'Auto',revenue:41862,ebitdaReported:8160,ebitdaMargin:19.5,
+   adjItems:[
+     {label:'Investment income reclass',amount:-450,type:'one-time',note:'Dividend from subsidiary; exclude from operating EBITDA'},
+     {label:'EV subsidisation cost',amount:320,type:'one-time',note:'Chetak launch subsidy to dealers'}
+   ],nwcPct:6.8,cfRatio:0.93,accrualRatio:0.03},
+
+  {name:'Hero MotoCorp',ticker:'HEROMOTOCO',sector:'Auto',revenue:36682,ebitdaReported:5960,ebitdaMargin:16.2,
+   adjItems:[
+     {label:'R&D write-off (discontinued platform)',amount:420,type:'one-time',note:'Abandoned combustion platform costs'},
+     {label:'Run-rate commodity savings',amount:-280,type:'run-rate',note:'Annualise steel/aluminium contract reset'}
+   ],nwcPct:8.2,cfRatio:0.89,accrualRatio:0.05},
+
+  {name:'Mahindra & Mahindra',ticker:'M_M',sector:'Auto',revenue:97120,ebitdaReported:15200,ebitdaMargin:15.7,
+   adjItems:[
+     {label:'Farm equipment restructuring',amount:680,type:'one-time',note:'Swaraj division product line exit'},
+     {label:'Auto sub-brand discontinuation costs',amount:350,type:'one-time',note:'Ssangyong exit-related expenses'},
+     {label:'Pro-forma SUV run-rate EBITDA',amount:-900,type:'pro-forma',note:'Annualise full year of XUV 3XO ramp-up'}
+   ],nwcPct:11.4,cfRatio:0.85,accrualRatio:0.07},
+
+  {name:'Larsen & Toubro',ticker:'LT',sector:'Industrials',revenue:221060,ebitdaReported:27500,ebitdaMargin:12.4,
+   adjItems:[
+     {label:'Project cost overruns (legacy orders)',amount:1500,type:'one-time',note:'Pre-pandemic fixed-price order losses'},
+     {label:'IT subsidiary divestiture gain',amount:-2200,type:'one-time',note:'LTIMindtree stake sale gain; exclude'},
+     {label:'Middle East project startup costs',amount:850,type:'one-time',note:'Saudi Aramco project pre-ops; one-time'}
+   ],nwcPct:24.5,cfRatio:0.74,accrualRatio:0.16},
+
+  {name:'Adani Ports',ticker:'ADANIPORTS',sector:'Industrials',revenue:24748,ebitdaReported:14200,ebitdaMargin:57.4,
+   adjItems:[
+     {label:'Myanmar port disposal loss',amount:1800,type:'one-time',note:'Exit from controversial project; extraordinary'},
+     {label:'Pro-forma Gopalpur port integration',amount:-600,type:'pro-forma',note:'Annualise newly acquired port EBITDA'}
+   ],nwcPct:32.1,cfRatio:0.68,accrualRatio:0.18},
+
+  {name:'Power Grid Corp',ticker:'POWERGRID',sector:'Industrials',revenue:45614,ebitdaReported:39200,ebitdaMargin:85.9,
+   adjItems:[
+     {label:'Regulatory true-up income (one-time)',amount:-1200,type:'one-time',note:'CERC tariff true-up; non-recurring'},
+     {label:'Line loss provision (accelerated)',amount:800,type:'one-time',note:'Accelerated transmission loss provision'}
+   ],nwcPct:6.2,cfRatio:0.85,accrualRatio:0.06},
+
+  {name:'Bharat Electronics',ticker:'BEL',sector:'Industrials',revenue:19695,ebitdaReported:4060,ebitdaMargin:20.6,
+   adjItems:[
+     {label:'Defence export one-time order',amount:-380,type:'one-time',note:'Non-recurring large export delivery'},
+     {label:'Run-rate margin improvement (new products)',amount:-250,type:'run-rate',note:'Higher-margin radar product mix shift annualised'}
+   ],nwcPct:28.4,cfRatio:0.72,accrualRatio:0.14},
+
+  {name:'BHEL',ticker:'BHEL',sector:'Industrials',revenue:30486,ebitdaReported:1820,ebitdaMargin:6.0,
+   adjItems:[
+     {label:'Inventory write-down (obsolete stock)',amount:650,type:'one-time',note:'Supercritical boiler inventory; stranded'},
+     {label:'Union wage settlement arrears',amount:480,type:'one-time',note:'Retrospective settlement; catch-up payment'},
+     {label:'Pro-forma green hydrogen order EBITDA',amount:-300,type:'pro-forma',note:'New electrolyser order contribution annualised'}
+   ],nwcPct:42.3,cfRatio:0.58,accrualRatio:0.22}
+];
+
+/* compute derived fields */
+COMPANIES.forEach(c => {
+  if(c.isBank){c.ebitdaNorm=null;c.netAdj=null;c.adjPct=null;c.normMargin=null;return;}
+  c.netAdj = c.adjItems.reduce((s,a)=>s+a.amount,0);
+  c.ebitdaNorm = c.ebitdaReported + c.netAdj;
+  c.adjPct = c.netAdj / c.ebitdaReported * 100;
+  c.normMargin = c.ebitdaNorm / c.revenue * 100;
+});
+
+/* ============================================================
+   TEACHING FACTS
+============================================================ */
+const TEACH_FACTS = [
+  {q:'What exactly is "normalisation" in due diligence?',a:'Normalisation converts the reported P&L into what a new owner would actually earn from the business going forward. It strips items that belong to history (one-time hits), adjusts for mid-year changes (run-rate), reflects structural events (pro-forma), and challenges questionable management claims. The normalised EBITDA is the number the deal multiple is applied to — get it wrong and valuation is wrong.'},
+  {q:'How do you decide if an item is truly one-time?',a:'Apply the three-year test: "Would this item appear again in FY2025, FY2026, or FY2027?" If yes, it is not one-time. Many companies have recurring "one-time" restructuring charges — if a company has restructured every year for 5 years, restructuring is part of the run-rate cost base. Also check: is the event genuinely complete, or is there a tail risk? (e.g., a legal settlement still under appeal is not finalised.)'},
+  {q:'Run-rate adjustments: how do you validate the annualisation?',a:'Run-rate adjustments require a verifiable start date and a stable run-rate going forward. For a headcount reduction in Q3, you need: (1) the redundancy list signed off, (2) actual exit dates for each person, (3) confirmation no rehiring has occurred. Buying management\'s "annualised savings" without evidence is a common source of deal losses. Request HR records, cost-centre reports, and post-close actual data if available.'},
+  {q:'Pro-forma adjustments: where are they legitimate vs. abused?',a:'Legitimate: a factory commissioned in Q3 that runs at full capacity from Q4. Pro-forma = annualise Q4 run rate to 12 months. You need a commissioning certificate and production records. Abused: "we will build this facility next year, so add its projected EBITDA." That is a forecast, not a pro-forma — it belongs in the DCF model, not the normalised EBITDA. Watch for sellers who blur this distinction.'},
+  {q:'What do buyers and sellers typically fight over?',a:'The five most contested areas in Indian M&A: (1) ESOP add-backs — buyers almost never accept; (2) Related-party cost eliminations — sellers argue they are "above market," buyers demand proof; (3) Run-rate savings with no track record; (4) Legal provisions sellers call "conservative" that have a real chance of crystallising; (5) Pro-forma revenue for customers "in pipeline." Each disputed item at 10× EBITDA multiples is worth 10× its size in deal price.'}
+];
+
+const LOADING_FACTS = [
+  '"Normalisation is not accounting — it is negotiation. Every item on the bridge will be challenged, and the one with better evidence wins." — Big 4 TA Director',
+  'In Indian TA deals, the gap between seller\'s normalised EBITDA and buyer\'s view averages 12–18% of reported EBITDA.',
+  'ESOP is added back in 78% of Indian IT sector deals. Buyers retain it as a cost in 60% of final SPAs.',
+  'A disputed ₹50 Cr normalisation item at a 10× EBITDA multiple = ₹500 Cr of deal value at stake.'
+];
+
+/* ============================================================
+   STATE
+============================================================ */
+let selectedCo = null;
+
+/* ============================================================
+   INIT
+============================================================ */
+document.addEventListener('DOMContentLoaded',()=>{
+  buildSectorPills();
+  renderGrid(COMPANIES);
+});
+
+function buildSectorPills(){
+  const sectors=[...new Set(COMPANIES.map(c=>c.sector))].sort();
+  const wrap=document.getElementById('sectorPills');
+  const all=document.createElement('button');
+  all.className='sector-pill active';all.textContent='All';
+  all.onclick=()=>{
+    wrap.querySelectorAll('.sector-pill').forEach(p=>p.classList.remove('active'));
+    all.classList.add('active');
+    filterGrid();
+  };
+  wrap.appendChild(all);
+  sectors.forEach(s=>{
+    const b=document.createElement('button');
+    b.className='sector-pill';b.textContent=s;b.dataset.sector=s;
+    b.onclick=()=>{
+      wrap.querySelectorAll('.sector-pill').forEach(p=>p.classList.remove('active'));
+      b.classList.add('active');
+      filterGrid();
+    };
+    wrap.appendChild(b);
+  });
+}
+
+function filterGrid(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const activePill=document.querySelector('.sector-pill.active');
+  const activeSector=activePill?.dataset.sector||null;
+  const filtered=COMPANIES.filter(c=>{
+    const matchQ=!q||c.name.toLowerCase().includes(q)||c.ticker.toLowerCase().includes(q)||c.sector.toLowerCase().includes(q);
+    const matchS=!activeSector||c.sector===activeSector;
+    return matchQ&&matchS;
+  });
+  renderGrid(filtered);
+}
+
+function renderGrid(list){
+  const grid=document.getElementById('companyGrid');
+  grid.innerHTML='';
+  list.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='co-card'+(c===selectedCo?' selected':'');
+    d.innerHTML=`<div class="co-name">${c.name}</div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:.3rem"><span class="co-sector">${c.sector}</span><span class="co-ticker">${c.ticker}</span></div>`;
+    d.addEventListener('click',()=>selectCo(c,d));
+    grid.appendChild(d);
+  });
+}
+
+function selectCo(c,el){
+  document.querySelectorAll('.co-card').forEach(d=>d.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedCo=c;
+  document.getElementById('nextBtn1').disabled=false;
+}
+
+/* ============================================================
+   LOADING SEQUENCE (5s)
+============================================================ */
+function startLoading(){
+  if(!selectedCo)return;
+  showStep(2);
+  document.getElementById('loadingDiv').style.display='block';
+  document.getElementById('ctxDiv').style.display='none';
+  document.getElementById('loadingCompany').textContent=selectedCo.name;
+  const fact=LOADING_FACTS[Math.floor(Math.random()*LOADING_FACTS.length)];
+  document.getElementById('loadingFact').textContent=fact;
+  const steps=[
+    {pct:20,text:'Pulling historical P&L…'},
+    {pct:45,text:'Classifying adjustment types…'},
+    {pct:70,text:'Mapping recurring vs. non-recurring…'},
+    {pct:90,text:'Building normalised P&L…'},
+    {pct:100,text:'Normalisation complete.'}
+  ];
+  let i=0;
+  const bar=document.getElementById('loadingBar');
+  const txt=document.getElementById('loadingText');
+  function tick(){
+    if(i>=steps.length){
+      setTimeout(()=>{
+        document.getElementById('loadingDiv').style.display='none';
+        renderCtx();
+        document.getElementById('ctxDiv').style.display='block';
+      },400);
+      return;
+    }
+    bar.style.width=steps[i].pct+'%';
+    txt.textContent=steps[i].text;
+    i++;
+    setTimeout(tick,900);
+  }
+  tick();
+}
+
+/* ============================================================
+   CTX CARD
+============================================================ */
+function renderCtx(){
+  const c=selectedCo;
+  const card=document.getElementById('ctxCard');
+  if(c.isBank){
+    card.innerHTML=`
+      <div class="ctx-header">
+        <div class="ctx-icon">🏦</div>
+        <div><div class="ctx-company">${c.name} <span style="font-size:.75rem;color:var(--muted);font-weight:500">${c.ticker}</span></div>
+        <div class="ctx-sub">${c.sector} · Revenue: ₹${(c.revenue/100).toFixed(0)}Cr NII</div></div>
+      </div>
+      <div class="ctx-chips">
+        <span class="ctx-chip">⚠️ Banks use <strong>NII / NIM</strong> not EBITDA</span>
+        <span class="ctx-chip">Normalisation framework differs for banks</span>
+        <span class="ctx-chip">Use credit analysis tools instead</span>
+      </div>`;
+  } else {
+    const byType={};
+    c.adjItems.forEach(a=>{if(!byType[a.type])byType[a.type]=0;byType[a.type]+=a.amount;});
+    const typeLabels={'one-time':'One-time','run-rate':'Run-rate','pro-forma':'Pro-forma','mgmt-addback':'Mgmt add-back'};
+    const typeBadge={'one-time':'badge-onetime','run-rate':'badge-runrate','pro-forma':'badge-proforma','mgmt-addback':'badge-mgmt'};
+    let typeChips='';
+    Object.entries(byType).forEach(([t,v])=>{
+      typeChips+=`<span class="ctx-chip"><span class="type-badge ${typeBadge[t]}" style="margin-right:.3rem">${typeLabels[t]}</span><strong>${v>=0?'+':''}₹${Math.abs(Math.round(v/100))}Cr</strong></span>`;
+    });
+    card.innerHTML=`
+      <div class="ctx-header">
+        <div class="ctx-icon">🔧</div>
+        <div><div class="ctx-company">${c.name} <span style="font-size:.75rem;color:var(--muted);font-weight:500">${c.ticker}</span></div>
+        <div class="ctx-sub">${c.sector} · Revenue ₹${(c.revenue/100).toFixed(0)}Cr · ${c.adjItems.length} adjustment item(s)</div></div>
+      </div>
+      <div class="ctx-chips">
+        <span class="ctx-chip">Reported EBITDA: <strong>₹${(c.ebitdaReported/100).toFixed(0)}Cr</strong></span>
+        <span class="ctx-chip">Normalised EBITDA: <strong>₹${(c.ebitdaNorm/100).toFixed(0)}Cr</strong></span>
+        <span class="ctx-chip">Net adj: <strong>${c.netAdj>=0?'+':''}${c.adjPct.toFixed(1)}% of reported</strong></span>
+        ${typeChips}
+      </div>`;
+  }
+
+  // Teaching rows
+  const tl=document.getElementById('teachList');
+  tl.innerHTML='';
+  TEACH_FACTS.forEach(f=>{
+    const row=document.createElement('div');row.className='teach-row';
+    row.innerHTML=`<div class="teach-q" onclick="toggleTeach(this)"><span>${f.q}</span><span>▼</span></div><div class="teach-a">${f.a}</div>`;
+    tl.appendChild(row);
+  });
+}
+
+function toggleTeach(q){
+  const a=q.nextElementSibling;
+  const wasOpen=a.classList.contains('open');
+  document.querySelectorAll('.teach-a').forEach(el=>el.classList.remove('open'));
+  if(!wasOpen)a.classList.add('open');
+}
+
+/* ============================================================
+   STEPPER NAVIGATION
+============================================================ */
+function showStep(n){
+  [1,2,3,4].forEach(i=>{
+    document.getElementById('step'+i).classList.toggle('active',i===n);
+    const dot=document.getElementById('dot'+i);
+    dot.classList.remove('active','done');
+    if(i===n)dot.classList.add('active');
+    else if(i<n)dot.classList.add('done');
+    const lbl=document.getElementById('lbl'+i);
+    lbl.classList.toggle('active',i===n);
+    if(i<n){const line=document.getElementById('line'+i+(i+1));if(line)line.classList.add('done');}
+    else{const line=document.getElementById('line'+i+(i+1));if(line)line.classList.remove('done');}
+  });
+}
+</script>
+</body>
+</html>

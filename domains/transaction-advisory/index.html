@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Transaction Advisory — ValuationDesk</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
+  --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--teal:#0d9488;
+  --violet:#7c3aed;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);z-index:100}
+.nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-.5px}
+.nav-logo span{color:var(--blue)}
+.nav-links{display:flex;gap:1.5rem;align-items:center;font-size:.875rem;font-weight:500;color:var(--muted)}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--text);color:#fff;padding:.45rem 1rem;border-radius:6px;font-size:.8rem;font-weight:600}
+.nav-cta:hover{opacity:.85}
+
+.hero{max-width:900px;margin:0 auto;padding:4rem 2rem 3rem;width:100%}
+.breadcrumb{font-size:.8rem;color:var(--muted);margin-bottom:1rem;display:flex;gap:.4rem;align-items:center}
+.breadcrumb a:hover{color:var(--text)}
+.domain-badge{display:inline-flex;align-items:center;gap:.4rem;background:#f5f3ff;border:1px solid #ddd6fe;color:var(--violet);border-radius:999px;padding:.25rem .75rem;font-size:.75rem;font-weight:700;letter-spacing:.03em;margin-bottom:1rem}
+h1{font-size:clamp(2rem,5vw,3rem);font-weight:900;letter-spacing:-.04em;line-height:1.05;margin-bottom:1rem}
+.hero-sub{font-size:1.1rem;color:var(--muted);max-width:600px;margin-bottom:2rem;line-height:1.6}
+.hero-pills{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:2.5rem}
+.hero-pill{background:var(--card);border:1px solid var(--border);border-radius:999px;padding:.3rem .75rem;font-size:.78rem;font-weight:600;color:var(--muted)}
+.hero-actions{display:flex;gap:.75rem;flex-wrap:wrap}
+.btn-primary{background:var(--text);color:#fff;padding:.7rem 1.5rem;border-radius:8px;font-weight:700;font-size:.9rem;display:inline-flex;align-items:center;gap:.4rem}
+.btn-primary:hover{opacity:.85}
+.btn-secondary{border:1.5px solid var(--border);padding:.7rem 1.5rem;border-radius:8px;font-weight:600;font-size:.9rem;color:var(--muted)}
+.btn-secondary:hover{border-color:var(--text);color:var(--text)}
+
+.stats-row{background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:1.5rem 2rem}
+.stats-inner{max-width:900px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1.5rem}
+.stat-item{display:flex;flex-direction:column;gap:.2rem}
+.stat-num{font-size:1.6rem;font-weight:900;letter-spacing:-.03em;font-family:'JetBrains Mono',monospace}
+.stat-label{font-size:.78rem;color:var(--muted);font-weight:500}
+
+.content{max-width:900px;margin:0 auto;padding:3rem 2rem;width:100%}
+.section-label{font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:1.25rem}
+
+.what-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:3rem}
+.what-card{border:1px solid var(--border);border-radius:12px;padding:1.5rem;background:var(--bg)}
+.what-card h3{font-size:.95rem;font-weight:700;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem}
+.what-card p{font-size:.85rem;color:var(--muted);line-height:1.6}
+
+.calc-list{display:flex;flex-direction:column;gap:.75rem;margin-bottom:3rem}
+.calc-row{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;background:var(--bg);transition:border-color .15s,box-shadow .15s}
+.calc-row:hover{border-color:var(--violet);box-shadow:0 3px 12px rgba(0,0,0,.06)}
+.calc-left{display:flex;align-items:center;gap:.9rem}
+.calc-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0}
+.calc-info h3{font-size:.9rem;font-weight:700;margin-bottom:.15rem}
+.calc-info p{font-size:.78rem;color:var(--muted)}
+.calc-right{display:flex;align-items:center;gap:.75rem}
+.tag-free{background:#dcfce7;color:#15803d;font-size:.7rem;font-weight:700;padding:.2rem .55rem;border-radius:999px}
+.tag-pro{background:#f5f3ff;color:var(--violet);font-size:.7rem;font-weight:700;padding:.2rem .55rem;border-radius:999px}
+.calc-arrow{color:var(--muted);font-size:.85rem}
+
+.learn-card{border:1px solid var(--border);border-radius:12px;padding:1.5rem;background:var(--card);display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.learn-left h3{font-size:1rem;font-weight:700;margin-bottom:.3rem}
+.learn-left p{font-size:.85rem;color:var(--muted)}
+.learn-right a{background:var(--text);color:#fff;padding:.55rem 1.1rem;border-radius:7px;font-size:.82rem;font-weight:600}
+.learn-right a:hover{opacity:.85}
+
+footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-size:.8rem;color:var(--muted);margin-top:auto}
+.footer-nav{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:.75rem}
+.footer-nav a:hover{color:var(--text)}
+
+@media(max-width:640px){
+  nav{padding:1rem}
+  .nav-links{display:none}
+  .hero{padding:2.5rem 1rem 2rem}
+  .stats-row{padding:1.25rem 1rem}
+  .content{padding:2rem 1rem}
+  .what-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">Valuation<span>Desk</span></a>
+  <div class="nav-links">
+    <a href="/domains/">All Domains</a>
+    <a href="/domains/transaction-advisory/calculators/">Calculators</a>
+    <a href="/domains/transaction-advisory/learn/">Learn</a>
+  </div>
+  <a href="#" class="nav-cta" onclick="unlockPro();return false">Unlock Pro — ₹799/mo →</a>
+</nav>
+
+<div class="hero">
+  <div class="breadcrumb">
+    <a href="/">Home</a> / <a href="/domains/">Domains</a> / Transaction Advisory
+  </div>
+  <div class="domain-badge">🤝 Domain 09 · Transaction Advisory</div>
+  <h1>Transaction<br/>Advisory</h1>
+  <p class="hero-sub">The craft behind every deal — normalising EBITDA, pegging working capital, and stress-testing the numbers before ink meets paper.</p>
+  <div class="hero-pills">
+    <span class="hero-pill">EBITDA Bridge</span>
+    <span class="hero-pill">Normalisation</span>
+    <span class="hero-pill">Working Capital Peg</span>
+    <span class="hero-pill">Quality of Earnings</span>
+    <span class="hero-pill">Deal Checklist</span>
+  </div>
+  <div class="hero-actions">
+    <a href="/domains/transaction-advisory/calculators/" class="btn-primary">Open Calculators →</a>
+    <a href="/domains/transaction-advisory/learn/" class="btn-secondary">Learn the Concepts</a>
+  </div>
+</div>
+
+<div class="stats-row">
+  <div class="stats-inner">
+    <div class="stat-item">
+      <span class="stat-num" style="color:var(--violet)">5</span>
+      <span class="stat-label">Calculators</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">30</span>
+      <span class="stat-label">Companies</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num">3</span>
+      <span class="stat-label">Learn Modules</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-num" style="color:var(--green)">1</span>
+      <span class="stat-label">Free Calculator</span>
+    </div>
+  </div>
+</div>
+
+<div class="content">
+  <div class="section-label">What is Transaction Advisory?</div>
+  <div class="what-grid">
+    <div class="what-card">
+      <h3>🔍 Quality of Earnings</h3>
+      <p>Reported EBITDA is a starting point, not the answer. TA advisors strip out one-time items, run-rate revenue, and management add-backs to arrive at the true economic earnings power of a business.</p>
+    </div>
+    <div class="what-card">
+      <h3>💰 Working Capital Peg</h3>
+      <p>Deals are done on a cash-free, debt-free, normalised working capital basis. Getting the peg wrong by ₹5 Cr in a ₹100 Cr deal is a 5% pricing error that eats directly into the buyer's return.</p>
+    </div>
+    <div class="what-card">
+      <h3>📊 EBITDA Bridge</h3>
+      <p>The bridge walks from statutory EBITDA to adjusted EBITDA — the number the deal actually prices on. Every line in the bridge is negotiated; sellers add back everything, buyers challenge everything.</p>
+    </div>
+    <div class="what-card">
+      <h3>✅ Deal Checklist</h3>
+      <p>Structured frameworks for flagging revenue recognition issues, contingent liabilities, related-party transactions, and off-balance-sheet items before they become post-closing surprises.</p>
+    </div>
+  </div>
+
+  <div class="section-label">Calculators</div>
+  <div class="calc-list">
+
+    <a href="/domains/transaction-advisory/calculators/ebitda-bridge.html" class="calc-row">
+      <div class="calc-left">
+        <div class="calc-icon" style="background:#f5f3ff">📊</div>
+        <div class="calc-info">
+          <h3>EBITDA Bridge</h3>
+          <p>Walk from reported to normalised EBITDA across 30 companies</p>
+        </div>
+      </div>
+      <div class="calc-right">
+        <span class="tag-free">FREE</span>
+        <span class="calc-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="/domains/transaction-advisory/calculators/normalisation.html" class="calc-row">
+      <div class="calc-left">
+        <div class="calc-icon" style="background:#eff6ff">🔧</div>
+        <div class="calc-info">
+          <h3>Normalisation Adjustments</h3>
+          <p>One-time items, run-rate adjustments, pro-forma add-backs</p>
+        </div>
+      </div>
+      <div class="calc-right">
+        <span class="tag-pro">PRO</span>
+        <span class="calc-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="/domains/transaction-advisory/calculators/working-capital-peg.html" class="calc-row">
+      <div class="calc-left">
+        <div class="calc-icon" style="background:#f0fdf4">💰</div>
+        <div class="calc-info">
+          <h3>Working Capital Peg</h3>
+          <p>12-month average, seasonality adjustment, peg vs. completion accounts</p>
+        </div>
+      </div>
+      <div class="calc-right">
+        <span class="tag-pro">PRO</span>
+        <span class="calc-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="/domains/transaction-advisory/calculators/quality-of-earnings.html" class="calc-row">
+      <div class="calc-left">
+        <div class="calc-icon" style="background:#fffbeb">📈</div>
+        <div class="calc-info">
+          <h3>Quality of Earnings</h3>
+          <p>Cash conversion, accrual ratio, revenue sustainability score</p>
+        </div>
+      </div>
+      <div class="calc-right">
+        <span class="tag-pro">PRO</span>
+        <span class="calc-arrow">→</span>
+      </div>
+    </a>
+
+    <a href="/domains/transaction-advisory/calculators/deal-checklist.html" class="calc-row">
+      <div class="calc-left">
+        <div class="calc-icon" style="background:#fef2f2">✅</div>
+        <div class="calc-info">
+          <h3>Deal Checklist</h3>
+          <p>Pre-signing diligence flag tracker — revenue, costs, balance sheet, legal</p>
+        </div>
+      </div>
+      <div class="calc-right">
+        <span class="tag-pro">PRO</span>
+        <span class="calc-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+
+  <div class="section-label">Learning Hub</div>
+  <div class="learn-card">
+    <div class="learn-left">
+      <h3>Transaction Advisory — 3 Modules</h3>
+      <p>EBITDA normalisation · Working capital mechanics · Deal diligence frameworks · 14 glossary terms</p>
+    </div>
+    <div class="learn-right">
+      <a href="/domains/transaction-advisory/learn/">Start Learning →</a>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-nav">
+    <a href="/">Home</a>
+    <a href="/domains/">All Domains</a>
+    <a href="/domains/credit-analysis/">Credit Analysis</a>
+    <a href="/domains/transaction-advisory/calculators/">Calculators</a>
+  </div>
+  <div>© 2025 ValuationDesk · ₹799/month · No annual plan</div>
+</footer>
+
+<script>
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+</script>
+</body>
+</html>

@@ -1,8 +1,8 @@
-// ValuationDesk Service Worker v8.0
+// ValuationDesk Service Worker v9.0
 // Configured for GitHub Pages subfolder: /valuation-toolkit/
 
 const BASE = '/valuation-toolkit';
-const CACHE_NAME = 'valuationdesk-v8';
+const CACHE_NAME = 'valuationdesk-v9';
 
 const STATIC_ASSETS = [
   BASE + '/',
@@ -90,6 +90,14 @@ const STATIC_ASSETS = [
   BASE + '/domains/credit-analysis/calculators/default-risk.html',
   BASE + '/domains/credit-analysis/calculators/bond-pricing.html',
   BASE + '/domains/credit-analysis/learn/index.html',
+  BASE + '/domains/transaction-advisory/index.html',
+  BASE + '/domains/transaction-advisory/calculators/index.html',
+  BASE + '/domains/transaction-advisory/calculators/ebitda-bridge.html',
+  BASE + '/domains/transaction-advisory/calculators/normalisation.html',
+  BASE + '/domains/transaction-advisory/calculators/working-capital-peg.html',
+  BASE + '/domains/transaction-advisory/calculators/quality-of-earnings.html',
+  BASE + '/domains/transaction-advisory/calculators/deal-checklist.html',
+  BASE + '/domains/transaction-advisory/learn/index.html',
 ];
 
 // Install — cache all static assets

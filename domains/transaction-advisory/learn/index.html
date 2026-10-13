@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Learn Transaction Advisory — ValuationDesk</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
+  --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--teal:#0d9488;
+  --violet:#7c3aed;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);z-index:100}
+.nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-.5px}
+.nav-logo span{color:var(--blue)}
+.nav-links{display:flex;gap:1.5rem;align-items:center;font-size:.875rem;font-weight:500;color:var(--muted)}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--text);color:#fff;padding:.45rem 1rem;border-radius:6px;font-size:.8rem;font-weight:600}
+.nav-cta:hover{opacity:.85}
+
+.hero{max-width:860px;margin:0 auto;padding:3rem 2rem 2rem;width:100%}
+.breadcrumb{font-size:.8rem;color:var(--muted);margin-bottom:.75rem;display:flex;gap:.4rem;align-items:center;flex-wrap:wrap}
+.breadcrumb a:hover{color:var(--text)}
+.domain-badge{display:inline-flex;align-items:center;gap:.4rem;background:#f5f3ff;border:1px solid #ddd6fe;color:var(--violet);border-radius:999px;padding:.25rem .75rem;font-size:.75rem;font-weight:700;letter-spacing:.03em;margin-bottom:.75rem}
+h1{font-size:clamp(1.6rem,3.5vw,2.2rem);font-weight:900;letter-spacing:-.03em;margin-bottom:.5rem}
+.hero-sub{font-size:.95rem;color:var(--muted);max-width:560px}
+
+.content{max-width:860px;margin:0 auto;padding:2rem;width:100%;flex:1}
+
+/* MODULE CARDS */
+.module-list{display:flex;flex-direction:column;gap:1rem;margin-bottom:3rem}
+.module-card{border:1.5px solid var(--border);border-radius:12px;overflow:hidden}
+.module-header{padding:1.1rem 1.25rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:1rem;background:var(--bg);transition:background .15s}
+.module-header:hover{background:var(--card)}
+.module-left{display:flex;align-items:flex-start;gap:1rem}
+.module-num{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;color:var(--muted);padding-top:.1rem;flex-shrink:0}
+.module-title{font-size:.95rem;font-weight:700;margin-bottom:.15rem}
+.module-desc{font-size:.8rem;color:var(--muted)}
+.module-chevron{font-size:.8rem;color:var(--muted);flex-shrink:0;transition:transform .2s}
+.module-card.open .module-chevron{transform:rotate(180deg)}
+.module-body{display:none;border-top:1px solid var(--border);padding:1.25rem;background:var(--card)}
+.module-card.open .module-body{display:block}
+
+/* MODULE BODY STYLES */
+.module-intro{font-size:.88rem;color:var(--muted);margin-bottom:1.25rem;line-height:1.65}
+.section-h{font-size:.8rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--violet);margin-bottom:.6rem;margin-top:1.1rem}
+.section-h:first-child{margin-top:0}
+
+.key-concepts{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.6rem;margin-bottom:.75rem}
+.kc-item{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:.7rem .85rem}
+.kc-label{font-size:.72rem;font-weight:700;color:var(--violet);margin-bottom:.2rem}
+.kc-text{font-size:.78rem;color:var(--muted);line-height:1.5}
+
+.formula-box{background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;padding:.85rem 1rem;margin-bottom:.75rem;font-family:'JetBrains Mono',monospace;font-size:.8rem;color:var(--violet);line-height:1.7}
+
+.example-table{width:100%;border-collapse:collapse;margin-bottom:.75rem;font-size:.8rem}
+.example-table th{text-align:left;padding:.45rem .6rem;border-bottom:2px solid var(--border);font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted)}
+.example-table td{padding:.45rem .6rem;border-bottom:1px solid var(--border)}
+.example-table tr:last-child td{border-bottom:none}
+.example-table td:last-child{font-family:'JetBrains Mono',monospace;text-align:right}
+.tag-ot{background:#fee2e2;color:#991b1b;font-size:.65rem;font-weight:700;padding:.1rem .35rem;border-radius:4px}
+.tag-rr{background:#dcfce7;color:#15803d;font-size:.65rem;font-weight:700;padding:.1rem .35rem;border-radius:4px}
+.tag-pf{background:#eff6ff;color:#1d4ed8;font-size:.65rem;font-weight:700;padding:.1rem .35rem;border-radius:4px}
+.tag-mgmt{background:#fef3c7;color:#92400e;font-size:.65rem;font-weight:700;padding:.1rem .35rem;border-radius:4px}
+
+.takeaway-box{background:var(--bg);border-left:3px solid var(--violet);padding:.75rem 1rem;border-radius:0 6px 6px 0;font-size:.82rem;color:var(--text);line-height:1.6;margin-top:.75rem}
+
+.steps-list{display:flex;flex-direction:column;gap:.5rem;margin-bottom:.75rem}
+.step-item{display:flex;align-items:flex-start;gap:.65rem;font-size:.82rem}
+.step-dot{width:20px;height:20px;border-radius:50%;background:var(--violet);color:#fff;font-size:.65rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:.15rem}
+
+/* CALC LINK */
+.calc-cta{display:flex;align-items:center;justify-content:space-between;background:#f5f3ff;border:1.5px solid #ddd6fe;border-radius:10px;padding:.85rem 1.1rem;margin-top:1.1rem}
+.calc-cta-left{font-size:.82rem;font-weight:600;color:var(--violet)}
+.calc-cta-left span{display:block;font-size:.75rem;font-weight:400;color:var(--muted);margin-top:.1rem}
+.calc-cta-btn{background:var(--violet);color:#fff;padding:.4rem .9rem;border-radius:6px;font-size:.78rem;font-weight:700;white-space:nowrap}
+.calc-cta-btn:hover{opacity:.85}
+
+/* GLOSSARY */
+.glossary-section{margin-bottom:2rem}
+.glossary-section h2{font-size:1.1rem;font-weight:800;letter-spacing:-.02em;margin-bottom:1rem}
+.glossary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:.6rem}
+.glossary-item{border:1px solid var(--border);border-radius:8px;padding:.8rem 1rem;background:var(--bg)}
+.glossary-term{font-size:.82rem;font-weight:700;margin-bottom:.25rem}
+.glossary-def{font-size:.77rem;color:var(--muted);line-height:1.5}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-size:.8rem;color:var(--muted);margin-top:auto}
+.footer-nav{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:.75rem}
+.footer-nav a:hover{color:var(--text)}
+
+@media(max-width:640px){
+  nav{padding:1rem}.nav-links{display:none}
+  .hero,.content{padding-left:1rem;padding-right:1rem}
+  .key-concepts{grid-template-columns:1fr}
+  .glossary-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">Valuation<span>Desk</span></a>
+  <div class="nav-links">
+    <a href="/domains/">All Domains</a>
+    <a href="/domains/transaction-advisory/">Transaction Advisory</a>
+    <a href="/domains/transaction-advisory/calculators/">Calculators</a>
+  </div>
+  <a href="#" class="nav-cta" onclick="alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');return false">Unlock Pro — ₹799/mo →</a>
+</nav>
+
+<div class="hero">
+  <div class="breadcrumb">
+    <a href="/">Home</a> / <a href="/domains/">Domains</a> / <a href="/domains/transaction-advisory/">Transaction Advisory</a> / Learn
+  </div>
+  <div class="domain-badge">🤝 Domain 09 · Transaction Advisory</div>
+  <h1>Learn Transaction Advisory</h1>
+  <p class="hero-sub">Three modules covering EBITDA normalisation, working capital mechanics, and deal diligence frameworks — the technical backbone of every M&amp;A transaction.</p>
+</div>
+
+<div class="content">
+
+  <div class="module-list">
+
+    <!-- MODULE 1 -->
+    <div class="module-card" id="mod1">
+      <div class="module-header" onclick="toggleModule('mod1')">
+        <div class="module-left">
+          <span class="module-num">01</span>
+          <div>
+            <div class="module-title">EBITDA Normalisation</div>
+            <div class="module-desc">What adjustments buyers and sellers fight over — and why the normalised number is the only number that matters.</div>
+          </div>
+        </div>
+        <span class="module-chevron">▼</span>
+      </div>
+      <div class="module-body">
+        <p class="module-intro">In a transaction, the EBITDA that appears in the target's audited accounts is almost never the EBITDA used to set the purchase price. Between reported and normalised lies a bridge of adjustments — some straightforward, many contested. Understanding this bridge is the first and most important skill in transaction advisory.</p>
+
+        <div class="section-h">Why reported EBITDA is wrong</div>
+        <div class="key-concepts">
+          <div class="kc-item">
+            <div class="kc-label">One-Time Items</div>
+            <div class="kc-text">Costs or revenues that occurred in the period but will not recur. A factory fire insurance payout inflates EBITDA; a VRS charge deflates it. Both must be removed to see the run-rate business.</div>
+          </div>
+          <div class="kc-item">
+            <div class="kc-label">Run-Rate Adjustments</div>
+            <div class="kc-text">Structural changes to the business mid-period: a new plant that ran for 6 months, a price increase effective mid-year. These are annualised to reflect the steady-state earnings power.</div>
+          </div>
+          <div class="kc-item">
+            <div class="kc-label">Pro-Forma Items</div>
+            <div class="kc-text">Acquisitions, disposals, or contract wins that weren't in the business for the full period. Pro-forma EBITDA shows what the current business would have earned over 12 full months.</div>
+          </div>
+          <div class="kc-item">
+            <div class="kc-label">Management Add-Backs</div>
+            <div class="kc-text">Discretionary costs that belong to the current owners but not to a new buyer — excess promoter salary, above-market rent to a related party, personal expenses run through P&amp;L. Contested territory in every deal.</div>
+          </div>
+        </div>
+
+        <div class="section-h">The EBITDA bridge</div>
+        <div class="formula-box">
+Reported EBITDA
+  + One-time costs       → removes non-recurring charges
+  − One-time income      → removes non-recurring windfall
+  + / − Run-rate items   → annualises partial-year changes
+  + Pro-forma items      → reflects full-year ownership
+  + Management add-backs → normalises owner-specific costs
+= Adjusted EBITDA
+  ± Buyer-specific items → removes synergies / integration costs
+= Normalised EBITDA      (the number the deal price is built on)
+        </div>
+
+        <div class="section-h">Real-world examples — Indian transactions</div>
+        <table class="example-table">
+          <thead><tr><th>Item</th><th>Type</th><th>Direction</th><th>Typical Size</th></tr></thead>
+          <tbody>
+            <tr><td>COVID-era wage subsidy (PMGKY)</td><td><span class="tag-ot">OT</span></td><td>Remove income</td><td>₹5–50 Cr</td></tr>
+            <tr><td>Workforce restructuring charge</td><td><span class="tag-ot">OT</span></td><td>Add back cost</td><td>₹10–100 Cr</td></tr>
+            <tr><td>New manufacturing line (9 months)</td><td><span class="tag-rr">RR</span></td><td>Annualise EBITDA</td><td>×1.33 uplift</td></tr>
+            <tr><td>Price increase effective Apr (6 months)</td><td><span class="tag-rr">RR</span></td><td>Annualise revenue</td><td>~2–5% uplift</td></tr>
+            <tr><td>Acquisition closed Jul — 9-month contribution</td><td><span class="tag-pf">PF</span></td><td>Gross up to 12 months</td><td>+33% gross-up</td></tr>
+            <tr><td>Promoter salary above market (₹5 Cr vs ₹2 Cr market)</td><td><span class="tag-mgmt">MGMT</span></td><td>Add back ₹3 Cr</td><td>₹1–10 Cr</td></tr>
+            <tr><td>Office rent to promoter's property at 2× market</td><td><span class="tag-mgmt">MGMT</span></td><td>Haircut to market rent</td><td>₹50L–5 Cr</td></tr>
+          </tbody>
+        </table>
+
+        <div class="section-h">Who makes the adjustments — and the conflict</div>
+        <p style="font-size:.83rem;color:var(--muted);line-height:1.65;margin-bottom:.75rem">Sellers present a management case with the most aggressive adjustments. Buyers commission an independent QoE report and challenge each add-back. The final normalised EBITDA is the outcome of negotiation, not accounting. The spread between management case and buyer case is often 15–25% of EBITDA — meaning a 1× difference in that gap on a 10× multiple deal is a 10–25% difference in enterprise value.</p>
+
+        <div class="takeaway-box">Key insight: The EBITDA bridge is not just an accounting exercise — it is a negotiating document. Every ₹1 Cr of add-back you defend at 10× EBITDA is worth ₹10 Cr of deal value. Transaction advisors who understand the limits of defensible adjustments create more value than those who maximise the add-back list on paper.</div>
+
+        <a href="/domains/transaction-advisory/calculators/ebitda-bridge.html" class="calc-cta">
+          <div class="calc-cta-left">EBITDA Bridge Calculator
+            <span>Build the bridge for 30 Indian companies — free</span>
+          </div>
+          <span class="calc-cta-btn">Open Calculator →</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- MODULE 2 -->
+    <div class="module-card" id="mod2">
+      <div class="module-header" onclick="toggleModule('mod2')">
+        <div class="module-left">
+          <span class="module-num">02</span>
+          <div>
+            <div class="module-title">Working Capital Mechanics</div>
+            <div class="module-desc">How the working capital peg protects buyers, what locked-box means, and why NWC is the most contentious post-closing adjustment.</div>
+          </div>
+        </div>
+        <span class="module-chevron">▼</span>
+      </div>
+      <div class="module-body">
+        <p class="module-intro">Every acquisition effectively transfers working capital from seller to buyer. The question is: how much, and at what value? Getting this wrong is how buyers end up paying for a business they thought was cash-rich but was actually burning cash in the months before closing.</p>
+
+        <div class="section-h">What is working capital in a deal context</div>
+        <div class="key-concepts">
+          <div class="kc-item">
+            <div class="kc-label">Net Working Capital (NWC)</div>
+            <div class="kc-text">Current assets minus current liabilities, excluding cash, debt, and financial items. The operational float needed to run the business day-to-day. Buyers need it to keep operating from Day 1.</div>
+          </div>
+          <div class="kc-item">
+            <div class="kc-label">NWC Days Formula</div>
+            <div class="kc-text">Receivable Days + Inventory Days − Payable Days = NWC Cycle. A business with 60R + 30I − 45P has a 45-day cycle. Every day of NWC ≈ Revenue/365.</div>
+          </div>
+          <div class="kc-item">
+            <div class="kc-label">The Peg</div>
+            <div class="kc-text">The agreed "normal" level of NWC that the seller delivers at closing. Typically the trailing 12-month average, adjusted for seasonality. If closing NWC &gt; peg, buyer pays extra; if &lt; peg, buyer gets a refund.</div>
+          </div>
+          <div class="kc-item">
+            <div class="kc-label">Seasonality Band</div>
+            <div class="kc-text">Most businesses have seasonal NWC swings. The peg should reflect the average, not the low. Closing in peak season (high NWC) benefits the seller; closing in trough benefits the buyer.</div>
+          </div>
+        </div>
+
+        <div class="section-h">Locked-box vs. completion accounts</div>
+        <div class="key-concepts">
+          <div class="kc-item">
+            <div class="kc-label">Locked-Box (Seller-Friendly)</div>
+            <div class="kc-text">Price is fixed at a locked date using audited accounts. No post-closing adjustment. Seller retains economic risk/reward between lock date and close. Common in PE deals and competitive auctions.</div>
+          </div>
+          <div class="kc-item">
+            <div class="kc-label">Completion Accounts (Buyer-Friendly)</div>
+            <div class="kc-text">Price adjusts post-closing based on actual NWC, net debt, and other items at closing date. Buyer has more protection but process is lengthy — completion accounts can take 60–90 days to finalise.</div>
+          </div>
+          <div class="kc-item">
+            <div class="kc-label">Leakage (Locked-Box)</div>
+            <div class="kc-text">Permitted and unpermitted value transfers from the business to the seller between lock date and close — dividends, management fees, related-party payments. Buyer gets a deduction for unpermitted leakage.</div>
+          </div>
+          <div class="kc-item">
+            <div class="kc-label">Earn-Out Linkage</div>
+            <div class="kc-text">When NWC risk is high (e.g., a manufacturing company with volatile receivables), buyers sometimes link part of the consideration to post-closing NWC performance over 12–24 months.</div>
+          </div>
+        </div>
+
+        <div class="section-h">How the peg is calculated</div>
+        <div class="formula-box">
+Step 1: Collect 13 monthly NWC balances (12-month + opening)
+Step 2: Average each component (receivables, inventory, payables)
+Step 3: Exclude non-recurring items (pre-deal costs, extraordinary balances)
+Step 4: Adjust for structural changes (new products, channel shifts)
+Step 5: Set peg = adjusted 12-month average NWC
+Step 6: Define band = peg ± seasonality swing (e.g., ± ₹20 Cr)
+       No adjustment if closing NWC falls within band
+        </div>
+
+        <div class="section-h">Most common NWC disputes in Indian deals</div>
+        <div class="steps-list">
+          <div class="step-item"><div class="step-dot">1</div><div>Receivables aging — buyer argues old receivables should be excluded; seller argues they are collectable.</div></div>
+          <div class="step-item"><div class="step-dot">2</div><div>Inventory valuation — buyer applies haircut for slow-moving or obsolete stock; seller resists.</div></div>
+          <div class="step-item"><div class="step-dot">3</div><div>Advance payments — should customer advances be included in NWC or treated as debt-like items?</div></div>
+          <div class="step-item"><div class="step-dot">4</div><div>Accrued liabilities — are all expense accruals properly reflected at the reference date?</div></div>
+          <div class="step-item"><div class="step-dot">5</div><div>GST / TDS receivables — tax refunds due; buyers include, sellers argue they are cash equivalents.</div></div>
+        </div>
+
+        <div class="takeaway-box">Key insight: The NWC peg looks like a back-office accounting detail, but on a large transaction it can shift the effective purchase price by 5–10%. Transaction advisors who set a conservative peg (high for buyers, low for sellers) provide their client with substantial economic protection that is invisible in the headline price.</div>
+
+        <a href="/domains/transaction-advisory/calculators/working-capital-peg.html" class="calc-cta">
+          <div class="calc-cta-left">Working Capital Peg Calculator
+            <span>NWC model, seasonality band, locked-box vs. completion accounts — Pro</span>
+          </div>
+          <span class="calc-cta-btn">Open Calculator →</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- MODULE 3 -->
+    <div class="module-card" id="mod3">
+      <div class="module-header" onclick="toggleModule('mod3')">
+        <div class="module-left">
+          <span class="module-num">03</span>
+          <div>
+            <div class="module-title">Deal Diligence Frameworks</div>
+            <div class="module-desc">How to structure a buy-side diligence, score risk across workstreams, and translate findings into deal structure adjustments.</div>
+          </div>
+        </div>
+        <span class="module-chevron">▼</span>
+      </div>
+      <div class="module-body">
+        <p class="module-intro">Diligence is not a checklist exercise — it is a risk-pricing exercise. The goal is not to find reasons to walk away. The goal is to understand what risks exist, quantify them, and decide how to price or structure around them. Every finding should map to a deal structure implication: chip the price, put money in escrow, demand a rep and warranty, or walk away.</p>
+
+        <div class="section-h">The five workstreams</div>
+        <div class="key-concepts">
+          <div class="kc-item">
+            <div class="kc-label">1. Revenue Diligence</div>
+            <div class="kc-text">Is the reported revenue real? Is it recurring? Check revenue recognition policies (IFRS 15 / Ind AS 115), contract terms, deferred revenue, and whether sales are front-loaded near the period end.</div>
+          </div>
+          <div class="kc-item">
+            <div class="kc-label">2. Cost / EBITDA Diligence</div>
+            <div class="kc-text">Are margins sustainable? Look for costs shifted to capex, related-party rent below market, promoter salary well below or above market, and any expense deferred into future periods.</div>
+          </div>
+          <div class="kc-item">
+            <div class="kc-label">3. Balance Sheet Diligence</div>
+            <div class="kc-text">What are the real assets and liabilities? Focus on receivables aging (30/60/90+ day buckets), inventory turns versus peers, off-balance-sheet obligations, and contingent liabilities in notes.</div>
+          </div>
+          <div class="kc-item">
+            <div class="kc-label">4. Legal Diligence</div>
+            <div class="kc-text">Pending litigation, NCLT proceedings, SEBI notices, change-of-control clauses in key customer contracts, IP ownership, title to land and plant — all must be verified against original documents.</div>
+          </div>
+          <div class="kc-item">
+            <div class="kc-label">5. Tax Diligence</div>
+            <div class="kc-text">Unprovisioned demands under appeal, aggressive transfer pricing positions, withholding tax exposure, GST notices, and MAT credit utilisation assumptions — together these often reveal liabilities the balance sheet understates by 5–15% of EV.</div>
+          </div>
+        </div>
+
+        <div class="section-h">Risk-to-deal structure mapping</div>
+        <table class="example-table">
+          <thead><tr><th>Finding</th><th>Severity</th><th>Deal Structure Response</th></tr></thead>
+          <tbody>
+            <tr><td>Related party transactions &gt;20% of revenue</td><td style="color:var(--red);font-weight:700">High</td><td>Price chip + escrow + wind-down covenant</td></tr>
+            <tr><td>Tax demand = 15% of EBITDA under appeal</td><td style="color:var(--red);font-weight:700">High</td><td>Escrow equal to demand + interest</td></tr>
+            <tr><td>Customer concentration — 1 customer = 35% revenue</td><td style="color:var(--red);font-weight:700">High</td><td>Earn-out linked to customer retention</td></tr>
+            <tr><td>Non-Big4 auditor, limited audit trail</td><td style="color:var(--amber);font-weight:700">Medium</td><td>Require Big4 audit pre-close + enhanced reps</td></tr>
+            <tr><td>Receivables aging — 20% over 180 days</td><td style="color:var(--amber);font-weight:700">Medium</td><td>NWC peg haircut for disputed receivables</td></tr>
+            <tr><td>Pending USFDA warning letter (pharma)</td><td style="color:var(--red);font-weight:700">High</td><td>Deferred consideration or MAC clause</td></tr>
+            <tr><td>Auditor changed 2 years ago</td><td style="color:var(--amber);font-weight:700">Medium</td><td>Interview outgoing auditor — enhanced rep</td></tr>
+            <tr><td>Inventory days 40% above sector average</td><td style="color:var(--amber);font-weight:700">Medium</td><td>Inventory haircut in NWC peg calculation</td></tr>
+          </tbody>
+        </table>
+
+        <div class="section-h">Quality of Earnings — the financial diligence crown jewel</div>
+        <div class="key-concepts">
+          <div class="kc-item">
+            <div class="kc-label">Cash Conversion Ratio</div>
+            <div class="kc-text">Operating Cash Flow / EBITDA. Should be 80–100%+ for a quality business. Below 70% suggests aggressive accruals or working capital deterioration eating up reported profits.</div>
+          </div>
+          <div class="kc-item">
+            <div class="kc-label">Accrual Ratio</div>
+            <div class="kc-text">(EBITDA − Operating Cash Flow) / Revenue. Measures the proportion of earnings that never converts to cash. High accrual ratio = reported earnings exceed economic reality.</div>
+          </div>
+          <div class="kc-item">
+            <div class="kc-label">Revenue Concentration Risk</div>
+            <div class="kc-text">Top customer as % of revenue. Above 25% triggers enhanced revenue diligence and often a retention mechanism in the deal structure. Above 50% is typically a deal-shaper.</div>
+          </div>
+          <div class="kc-item">
+            <div class="kc-label">Sustainability of EBITDA</div>
+            <div class="kc-text">After all QoE adjustments, does the normalised EBITDA represent a real, recurring earnings stream that a buyer can count on? This single judgment drives the multiple paid.</div>
+          </div>
+        </div>
+
+        <div class="section-h">The diligence process — how it flows</div>
+        <div class="steps-list">
+          <div class="step-item"><div class="step-dot">1</div><div>Management presentation and data room access — information memorandum, 3-year audited accounts, month-by-month MIS.</div></div>
+          <div class="step-item"><div class="step-dot">2</div><div>Financial diligence kick-off — preliminary QoE, NWC analysis, and normalisation adjustments based on data room.</div></div>
+          <div class="step-item"><div class="step-dot">3</div><div>Management Q&amp;A sessions — interrogate add-backs, challenge revenue recognition, verify customer contracts.</div></div>
+          <div class="step-item"><div class="step-dot">4</div><div>Legal and tax specialists — third-party lawyers review litigation schedule; Big4 tax team review demands under appeal.</div></div>
+          <div class="step-item"><div class="step-dot">5</div><div>Diligence report — consolidated findings, risk register, deal structure recommendations, normalised EBITDA with sensitivities.</div></div>
+          <div class="step-item"><div class="step-dot">6</div><div>Price negotiation — buyer chips the price for identified risks; seller contests; final price reflects risk-sharing agreement.</div></div>
+        </div>
+
+        <div class="takeaway-box">Key insight: The best diligence teams are not the ones who find the most problems — they are the ones who correctly prioritise. A high-severity finding missed is catastrophic. A medium-severity finding inflated into a deal-killer destroys value needlessly. The judgment call between "this is priceable" and "this is a walk-away" is where transaction advisory earns its fee.</div>
+
+        <a href="/domains/transaction-advisory/calculators/deal-checklist.html" class="calc-cta">
+          <div class="calc-cta-left">Deal Checklist Calculator
+            <span>Diligence risk scoring across all 5 workstreams for 30 Indian companies</span>
+          </div>
+          <span class="calc-cta-btn">Open Calculator →</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- GLOSSARY -->
+  <div class="glossary-section">
+    <h2>Transaction Advisory Glossary</h2>
+    <div class="glossary-grid">
+      <div class="glossary-item">
+        <div class="glossary-term">EBITDA Bridge</div>
+        <div class="glossary-def">A line-by-line reconciliation from reported EBITDA to normalised EBITDA, showing every adjustment and its business rationale.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Normalisation</div>
+        <div class="glossary-def">The process of adjusting reported financials to reflect the underlying, sustainable economics of the business — stripping out one-time, owner-specific, and non-recurring items.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">One-Time Item</div>
+        <div class="glossary-def">A cost or revenue that occurred in the measurement period but will not recur in the ordinary course of business. Must be clearly evidenced and non-recurring in nature.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Run-Rate Adjustment</div>
+        <div class="glossary-def">An annualisation of a structural change that happened mid-period — a new plant, a price increase, a contract win — to reflect 12 months of the changed business.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Pro-Forma Adjustment</div>
+        <div class="glossary-def">A restatement to show what the current business would have earned if an acquisition or disposal had occurred at the start of the measurement period, not mid-period.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Management Add-Back</div>
+        <div class="glossary-def">An expense specific to the current owners — excess salary, above-market RPT costs, personal expenses — that a new buyer would not incur, added back to reach normalised EBITDA.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Working Capital Peg</div>
+        <div class="glossary-def">The agreed reference level of NWC that the seller delivers at closing, typically based on the trailing 12-month average. Price adjusts up or down if actual closing NWC differs from the peg.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Locked-Box Mechanism</div>
+        <div class="glossary-def">A deal structure where the price is fixed at a historical balance sheet date, with no post-closing NWC adjustment. The buyer bears economic risk from the lock date to closing.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Completion Accounts</div>
+        <div class="glossary-def">A deal structure where the final price adjusts post-closing based on audited accounts prepared as of closing date, reflecting actual NWC, net debt, and other agreed items.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Net Working Capital (NWC)</div>
+        <div class="glossary-def">Trade receivables plus inventory plus other current operating assets, minus trade payables and other current operating liabilities. Excludes cash, debt, and financial instruments.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Quality of Earnings (QoE)</div>
+        <div class="glossary-def">An independent report assessing the reliability and sustainability of reported earnings. Covers normalisation, cash conversion, revenue concentration, and balance sheet quality.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Cash Conversion Ratio (CCR)</div>
+        <div class="glossary-def">Operating Cash Flow divided by EBITDA, expressed as a percentage. A CCR above 85% indicates high earnings quality; below 70% suggests material accrual risk.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Accrual Ratio</div>
+        <div class="glossary-def">(EBITDA − Operating Cash Flow) / Revenue. Measures the share of profits that exists only on paper. A rising accrual ratio over multiple years is a significant earnings quality red flag.</div>
+      </div>
+      <div class="glossary-item">
+        <div class="glossary-term">Related Party Transaction (RPT)</div>
+        <div class="glossary-def">A transaction between the target and a party connected to the promoters or management — a sister company, a family trust, a promoter-controlled entity. High RPT volumes inflate or deflate reported EBITDA and require normalisation.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+    <a href="/domains/transaction-advisory/calculators/" style="font-size:.85rem;font-weight:600;color:var(--violet)">← Back to Calculators</a>
+    <a href="/domains/transaction-advisory/" style="font-size:.85rem;font-weight:600;color:var(--muted)">Domain Overview →</a>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-nav">
+    <a href="/">Home</a>
+    <a href="/domains/">All Domains</a>
+    <a href="/domains/transaction-advisory/">Transaction Advisory</a>
+    <a href="/domains/transaction-advisory/calculators/">Calculators</a>
+  </div>
+  <div>© 2025 ValuationDesk · ₹799/month · No annual plan</div>
+</footer>
+
+<script>
+function toggleModule(id){
+  var card=document.getElementById(id);
+  card.classList.toggle('open');
+}
+// Open first module by default
+document.getElementById('mod1').classList.add('open');
+</script>
+</body>
+</html>

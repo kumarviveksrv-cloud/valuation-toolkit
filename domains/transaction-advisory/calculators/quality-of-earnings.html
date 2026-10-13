@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Quality of Earnings — Transaction Advisory — ValuationDesk</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
+  --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--teal:#0d9488;
+  --violet:#7c3aed;
+  --accent:#d97706;--accent-bg:#fffbeb;--accent-border:#fde68a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);z-index:100}
+.nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-.5px}
+.nav-logo span{color:var(--blue)}
+.nav-links{display:flex;gap:1.5rem;align-items:center;font-size:.875rem;font-weight:500;color:var(--muted)}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--text);color:#fff;padding:.45rem 1rem;border-radius:6px;font-size:.8rem;font-weight:600}
+.nav-cta:hover{opacity:.85}
+
+.calc-hero{max-width:860px;margin:0 auto;padding:2.5rem 2rem 1.5rem;width:100%}
+.breadcrumb{font-size:.8rem;color:var(--muted);margin-bottom:.75rem;display:flex;gap:.4rem;align-items:center;flex-wrap:wrap}
+.breadcrumb a:hover{color:var(--text)}
+.calc-badge{display:inline-flex;align-items:center;gap:.4rem;background:var(--accent-bg);border:1px solid var(--accent-border);color:var(--accent);border-radius:999px;padding:.25rem .75rem;font-size:.75rem;font-weight:700;letter-spacing:.03em;margin-bottom:.5rem}
+.calc-hero h1{font-size:clamp(1.5rem,3vw,2rem);font-weight:900;letter-spacing:-.03em;margin-bottom:.35rem}
+.calc-hero p{font-size:.9rem;color:var(--muted)}
+.tag-pro-lg{background:#f5f3ff;color:var(--violet);font-size:.75rem;font-weight:700;padding:.3rem .75rem;border-radius:999px;display:inline-block;margin-top:.4rem;border:1px solid #ddd6fe}
+
+.step-bar{background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:1rem 2rem}
+.step-inner{max-width:860px;margin:0 auto;display:flex;align-items:center}
+.step-item{display:flex;align-items:center;gap:.5rem;flex:1;min-width:0}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.75rem;font-weight:700;color:var(--muted);background:var(--bg);flex-shrink:0;transition:all .2s}
+.step-dot.active{border-color:var(--accent);background:var(--accent);color:#fff}
+.step-dot.done{border-color:var(--accent);background:var(--accent-bg);color:var(--accent)}
+.step-label{font-size:.72rem;font-weight:600;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.step-label.active{color:var(--accent);font-weight:700}
+.step-line{height:2px;background:var(--border);flex:1;min-width:12px;margin:0 .25rem;transition:background .2s}
+.step-line.done{background:var(--accent)}
+
+.calc-body{max-width:860px;margin:0 auto;padding:2rem;width:100%;flex:1}
+
+.filter-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.25rem}
+.pill{border:1px solid var(--border);border-radius:999px;padding:.3rem .75rem;font-size:.75rem;font-weight:600;color:var(--muted);cursor:pointer;background:var(--bg);transition:all .15s}
+.pill.active{background:var(--accent);border-color:var(--accent);color:#fff}
+
+.co-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.75rem;margin-bottom:1.5rem}
+.co-card{border:1px solid var(--border);border-radius:10px;padding:1rem;cursor:pointer;background:var(--bg);transition:border-color .15s,box-shadow .15s;display:flex;flex-direction:column;gap:.3rem}
+.co-card:hover{border-color:var(--accent);box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.co-card.selected{border-color:var(--accent);background:var(--accent-bg)}
+.co-name{font-size:.85rem;font-weight:700}
+.co-sector{font-size:.72rem;color:var(--muted);font-weight:500}
+.co-highlight{font-size:.72rem;font-family:'JetBrains Mono',monospace;color:var(--accent);font-weight:700}
+.co-meta{font-size:.72rem;font-family:'JetBrains Mono',monospace;color:var(--muted)}
+
+.ctx-card{border:1px solid var(--accent-border);border-radius:12px;padding:1.5rem;background:var(--accent-bg);margin-bottom:1.5rem}
+.ctx-name{font-weight:800;font-size:1rem;margin-bottom:.25rem}
+.ctx-desc{font-size:.82rem;color:var(--muted);margin-bottom:1rem}
+.ctx-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin-bottom:.75rem}
+.ctx-item{background:rgba(255,255,255,.75);border-radius:8px;padding:.6rem .75rem}
+.ctx-val{font-size:.95rem;font-weight:800;font-family:'JetBrains Mono',monospace;letter-spacing:-.02em}
+.ctx-lbl{font-size:.67rem;color:var(--muted);font-weight:500;margin-top:.1rem}
+
+.qoe-meter{background:rgba(255,255,255,.75);border-radius:8px;padding:.75rem 1rem}
+.qoe-meter-label{font-size:.68rem;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:.6rem}
+.qoe-bar-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.45rem}
+.qoe-bar-name{width:130px;font-size:.76rem;color:var(--muted);font-weight:500;flex-shrink:0}
+.qoe-bar-track{flex:1;height:7px;background:var(--border);border-radius:4px;overflow:hidden}
+.qoe-bar-fill{height:100%;border-radius:4px;transition:width .4s}
+.qoe-bar-val{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;width:48px;text-align:right;flex-shrink:0}
+
+.concept-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;margin-bottom:1.5rem}
+.concept-card{border:1px solid var(--border);border-radius:10px;padding:1rem;background:var(--bg)}
+.concept-card h3{font-size:.85rem;font-weight:700;margin-bottom:.35rem;display:flex;align-items:center;gap:.4rem}
+.concept-card p{font-size:.78rem;color:var(--muted);line-height:1.55}
+.concept-badge{display:inline-block;padding:.12rem .4rem;border-radius:4px;font-size:.65rem;font-weight:700;flex-shrink:0}
+.badge-ccr{background:#dcfce7;color:#15803d}
+.badge-accrual{background:#fef9c3;color:#854d0e}
+.badge-conc{background:#fce7f3;color:#9d174d}
+.badge-score{background:#dbeafe;color:#1e40af}
+
+.teach-list{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.5rem}
+.teach-item{border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.teach-q{width:100%;text-align:left;padding:.75rem 1rem;background:var(--bg);border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:.82rem;font-weight:600;display:flex;justify-content:space-between;align-items:center;color:var(--text);gap:.5rem}
+.teach-q:hover{background:var(--card)}
+.teach-q .chev{color:var(--muted);font-size:.72rem;transition:transform .2s;flex-shrink:0}
+.teach-q.open .chev{transform:rotate(180deg)}
+.teach-a{padding:0 1rem;max-height:0;overflow:hidden;transition:max-height .3s ease,padding .3s ease}
+.teach-a.open{max-height:600px;padding:.75rem 1rem}
+.teach-a p{font-size:.82rem;color:var(--muted);line-height:1.65}
+
+.pro-gate{border:2px dashed var(--border);border-radius:14px;padding:2.5rem;text-align:center;background:var(--card)}
+.pro-lock{font-size:2.5rem;margin-bottom:.75rem}
+.pro-gate h3{font-size:1.1rem;font-weight:800;margin-bottom:.5rem}
+.pro-gate p{font-size:.85rem;color:var(--muted);margin-bottom:1.25rem;max-width:420px;margin-left:auto;margin-right:auto}
+.pro-features{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-bottom:1.5rem}
+.pro-feat{background:#fff;border:1px solid var(--border);border-radius:999px;padding:.3rem .75rem;font-size:.75rem;font-weight:600;color:var(--text)}
+.pro-btn{background:var(--text);color:#fff;border:none;border-radius:8px;padding:.75rem 1.75rem;font-size:.9rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+.pro-btn:hover{opacity:.85}
+
+.bank-msg{border:1px solid #ddd6fe;border-radius:12px;padding:1.5rem;background:#f5f3ff;text-align:center;margin-bottom:1.5rem}
+.bank-msg h3{font-weight:700;margin-bottom:.35rem;color:var(--violet)}
+.bank-msg p{font-size:.82rem;color:var(--muted)}
+.bank-msg a{color:var(--violet);text-decoration:underline}
+
+.section-label{font-size:.75rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem}
+.btn-row{display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1.5rem}
+.btn-primary{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:.7rem 1.75rem;font-size:.9rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-primary:hover{opacity:.85}
+.btn-primary:disabled{opacity:.45;cursor:not-allowed}
+.btn-secondary{border:1.5px solid var(--border);background:var(--bg);border-radius:8px;padding:.65rem 1.5rem;font-size:.875rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;color:var(--muted)}
+.btn-secondary:hover{border-color:var(--text);color:var(--text)}
+
+.step-section{display:none}
+.step-section.active{display:block}
+
+.calc-nav{border-top:1px solid var(--border);padding:1.25rem 2rem;background:var(--card)}
+.calc-nav-inner{max-width:860px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;font-size:.82rem;flex-wrap:wrap;gap:.5rem}
+.calc-nav-inner a{color:var(--muted);font-weight:500}
+.calc-nav-inner a:hover{color:var(--text)}
+.calc-nav-inner span{color:var(--border)}
+
+footer{border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;font-size:.8rem;color:var(--muted);margin-top:auto}
+.footer-nav{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:.5rem}
+.footer-nav a:hover{color:var(--text)}
+
+@media(max-width:640px){
+  nav{padding:1rem}.nav-links{display:none}
+  .calc-hero,.calc-body{padding-left:1rem;padding-right:1rem}
+  .step-bar{padding:.85rem 1rem}
+  .co-grid{grid-template-columns:repeat(auto-fill,minmax(155px,1fr))}
+  .ctx-grid{grid-template-columns:repeat(2,1fr)}
+  .concept-grid{grid-template-columns:1fr}
+  .calc-nav{padding:1rem}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">Valuation<span>Desk</span></a>
+  <div class="nav-links">
+    <a href="/domains/">All Domains</a>
+    <a href="/domains/transaction-advisory/">Transaction Advisory</a>
+    <a href="/domains/transaction-advisory/calculators/">Calculators</a>
+  </div>
+  <a href="#" class="nav-cta" onclick="unlockPro();return false">Unlock Pro — ₹799/mo →</a>
+</nav>
+
+<div class="calc-hero">
+  <div class="breadcrumb">
+    <a href="/">Home</a> /
+    <a href="/domains/">Domains</a> /
+    <a href="/domains/transaction-advisory/">Transaction Advisory</a> /
+    <a href="/domains/transaction-advisory/calculators/">Calculators</a> /
+    Quality of Earnings
+  </div>
+  <div class="calc-badge">📈 Calculator 04</div>
+  <h1>Quality of Earnings</h1>
+  <p>Cash conversion ratio · Accrual ratio · Revenue concentration · Customer churn risk score</p>
+  <span class="tag-pro-lg">PRO Calculator</span>
+</div>
+
+<div class="step-bar">
+  <div class="step-inner">
+    <div class="step-item">
+      <div class="step-dot active" id="dot-1">1</div>
+      <span class="step-label active" id="lbl-1">Pick Company</span>
+    </div>
+    <div class="step-line" id="line-1"></div>
+    <div class="step-item">
+      <div class="step-dot" id="dot-2">2</div>
+      <span class="step-label" id="lbl-2">Understand</span>
+    </div>
+    <div class="step-line" id="line-2"></div>
+    <div class="step-item">
+      <div class="step-dot" id="dot-3">3</div>
+      <span class="step-label" id="lbl-3">QoE Model</span>
+    </div>
+    <div class="step-line" id="line-3"></div>
+    <div class="step-item">
+      <div class="step-dot" id="dot-4">4</div>
+      <span class="step-label" id="lbl-4">Earnings Score</span>
+    </div>
+  </div>
+</div>
+
+<div class="calc-body">
+
+  <!-- STEP 1: Pick Company -->
+  <div class="step-section active" id="step-1">
+    <div class="filter-row" id="filter-pills"></div>
+    <div class="co-grid" id="co-grid"></div>
+    <div class="btn-row">
+      <button class="btn-primary" id="btn-step1" onclick="showStep(2)" disabled>Analyse Earnings Quality →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: Understand -->
+  <div class="step-section" id="step-2">
+    <div id="ctx-card"></div>
+
+    <div class="section-label">Four QoE Dimensions</div>
+    <div class="concept-grid">
+      <div class="concept-card">
+        <h3><span class="concept-badge badge-ccr">CCR</span> Cash Conversion Ratio</h3>
+        <p>Operating cash flow as a percentage of EBITDA. A ratio above 90% signals high-quality earnings — EBITDA is genuinely converting to cash. Below 70% is a red flag; the gap is absorbed by accruals, receivable build-up, or aggressive revenue recognition.</p>
+      </div>
+      <div class="concept-card">
+        <h3><span class="concept-badge badge-accrual">ACR</span> Accrual Ratio</h3>
+        <p>The proportion of earnings that is accrual-based (non-cash) rather than cash-based. Calculated as (EBITDA − Operating Cash Flow) / Revenue. High accrual ratios flag earnings that may not materialise into cash, signalling manipulation risk or structural collection weakness.</p>
+      </div>
+      <div class="concept-card">
+        <h3><span class="concept-badge badge-conc">CON</span> Revenue Concentration</h3>
+        <p>Percentage of revenue from the top 1, 3, or 5 customers. High concentration (top customer &gt;20%) is a deal risk — their departure shrinks the business materially. Buyers apply a "key customer discount" to EBITDA multiples in concentrated businesses.</p>
+      </div>
+      <div class="concept-card">
+        <h3><span class="concept-badge badge-score">QoE</span> QoE Score (0–100)</h3>
+        <p>A composite score combining cash conversion, accrual ratio, revenue concentration, growth sustainability, and margin consistency. Above 75 = high-quality earnings. 50–75 = moderate risk. Below 50 = significant QoE concern requiring buyer's own diligence overlay.</p>
+      </div>
+    </div>
+
+    <div class="section-label">Quality of Earnings — 5 Key Questions</div>
+    <div class="teach-list">
+      <div class="teach-item">
+        <button class="teach-q" onclick="toggleTeach('q1')">What is a QoE review and why does it matter in every deal?<span class="chev" id="chev-q1">▼</span></button>
+        <div class="teach-a" id="ans-q1">
+          <p>A Quality of Earnings review is a sell-side or buy-side exercise that stress-tests reported EBITDA to determine how much of it is (a) recurring, (b) cash-backed, and (c) representative of the forward business. Unlike an audit — which verifies that financials comply with accounting standards — a QoE review answers the commercial question: "Is this EBITDA real, and will it continue?" In an M&A deal, the target's EBITDA is multiplied by a sector multiple (7x–15x for Indian mid-market). A ₹10 Cr QoE downward adjustment in a 10x deal destroys ₹100 Cr of equity value. This is why QoE is the highest-ROI exercise in any deal process.</p>
+        </div>
+      </div>
+      <div class="teach-item">
+        <button class="teach-q" onclick="toggleTeach('q2')">What constitutes a "good" cash conversion ratio, and what causes it to be low?<span class="chev" id="chev-q2">▼</span></button>
+        <div class="teach-a" id="ans-q2">
+          <p>A cash conversion ratio (CCR = Operating Cash Flow / EBITDA) above 90% is generally considered high quality for Indian businesses. IT services companies like TCS and Infosys typically run 85–95% CCR because their business is cash-generative by nature. What causes CCR to be low? Four main drivers: (1) Working capital deterioration — receivables growing faster than revenue. (2) Aggressive revenue recognition — billing before delivery or completion. (3) Large capex disguised as opex. (4) Inventory build-up or obsolescence. A low CCR alone isn't a red flag if the business is growing fast (working capital investment is expected). But a low CCR combined with flat growth is a serious warning that EBITDA quality is poor.</p>
+        </div>
+      </div>
+      <div class="teach-item">
+        <button class="teach-q" onclick="toggleTeach('q3')">How does the accrual ratio expose hidden earnings risk?<span class="chev" id="chev-q3">▼</span></button>
+        <div class="teach-a" id="ans-q3">
+          <p>The accrual ratio (Accrual Ratio = (EBITDA − Operating Cash Flow) / Revenue) measures what proportion of revenue is recognised on an accounting basis before cash is actually received. Academic research by Sloan (1996) showed that companies with high accrual ratios statistically underperform in the following 3–5 years — because accruals are less persistent than cash earnings. In a deal context, a high accrual ratio raises questions: Is the company booking revenue on long-term contracts too aggressively? Are there large unbilled receivables (work done but not yet invoiced)? Are provisions being released to inflate EBITDA? Indian construction and IT services companies are particularly prone to high accruals due to milestone-based billing in long-cycle projects.</p>
+        </div>
+      </div>
+      <div class="teach-item">
+        <button class="teach-q" onclick="toggleTeach('q4')">How does revenue concentration risk affect deal pricing and structure?<span class="chev" id="chev-q4">▼</span></button>
+        <div class="teach-a" id="ans-q4">
+          <p>When a single customer represents more than 20% of revenue, buyers face a binary risk: lose that customer and the business is fundamentally different. The standard approach is a "key customer discount" on the EBITDA multiple — buyers either reduce the multiple by 1–2 turns, or insist on an earnout structure where part of the consideration is paid over 2–3 years conditional on the key customer relationship being maintained. Sellers argue the relationship is contractual; buyers argue contracts don't prevent switching. In Indian B2B and defence companies, government customers often represent 60–90% of revenue — this creates concentration risk even without a single commercial customer dependency, since government budget cycles and policy changes become an outsized risk factor for the combined business.</p>
+        </div>
+      </div>
+      <div class="teach-item">
+        <button class="teach-q" onclick="toggleTeach('q5')">What are the most common QoE red flags in Indian companies?<span class="chev" id="chev-q5">▼</span></button>
+        <div class="teach-a" id="ans-q5">
+          <p>The six most common QoE red flags uncovered in Indian M&A due diligence: (1) Channel stuffing — revenue spiked in the quarter before the deal was signed, often by incentivising distributors to over-stock. (2) Related-party revenue — a meaningful portion of revenue is from entities owned by the promoter family, which may not survive the ownership change. (3) Deferred revenue reversal — SaaS or prepaid businesses releasing deferred revenue to inflate EBITDA without corresponding service delivery. (4) Provision reversals — bad debt provisions or warranty provisions reversed into P&L with no supportable basis. (5) Export incentive income — government export subsidies counted as EBITDA, which a buyer may not qualify for. (6) Key-man dependency — EBITDA is a function of one person's client relationships; their departure post-deal collapses the earnings base.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="showStep(1)">← Back</button>
+      <button class="btn-primary" onclick="showStep(3)">Run QoE Model →</button>
+    </div>
+  </div>
+
+  <!-- STEP 3: QoE Model (PRO gate) -->
+  <div class="step-section" id="step-3">
+    <div class="pro-gate">
+      <div class="pro-lock">🔒</div>
+      <h3>QoE Model — Pro Feature</h3>
+      <p>Run a full Quality of Earnings model with cash conversion trend, accrual ratio decomposition, revenue concentration heat map, and recurring vs. non-recurring revenue split.</p>
+      <div class="pro-features">
+        <span class="pro-feat">Cash conversion ratio (3-year trend)</span>
+        <span class="pro-feat">Accrual ratio decomposition</span>
+        <span class="pro-feat">Revenue concentration heat map</span>
+        <span class="pro-feat">Recurring vs. non-recurring split</span>
+        <span class="pro-feat">EBITDA bridge with QoE adjustments</span>
+        <span class="pro-feat">Margin sustainability analysis</span>
+      </div>
+      <button class="pro-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="showStep(2)">← Back</button>
+      <button class="btn-primary" onclick="showStep(4)">View Earnings Score →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: Earnings Quality Score (PRO gate) -->
+  <div class="step-section" id="step-4">
+    <div class="pro-gate">
+      <div class="pro-lock">🔒</div>
+      <h3>Earnings Quality Score — Pro Feature</h3>
+      <p>Get a composite QoE score (0–100), customer churn risk rating, revenue sustainability assessment, and a full red flag checklist with deal structure implications.</p>
+      <div class="pro-features">
+        <span class="pro-feat">QoE composite score (0–100)</span>
+        <span class="pro-feat">Customer churn risk rating</span>
+        <span class="pro-feat">Revenue sustainability grade</span>
+        <span class="pro-feat">Automated red flag checklist</span>
+        <span class="pro-feat">Deal structure recommendations</span>
+        <span class="pro-feat">Sector peer QoE comparison</span>
+      </div>
+      <button class="pro-btn" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+    </div>
+    <div class="btn-row">
+      <button class="btn-secondary" onclick="showStep(3)">← Back</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="calc-nav">
+  <div class="calc-nav-inner">
+    <a href="/domains/transaction-advisory/calculators/working-capital-peg.html">← Working Capital Peg</a>
+    <span>|</span>
+    <a href="/domains/transaction-advisory/calculators/deal-checklist.html">Deal Checklist →</a>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-nav">
+    <a href="/">Home</a>
+    <a href="/domains/">All Domains</a>
+    <a href="/domains/transaction-advisory/">Transaction Advisory</a>
+    <a href="/domains/transaction-advisory/calculators/">Calculators</a>
+  </div>
+  <div>© 2025 ValuationDesk · ₹799/month · No annual plan</div>
+</footer>
+
+<script>
+const COMPANIES = [
+  // IT Services
+  {id:'tcs',name:'TCS',sector:'IT',revenue:249000,isBank:false,
+   ebitda:56000,operatingCF:51200,revenueGrowth:8.2,topCustPct:3,
+   desc:'Asia\'s largest IT services company — 600K+ employees across 55 countries'},
+  {id:'infy',name:'Infosys',sector:'IT',revenue:153670,isBank:false,
+   ebitda:32500,operatingCF:29800,revenueGrowth:5.1,topCustPct:4,
+   desc:'Second-largest Indian IT; digital transformation and cloud leader globally'},
+  {id:'wipro',name:'Wipro',sector:'IT',revenue:90480,isBank:false,
+   ebitda:16500,operatingCF:14200,revenueGrowth:2.0,topCustPct:5,
+   desc:'Global IT services with strong manufacturing and energy sector verticals'},
+  {id:'hcltech',name:'HCL Technologies',sector:'IT',revenue:101456,isBank:false,
+   ebitda:19200,operatingCF:17800,revenueGrowth:6.5,topCustPct:5,
+   desc:'Products and services hybrid — Engineering R&D and IP-led revenue model'},
+  {id:'techm',name:'Tech Mahindra',sector:'IT',revenue:51922,isBank:false,
+   ebitda:7800,operatingCF:5400,revenueGrowth:-1.5,topCustPct:8,
+   desc:'Telecom and 5G specialist; BPO and digital engineering services'},
+
+  // FMCG
+  {id:'hul',name:'HUL',sector:'FMCG',revenue:60133,isBank:false,
+   ebitda:12500,operatingCF:11200,revenueGrowth:4.5,topCustPct:8,
+   desc:'India\'s largest FMCG — 50+ brands across personal care, home care and foods'},
+  {id:'itc',name:'ITC',sector:'FMCG',revenue:69467,isBank:false,
+   ebitda:21000,operatingCF:18500,revenueGrowth:7.2,topCustPct:10,
+   desc:'Diversified conglomerate — cigarettes, FMCG, hotels, paper, agri-business'},
+  {id:'nestle',name:'Nestle India',sector:'FMCG',revenue:22360,isBank:false,
+   ebitda:4800,operatingCF:4200,revenueGrowth:11.5,topCustPct:12,
+   desc:'Maggi, KitKat, Munch — 60+ year India presence, premium brand positioning'},
+  {id:'dabur',name:'Dabur India',sector:'FMCG',revenue:12544,isBank:false,
+   ebitda:2650,operatingCF:2100,revenueGrowth:5.8,topCustPct:8,
+   desc:'Ayurveda and natural health products; deep rural distribution network'},
+  {id:'marico',name:'Marico',sector:'FMCG',revenue:9653,isBank:false,
+   ebitda:2100,operatingCF:1900,revenueGrowth:6.2,topCustPct:10,
+   desc:'Parachute, Saffola, Livon — market leader in coconut oil and value-added hair care'},
+
+  // Financials (Banks)
+  {id:'hdfc',name:'HDFC Bank',sector:'Financials',revenue:241816,isBank:true,
+   desc:'India\'s largest private bank by market cap — 8,000+ branches nationwide'},
+  {id:'icici',name:'ICICI Bank',sector:'Financials',revenue:196998,isBank:true,
+   desc:'Second-largest private bank; strong retail and corporate lending franchise'},
+  {id:'kotak',name:'Kotak Mahindra Bank',sector:'Financials',revenue:77862,isBank:true,
+   desc:'Premium private bank — wealth management and personal banking focus'},
+  {id:'axis',name:'Axis Bank',sector:'Financials',revenue:115457,isBank:true,
+   desc:'Third-largest private bank; corporate banking and SME lending strength'},
+  {id:'sbi',name:'State Bank of India',sector:'Financials',revenue:472855,isBank:true,
+   desc:'India\'s largest public sector bank — 22,000+ branches across every district'},
+
+  // Energy
+  {id:'reliance',name:'Reliance Industries',sector:'Energy',revenue:878025,isBank:false,
+   ebitda:175000,operatingCF:140000,revenueGrowth:8.5,topCustPct:15,
+   desc:'India\'s largest company — refining, petrochemicals, Jio telecom, JioMart retail'},
+  {id:'ongc',name:'ONGC',sector:'Energy',revenue:159270,isBank:false,
+   ebitda:62000,operatingCF:48000,revenueGrowth:4.2,topCustPct:60,
+   desc:'India\'s largest oil and gas explorer; dominant upstream E&P operations'},
+  {id:'bpcl',name:'BPCL',sector:'Energy',revenue:468482,isBank:false,
+   ebitda:18000,operatingCF:12000,revenueGrowth:6.8,topCustPct:40,
+   desc:'Bharat Petroleum — large refiner and fuel retail network across India'},
+  {id:'coalindia',name:'Coal India',sector:'Energy',revenue:141140,isBank:false,
+   ebitda:42000,operatingCF:38000,revenueGrowth:8.0,topCustPct:90,
+   desc:'World\'s largest coal producer; near-monopoly supplier to Indian power plants'},
+  {id:'ntpc',name:'NTPC',sector:'Energy',revenue:176990,isBank:false,
+   ebitda:45000,operatingCF:30000,revenueGrowth:12.5,topCustPct:70,
+   desc:'India\'s largest power generation company — 70+ GW of installed capacity'},
+
+  // Auto
+  {id:'tatamotors',name:'Tata Motors',sector:'Auto',revenue:437928,isBank:false,
+   ebitda:52000,operatingCF:35000,revenueGrowth:22.5,topCustPct:12,
+   desc:'JLR parent — India\'s largest commercial vehicle maker and EV pioneer'},
+  {id:'maruti',name:'Maruti Suzuki',sector:'Auto',revenue:137869,isBank:false,
+   ebitda:21000,operatingCF:19000,revenueGrowth:15.8,topCustPct:5,
+   desc:'India\'s largest passenger vehicle maker — 42%+ domestic market share'},
+  {id:'bajaj',name:'Bajaj Auto',sector:'Auto',revenue:46207,isBank:false,
+   ebitda:9500,operatingCF:8800,revenueGrowth:18.2,topCustPct:8,
+   desc:'World\'s third-largest motorcycle maker — Pulsar, Dominar, Chetak EV brands'},
+  {id:'hero',name:'Hero MotoCorp',sector:'Auto',revenue:40032,isBank:false,
+   ebitda:5500,operatingCF:5000,revenueGrowth:8.5,topCustPct:6,
+   desc:'World\'s largest two-wheeler manufacturer by volume — 50%+ domestic share'},
+  {id:'mm',name:'Mahindra & Mahindra',sector:'Auto',revenue:97926,isBank:false,
+   ebitda:18000,operatingCF:13500,revenueGrowth:25.0,topCustPct:10,
+   desc:'SUV market leader in India — farm equipment and ambitious EV roadmap'},
+
+  // Industrials
+  {id:'lt',name:'Larsen & Toubro',sector:'Industrials',revenue:221986,isBank:false,
+   ebitda:24000,operatingCF:12000,revenueGrowth:18.5,topCustPct:8,
+   desc:'India\'s largest engineering and construction conglomerate — infra and defence'},
+  {id:'adaniports',name:'Adani Ports',sector:'Industrials',revenue:25011,isBank:false,
+   ebitda:12000,operatingCF:10500,revenueGrowth:24.5,topCustPct:15,
+   desc:'India\'s largest private port operator — 13+ ports and integrated logistics hubs'},
+  {id:'powergrid',name:'Power Grid Corp',sector:'Industrials',revenue:47592,isBank:false,
+   ebitda:36000,operatingCF:22000,revenueGrowth:8.2,topCustPct:85,
+   desc:'Central transmission utility — operates 170,000+ km of high-voltage lines'},
+  {id:'bel',name:'Bharat Electronics',sector:'Industrials',revenue:20264,isBank:false,
+   ebitda:3800,operatingCF:2000,revenueGrowth:35.0,topCustPct:90,
+   desc:'Defence PSU — radars, electronic warfare suites and communication systems'},
+  {id:'bhel',name:'BHEL',sector:'Industrials',revenue:31011,isBank:false,
+   ebitda:2200,operatingCF:500,revenueGrowth:24.5,topCustPct:75,
+   desc:'Bharat Heavy Electricals — power plant equipment and industrial machinery'},
+];
+
+// Derive QoE metrics
+COMPANIES.forEach(c => {
+  if(c.isBank){ c.ccr = null; c.accrualRatio = null; c.ebitdaMargin = null; return; }
+  c.ccr = (c.operatingCF / c.ebitda * 100);
+  c.accrualRatio = ((c.ebitda - c.operatingCF) / c.revenue * 100);
+  c.ebitdaMargin = (c.ebitda / c.revenue * 100);
+});
+
+let selected = null;
+const SECTORS = ['All','IT','FMCG','Financials','Energy','Auto','Industrials'];
+let activeSector = 'All';
+
+function buildSectorPills(){
+  const wrap = document.getElementById('filter-pills');
+  wrap.innerHTML = '';
+  SECTORS.forEach(s => {
+    const b = document.createElement('button');
+    b.className = 'pill' + (s === activeSector ? ' active' : '');
+    b.textContent = s;
+    b.onclick = () => { activeSector = s; buildSectorPills(); renderGrid(); };
+    wrap.appendChild(b);
+  });
+}
+
+function renderGrid(){
+  const grid = document.getElementById('co-grid');
+  grid.innerHTML = '';
+  COMPANIES.filter(c => activeSector === 'All' || c.sector === activeSector).forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'co-card' + (selected && selected.id === c.id ? ' selected' : '');
+    const ccrLine = c.isBank ? 'CCR: N/A' : 'CCR ' + c.ccr.toFixed(0) + '% · Conc. ' + c.topCustPct + '%';
+    const metaLine = c.isBank ? 'Rev ₹' + fmtK(c.revenue) + ' Cr' : 'Rev ₹' + fmtK(c.revenue) + ' Cr · ' + (c.revenueGrowth >= 0 ? '+' : '') + c.revenueGrowth.toFixed(1) + '% YoY';
+    div.innerHTML = `<div class="co-name">${c.name}</div>
+      <div class="co-sector">${c.sector}</div>
+      <div class="co-highlight">${ccrLine}</div>
+      <div class="co-meta">${metaLine}</div>`;
+    div.onclick = () => selectCo(c.id);
+    grid.appendChild(div);
+  });
+}
+
+function selectCo(id){
+  selected = COMPANIES.find(c => c.id === id);
+  renderGrid();
+  document.getElementById('btn-step1').disabled = false;
+}
+
+function renderCtx(){
+  const wrap = document.getElementById('ctx-card');
+  if(!selected){ wrap.innerHTML = ''; return; }
+  const c = selected;
+  if(c.isBank){
+    wrap.innerHTML = `<div class="bank-msg">
+      <h3>🏦 ${c.name} — Standard QoE Not Applicable</h3>
+      <p>Banks use Net Interest Income and provision coverage ratios rather than EBITDA-based Quality of Earnings metrics. For bank credit quality, see <a href="/domains/credit-analysis/calculators/credit-ratios.html">Credit Ratios</a>. QoE analysis in this calculator is for operating companies only.</p>
+    </div>`;
+    return;
+  }
+  const ccrColor = c.ccr >= 90 ? '#16a34a' : c.ccr >= 70 ? '#d97706' : '#dc2626';
+  const concColor = c.topCustPct <= 10 ? '#16a34a' : c.topCustPct <= 25 ? '#d97706' : '#dc2626';
+  wrap.innerHTML = `<div class="ctx-card">
+    <div class="ctx-name">${c.name}</div>
+    <div class="ctx-desc">${c.desc}</div>
+    <div class="ctx-grid">
+      <div class="ctx-item">
+        <div class="ctx-val" style="color:${ccrColor}">${c.ccr.toFixed(0)}%</div>
+        <div class="ctx-lbl">Cash Conversion</div>
+      </div>
+      <div class="ctx-item">
+        <div class="ctx-val">${c.accrualRatio.toFixed(1)}%</div>
+        <div class="ctx-lbl">Accrual Ratio</div>
+      </div>
+      <div class="ctx-item">
+        <div class="ctx-val" style="color:${concColor}">${c.topCustPct}%</div>
+        <div class="ctx-lbl">Top Customer</div>
+      </div>
+      <div class="ctx-item">
+        <div class="ctx-val">${c.ebitdaMargin.toFixed(1)}%</div>
+        <div class="ctx-lbl">EBITDA Margin</div>
+      </div>
+      <div class="ctx-item">
+        <div class="ctx-val">${c.revenueGrowth >= 0 ? '+' : ''}${c.revenueGrowth.toFixed(1)}%</div>
+        <div class="ctx-lbl">Revenue Growth</div>
+      </div>
+      <div class="ctx-item">
+        <div class="ctx-val">₹${fmtK(c.revenue)} Cr</div>
+        <div class="ctx-lbl">Revenue (FY24)</div>
+      </div>
+    </div>
+    <div class="qoe-meter">
+      <div class="qoe-meter-label">QoE Snapshot</div>
+      <div class="qoe-bar-row">
+        <span class="qoe-bar-name">Cash Conversion</span>
+        <div class="qoe-bar-track"><div class="qoe-bar-fill" style="width:${Math.min(c.ccr,100)}%;background:${ccrColor}"></div></div>
+        <span class="qoe-bar-val" style="color:${ccrColor}">${c.ccr.toFixed(0)}%</span>
+      </div>
+      <div class="qoe-bar-row">
+        <span class="qoe-bar-name">Cust. Concentration</span>
+        <div class="qoe-bar-track"><div class="qoe-bar-fill" style="width:${Math.min(c.topCustPct*2,100)}%;background:${concColor}"></div></div>
+        <span class="qoe-bar-val" style="color:${concColor}">${c.topCustPct}%</span>
+      </div>
+      <div class="qoe-bar-row">
+        <span class="qoe-bar-name">EBITDA Margin</span>
+        <div class="qoe-bar-track"><div class="qoe-bar-fill" style="width:${Math.min(c.ebitdaMargin*2,100)}%;background:var(--accent)"></div></div>
+        <span class="qoe-bar-val" style="color:var(--accent)">${c.ebitdaMargin.toFixed(1)}%</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleTeach(id){
+  const q = document.querySelector(`[onclick="toggleTeach('${id}')"]`);
+  const a = document.getElementById('ans-' + id);
+  const isOpen = a.classList.contains('open');
+  document.querySelectorAll('.teach-a').forEach(el => el.classList.remove('open'));
+  document.querySelectorAll('.teach-q').forEach(el => el.classList.remove('open'));
+  if(!isOpen){ a.classList.add('open'); q.classList.add('open'); }
+}
+
+function showStep(n){
+  [1,2,3,4].forEach(i => {
+    document.getElementById('step-' + i).classList.toggle('active', i === n);
+    document.getElementById('dot-' + i).classList.toggle('active', i === n);
+    document.getElementById('dot-' + i).classList.toggle('done', i < n);
+    document.getElementById('lbl-' + i).classList.toggle('active', i === n);
+    if(i < 4) document.getElementById('line-' + i).classList.toggle('done', i < n);
+  });
+  if(n === 2) renderCtx();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function fmtK(n){ if(n >= 100000) return (n/100000).toFixed(1)+'L'; if(n >= 1000) return (n/1000).toFixed(1)+'K'; return String(n); }
+function unlockPro(){ alert('Pro unlock coming soon — ₹799/mo for all 15 domains.'); }
+
+buildSectorPills();
+renderGrid();
+</script>
+</body>
+</html>

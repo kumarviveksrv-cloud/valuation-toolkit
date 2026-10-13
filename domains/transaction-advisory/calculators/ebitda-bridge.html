@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>EBITDA Bridge — Transaction Advisory — ValuationDesk</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
+  --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--teal:#0d9488;
+  --violet:#7c3aed;
+  --accent:#7c3aed;--accent-bg:#f5f3ff;--accent-border:#ddd6fe;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);z-index:100}
+.nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-.5px}
+.nav-logo span{color:var(--blue)}
+.nav-links{display:flex;gap:1.5rem;align-items:center;font-size:.875rem;font-weight:500;color:var(--muted)}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--text);color:#fff;padding:.45rem 1rem;border-radius:6px;font-size:.8rem;font-weight:600}
+.nav-cta:hover{opacity:.85}
+
+.main{max-width:860px;margin:0 auto;padding:2rem;width:100%;flex:1}
+.breadcrumb{font-size:.8rem;color:var(--muted);margin-bottom:.75rem;display:flex;gap:.4rem;align-items:center}
+.breadcrumb a:hover{color:var(--text)}
+.calc-header{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1.75rem;flex-wrap:wrap}
+.calc-title-block h1{font-size:1.5rem;font-weight:900;letter-spacing:-.03em;margin-bottom:.3rem}
+.calc-title-block p{font-size:.875rem;color:var(--muted)}
+.tag-free-lg{background:#dcfce7;color:#15803d;font-size:.75rem;font-weight:700;padding:.3rem .75rem;border-radius:999px;display:inline-block;margin-top:.4rem}
+
+/* STEPPER */
+.stepper{display:flex;align-items:center;gap:0;margin-bottom:2rem}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;color:var(--muted);flex-shrink:0;position:relative;z-index:1}
+.step-dot.active{border-color:var(--accent);background:var(--accent);color:#fff}
+.step-dot.done{border-color:var(--accent);background:var(--accent-bg);color:var(--accent)}
+.step-line{flex:1;height:2px;background:var(--border)}
+.step-line.done{background:var(--accent)}
+.step-labels{display:flex;justify-content:space-between;margin-top:.4rem;margin-bottom:1.5rem}
+.step-label{font-size:.7rem;font-weight:600;color:var(--muted);text-align:center;flex:1}
+.step-label.active{color:var(--accent)}
+
+/* STEPS */
+.step{display:none}
+.step.active{display:block}
+
+/* LOADING */
+.loading-wrap{text-align:center;padding:3rem 1rem}
+.loading-logo{font-size:2.5rem;margin-bottom:1rem;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.loading-bar-wrap{background:var(--card);border-radius:999px;height:6px;max-width:320px;margin:1.5rem auto}
+.loading-bar{height:6px;border-radius:999px;background:linear-gradient(90deg,var(--accent),#a855f7);width:0%;transition:width .4s ease}
+.loading-text{font-size:.875rem;color:var(--muted);margin-top:.75rem;font-weight:500}
+.loading-fact{font-size:.78rem;color:var(--muted);margin-top:.5rem;font-style:italic;max-width:340px;margin-left:auto;margin-right:auto}
+
+/* COMPANY GRID */
+.filter-row{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-bottom:1rem}
+.filter-row input{flex:1;min-width:160px;border:1px solid var(--border);border-radius:7px;padding:.5rem .75rem;font-size:.85rem;font-family:'Inter',sans-serif}
+.filter-row input:focus{outline:none;border-color:var(--accent)}
+.sector-pills{display:flex;gap:.4rem;flex-wrap:wrap}
+.sector-pill{border:1px solid var(--border);background:var(--bg);border-radius:999px;padding:.25rem .65rem;font-size:.72rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s}
+.sector-pill.active{border-color:var(--accent);background:var(--accent-bg);color:var(--accent)}
+.company-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:.6rem;margin-bottom:1.5rem}
+.co-card{border:1.5px solid var(--border);border-radius:9px;padding:.75rem;cursor:pointer;transition:all .15s;background:var(--bg)}
+.co-card:hover{border-color:var(--accent);background:var(--accent-bg)}
+.co-card.selected{border-color:var(--accent);background:var(--accent-bg)}
+.co-name{font-weight:700;font-size:.82rem;margin-bottom:.2rem}
+.co-sector{font-size:.7rem;color:var(--muted)}
+.co-ticker{font-family:'JetBrains Mono',monospace;font-size:.68rem;color:var(--accent);font-weight:700}
+
+/* CONTEXT / TEACH CARD */
+.ctx-card{border:1px solid var(--accent-border);border-radius:12px;background:var(--accent-bg);padding:1.5rem;margin-bottom:1.5rem}
+.ctx-header{display:flex;align-items:flex-start;gap:1rem;margin-bottom:1rem}
+.ctx-icon{font-size:2rem;line-height:1}
+.ctx-company{font-size:1.1rem;font-weight:800;letter-spacing:-.02em}
+.ctx-sub{font-size:.82rem;color:var(--muted);margin-top:.15rem}
+.ctx-chips{display:flex;flex-wrap:wrap;gap:.45rem;margin-top:.75rem}
+.ctx-chip{background:#fff;border:1px solid var(--accent-border);border-radius:999px;padding:.2rem .65rem;font-size:.75rem;font-weight:600;color:var(--text)}
+.ctx-chip strong{color:var(--accent)}
+
+.teach-list{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.5rem}
+.teach-row{border:1px solid var(--border);border-radius:9px;overflow:hidden}
+.teach-q{display:flex;align-items:center;justify-content:space-between;padding:.85rem 1rem;cursor:pointer;font-weight:600;font-size:.875rem;background:var(--card)}
+.teach-q:hover{background:#f3f4f6}
+.teach-a{display:none;padding:.85rem 1rem;font-size:.85rem;color:#374151;border-top:1px solid var(--border);line-height:1.6}
+.teach-a.open{display:block}
+
+/* BRIDGE TABLE */
+.bridge-wrap{background:var(--bg);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:1.5rem}
+.bridge-table{width:100%;border-collapse:collapse;font-size:.875rem}
+.bridge-table th{text-align:left;padding:.7rem 1rem;background:var(--card);border-bottom:2px solid var(--border);font-weight:700;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.bridge-table td{padding:.75rem 1rem;border-bottom:1px solid var(--border);vertical-align:middle}
+.bridge-table tr:last-child td{border-bottom:none}
+.bridge-table tr.row-total td{background:var(--accent-bg);font-weight:800;color:var(--accent);border-top:2px solid var(--accent-border)}
+.bridge-table tr.row-group td{background:#f8f8f8;font-weight:700;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);padding:.5rem 1rem}
+.num{font-family:'JetBrains Mono',monospace;font-weight:700}
+.pos{color:var(--green)}
+.neg{color:var(--red)}
+.adj-tag{display:inline-block;padding:.15rem .45rem;border-radius:4px;font-size:.68rem;font-weight:700;margin-left:.4rem}
+.adj-onetime{background:#fef9c3;color:#854d0e}
+.adj-runrate{background:#dbeafe;color:#1e40af}
+.adj-proforma{background:#dcfce7;color:#15803d}
+.adj-mgmt{background:#fce7f3;color:#9d174d}
+
+/* SIGNAL BAR */
+.signal-row{display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;margin-bottom:1.5rem}
+.signal-card{border:1px solid var(--border);border-radius:10px;padding:1rem;text-align:center;background:var(--bg)}
+.signal-val{font-size:1.4rem;font-weight:900;font-family:'JetBrains Mono',monospace;letter-spacing:-.03em}
+.signal-lbl{font-size:.72rem;color:var(--muted);font-weight:600;margin-top:.2rem}
+.signal-sub{font-size:.7rem;color:var(--muted);margin-top:.2rem}
+
+/* SORT/FILTER TABLE */
+.sort-row{display:flex;gap:.5rem;align-items:center;margin-bottom:.75rem;flex-wrap:wrap}
+.sort-btn{border:1px solid var(--border);background:var(--bg);border-radius:6px;padding:.3rem .7rem;font-size:.75rem;font-weight:600;cursor:pointer;color:var(--muted);font-family:'Inter',sans-serif}
+.sort-btn.active{border-color:var(--accent);background:var(--accent-bg);color:var(--accent)}
+.co-table{width:100%;border-collapse:collapse;font-size:.82rem;margin-bottom:2rem}
+.co-table th{text-align:right;padding:.55rem .75rem;background:var(--card);border-bottom:2px solid var(--border);font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);cursor:pointer;white-space:nowrap}
+.co-table th:first-child{text-align:left}
+.co-table th:hover{color:var(--text)}
+.co-table td{padding:.6rem .75rem;border-bottom:1px solid var(--border);text-align:right;color:#374151;white-space:nowrap}
+.co-table td:first-child{text-align:left;font-weight:600;color:var(--text)}
+.co-table tr:hover td{background:#fafafa}
+.pill-sm{display:inline-block;padding:.12rem .45rem;border-radius:999px;font-size:.68rem;font-weight:700}
+.pill-pos{background:#dcfce7;color:#15803d}
+.pill-neg{background:#fee2e2;color:#b91c1c}
+.pill-neu{background:#f3f4f6;color:#6b7280}
+
+/* STEP BUTTONS */
+.step-btns{display:flex;justify-content:space-between;margin-top:1.5rem;gap:1rem}
+.btn-back{border:1.5px solid var(--border);background:var(--bg);border-radius:8px;padding:.65rem 1.25rem;font-size:.875rem;font-weight:600;cursor:pointer;color:var(--muted);font-family:'Inter',sans-serif}
+.btn-back:hover{border-color:var(--text);color:var(--text)}
+.btn-next{background:var(--accent);color:#fff;border:none;border-radius:8px;padding:.65rem 1.5rem;font-size:.875rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+.btn-next:hover{opacity:.88}
+.btn-next:disabled{opacity:.4;cursor:not-allowed}
+
+.calc-nav{display:flex;justify-content:space-between;margin-top:2rem;padding-top:1.5rem;border-top:1px solid var(--border);flex-wrap:wrap;gap:1rem}
+.calc-nav a{font-size:.875rem;font-weight:600;color:var(--muted)}
+.calc-nav a:hover{color:var(--text)}
+
+footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-size:.8rem;color:var(--muted);margin-top:auto}
+.footer-nav{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:.75rem}
+.footer-nav a:hover{color:var(--text)}
+
+@media(max-width:640px){
+  nav{padding:1rem}.nav-links{display:none}
+  .main{padding:1.5rem 1rem}
+  .signal-row{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+<nav>
+  <a href="/" class="nav-logo">Valuation<span>Desk</span></a>
+  <div class="nav-links">
+    <a href="/domains/transaction-advisory/">Transaction Advisory</a>
+    <a href="/domains/transaction-advisory/calculators/">Calculators</a>
+    <a href="/domains/transaction-advisory/learn/">Learn</a>
+  </div>
+  <a href="#" class="nav-cta" onclick="unlockPro();return false">Unlock Pro — ₹799/mo →</a>
+</nav>
+
+<div class="main">
+  <div class="breadcrumb">
+    <a href="/">Home</a> / <a href="/domains/transaction-advisory/">Transaction Advisory</a> / <a href="/domains/transaction-advisory/calculators/">Calculators</a> / EBITDA Bridge
+  </div>
+
+  <div class="calc-header">
+    <div class="calc-title-block">
+      <h1>📊 EBITDA Bridge</h1>
+      <p>Walk from reported EBITDA to normalised EBITDA across 30 Indian companies.</p>
+      <span class="tag-free-lg">FREE Calculator</span>
+    </div>
+  </div>
+
+  <!-- STEPPER -->
+  <div class="stepper">
+    <div class="step-dot active" id="dot1">1</div>
+    <div class="step-line" id="line12"></div>
+    <div class="step-dot" id="dot2">2</div>
+    <div class="step-line" id="line23"></div>
+    <div class="step-dot" id="dot3">3</div>
+    <div class="step-line" id="line34"></div>
+    <div class="step-dot" id="dot4">4</div>
+  </div>
+  <div class="step-labels">
+    <span class="step-label active" id="lbl1">Pick Company</span>
+    <span class="step-label" id="lbl2">Understand</span>
+    <span class="step-label" id="lbl3">Bridge View</span>
+    <span class="step-label" id="lbl4">All Companies</span>
+  </div>
+
+  <!-- STEP 1: PICK -->
+  <div class="step active" id="step1">
+    <div class="filter-row">
+      <input type="text" id="searchInput" placeholder="Search company or ticker…" oninput="filterGrid()"/>
+      <div class="sector-pills" id="sectorPills"></div>
+    </div>
+    <div class="company-grid" id="companyGrid"></div>
+    <div class="step-btns">
+      <span></span>
+      <button class="btn-next" id="nextBtn1" onclick="startLoading()" disabled>Next →</button>
+    </div>
+  </div>
+
+  <!-- STEP 2: LOADING + CONTEXT -->
+  <div class="step" id="step2">
+    <div id="loadingDiv" class="loading-wrap">
+      <div style="font-size:2.5rem;margin-bottom:.75rem">📊</div>
+      <div style="font-weight:700;font-size:1rem;margin-bottom:.5rem" id="loadingCompany"></div>
+      <div class="loading-bar-wrap"><div class="loading-bar" id="loadingBar"></div></div>
+      <div class="loading-text" id="loadingText">Pulling normalisation items…</div>
+      <div class="loading-fact" id="loadingFact"></div>
+    </div>
+    <div id="ctxDiv" style="display:none">
+      <div class="ctx-card" id="ctxCard"></div>
+      <div class="teach-list" id="teachList"></div>
+      <div class="step-btns">
+        <button class="btn-back" onclick="showStep(1)">← Back</button>
+        <button class="btn-next" onclick="showStep(3)">Bridge View →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: BRIDGE -->
+  <div class="step" id="step3">
+    <div class="signal-row" id="signalRow"></div>
+    <div class="bridge-wrap">
+      <table class="bridge-table" id="bridgeTable">
+        <thead>
+          <tr>
+            <th>Line Item</th>
+            <th style="text-align:right">₹ Cr</th>
+            <th style="text-align:right">% Reported</th>
+            <th style="text-align:center">Type</th>
+          </tr>
+        </thead>
+        <tbody id="bridgeTbody"></tbody>
+      </table>
+    </div>
+    <div class="step-btns">
+      <button class="btn-back" onclick="showStep(2)">← Back</button>
+      <button class="btn-next" onclick="showStep(4)">All Companies →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: ALL COMPANIES TABLE -->
+  <div class="step" id="step4">
+    <div class="sort-row">
+      <span style="font-size:.78rem;font-weight:600;color:var(--muted)">Sort by:</span>
+      <button class="sort-btn active" onclick="sortTable('name',this)">Company</button>
+      <button class="sort-btn" onclick="sortTable('ebitdaReported',this)">Reported EBITDA</button>
+      <button class="sort-btn" onclick="sortTable('netAdj',this)">Net Adj</button>
+      <button class="sort-btn" onclick="sortTable('ebitdaNorm',this)">Normalised</button>
+      <button class="sort-btn" onclick="sortTable('adjPct',this)">Adj %</button>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="co-table" id="coTable">
+        <thead>
+          <tr>
+            <th onclick="sortTable('name',null)">Company</th>
+            <th onclick="sortTable('sector',null)">Sector</th>
+            <th onclick="sortTable('ebitdaReported',null)">Reported ₹Cr</th>
+            <th onclick="sortTable('netAdj',null)">Net Adj ₹Cr</th>
+            <th onclick="sortTable('ebitdaNorm',null)">Normalised ₹Cr</th>
+            <th onclick="sortTable('adjPct',null)">Adj %</th>
+            <th onclick="sortTable('normMargin',null)">Norm Margin</th>
+          </tr>
+        </thead>
+        <tbody id="coTbody"></tbody>
+      </table>
+    </div>
+    <div class="step-btns">
+      <button class="btn-back" onclick="showStep(3)">← Back</button>
+      <button class="btn-next" onclick="showStep(1)">New Company →</button>
+    </div>
+  </div>
+
+  <div class="calc-nav">
+    <a href="/domains/transaction-advisory/calculators/">← All Calculators</a>
+    <a href="/domains/transaction-advisory/calculators/normalisation.html">Normalisation →</a>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-nav">
+    <a href="/">Home</a>
+    <a href="/domains/transaction-advisory/">Transaction Advisory</a>
+    <a href="/domains/transaction-advisory/calculators/">Calculators</a>
+    <a href="/domains/transaction-advisory/learn/">Learn</a>
+  </div>
+  <div>© 2025 ValuationDesk · ₹799/month · No annual plan</div>
+</footer>
+
+<script>
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+
+/* ============================================================
+   DATA — 30 COMPANIES
+   Fields per company:
+   name, ticker, sector, revenue (₹Cr), ebitdaReported (₹Cr),
+   ebitdaMargin (%), adjItems: [{label, amount, type, note}],
+   nwcPct (NWC as % revenue), cfRatio (CFO/EBITDA), accrualRatio
+   Type: 'one-time' | 'run-rate' | 'pro-forma' | 'mgmt-addback'
+============================================================ */
+const COMPANIES = [
+  {name:'TCS',ticker:'TCS',sector:'IT',revenue:240893,ebitdaReported:62632,ebitdaMargin:26.0,
+   adjItems:[
+     {label:'Restructuring charge (one-time)',amount:320,type:'one-time',note:'BaNCS platform migration costs; non-recurring'},
+     {label:'ESOP expense add-back',amount:180,type:'mgmt-addback',note:'Mgmt adds back; analysts typically keep in'},
+     {label:'Forex MTM loss',amount:-95,type:'one-time',note:'Mark-to-market hedging loss; volatile'}
+   ],nwcPct:8.2,cfRatio:0.94,accrualRatio:0.03},
+
+  {name:'Infosys',ticker:'INFY',sector:'IT',revenue:153670,ebitdaReported:33200,ebitdaMargin:21.6,
+   adjItems:[
+     {label:'Severance — headcount rationalisation',amount:450,type:'one-time',note:'One-time workforce adjustment'},
+     {label:'Legal settlement provision',amount:280,type:'one-time',note:'US visa settlement accrual'},
+     {label:'Run-rate savings from automation',amount:-500,type:'run-rate',note:'Annualise partial-year AI tooling savings'}
+   ],nwcPct:9.1,cfRatio:0.91,accrualRatio:0.04},
+
+  {name:'Wipro',ticker:'WIPRO',sector:'IT',revenue:90487,ebitdaReported:16660,ebitdaMargin:18.4,
+   adjItems:[
+     {label:'Acquisition integration costs',amount:390,type:'one-time',note:'Capco integration; non-recurring'},
+     {label:'Office consolidation write-off',amount:180,type:'one-time',note:'Lease exits in US/UK'},
+     {label:'CEO transition costs',amount:85,type:'one-time',note:'One-time leadership transition'}
+   ],nwcPct:11.3,cfRatio:0.87,accrualRatio:0.05},
+
+  {name:'HCL Technologies',ticker:'HCLTECH',sector:'IT',revenue:104057,ebitdaReported:22700,ebitdaMargin:21.8,
+   adjItems:[
+     {label:'Product division restructuring',amount:420,type:'one-time',note:'HCL Software reorganisation'},
+     {label:'Run-rate headcount savings',amount:-350,type:'run-rate',note:'Annualise H2 hiring freeze savings'}
+   ],nwcPct:10.5,cfRatio:0.90,accrualRatio:0.04},
+
+  {name:'Tech Mahindra',ticker:'TECHM',sector:'IT',revenue:51906,ebitdaReported:5700,ebitdaMargin:11.0,
+   adjItems:[
+     {label:'Telecom client bankruptcy provision',amount:650,type:'one-time',note:'Specific client exposure; one-time'},
+     {label:'Platform write-down',amount:430,type:'one-time',note:'Legacy platform impairment'},
+     {label:'New CEO integration spend',amount:200,type:'one-time',note:'Transformation programme costs'}
+   ],nwcPct:14.1,cfRatio:0.78,accrualRatio:0.09},
+
+  {name:'Hindustan Unilever',ticker:'HINDUNILVR',sector:'FMCG',revenue:60580,ebitdaReported:14350,ebitdaMargin:23.7,
+   adjItems:[
+     {label:'Brand divestiture gain',amount:-450,type:'one-time',note:'Gain on sale of non-core brand; not recurring'},
+     {label:'Supply chain disruption cost',amount:280,type:'one-time',note:'Palm oil sourcing disruption; one-time'},
+     {label:'Run-rate savings — pricing architecture',amount:-320,type:'run-rate',note:'Annualised benefit of grammage rationalisation'}
+   ],nwcPct:5.2,cfRatio:0.96,accrualRatio:0.02},
+
+  {name:'ITC',ticker:'ITC',sector:'FMCG',revenue:72278,ebitdaReported:24800,ebitdaMargin:34.3,
+   adjItems:[
+     {label:'Hotel business one-time renovation',amount:380,type:'one-time',note:'Non-FMCG segment capex expensed'},
+     {label:'NBFC subsidiary loss provision',amount:220,type:'one-time',note:'Financial services provision; ring-fenced'}
+   ],nwcPct:7.3,cfRatio:0.93,accrualRatio:0.03},
+
+  {name:'Nestle India',ticker:'NESTLEIND',sector:'FMCG',revenue:17354,ebitdaReported:4010,ebitdaMargin:23.1,
+   adjItems:[
+     {label:'One-time pricing correction',amount:180,type:'one-time',note:'Managed price rollback; non-recurring'},
+     {label:'Capacity expansion pre-operating cost',amount:90,type:'one-time',note:'New factory ramp-up costs'}
+   ],nwcPct:4.8,cfRatio:0.97,accrualRatio:0.02},
+
+  {name:'Dabur India',ticker:'DABUR',sector:'FMCG',revenue:12392,ebitdaReported:2285,ebitdaMargin:18.4,
+   adjItems:[
+     {label:'International subsidiary restructuring',amount:175,type:'one-time',note:'MENA operations reorg costs'},
+     {label:'Run-rate A&P normalisation',amount:-150,type:'run-rate',note:'Annualise lower ad spend post brand refresh'}
+   ],nwcPct:9.5,cfRatio:0.90,accrualRatio:0.05},
+
+  {name:'Marico',ticker:'MARICO',sector:'FMCG',revenue:9764,ebitdaReported:1685,ebitdaMargin:17.3,
+   adjItems:[
+     {label:'Coconut oil hedging loss',amount:130,type:'one-time',note:'Commodity MTM; non-recurring'},
+     {label:'D2C platform build cost',amount:85,type:'one-time',note:'One-time digital channel setup'}
+   ],nwcPct:8.7,cfRatio:0.92,accrualRatio:0.04},
+
+  {name:'HDFC Bank',ticker:'HDFCBANK',sector:'Financials',revenue:248600,ebitdaReported:null,ebitdaMargin:null,
+   adjItems:[],nwcPct:null,cfRatio:null,accrualRatio:null,isBank:true},
+
+  {name:'ICICI Bank',ticker:'ICICIBANK',sector:'Financials',revenue:176400,ebitdaReported:null,ebitdaMargin:null,
+   adjItems:[],nwcPct:null,cfRatio:null,accrualRatio:null,isBank:true},
+
+  {name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',sector:'Financials',revenue:98200,ebitdaReported:null,ebitdaMargin:null,
+   adjItems:[],nwcPct:null,cfRatio:null,accrualRatio:null,isBank:true},
+
+  {name:'Axis Bank',ticker:'AXISBANK',sector:'Financials',revenue:112300,ebitdaReported:null,ebitdaMargin:null,
+   adjItems:[],nwcPct:null,cfRatio:null,accrualRatio:null,isBank:true},
+
+  {name:'State Bank of India',ticker:'SBIN',sector:'Financials',revenue:328100,ebitdaReported:null,ebitdaMargin:null,
+   adjItems:[],nwcPct:null,cfRatio:null,accrualRatio:null,isBank:true},
+
+  {name:'Reliance Industries',ticker:'RELIANCE',sector:'Energy',revenue:964710,ebitdaReported:175800,ebitdaMargin:18.2,
+   adjItems:[
+     {label:'Retail mark-to-market inventory gain',amount:-2800,type:'one-time',note:'Crude oil inventory revaluation; non-recurring'},
+     {label:'O2C restructuring costs',amount:1200,type:'one-time',note:'Refining division reorganisation'},
+     {label:'Pro-forma Jio Platforms full-year',amount:-3500,type:'pro-forma',note:'Annualise partial-year digital platform EBITDA'}
+   ],nwcPct:12.8,cfRatio:0.82,accrualRatio:0.08},
+
+  {name:'ONGC',ticker:'ONGC',sector:'Energy',revenue:139234,ebitdaReported:52800,ebitdaMargin:37.9,
+   adjItems:[
+     {label:'Windfall tax one-time hit',amount:4200,type:'one-time',note:'Govt windfall levy; extraordinary'},
+     {label:'Subsidy burden true-up',amount:1800,type:'one-time',note:'Retrospective LPG subsidy adjustment'}
+   ],nwcPct:15.2,cfRatio:0.79,accrualRatio:0.11},
+
+  {name:'BPCL',ticker:'BPCL',sector:'Energy',revenue:466440,ebitdaReported:18900,ebitdaMargin:4.1,
+   adjItems:[
+     {label:'Inventory valuation loss',amount:2200,type:'one-time',note:'Crude price fall; unrealised inventory loss'},
+     {label:'Retail fuel margin subsidy normalisation',amount:-1500,type:'run-rate',note:'Annualise restoration of marketing margins'}
+   ],nwcPct:18.4,cfRatio:0.71,accrualRatio:0.14},
+
+  {name:'Coal India',ticker:'COALINDIA',sector:'Energy',revenue:147558,ebitdaReported:40200,ebitdaMargin:27.2,
+   adjItems:[
+     {label:'Mine closure provisioning (accelerated)',amount:1200,type:'one-time',note:'Provision pulled forward; timing only'},
+     {label:'SECL wage revision arrears',amount:950,type:'one-time',note:'Retrospective wage settlement'},
+   ],nwcPct:10.1,cfRatio:0.88,accrualRatio:0.06},
+
+  {name:'NTPC',ticker:'NTPC',sector:'Energy',revenue:168640,ebitdaReported:51200,ebitdaMargin:30.4,
+   adjItems:[
+     {label:'Stranded asset write-off (old plants)',amount:2100,type:'one-time',note:'Retirement of 40-year thermal units'},
+     {label:'Renewable capacity pro-forma EBITDA',amount:-1800,type:'pro-forma',note:'Annualise H2 solar commissioning'}
+   ],nwcPct:22.5,cfRatio:0.76,accrualRatio:0.13},
+
+  {name:'Tata Motors',ticker:'TATAMOTORS',sector:'Auto',revenue:437928,ebitdaReported:61400,ebitdaMargin:14.0,
+   adjItems:[
+     {label:'EV investment expensed (R&D)',amount:3200,type:'one-time',note:'Jaguar EV platform; partly capitalised going forward'},
+     {label:'China JV impairment',amount:1800,type:'one-time',note:'JLR-Chery JV write-down'},
+     {label:'UK pension past-service cost',amount:1400,type:'one-time',note:'Defined benefit actuarial catch-up'}
+   ],nwcPct:16.3,cfRatio:0.80,accrualRatio:0.10},
+
+  {name:'Maruti Suzuki',ticker:'MARUTI',sector:'Auto',revenue:132168,ebitdaReported:18200,ebitdaMargin:13.8,
+   adjItems:[
+     {label:'Gujarat facility ramp-up costs',amount:820,type:'one-time',note:'Pre-production startup costs; non-recurring'},
+     {label:'Supply chain premium freight costs',amount:560,type:'one-time',note:'Semiconductor shortage logistics; one-time'}
+   ],nwcPct:7.5,cfRatio:0.91,accrualRatio:0.04},
+
+  {name:'Bajaj Auto',ticker:'BAJAJAUTO',sector:'Auto',revenue:41862,ebitdaReported:8160,ebitdaMargin:19.5,
+   adjItems:[
+     {label:'Investment income reclass',amount:-450,type:'one-time',note:'Dividend from subsidiary; exclude from operating EBITDA'},
+     {label:'EV subsidisation cost',amount:320,type:'one-time',note:'Chetak launch subsidy to dealers'}
+   ],nwcPct:6.8,cfRatio:0.93,accrualRatio:0.03},
+
+  {name:'Hero MotoCorp',ticker:'HEROMOTOCO',sector:'Auto',revenue:36682,ebitdaReported:5960,ebitdaMargin:16.2,
+   adjItems:[
+     {label:'R&D write-off (discontinued platform)',amount:420,type:'one-time',note:'Abandoned combustion platform costs'},
+     {label:'Run-rate commodity savings',amount:-280,type:'run-rate',note:'Annualise steel/aluminium contract reset'}
+   ],nwcPct:8.2,cfRatio:0.89,accrualRatio:0.05},
+
+  {name:'Mahindra & Mahindra',ticker:'M_M',sector:'Auto',revenue:97120,ebitdaReported:15200,ebitdaMargin:15.7,
+   adjItems:[
+     {label:'Farm equipment restructuring',amount:680,type:'one-time',note:'Swaraj division product line exit'},
+     {label:'Auto sub-brand discontinuation costs',amount:350,type:'one-time',note:'Ssangyong exit-related expenses'},
+     {label:'Pro-forma SUV run-rate EBITDA',amount:-900,type:'pro-forma',note:'Annualise full year of XUV 3XO ramp-up'}
+   ],nwcPct:11.4,cfRatio:0.85,accrualRatio:0.07},
+
+  {name:'Larsen & Toubro',ticker:'LT',sector:'Industrials',revenue:221060,ebitdaReported:27500,ebitdaMargin:12.4,
+   adjItems:[
+     {label:'Project cost overruns (legacy orders)',amount:1500,type:'one-time',note:'Pre-pandemic fixed-price order losses'},
+     {label:'IT subsidiary divestiture gain',amount:-2200,type:'one-time',note:'LTIMindtree stake sale gain; exclude'},
+     {label:'Middle East project startup costs',amount:850,type:'one-time',note:'Saudi Aramco project pre-ops; one-time'}
+   ],nwcPct:24.5,cfRatio:0.74,accrualRatio:0.16},
+
+  {name:'Adani Ports',ticker:'ADANIPORTS',sector:'Industrials',revenue:24748,ebitdaReported:14200,ebitdaMargin:57.4,
+   adjItems:[
+     {label:'Myanmar port disposal loss',amount:1800,type:'one-time',note:'Exit from controversial project; extraordinary'},
+     {label:'Pro-forma Gopalpur port integration',amount:-600,type:'pro-forma',note:'Annualise newly acquired port EBITDA'}
+   ],nwcPct:32.1,cfRatio:0.68,accrualRatio:0.18},
+
+  {name:'Power Grid Corp',ticker:'POWERGRID',sector:'Industrials',revenue:45614,ebitdaReported:39200,ebitdaMargin:85.9,
+   adjItems:[
+     {label:'Regulatory true-up income (one-time)',amount:-1200,type:'one-time',note:'CERC tariff true-up; non-recurring'},
+     {label:'Line loss provision (accelerated)',amount:800,type:'one-time',note:'Accelerated transmission loss provision'}
+   ],nwcPct:6.2,cfRatio:0.85,accrualRatio:0.06},
+
+  {name:'Bharat Electronics',ticker:'BEL',sector:'Industrials',revenue:19695,ebitdaReported:4060,ebitdaMargin:20.6,
+   adjItems:[
+     {label:'Defence export one-time order',amount:-380,type:'one-time',note:'Non-recurring large export delivery'},
+     {label:'Run-rate margin improvement (new products)',amount:-250,type:'run-rate',note:'Higher-margin radar product mix shift annualised'}
+   ],nwcPct:28.4,cfRatio:0.72,accrualRatio:0.14},
+
+  {name:'BHEL',ticker:'BHEL',sector:'Industrials',revenue:30486,ebitdaReported:1820,ebitdaMargin:6.0,
+   adjItems:[
+     {label:'Inventory write-down (obsolete stock)',amount:650,type:'one-time',note:'Supercritical boiler inventory; stranded'},
+     {label:'Union wage settlement arrears',amount:480,type:'one-time',note:'Retrospective settlement; catch-up payment'},
+     {label:'Pro-forma green hydrogen order EBITDA',amount:-300,type:'pro-forma',note:'New electrolyser order contribution annualised'}
+   ],nwcPct:42.3,cfRatio:0.58,accrualRatio:0.22}
+];
+
+/* compute derived fields */
+COMPANIES.forEach(c => {
+  if(c.isBank){c.ebitdaNorm=null;c.netAdj=null;c.adjPct=null;c.normMargin=null;return;}
+  c.netAdj = c.adjItems.reduce((s,a)=>s+a.amount,0);
+  c.ebitdaNorm = c.ebitdaReported + c.netAdj;
+  c.adjPct = c.netAdj / c.ebitdaReported * 100;
+  c.normMargin = c.ebitdaNorm / c.revenue * 100;
+});
+
+/* ============================================================
+   TEACHING FACTS
+============================================================ */
+const TEACH_FACTS = [
+  {q:'Why build an EBITDA bridge at all?',a:'Reported EBITDA under IndAS/IFRS includes items that will not recur next year. If you price a deal at 10× reported EBITDA and ₹500 Cr of that is a one-time reversal, you\'ve overpaid by ₹5,000 Cr. The bridge forces every adjustment into the open where it can be negotiated.'},
+  {q:'What is a "one-time" adjustment vs. "run-rate"?',a:'One-time items are genuinely non-recurring: restructuring charges, legal settlements, asset write-downs, severance. Run-rate adjustments annualise benefits that started mid-year — e.g. a cost-saving initiative that started in October should be reflected as a full 12-month impact in normalised EBITDA even if only 6 months show in the P&L.'},
+  {q:'What are management add-backs and should you accept them?',a:'Management teams routinely add back ESOP expense, "non-cash" items, and sometimes even ongoing legal costs. The seller\'s argument: "these don\'t affect cash." The buyer\'s counter: ESOP is a real cost of compensating employees; if you add it back, the multiple you pay gets inflated. Sophisticated buyers scrutinise every add-back.'},
+  {q:'How is an EBITDA bridge negotiated in a deal?',a:'The SPA (Sale and Purchase Agreement) defines what adjustments are permitted. Advisors on both sides submit "Completion Accounts" or agree on a "Locked Box" mechanism. The bridge is attached as a schedule. Disputes end up in expert determination — a process where an independent accountant (usually Big 4) decides contested items.'},
+  {q:'What is pro-forma EBITDA and when is it valid?',a:'Pro-forma adjustments annualise the impact of events that happened during the year — an acquisition, a new factory, a lost customer. They\'re valid when the underlying change is verifiable (e.g., a commissioning certificate for a new plant). Red flag: management using pro-forma to paper over structural problems as "temporary."'}
+];
+
+const LOADING_FACTS = [
+  '"The bridge is where deals are won and lost. Every ₹100 Cr in disputed adjustments moves deal value by ₹800–1,200 Cr at 8–12× EBITDA." — Senior TA Partner',
+  'In India\'s M&A market, the normalised EBITDA is typically 8–18% higher than reported EBITDA — sellers add back more than buyers accept.',
+  'ESOP add-backs are the single most contentious adjustment in Indian IT sector deals.',
+  'The average Big 4 TA engagement in India takes 6–8 weeks and identifies adjustments worth 12–20% of reported EBITDA.'
+];
+
+/* ============================================================
+   STATE
+============================================================ */
+let selectedCo = null;
+let currentSort = {col:'name',dir:1};
+
+/* ============================================================
+   INIT
+============================================================ */
+document.addEventListener('DOMContentLoaded',()=>{
+  buildSectorPills();
+  renderGrid(COMPANIES);
+  renderAllTable(COMPANIES);
+});
+
+function buildSectorPills(){
+  const sectors=[...new Set(COMPANIES.map(c=>c.sector))].sort();
+  const wrap=document.getElementById('sectorPills');
+  const all=document.createElement('button');
+  all.className='sector-pill active';all.textContent='All';
+  all.onclick=()=>{
+    wrap.querySelectorAll('.sector-pill').forEach(p=>p.classList.remove('active'));
+    all.classList.add('active');
+    filterGrid();
+  };
+  wrap.appendChild(all);
+  sectors.forEach(s=>{
+    const b=document.createElement('button');
+    b.className='sector-pill';b.textContent=s;b.dataset.sector=s;
+    b.onclick=()=>{
+      wrap.querySelectorAll('.sector-pill').forEach(p=>p.classList.remove('active'));
+      b.classList.add('active');
+      filterGrid();
+    };
+    wrap.appendChild(b);
+  });
+}
+
+function filterGrid(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const activePill=document.querySelector('.sector-pill.active');
+  const activeSector=activePill?.dataset.sector||null;
+  const filtered=COMPANIES.filter(c=>{
+    const matchQ=!q||c.name.toLowerCase().includes(q)||c.ticker.toLowerCase().includes(q)||c.sector.toLowerCase().includes(q);
+    const matchS=!activeSector||c.sector===activeSector;
+    return matchQ&&matchS;
+  });
+  renderGrid(filtered);
+}
+
+function renderGrid(list){
+  const grid=document.getElementById('companyGrid');
+  grid.innerHTML='';
+  list.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='co-card'+(c===selectedCo?' selected':'');
+    d.innerHTML=`<div class="co-name">${c.name}</div><div style="display:flex;justify-content:space-between;align-items:center;margin-top:.3rem"><span class="co-sector">${c.sector}</span><span class="co-ticker">${c.ticker}</span></div>`;
+    d.addEventListener('click',()=>selectCo(c,d));
+    grid.appendChild(d);
+  });
+}
+
+function selectCo(c,el){
+  document.querySelectorAll('.co-card').forEach(d=>d.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedCo=c;
+  document.getElementById('nextBtn1').disabled=false;
+}
+
+/* ============================================================
+   LOADING SEQUENCE (5s)
+============================================================ */
+function startLoading(){
+  if(!selectedCo)return;
+  showStep(2);
+  document.getElementById('loadingDiv').style.display='block';
+  document.getElementById('ctxDiv').style.display='none';
+  document.getElementById('loadingCompany').textContent=selectedCo.name;
+  const fact=LOADING_FACTS[Math.floor(Math.random()*LOADING_FACTS.length)];
+  document.getElementById('loadingFact').textContent=fact;
+  const steps=[
+    {pct:20,text:'Pulling FY2024 financials…'},
+    {pct:45,text:'Classifying adjustment items…'},
+    {pct:70,text:'Building normalisation bridge…'},
+    {pct:90,text:'Computing adjusted margins…'},
+    {pct:100,text:'Bridge ready.'}
+  ];
+  let i=0;
+  const bar=document.getElementById('loadingBar');
+  const txt=document.getElementById('loadingText');
+  function tick(){
+    if(i>=steps.length){
+      setTimeout(()=>{
+        document.getElementById('loadingDiv').style.display='none';
+        renderCtx();
+        document.getElementById('ctxDiv').style.display='block';
+      },400);
+      return;
+    }
+    bar.style.width=steps[i].pct+'%';
+    txt.textContent=steps[i].text;
+    i++;
+    setTimeout(tick,900);
+  }
+  tick();
+}
+
+/* ============================================================
+   CTX CARD
+============================================================ */
+function renderCtx(){
+  const c=selectedCo;
+  const card=document.getElementById('ctxCard');
+  if(c.isBank){
+    card.innerHTML=`
+      <div class="ctx-header">
+        <div class="ctx-icon">🏦</div>
+        <div><div class="ctx-company">${c.name} <span style="font-size:.75rem;color:var(--muted);font-weight:500">${c.ticker}</span></div>
+        <div class="ctx-sub">${c.sector} · Revenue: ₹${(c.revenue/100).toFixed(0)}Cr NII</div></div>
+      </div>
+      <div class="ctx-chips">
+        <span class="ctx-chip">⚠️ Banks use <strong>NII / NIM</strong> not EBITDA</span>
+        <span class="ctx-chip">Use credit analysis tools for banks</span>
+        <span class="ctx-chip">EBITDA bridge not applicable</span>
+      </div>`;
+  } else {
+    const netAdj=c.adjItems.reduce((s,a)=>s+a.amount,0);
+    const norm=c.ebitdaReported+netAdj;
+    const pct=(netAdj/c.ebitdaReported*100).toFixed(1);
+    card.innerHTML=`
+      <div class="ctx-header">
+        <div class="ctx-icon">📊</div>
+        <div><div class="ctx-company">${c.name} <span style="font-size:.75rem;color:var(--muted);font-weight:500">${c.ticker}</span></div>
+        <div class="ctx-sub">${c.sector} · Revenue ₹${(c.revenue/100).toFixed(0)}Cr · ${c.adjItems.length} adjustment(s)</div></div>
+      </div>
+      <div class="ctx-chips">
+        <span class="ctx-chip">Reported EBITDA: <strong>₹${(c.ebitdaReported/100).toFixed(0)}Cr</strong></span>
+        <span class="ctx-chip">Net adjustments: <strong>${netAdj>=0?'+':''}₹${(netAdj/100).toFixed(0)}Cr (${pct}%)</strong></span>
+        <span class="ctx-chip">Normalised EBITDA: <strong>₹${(norm/100).toFixed(0)}Cr</strong></span>
+        <span class="ctx-chip">Norm margin: <strong>${(norm/c.revenue*100).toFixed(1)}%</strong></span>
+        <span class="ctx-chip">Cash conversion: <strong>${(c.cfRatio*100).toFixed(0)}%</strong></span>
+      </div>`;
+  }
+
+  // Teaching rows
+  const tl=document.getElementById('teachList');
+  tl.innerHTML='';
+  TEACH_FACTS.forEach(f=>{
+    const row=document.createElement('div');row.className='teach-row';
+    row.innerHTML=`<div class="teach-q" onclick="toggleTeach(this)"><span>${f.q}</span><span>▼</span></div><div class="teach-a">${f.a}</div>`;
+    tl.appendChild(row);
+  });
+
+  // Also build bridge
+  renderBridge(c);
+}
+
+function toggleTeach(q){
+  const a=q.nextElementSibling;
+  const wasOpen=a.classList.contains('open');
+  document.querySelectorAll('.teach-a').forEach(el=>el.classList.remove('open'));
+  if(!wasOpen)a.classList.add('open');
+}
+
+/* ============================================================
+   BRIDGE (STEP 3)
+============================================================ */
+function renderBridge(c){
+  const sr=document.getElementById('signalRow');
+  const tbody=document.getElementById('bridgeTbody');
+
+  if(c.isBank){
+    sr.innerHTML=`<div class="signal-card" style="grid-column:1/-1;color:var(--muted);font-size:.9rem;padding:2rem">EBITDA bridge is not applicable to banks and financial companies. Use the <a href="/domains/credit-analysis/calculators/credit-ratios.html" style="color:var(--accent)">Credit Ratios calculator</a> instead.</div>`;
+    tbody.innerHTML='';
+    return;
+  }
+
+  const netAdj=c.adjItems.reduce((s,a)=>s+a.amount,0);
+  const norm=c.ebitdaReported+netAdj;
+  const pct=(netAdj/c.ebitdaReported*100).toFixed(1);
+
+  // Signals
+  const cfLabel=c.cfRatio>=0.90?'Strong':'c.cfRatio>=0.80?\'Moderate\':(\'Weak\')';
+  const acColor=c.accrualRatio<=0.05?'var(--green)':c.accrualRatio<=0.12?'var(--amber)':'var(--red)';
+  sr.innerHTML=`
+    <div class="signal-card">
+      <div class="signal-val" style="color:${netAdj>=0?'var(--red)':'var(--green)'}">${netAdj>=0?'+':''}₹${Math.abs(Math.round(netAdj/100))}Cr</div>
+      <div class="signal-lbl">Net Adjustments</div>
+      <div class="signal-sub">${netAdj>0?'Increases normalised EBITDA':'Decreases normalised EBITDA'}</div>
+    </div>
+    <div class="signal-card">
+      <div class="signal-val" style="color:${Math.abs(parseFloat(pct))>15?'var(--amber)':'var(--green)'}">${netAdj>=0?'+':''}${pct}%</div>
+      <div class="signal-lbl">Adj as % Reported</div>
+      <div class="signal-sub">${Math.abs(parseFloat(pct))>20?'High — scrutinise carefully':Math.abs(parseFloat(pct))>10?'Moderate':'Low — simple bridge'}</div>
+    </div>
+    <div class="signal-card">
+      <div class="signal-val" style="color:${c.cfRatio>=0.88?'var(--green)':c.cfRatio>=0.75?'var(--amber)':'var(--red)'}">${(c.cfRatio*100).toFixed(0)}%</div>
+      <div class="signal-lbl">Cash Conversion</div>
+      <div class="signal-sub">CFO / EBITDA · ${c.cfRatio>=0.88?'High quality':'c.cfRatio>=0.75?\'Moderate\':(\'Low quality earnings\')'}</div>
+    </div>`;
+
+  // Bridge table
+  tbody.innerHTML='';
+  function row(label,amt,type,note,isTotal){
+    const tr=document.createElement('tr');
+    if(isTotal)tr.className='row-total';
+    const typeTag=type?`<span class="adj-tag adj-${type.replace('-','')}">${type}</span>`:'';
+    const valClass=amt>0?'pos':amt<0?'neg':'';
+    const valStr=amt===null?'—':`${amt>=0?'+':''}₹${Math.abs(Math.round(amt/100))}Cr`;
+    const pctStr=amt===null||isTotal?'':((amt/c.ebitdaReported*100).toFixed(1)+'%');
+    tr.innerHTML=`<td>${label}${typeTag}${note?`<div style="font-size:.72rem;color:var(--muted);font-weight:400;margin-top:.15rem">${note}</div>`:''}</td><td style="text-align:right" class="num ${isTotal?'':valClass}">${isTotal?`₹${Math.round(amt/100)}Cr`:valStr}</td><td style="text-align:right;color:var(--muted);font-size:.78rem">${pctStr}</td><td style="text-align:center">${typeTag&&!isTotal?'':''}</td>`;
+    tbody.appendChild(tr);
+  }
+
+  // Reported line
+  const trRep=document.createElement('tr');
+  trRep.innerHTML=`<td><strong>Reported EBITDA (FY2024)</strong></td><td style="text-align:right" class="num">₹${Math.round(c.ebitdaReported/100)}Cr</td><td style="text-align:right;color:var(--muted);font-size:.78rem">${c.ebitdaMargin.toFixed(1)}%</td><td></td>`;
+  tbody.appendChild(trRep);
+
+  // Group adjustments
+  const groupOrder=['one-time','run-rate','pro-forma','mgmt-addback'];
+  const groupLabel={'one-time':'One-Time Items','run-rate':'Run-Rate Adjustments','pro-forma':'Pro-Forma Adjustments','mgmt-addback':'Management Add-Backs'};
+  groupOrder.forEach(g=>{
+    const items=c.adjItems.filter(a=>a.type===g);
+    if(!items.length)return;
+    const gTr=document.createElement('tr');gTr.className='row-group';
+    gTr.innerHTML=`<td colspan="4">${groupLabel[g]}</td>`;
+    tbody.appendChild(gTr);
+    items.forEach(a=>{
+      const tr=document.createElement('tr');
+      const valClass=a.amount>0?'pos':'neg';
+      const pctV=(a.amount/c.ebitdaReported*100).toFixed(1);
+      tr.innerHTML=`<td style="padding-left:1.75rem">${a.label}<div style="font-size:.72rem;color:var(--muted);font-weight:400;margin-top:.1rem">${a.note}</div></td><td style="text-align:right" class="num ${valClass}">${a.amount>=0?'+':''}₹${Math.abs(Math.round(a.amount/100))}Cr</td><td style="text-align:right;color:var(--muted);font-size:.78rem">${pctV}%</td><td style="text-align:center"><span class="adj-tag adj-${g.replace('-','')}">${g}</span></td>`;
+      tbody.appendChild(tr);
+    });
+  });
+
+  // Total
+  const trTot=document.createElement('tr');trTot.className='row-total';
+  trTot.innerHTML=`<td><strong>Normalised EBITDA</strong></td><td style="text-align:right" class="num">₹${Math.round(norm/100)}Cr</td><td style="text-align:right;font-size:.78rem">${(norm/c.revenue*100).toFixed(1)}%</td><td></td>`;
+  tbody.appendChild(trTot);
+}
+
+/* ============================================================
+   ALL COMPANIES TABLE
+============================================================ */
+function renderAllTable(list){
+  const tbody=document.getElementById('coTbody');tbody.innerHTML='';
+  list.forEach(c=>{
+    const tr=document.createElement('tr');
+    if(c.isBank){
+      tr.innerHTML=`<td>${c.name}</td><td style="text-align:right;color:var(--muted)">${c.sector}</td><td colspan="5" style="text-align:center;color:var(--muted);font-size:.78rem">EBITDA bridge not applicable for banks</td>`;
+    } else {
+      const adjPct=c.adjPct;
+      const adjPill=adjPct>15?'pill-neg':adjPct<-5?'pill-pos':'pill-neu';
+      const cfPill=c.cfRatio>=0.88?'pill-pos':c.cfRatio>=0.75?'pill-neu':'pill-neg';
+      tr.innerHTML=`
+        <td>${c.name}</td>
+        <td style="text-align:right;color:var(--muted)">${c.sector}</td>
+        <td style="text-align:right" class="num">₹${Math.round(c.ebitdaReported/100)}Cr</td>
+        <td style="text-align:right" class="num ${c.netAdj>=0?'pos':'neg'}">${c.netAdj>=0?'+':''}₹${Math.abs(Math.round(c.netAdj/100))}Cr</td>
+        <td style="text-align:right" class="num">₹${Math.round(c.ebitdaNorm/100)}Cr</td>
+        <td style="text-align:right"><span class="pill-sm ${adjPill}">${adjPct>=0?'+':''}${adjPct.toFixed(1)}%</span></td>
+        <td style="text-align:right"><span class="pill-sm ${cfPill}">${(c.normMargin).toFixed(1)}%</span></td>`;
+    }
+    tbody.appendChild(tr);
+  });
+}
+
+function sortTable(col,btn){
+  if(btn){
+    document.querySelectorAll('.sort-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  if(currentSort.col===col)currentSort.dir*=-1;
+  else{currentSort.col=col;currentSort.dir=1;}
+  const sorted=[...COMPANIES].sort((a,b)=>{
+    if(a[col]==null&&b[col]==null)return 0;
+    if(a[col]==null)return 1;
+    if(b[col]==null)return -1;
+    return (a[col]<b[col]?-1:1)*currentSort.dir;
+  });
+  renderAllTable(sorted);
+}
+
+/* ============================================================
+   STEPPER NAVIGATION
+============================================================ */
+function showStep(n){
+  [1,2,3,4].forEach(i=>{
+    document.getElementById('step'+i).classList.toggle('active',i===n);
+    const dot=document.getElementById('dot'+i);
+    dot.classList.remove('active','done');
+    if(i===n)dot.classList.add('active');
+    else if(i<n)dot.classList.add('done');
+    const lbl=document.getElementById('lbl'+i);
+    lbl.classList.toggle('active',i===n);
+    if(i<n){const line=document.getElementById('line'+i+(i+1));if(line)line.classList.add('done');}
+    else{const line=document.getElementById('line'+i+(i+1));if(line)line.classList.remove('done');}
+  });
+  if(n===2&&selectedCo){}  // loading handles itself
+}
+</script>
+</body>
+</html>
