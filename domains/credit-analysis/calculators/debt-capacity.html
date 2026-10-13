@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Debt Capacity Model | ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--teal:#0d9488;--accent:#2563eb;--accent-bg:#eff6ff;--accent-border:#bfdbfe}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;gap:16px;position:sticky;top:0;background:var(--bg);z-index:100}
+.nav-logo{font-weight:800;font-size:15px;letter-spacing:-.3px}.nav-logo span{color:var(--blue)}
+.nav-sep{color:var(--border);font-size:18px}
+.nav-crumb{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}.nav-crumb a:hover{color:var(--text)}.nav-crumb .sep{color:var(--border)}
+.nav-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.btn-sm{font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg);cursor:pointer;transition:all .15s}.btn-sm:hover{background:var(--card)}
+.btn-pro{background:var(--text);color:#fff;border-color:var(--text)}.btn-pro:hover{background:#333;border-color:#333}
+
+/* Progress stepper */
+.stepper{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:0;max-width:860px;margin:0 auto;width:100%}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--muted);background:var(--bg);flex-shrink:0;transition:all .2s}
+.step-dot.active{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+.step-dot.done{border-color:var(--accent);background:var(--accent);color:#fff}
+.step-label{font-size:11px;color:var(--muted);margin-left:6px;white-space:nowrap}
+.step-label.active{color:var(--accent);font-weight:600}
+.step-line{flex:1;height:1px;background:var(--border);margin:0 8px}
+.step-line.done{background:var(--accent)}
+
+/* Steps */
+.step{padding:32px 24px;max-width:860px;margin:0 auto}
+.step.hidden{display:none}
+.step-header{margin-bottom:24px}
+.step-num{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.step-title{font-size:22px;font-weight:900;letter-spacing:-.3px;margin-bottom:6px}
+.step-sub{font-size:14px;color:var(--muted)}
+
+/* Step 1 - company grid */
+.toolbar1{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.search-box{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:8px;padding:8px 12px;background:var(--bg);min-width:200px}
+.search-box input{border:none;outline:none;font-size:13px;width:100%;font-family:'Inter',sans-serif}
+.chip{font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--bg);cursor:pointer;transition:all .12s;white-space:nowrap}
+.chip.active{background:var(--text);color:#fff;border-color:var(--text)}
+.co-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:8px;margin-bottom:24px}
+.co-card{border:1px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;transition:all .15s}
+.co-card:hover{border-color:var(--accent);background:var(--accent-bg)}
+.co-card.selected{border-color:var(--accent);background:var(--accent-bg);box-shadow:0 0 0 2px var(--accent)}
+.co-name{font-size:12px;font-weight:700;margin-bottom:2px}
+.co-ticker{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted)}
+.co-meta{display:flex;gap:8px;margin-top:6px}
+.co-stat{font-size:10px;color:var(--muted)}.co-stat span{font-weight:700;color:var(--text)}
+.btn-next{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:#fff;font-size:13px;font-weight:700;padding:11px 24px;border-radius:8px;border:none;cursor:pointer;transition:opacity .15s}
+.btn-next:hover{opacity:.85}
+.btn-next:disabled{opacity:.35;cursor:not-allowed}
+.btn-back{display:inline-flex;align-items:center;gap:8px;background:var(--bg);color:var(--text);font-size:13px;font-weight:700;padding:11px 24px;border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:all .15s;margin-right:8px}
+.btn-back:hover{background:var(--card)}
+
+/* Step 2 - context card */
+.ctx-card{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:12px;padding:24px;margin-bottom:20px}
+.ctx-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:16px}
+.ctx-icon{font-size:28px;flex-shrink:0}
+.ctx-co{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);margin-bottom:3px}
+.ctx-name{font-size:18px;font-weight:900;letter-spacing:-.2px}
+.bench-box{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-top:12px}
+.bench-item{background:#fff;border:1px solid var(--accent-border);border-radius:8px;padding:10px 12px}
+.bench-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px}
+.bench-val{font-size:14px;font-weight:800;color:var(--accent)}
+.bench-note{font-size:10px;color:var(--muted);margin-top:2px}
+
+.teach-rows{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.teach-row{border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+.teach-row-title{font-size:12px;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.teach-row-body{font-size:12px;color:var(--muted);line-height:1.6}
+
+/* Step 3/4 Pro gate */
+.pro-gate{border:2px dashed var(--border);border-radius:12px;padding:32px;text-align:center;margin-bottom:24px}
+.pro-gate-icon{font-size:32px;margin-bottom:12px}
+.pro-gate-title{font-size:16px;font-weight:800;margin-bottom:6px}
+.pro-gate-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.pro-features{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px}
+.pro-pill{font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;background:var(--card);border:1px solid var(--border)}
+.btn-unlock{display:inline-flex;align-items:center;gap:8px;background:var(--text);color:#fff;font-size:13px;font-weight:700;padding:12px 28px;border-radius:8px;border:none;cursor:pointer;transition:opacity .15s}
+.btn-unlock:hover{opacity:.85}
+
+footer{border-top:1px solid var(--border);padding:20px 24px;max-width:860px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-left{font-size:12px;color:var(--muted)}.footer-left strong{color:var(--text)}
+.footer-links{display:flex;gap:16px}.footer-links a{font-size:12px;color:var(--muted)}.footer-links a:hover{color:var(--text)}
+@media(max-width:600px){.co-grid{grid-template-columns:1fr 1fr}.bench-box{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo">Valuation<span>Desk</span></div>
+  <span class="nav-sep">/</span>
+  <div class="nav-crumb">
+    <a href="/">Home</a><span class="sep">/</span>
+    <a href="../">Credit Analysis</a><span class="sep">/</span>
+    <span>Debt Capacity</span>
+  </div>
+  <div class="nav-actions">
+    <button class="btn-sm btn-pro" onclick="unlockPro()">Unlock Pro — ₹799/mo</button>
+  </div>
+</nav>
+
+<div class="stepper">
+  <div class="step-dot active" id="dot1">1</div>
+  <div class="step-label active" id="lbl1">Pick Stock</div>
+  <div class="step-line" id="line1"></div>
+  <div class="step-dot" id="dot2">2</div>
+  <div class="step-label" id="lbl2">Understand</div>
+  <div class="step-line" id="line2"></div>
+  <div class="step-dot" id="dot3">3</div>
+  <div class="step-label" id="lbl3">Capacity Model</div>
+  <div class="step-line" id="line3"></div>
+  <div class="step-dot" id="dot4">4</div>
+  <div class="step-label" id="lbl4">Output</div>
+</div>
+
+<!-- STEP 1 -->
+<div class="step" id="step1">
+  <div class="step-header">
+    <div class="step-num">Step 1 of 4</div>
+    <div class="step-title">Pick a company to model</div>
+    <div class="step-sub">Select from 30 NSE-listed companies across 6 sectors</div>
+  </div>
+  <div class="toolbar1">
+    <div class="search-box">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="searchBox" placeholder="Search…" oninput="renderGrid()">
+    </div>
+    <button class="chip active" onclick="setSector('All',this)">All</button>
+    <button class="chip" onclick="setSector('Financials',this)">Financials</button>
+    <button class="chip" onclick="setSector('IT',this)">IT</button>
+    <button class="chip" onclick="setSector('FMCG',this)">FMCG</button>
+    <button class="chip" onclick="setSector('Energy',this)">Energy</button>
+    <button class="chip" onclick="setSector('Auto',this)">Auto</button>
+    <button class="chip" onclick="setSector('Industrials',this)">Industrials</button>
+  </div>
+  <div class="co-grid" id="coGrid"></div>
+  <button class="btn-next" id="nextBtn1" onclick="showStep(2)" disabled>Next: Understand Context →</button>
+</div>
+
+<!-- STEP 2 -->
+<div class="step hidden" id="step2">
+  <div class="step-header">
+    <div class="step-num">Step 2 of 4</div>
+    <div class="step-title">Credit context for this company</div>
+    <div class="step-sub">Understand sector leverage norms before building the model</div>
+  </div>
+  <div class="ctx-card" id="ctxCard"></div>
+  <div class="teach-rows">
+    <div class="teach-row">
+      <div class="teach-row-title">🏗️ Why Debt Capacity Matters</div>
+      <div class="teach-row-body">Debt capacity is the maximum debt a company can carry while maintaining its credit rating and ability to service obligations. Too little debt leaves value on the table (tax shield unused). Too much triggers rating downgrades, covenant breaches, and in extreme cases, distress. The sweet spot is sector-dependent.</div>
+    </div>
+    <div class="teach-row">
+      <div class="teach-row-title">📊 EBITDA-Based Leverage Ceiling</div>
+      <div class="teach-row-body">The most common approach: Net Debt / EBITDA tells you how many years of earnings it takes to repay debt. Investment-grade companies in India typically maintain 2–3x. Capital-intensive sectors (utilities, infrastructure) can sustain 4–5x due to stable contracted cash flows. Cyclical sectors (auto, chemicals) must stay below 2x due to earnings volatility.</div>
+    </div>
+    <div class="teach-row">
+      <div class="teach-row-title">💵 FCF Coverage Approach</div>
+      <div class="teach-row-body">A more conservative measure: how many years of Free Cash Flow does it take to repay net debt? FCF-based capacity is lower than EBITDA-based because FCF accounts for capex, working capital changes, and taxes. Rating agencies like CRISIL weigh FCF coverage heavily for investment-grade assessments.</div>
+    </div>
+    <div class="teach-row">
+      <div class="teach-row-title">🏦 Asset-Based Capacity</div>
+      <div class="teach-row-body">For asset-heavy companies (real estate, infrastructure, power), debt capacity is also benchmarked against the asset base. Loan-to-Value (LTV) ratios determine how much a lender will advance against assets. Power Grid with ₹3L Cr of transmission assets can carry far more debt than its EBITDA alone suggests.</div>
+    </div>
+    <div class="teach-row">
+      <div class="teach-row-title">⭐ Rating Agency Perspective</div>
+      <div class="teach-row-body">CRISIL, ICRA, and CARE set their own leverage thresholds per sector. Breaching them triggers a rating review. For Reliance (AAA), Net Debt/EBITDA must stay under 2x. For NTPC (AA+), up to 5x is acceptable. Knowing the agency threshold is the practical upper bound of debt capacity in the Indian market.</div>
+    </div>
+  </div>
+  <div>
+    <button class="btn-back" onclick="showStep(1)">← Back</button>
+    <button class="btn-next" onclick="showStep(3)">Next: Build Capacity Model →</button>
+  </div>
+</div>
+
+<!-- STEP 3 -->
+<div class="step hidden" id="step3">
+  <div class="step-header">
+    <div class="step-num">Step 3 of 4</div>
+    <div class="step-title">Build the Debt Capacity Model</div>
+    <div class="step-sub">Pro feature — unlock to model maximum sustainable leverage</div>
+  </div>
+  <div class="pro-gate">
+    <div class="pro-gate-icon">🔒</div>
+    <div class="pro-gate-title">Build the Debt Capacity Model</div>
+    <div class="pro-gate-sub">Enter EBITDA, FCF, capex, and interest rate assumptions to compute the leverage ceiling</div>
+    <div class="pro-features">
+      <span class="pro-pill">EBITDA-based ceiling</span>
+      <span class="pro-pill">FCF-based ceiling</span>
+      <span class="pro-pill">Interest rate sensitivity</span>
+      <span class="pro-pill">Rating agency thresholds</span>
+      <span class="pro-pill">Optimal D/E target</span>
+    </div>
+    <button class="btn-unlock" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+  </div>
+  <div>
+    <button class="btn-back" onclick="showStep(2)">← Back</button>
+    <button class="btn-next" onclick="showStep(4)">See Output →</button>
+  </div>
+</div>
+
+<!-- STEP 4 -->
+<div class="step hidden" id="step4">
+  <div class="step-header">
+    <div class="step-num">Step 4 of 4</div>
+    <div class="step-title">Debt Capacity Output</div>
+    <div class="step-sub">Pro feature — unlock to see the full capacity analysis</div>
+  </div>
+  <div class="pro-gate">
+    <div class="pro-gate-icon">🔒</div>
+    <div class="pro-gate-title">Debt Capacity Output</div>
+    <div class="pro-gate-sub">Maximum debt under each method, headroom from current leverage, and optimal target</div>
+    <div class="pro-features">
+      <span class="pro-pill">Max debt — EBITDA method</span>
+      <span class="pro-pill">Max debt — FCF method</span>
+      <span class="pro-pill">Current leverage vs ceiling</span>
+      <span class="pro-pill">Headroom / excess capacity</span>
+      <span class="pro-pill">Credit rating implication</span>
+    </div>
+    <button class="btn-unlock" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+  </div>
+  <div>
+    <button class="btn-back" onclick="showStep(3)">← Back</button>
+    <button class="btn-next" onclick="location.href='interest-coverage.html'">Next Calculator: Interest Coverage →</button>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-left"><strong>ValuationDesk</strong> · Debt Capacity Model · PRO</div>
+  <div class="footer-links">
+    <a href="./">All Calculators</a>
+    <a href="../learn/">Learn</a>
+    <a href="../">Domain Home</a>
+  </div>
+</footer>
+
+<script>
+const COMPANIES=[
+  {name:'HDFC Bank',ticker:'HDFCBANK',sector:'Financials',de:null,netDebtEbitda:null,icr:null,rating:'AAA',car:19.3,gnpa:1.3},
+  {name:'ICICI Bank',ticker:'ICICIBANK',sector:'Financials',de:null,netDebtEbitda:null,icr:null,rating:'AAA',car:16.8,gnpa:2.2},
+  {name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',sector:'Financials',de:null,netDebtEbitda:null,icr:null,rating:'AAA',car:21.8,gnpa:1.7},
+  {name:'Axis Bank',ticker:'AXISBANK',sector:'Financials',de:null,netDebtEbitda:null,icr:null,rating:'AA+',car:16.6,gnpa:1.6},
+  {name:'State Bank of India',ticker:'SBIN',sector:'Financials',de:null,netDebtEbitda:null,icr:null,rating:'AAA',car:14.9,gnpa:2.4},
+  {name:'TCS',ticker:'TCS',sector:'IT',de:0.0,netDebtEbitda:-1.2,icr:45,rating:'AAA',car:null,gnpa:null},
+  {name:'Infosys',ticker:'INFY',sector:'IT',de:0.0,netDebtEbitda:-0.8,icr:38,rating:'AAA',car:null,gnpa:null},
+  {name:'Wipro',ticker:'WIPRO',sector:'IT',de:0.1,netDebtEbitda:-0.5,icr:22,rating:'AA+',car:null,gnpa:null},
+  {name:'HCL Technologies',ticker:'HCLTECH',sector:'IT',de:0.1,netDebtEbitda:-0.3,icr:28,rating:'AA+',car:null,gnpa:null},
+  {name:'Tech Mahindra',ticker:'TECHM',sector:'IT',de:0.1,netDebtEbitda:0.2,icr:15,rating:'AA',car:null,gnpa:null},
+  {name:'Hindustan Unilever',ticker:'HINDUNILVR',sector:'FMCG',de:0.0,netDebtEbitda:-0.5,icr:50,rating:'AAA',car:null,gnpa:null},
+  {name:'ITC',ticker:'ITC',sector:'FMCG',de:0.0,netDebtEbitda:-1.5,icr:35,rating:'AAA',car:null,gnpa:null},
+  {name:'Nestle India',ticker:'NESTLEIND',sector:'FMCG',de:0.0,netDebtEbitda:-0.2,icr:42,rating:'AAA',car:null,gnpa:null},
+  {name:'Dabur India',ticker:'DABUR',sector:'FMCG',de:0.1,netDebtEbitda:0.1,icr:25,rating:'AA+',car:null,gnpa:null},
+  {name:'Marico',ticker:'MARICO',sector:'FMCG',de:0.1,netDebtEbitda:-0.1,icr:28,rating:'AA+',car:null,gnpa:null},
+  {name:'Reliance Industries',ticker:'RELIANCE',sector:'Energy',de:0.5,netDebtEbitda:1.8,icr:8,rating:'AAA',car:null,gnpa:null},
+  {name:'ONGC',ticker:'ONGC',sector:'Energy',de:0.3,netDebtEbitda:0.8,icr:12,rating:'AAA',car:null,gnpa:null},
+  {name:'BPCL',ticker:'BPCL',sector:'Energy',de:0.8,netDebtEbitda:2.1,icr:5,rating:'AA+',car:null,gnpa:null},
+  {name:'Coal India',ticker:'COALINDIA',sector:'Energy',de:0.0,netDebtEbitda:-2.0,icr:30,rating:'AAA',car:null,gnpa:null},
+  {name:'NTPC',ticker:'NTPC',sector:'Energy',de:1.5,netDebtEbitda:4.2,icr:3.5,rating:'AA+',car:null,gnpa:null},
+  {name:'Tata Motors',ticker:'TATAMOTORS',sector:'Auto',de:1.2,netDebtEbitda:2.8,icr:4.5,rating:'AA',car:null,gnpa:null},
+  {name:'Maruti Suzuki',ticker:'MARUTI',sector:'Auto',de:0.0,netDebtEbitda:-1.2,icr:32,rating:'AAA',car:null,gnpa:null},
+  {name:'Bajaj Auto',ticker:'BAJAJAUTO',sector:'Auto',de:0.0,netDebtEbitda:-1.5,icr:28,rating:'AAA',car:null,gnpa:null},
+  {name:'Hero MotoCorp',ticker:'HEROMOTOCO',sector:'Auto',de:0.0,netDebtEbitda:-0.8,icr:22,rating:'AA+',car:null,gnpa:null},
+  {name:'Mahindra & Mahindra',ticker:'M_M',sector:'Auto',de:0.3,netDebtEbitda:0.5,icr:12,rating:'AA+',car:null,gnpa:null},
+  {name:'Larsen & Toubro',ticker:'LT',sector:'Industrials',de:0.2,netDebtEbitda:0.8,icr:14,rating:'AAA',car:null,gnpa:null},
+  {name:'Adani Ports',ticker:'ADANIPORTS',sector:'Industrials',de:1.1,netDebtEbitda:3.5,icr:4.5,rating:'AA',car:null,gnpa:null},
+  {name:'Power Grid Corp',ticker:'POWERGRID',sector:'Industrials',de:2.1,netDebtEbitda:5.8,icr:3.2,rating:'AA+',car:null,gnpa:null},
+  {name:'Bharat Electronics',ticker:'BEL',sector:'Industrials',de:0.0,netDebtEbitda:-0.8,icr:35,rating:'AAA',car:null,gnpa:null},
+  {name:'BHEL',ticker:'BHEL',sector:'Industrials',de:0.2,netDebtEbitda:1.2,icr:6,rating:'AA',car:null,gnpa:null}
+];
+
+const SECTOR_CONTEXT={
+  'Financials':{maxLeverage:'CAR >15%',debtCeiling:'Regulatory (RBI)',fcfCoverage:'N/A (banks)',sectorNorm:'Capital adequacy, not leverage ratio'},
+  'IT':{maxLeverage:'0.0–0.3x D/E',debtCeiling:'Net Cash preferred',fcfCoverage:'>20x ICR typical',sectorNorm:'Zero-leverage culture; debt only for acquisitions'},
+  'FMCG':{maxLeverage:'0.0–0.5x D/E',debtCeiling:'Net Debt/EBITDA < 1x',fcfCoverage:'>15x ICR typical',sectorNorm:'Premium brands sustain near-zero leverage with high FCF'},
+  'Energy':{maxLeverage:'0.5–2.0x D/E',debtCeiling:'Net Debt/EBITDA < 3x',fcfCoverage:'>5x ICR for AAA',sectorNorm:'Capital-intensive; PSUs benefit from sovereign backing'},
+  'Auto':{maxLeverage:'0.0–1.0x D/E',debtCeiling:'Net Debt/EBITDA < 2x',fcfCoverage:'>8x ICR for AA',sectorNorm:'Cyclical earnings demand conservative leverage; EV capex pressure'},
+  'Industrials':{maxLeverage:'0.2–2.5x D/E',debtCeiling:'Net Debt/EBITDA < 4x',fcfCoverage:'>4x ICR for AA+',sectorNorm:'Infrastructure/power can sustain higher leverage on contracted cash flows'}
+};
+
+let selectedCo=null;
+let activeSector='All';
+
+function setSector(s,el){
+  activeSector=s;
+  document.querySelectorAll('.toolbar1 .chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderGrid();
+}
+
+function renderGrid(){
+  const q=document.getElementById('searchBox').value.toLowerCase();
+  const filtered=COMPANIES.filter(c=>{
+    if(activeSector!=='All'&&c.sector!==activeSector)return false;
+    if(q&&!c.name.toLowerCase().includes(q)&&!c.ticker.toLowerCase().includes(q))return false;
+    return true;
+  });
+  const grid=document.getElementById('coGrid');
+  grid.innerHTML=filtered.map(c=>`
+    <div class="co-card${selectedCo&&selectedCo.ticker===c.ticker?' selected':''}" data-co='${JSON.stringify(c)}'>
+      <div class="co-name">${c.name}</div>
+      <div class="co-ticker">${c.ticker} · ${c.sector}</div>
+      <div class="co-meta">
+        <div class="co-stat">D/E <span>${c.de!==null?c.de+'x':'Bank'}</span></div>
+        <div class="co-stat">ICR <span>${c.icr!==null?c.icr+'x':'Bank'}</span></div>
+      </div>
+    </div>`).join('');
+}
+
+document.getElementById('coGrid').addEventListener('click',function(e){
+  const card=e.target.closest('.co-card[data-co]');
+  if(!card)return;
+  selectedCo=JSON.parse(card.dataset.co);
+  document.getElementById('nextBtn1').disabled=false;
+  renderGrid();
+});
+
+function renderCtx(){
+  const c=selectedCo;
+  const sc=SECTOR_CONTEXT[c.sector];
+  document.getElementById('ctxCard').innerHTML=`
+    <div class="ctx-header">
+      <div class="ctx-icon">💰</div>
+      <div>
+        <div class="ctx-co">${c.sector} · ${c.rating}</div>
+        <div class="ctx-name">${c.name} (${c.ticker})</div>
+      </div>
+    </div>
+    <div class="bench-box" id="benchBox">
+      <div class="bench-item"><div class="bench-label">Max Leverage</div><div class="bench-val">${sc.maxLeverage}</div><div class="bench-note">Sector norm</div></div>
+      <div class="bench-item"><div class="bench-label">Debt Ceiling</div><div class="bench-val">${sc.debtCeiling}</div><div class="bench-note">Rating threshold</div></div>
+      <div class="bench-item"><div class="bench-label">FCF Coverage</div><div class="bench-val">${sc.fcfCoverage}</div><div class="bench-note">Typical floor</div></div>
+      <div class="bench-item"><div class="bench-label">Current D/E</div><div class="bench-val">${c.de!==null?c.de+'x':'Bank (CAR '+c.car+'%)'}</div><div class="bench-note">Vs sector max</div></div>
+    </div>
+    <div style="margin-top:12px;font-size:12px;color:var(--muted);font-style:italic">${sc.sectorNorm}</div>`;
+}
+
+function showStep(n){
+  for(let i=1;i<=4;i++){
+    document.getElementById('step'+i).classList.toggle('hidden',i!==n);
+    const dot=document.getElementById('dot'+i);
+    const lbl=document.getElementById('lbl'+i);
+    dot.classList.remove('active','done');
+    lbl.classList.remove('active');
+    if(i===n){dot.classList.add('active');lbl.classList.add('active');}
+    else if(i<n)dot.classList.add('done');
+    if(i<4){document.getElementById('line'+i).classList.toggle('done',i<n);}
+  }
+  if(n===2)renderCtx();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+renderGrid();
+</script>
+</body>
+</html>

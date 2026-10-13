@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Learn Credit Analysis — ValuationDesk</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
+  --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--teal:#0d9488;
+  --orange:#ea580c;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
+a{color:inherit;text-decoration:none}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);z-index:100}
+.nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-.5px}
+.nav-logo span{color:var(--blue)}
+.nav-links{display:flex;gap:1.5rem;align-items:center;font-size:.875rem;font-weight:500;color:var(--muted)}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{background:var(--text);color:#fff;padding:.45rem 1rem;border-radius:6px;font-size:.8rem;font-weight:600}
+.nav-cta:hover{opacity:.85}
+
+/* HERO */
+.hero{padding:3rem 2rem 2rem;max-width:900px;margin:0 auto;width:100%}
+.breadcrumb{font-size:.8rem;color:var(--muted);margin-bottom:1rem;display:flex;gap:.4rem;align-items:center}
+.breadcrumb a:hover{color:var(--text)}
+.domain-badge{display:inline-flex;align-items:center;gap:.4rem;background:#fff7ed;border:1px solid #fed7aa;color:var(--orange);border-radius:999px;padding:.25rem .75rem;font-size:.75rem;font-weight:700;letter-spacing:.03em;margin-bottom:1rem}
+h1{font-size:clamp(1.8rem,4vw,2.5rem);font-weight:900;letter-spacing:-.03em;line-height:1.1;margin-bottom:.75rem}
+.hero-sub{font-size:1.05rem;color:var(--muted);max-width:600px;margin-bottom:1.5rem}
+.module-count{display:inline-flex;align-items:center;gap:.5rem;font-size:.85rem;color:var(--muted);font-weight:500}
+.module-count strong{color:var(--text)}
+
+/* MODULES GRID */
+.main-content{max-width:900px;margin:0 auto;padding:0 2rem 4rem;width:100%}
+
+.section-label{font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;margin-top:2.5rem}
+
+.modules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem;margin-bottom:2rem}
+
+.module-card{border:1px solid var(--border);border-radius:14px;padding:1.5rem;background:var(--bg);cursor:pointer;transition:box-shadow .18s,border-color .18s;position:relative;overflow:hidden}
+.module-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--mc-bg,#f9fafb) 0%,transparent 60%);pointer-events:none}
+.module-card:hover{box-shadow:0 6px 24px rgba(0,0,0,.08);border-color:var(--mc-color,#e5e5e5)}
+.module-num{font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:700;color:var(--mc-color,var(--muted));margin-bottom:.6rem;letter-spacing:.05em}
+.module-title{font-size:1rem;font-weight:700;margin-bottom:.4rem;line-height:1.3}
+.module-desc{font-size:.82rem;color:var(--muted);line-height:1.55;margin-bottom:1rem}
+.module-pills{display:flex;flex-wrap:wrap;gap:.35rem}
+.module-pill{background:var(--mc-bg,var(--card));border:1px solid var(--mc-border,var(--border));color:var(--mc-color,var(--muted));font-size:.7rem;font-weight:600;padding:.2rem .55rem;border-radius:999px}
+.module-icon{font-size:1.6rem;margin-bottom:.7rem;display:block}
+
+/* ACCORDION / CONCEPT CARDS */
+.concept-section{margin-top:1rem}
+.concept-header{display:flex;align-items:center;justify-content:space-between;padding:1rem 1.25rem;border:1px solid var(--border);border-radius:10px;cursor:pointer;background:var(--card);margin-bottom:.5rem;transition:background .15s}
+.concept-header:hover{background:#f3f4f6}
+.concept-header.open{border-radius:10px 10px 0 0;margin-bottom:0;border-bottom-color:transparent}
+.concept-title{font-weight:700;font-size:.95rem;display:flex;align-items:center;gap:.6rem}
+.concept-body{border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:1.25rem;margin-bottom:.5rem;background:#fff;display:none}
+.concept-body.open{display:block}
+.concept-body p{font-size:.9rem;color:#374151;margin-bottom:.75rem;line-height:1.6}
+.concept-body p:last-child{margin-bottom:0}
+.concept-body ul{padding-left:1.25rem;font-size:.9rem;color:#374151;line-height:1.7}
+.concept-body li{margin-bottom:.35rem}
+.chevron{font-size:.8rem;color:var(--muted);transition:transform .2s}
+.concept-header.open .chevron{transform:rotate(180deg)}
+
+/* FORMULA BOX */
+.formula-box{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:1.25rem 1.5rem;font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.8;margin:1rem 0;overflow-x:auto}
+
+/* GLOSSARY */
+.glossary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.75rem;margin-top:1rem}
+.gloss-card{border:1px solid var(--border);border-radius:10px;padding:.9rem 1rem;background:var(--card)}
+.gloss-term{font-weight:700;font-size:.82rem;margin-bottom:.3rem;color:var(--text)}
+.gloss-def{font-size:.78rem;color:var(--muted);line-height:1.5}
+
+/* CALC LINKS */
+.calc-links{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.75rem;margin-top:1rem}
+.calc-link-card{border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem;background:var(--bg);display:flex;align-items:center;justify-content:space-between;transition:border-color .15s,box-shadow .15s}
+.calc-link-card:hover{border-color:var(--orange);box-shadow:0 3px 12px rgba(0,0,0,.07)}
+.calc-link-left{display:flex;flex-direction:column;gap:.2rem}
+.calc-link-name{font-weight:700;font-size:.875rem}
+.calc-link-tag{font-size:.72rem;color:var(--muted)}
+.calc-arrow{color:var(--muted);font-size:.9rem}
+
+/* KEY RATIOS TABLE */
+.ratio-table{width:100%;border-collapse:collapse;margin-top:1rem;font-size:.85rem}
+.ratio-table th{text-align:left;padding:.6rem .9rem;background:var(--card);border-bottom:2px solid var(--border);font-weight:700;font-size:.78rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.ratio-table td{padding:.7rem .9rem;border-bottom:1px solid var(--border);color:#374151;vertical-align:top}
+.ratio-table tr:last-child td{border-bottom:none}
+.ratio-table tr:hover td{background:#f9fafb}
+.tag{display:inline-block;padding:.15rem .5rem;border-radius:999px;font-size:.7rem;font-weight:700}
+.tag-good{background:#dcfce7;color:#15803d}
+.tag-watch{background:#fef9c3;color:#854d0e}
+.tag-bad{background:#fee2e2;color:#b91c1c}
+
+/* PROGRESS BAR */
+.progress-wrap{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-top:2rem;margin-bottom:1rem}
+.progress-title{font-weight:700;font-size:.95rem;margin-bottom:1rem}
+.progress-items{display:flex;flex-direction:column;gap:.6rem}
+.progress-item{display:flex;align-items:center;gap:.75rem;font-size:.875rem}
+.progress-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.p-done{background:var(--green)}
+.p-next{background:var(--orange)}
+.p-todo{background:var(--border)}
+.progress-label{flex:1;font-weight:600}
+.progress-sub{font-size:.75rem;color:var(--muted)}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-size:.8rem;color:var(--muted);margin-top:auto}
+.footer-nav{display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:.75rem}
+.footer-nav a:hover{color:var(--text)}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  nav{padding:1rem}
+  .nav-links{display:none}
+  .hero{padding:2rem 1rem 1.5rem}
+  .main-content{padding:0 1rem 3rem}
+  h1{font-size:1.7rem}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="/" class="nav-logo">Valuation<span>Desk</span></a>
+  <div class="nav-links">
+    <a href="/domains/">Domains</a>
+    <a href="/domains/credit-analysis/">Credit Analysis</a>
+    <a href="/domains/credit-analysis/calculators/">Calculators</a>
+  </div>
+  <a href="#" class="nav-cta" onclick="unlockPro();return false">Unlock Pro — ₹799/mo →</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="breadcrumb">
+    <a href="/">Home</a> / <a href="/domains/">Domains</a> / <a href="/domains/credit-analysis/">Credit Analysis</a> / Learn
+  </div>
+  <div class="domain-badge">🔐 Domain 08 · Credit Analysis</div>
+  <h1>Learn Credit Analysis</h1>
+  <p class="hero-sub">From leverage ratios to bond pricing — the conceptual foundation every credit analyst needs.</p>
+  <div class="module-count"><strong>4 modules</strong> &nbsp;·&nbsp; 28 concepts &nbsp;·&nbsp; 7 calculators</div>
+</div>
+
+<!-- MAIN -->
+<div class="main-content">
+
+  <!-- MODULE CARDS -->
+  <div class="section-label">Learning Modules</div>
+  <div class="modules-grid">
+
+    <div class="module-card" style="--mc-color:#0d9488;--mc-bg:#f0fdfa;--mc-border:#99f6e4" onclick="scrollTo('mod1')">
+      <span class="module-icon">📐</span>
+      <div class="module-num">MODULE 01</div>
+      <div class="module-title">Intro to Credit Analysis</div>
+      <div class="module-desc">Why creditworthiness matters, the difference between equity and credit analysis, and what lenders look for.</div>
+      <div class="module-pills">
+        <span class="module-pill">Credit vs. Equity</span>
+        <span class="module-pill">5 Cs of Credit</span>
+        <span class="module-pill">Rating Framework</span>
+      </div>
+    </div>
+
+    <div class="module-card" style="--mc-color:#2563eb;--mc-bg:#eff6ff;--mc-border:#bfdbfe" onclick="scrollTo('mod2')">
+      <span class="module-icon">⚖️</span>
+      <div class="module-num">MODULE 02</div>
+      <div class="module-title">Leverage & Debt Capacity</div>
+      <div class="module-desc">How companies borrow, what ratios signal too much debt, and how analysts size sustainable debt loads.</div>
+      <div class="module-pills">
+        <span class="module-pill">D/E Ratio</span>
+        <span class="module-pill">Net Debt/EBITDA</span>
+        <span class="module-pill">ICR</span>
+      </div>
+    </div>
+
+    <div class="module-card" style="--mc-color:#d97706;--mc-bg:#fffbeb;--mc-border:#fde68a" onclick="scrollTo('mod3')">
+      <span class="module-icon">🏅</span>
+      <div class="module-num">MODULE 03</div>
+      <div class="module-title">Credit Scoring & Default Risk</div>
+      <div class="module-desc">How rating agencies score borrowers, what drives upgrades/downgrades, and how to spot distress early.</div>
+      <div class="module-pills">
+        <span class="module-pill">CRISIL Framework</span>
+        <span class="module-pill">Altman Z-Score</span>
+        <span class="module-pill">PD Estimation</span>
+      </div>
+    </div>
+
+    <div class="module-card" style="--mc-color:#4f46e5;--mc-bg:#eef2ff;--mc-border:#c7d2fe" onclick="scrollTo('mod4')">
+      <span class="module-icon">📊</span>
+      <div class="module-num">MODULE 04</div>
+      <div class="module-title">Bond Pricing & Fixed Income</div>
+      <div class="module-desc">How bond prices move with yields, what duration means in practice, and how to find fair value for a bond.</div>
+      <div class="module-pills">
+        <span class="module-pill">YTM</span>
+        <span class="module-pill">Duration</span>
+        <span class="module-pill">Credit Spread</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============================== MODULE 1 ============================== -->
+  <div id="mod1" class="section-label" style="margin-top:3rem">Module 01 — Intro to Credit Analysis</div>
+  <div class="concept-section">
+
+    <div class="concept-header" onclick="toggleConcept(this)">
+      <div class="concept-title">📌 What is Credit Analysis?</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="concept-body">
+      <p>Credit analysis is the process of evaluating a borrower's ability and willingness to repay debt. While equity analysts ask "how much can this company grow?", credit analysts ask "will this company be able to meet its debt obligations?"</p>
+      <p>The job has two outputs: (1) a yes/no lending decision, and (2) a price for the risk (interest rate / credit spread). Both depend on the same underlying analysis.</p>
+      <p>Credit analysis applies to: corporate bonds, bank loans, working capital facilities, equipment financing, and any instrument where the lender's return is capped at coupon but risk is unbounded on the downside.</p>
+    </div>
+
+    <div class="concept-header" onclick="toggleConcept(this)">
+      <div class="concept-title">📌 The 5 Cs of Credit</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="concept-body">
+      <p>The classic framework for credit evaluation uses five dimensions:</p>
+      <ul>
+        <li><strong>Character</strong> — Management track record, governance quality, history of honouring obligations. Hard to quantify, but a red flag here can override everything else.</li>
+        <li><strong>Capacity</strong> — Ability to repay from cash flows. Measured by ICR (EBIT/interest), DSCR (cash flow/debt service), and free cash flow generation.</li>
+        <li><strong>Capital</strong> — Equity cushion — how much loss can the company absorb before lenders lose money? Measured by D/E ratio and net worth.</li>
+        <li><strong>Collateral</strong> — Assets pledged as security. Important for secured lending; determines recovery rate in default scenarios.</li>
+        <li><strong>Conditions</strong> — Macro and industry backdrop — where are we in the credit cycle? Is the sector facing structural headwinds?</li>
+      </ul>
+    </div>
+
+    <div class="concept-header" onclick="toggleConcept(this)">
+      <div class="concept-title">📌 Credit Ratings — How They Work</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="concept-body">
+      <p>Indian credit rating agencies (CRISIL, ICRA, CARE, India Ratings) assign ratings from AAA (highest safety) to D (default). The long-term rating scale:</p>
+      <table class="ratio-table">
+        <thead><tr><th>Rating</th><th>Category</th><th>What It Means</th></tr></thead>
+        <tbody>
+          <tr><td><strong>AAA</strong></td><td><span class="tag tag-good">Highest Safety</span></td><td>Strongest capacity to honour obligations. Very low credit risk.</td></tr>
+          <tr><td><strong>AA</strong></td><td><span class="tag tag-good">High Safety</span></td><td>Very low credit risk, marginally below AAA.</td></tr>
+          <tr><td><strong>A</strong></td><td><span class="tag tag-good">Adequate Safety</span></td><td>Low credit risk but susceptible to adverse economic conditions.</td></tr>
+          <tr><td><strong>BBB</strong></td><td><span class="tag tag-watch">Moderate Safety</span></td><td>Lowest investment-grade. Adequate capacity under normal conditions.</td></tr>
+          <tr><td><strong>BB / B</strong></td><td><span class="tag tag-watch">Speculative</span></td><td>Vulnerable to economic changes; elevated credit risk.</td></tr>
+          <tr><td><strong>C / D</strong></td><td><span class="tag tag-bad">Default</span></td><td>Already in default or on the verge of default.</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:.75rem">Each major category (AA, A, BBB) is further split into + and – modifiers. CRISIL and ICRA use identical scales; ratings are <strong>solicited</strong> (company pays) or <strong>unsolicited</strong>.</p>
+    </div>
+
+    <div class="concept-header" onclick="toggleConcept(this)">
+      <div class="concept-title">📌 Credit vs. Equity Analysis — Key Differences</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="concept-body">
+      <table class="ratio-table">
+        <thead><tr><th>Dimension</th><th>Equity Analysis</th><th>Credit Analysis</th></tr></thead>
+        <tbody>
+          <tr><td>Primary question</td><td>How much will equity grow?</td><td>Will debt be repaid?</td></tr>
+          <tr><td>Return profile</td><td>Unlimited upside</td><td>Capped at coupon</td></tr>
+          <tr><td>Downside focus</td><td>Price decline</td><td>Default / recovery rate</td></tr>
+          <tr><td>Key metrics</td><td>EPS, ROE, P/E</td><td>ICR, D/E, DSCR, GNPA</td></tr>
+          <tr><td>Time horizon</td><td>Long-term growth</td><td>Loan / bond tenure</td></tr>
+          <tr><td>Tail risk</td><td>Market risk</td><td>Credit risk</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="concept-header" onclick="toggleConcept(this)">
+      <div class="concept-title">📌 Bank vs. Corporate Credit Analysis</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="concept-body">
+      <p>Banks are different from corporates and need a separate analytical lens:</p>
+      <ul>
+        <li><strong>Capital Adequacy Ratio (CAR)</strong> — Basel III requires Indian banks to maintain ≥11.5% (including capital conservation buffer). Higher CAR = stronger buffer against losses.</li>
+        <li><strong>GNPA / NNPA</strong> — Gross/Net Non-Performing Assets. A rising GNPA ratio signals deteriorating loan book quality. RBI classifies a loan NPA if overdue beyond 90 days.</li>
+        <li><strong>Net Interest Margin (NIM)</strong> — Spread between lending rate and borrowing cost. Higher NIM = more profitable core business.</li>
+        <li><strong>Provision Coverage Ratio (PCR)</strong> — % of NPAs covered by provisions. Higher is safer; below 60% raises red flags.</li>
+        <li><strong>Liquidity Coverage Ratio (LCR)</strong> — Ability to survive a 30-day stress scenario. Must exceed 100% per RBI rules.</li>
+      </ul>
+      <p>D/E and ICR ratios are not meaningful for banks — use CAR, GNPA, NIM instead.</p>
+    </div>
+
+  </div>
+
+  <!-- ============================== MODULE 2 ============================== -->
+  <div id="mod2" class="section-label" style="margin-top:3rem">Module 02 — Leverage & Debt Capacity</div>
+  <div class="concept-section">
+
+    <div class="concept-header" onclick="toggleConcept(this)">
+      <div class="concept-title">⚖️ Gross Debt vs. Net Debt</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="concept-body">
+      <p><strong>Gross Debt</strong> = All interest-bearing borrowings (short-term + long-term).</p>
+      <p><strong>Net Debt</strong> = Gross Debt − Cash & Cash Equivalents − Short-term Investments.</p>
+      <p>Net Debt better reflects economic leverage because a company with ₹1,000 Cr debt and ₹900 Cr cash has virtually no leverage. IT companies like TCS / Infosys are "net cash" — negative net debt — because their cash exceeds borrowings.</p>
+      <p>Use <strong>Gross Debt</strong> when analysing refinancing risk (can they roll over debt?) and <strong>Net Debt</strong> for leverage comparisons (how much is really owed?)</p>
+    </div>
+
+    <div class="concept-header" onclick="toggleConcept(this)">
+      <div class="concept-title">⚖️ D/E Ratio — What Levels Signal Risk</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="concept-body">
+      <p>Debt-to-Equity = Total Debt / Total Equity (book value). Indicates how much of the business is financed by debt vs. shareholder funds.</p>
+      <table class="ratio-table">
+        <thead><tr><th>D/E Level</th><th>Signal</th><th>Typical Sectors</th></tr></thead>
+        <tbody>
+          <tr><td>0.0 – 0.3</td><td><span class="tag tag-good">Conservative</span></td><td>IT, FMCG, cash-generative consumer</td></tr>
+          <tr><td>0.3 – 1.0</td><td><span class="tag tag-good">Moderate</span></td><td>Pharma, auto, diversified industrials</td></tr>
+          <tr><td>1.0 – 2.5</td><td><span class="tag tag-watch">Elevated</span></td><td>Infra, utilities, capital-intensive</td></tr>
+          <tr><td>> 2.5</td><td><span class="tag tag-bad">Stress Risk</span></td><td>Real estate, deeply stressed sectors</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:.75rem">Always benchmark D/E to sector peers — a D/E of 2.0x is normal for power utilities (NTPC, Power Grid) but alarming for an FMCG company.</p>
+    </div>
+
+    <div class="concept-header" onclick="toggleConcept(this)">
+      <div class="concept-title">⚖️ Net Debt / EBITDA — The Analyst's Favourite Metric</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="concept-body">
+      <p>Net Debt / EBITDA shows how many years of operating earnings it takes to repay net debt. It's the most widely used leverage metric by rating agencies and leveraged finance desks.</p>
+      <ul>
+        <li><strong>< 1.5x</strong> — Low leverage; strong capacity for additional debt</li>
+        <li><strong>1.5x – 3.5x</strong> — Moderate; acceptable for most investment-grade corporates</li>
+        <li><strong>3.5x – 5x</strong> — Elevated; typically sub-investment grade territory</li>
+        <li><strong>> 5x</strong> — High stress; covenant breach risk in leveraged buyouts</li>
+        <li><strong>Negative</strong> — Net cash company; TCS, Infosys, FMCG majors</li>
+      </ul>
+      <p>EBITDA is used instead of EBIT to proxy cash generation before capex — it's not perfect (ignores capex) but allows cross-sector comparison.</p>
+    </div>
+
+    <div class="concept-header" onclick="toggleConcept(this)">
+      <div class="concept-title">⚖️ Interest Coverage Ratio (ICR)</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="concept-body">
+      <p>ICR = EBIT / Interest Expense. Measures how many times operating profit covers interest cost. Below 1x = company cannot pay interest from operations.</p>
+      <div class="formula-box">ICR (EBIT-based)  = EBIT / Interest Expense
+ICR (EBITDA-based) = EBITDA / Interest Expense
+DSCR               = (EBITDA − Capex) / (Interest + Principal)</div>
+      <p>RBI's CRILC database flags companies as stressed when ICR drops below 1x consecutively. Rating agencies typically expect:</p>
+      <ul>
+        <li>AAA: ICR > 20x | AA: ICR > 10x | A: ICR > 5x | BBB: ICR > 2.5x</li>
+      </ul>
+      <p>Rising interest rates compress ICR for floating-rate borrowers — a 200bps rate shock on Reliance Industries' debt load meaningfully changes coverage calculations.</p>
+    </div>
+
+    <div class="concept-header" onclick="toggleConcept(this)">
+      <div class="concept-title">⚖️ Optimal Capital Structure & Tax Shield</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="concept-body">
+      <p>Modigliani-Miller (with taxes) shows debt creates value through the <strong>interest tax shield</strong> — interest is deductible, reducing taxable income. A company paying ₹100 Cr interest at 30% tax saves ₹30 Cr in tax vs. an all-equity firm.</p>
+      <p>But excessive debt raises <strong>financial distress costs</strong>: customers avoid you, suppliers tighten terms, and management time shifts to crisis management. The optimal D/E balances these two forces.</p>
+      <p>In practice, companies target a leverage level consistent with their desired credit rating — typically investment grade (BBB or above). That rating determines their borrowing cost, which feeds back into the capital structure decision.</p>
+    </div>
+
+  </div>
+
+  <!-- ============================== MODULE 3 ============================== -->
+  <div id="mod3" class="section-label" style="margin-top:3rem">Module 03 — Credit Scoring & Default Risk</div>
+  <div class="concept-section">
+
+    <div class="concept-header" onclick="toggleConcept(this)">
+      <div class="concept-title">🏅 How CRISIL Scores a Company</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="concept-body">
+      <p>CRISIL (and other Indian rating agencies) evaluate five dimensions, each scored 1–5 (1 = strongest):</p>
+      <ul>
+        <li><strong>Business Risk (30%)</strong> — Industry risk profile, market position, operational efficiency, scale</li>
+        <li><strong>Financial Risk (40%)</strong> — Five financial ratios: leverage, coverage, profitability, liquidity, cash flow adequacy</li>
+        <li><strong>Management Quality (15%)</strong> — Track record, governance, succession planning, related-party discipline</li>
+        <li><strong>Industry Position (10%)</strong> — Market share, pricing power, barriers to entry</li>
+        <li><strong>Liquidity (5%)</strong> — Current ratio, cash on hand, unutilised credit lines</li>
+      </ul>
+      <p>The composite score maps to a rating band. A company scoring 85/100 would typically fall in the AA to AAA band. Notch-level decisions (AA vs. AA+) involve qualitative overlays.</p>
+    </div>
+
+    <div class="concept-header" onclick="toggleConcept(this)">
+      <div class="concept-title">🏅 The Altman Z-Score</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="concept-body">
+      <p>Edward Altman's 1968 model combines five financial ratios into a single distress score. It was calibrated on US manufacturing firms but remains widely used as a screening tool.</p>
+      <div class="formula-box">Z = 1.2×X1 + 1.4×X2 + 3.3×X3 + 0.6×X4 + 1.0×X5
+
+X1 = Working Capital / Total Assets        (liquidity)
+X2 = Retained Earnings / Total Assets     (cumulative profitability)
+X3 = EBIT / Total Assets                  (return on assets)
+X4 = Market Value Equity / Total Liabilities (leverage)
+X5 = Revenue / Total Assets               (asset utilisation)</div>
+      <table class="ratio-table" style="margin-top:.75rem">
+        <thead><tr><th>Z-Score</th><th>Zone</th><th>Interpretation</th></tr></thead>
+        <tbody>
+          <tr><td>> 2.99</td><td><span class="tag tag-good">Safe Zone</span></td><td>Low distress probability</td></tr>
+          <tr><td>1.81 – 2.99</td><td><span class="tag tag-watch">Grey Zone</span></td><td>Elevated risk; monitor closely</td></tr>
+          <tr><td>< 1.81</td><td><span class="tag tag-bad">Distress Zone</span></td><td>High bankruptcy probability</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:.75rem">For non-manufacturing and banks, Altman developed Z'-Score (private) and Z''-Score (emerging markets). For Indian banks, use CAR + GNPA analysis instead.</p>
+    </div>
+
+    <div class="concept-header" onclick="toggleConcept(this)">
+      <div class="concept-title">🏅 What Drives Rating Upgrades & Downgrades</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="concept-body">
+      <p><strong>Common upgrade triggers:</strong></p>
+      <ul>
+        <li>Sustained ICR improvement (e.g. from 4x to 8x) over 2+ years</li>
+        <li>Significant debt repayment reducing leverage by 1+ turns</li>
+        <li>Rating agency gaining confidence in management after a change</li>
+        <li>Industry tailwind improving pricing power and margins</li>
+      </ul>
+      <p><strong>Common downgrade triggers:</strong></p>
+      <ul>
+        <li>Capex-driven debt surge without proportional EBITDA growth</li>
+        <li>Large acquisition at high leverage — "event risk"</li>
+        <li>ICR falling below covenant levels (2x–3x is typical threshold)</li>
+        <li>Management change with uncertain credit culture</li>
+        <li>Regulatory action, litigation, or fraud</li>
+      </ul>
+      <p>Rating actions typically <strong>lag</strong> financial deterioration — the market often prices in a downgrade 3–6 months before the official announcement via a widening credit spread.</p>
+    </div>
+
+    <div class="concept-header" onclick="toggleConcept(this)">
+      <div class="concept-title">🏅 IBC / NCLT — The Indian Default Resolution Process</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="concept-body">
+      <p>The Insolvency and Bankruptcy Code (IBC) 2016 created a time-bound resolution framework for Indian companies. Key features:</p>
+      <ul>
+        <li><strong>Trigger</strong> — Default of ₹1 Cr+ can trigger admission to NCLT by financial creditor, operational creditor, or the company itself</li>
+        <li><strong>CIRP</strong> — Corporate Insolvency Resolution Process. IRP (Interim Resolution Professional) takes over management within 7 days of admission</li>
+        <li><strong>270-day timeline</strong> — Resolution plan must be approved by Committee of Creditors (CoC) within 270 days; extensions possible</li>
+        <li><strong>Liquidation</strong> — If no resolution plan approved, company goes to liquidation. Recovery rates: secured financial creditors first, then unsecured, then equity</li>
+        <li><strong>Haircuts</strong> — Creditors in large IBC cases (Essar, Bhushan, Jet) have taken 50–80% haircuts. Highlights importance of secured lending and collateral quality</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <!-- ============================== MODULE 4 ============================== -->
+  <div id="mod4" class="section-label" style="margin-top:3rem">Module 04 — Bond Pricing & Fixed Income</div>
+  <div class="concept-section">
+
+    <div class="concept-header" onclick="toggleConcept(this)">
+      <div class="concept-title">📊 The Bond Pricing Formula</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="concept-body">
+      <p>A bond's price is the present value of all future cash flows — periodic coupons plus face value at maturity — discounted at the yield to maturity (YTM).</p>
+      <div class="formula-box">P = Σ [C / (1+y)^t] + [F / (1+y)^n]
+
+C = Coupon payment = Face × Annual Coupon Rate / Frequency
+y = Periodic YTM = Annual YTM / Frequency
+F = Face value (₹100 or ₹1,000 for Indian bonds)
+n = Total periods to maturity (years × frequency)</div>
+      <p>When market YTM rises above coupon rate → bond trades at <strong>discount</strong>. When YTM falls below coupon rate → bond trades at <strong>premium</strong>. At maturity, price always converges to face value.</p>
+    </div>
+
+    <div class="concept-header" onclick="toggleConcept(this)">
+      <div class="concept-title">📊 YTM vs. Current Yield vs. Coupon Rate</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="concept-body">
+      <p>Three yield measures, each capturing something different:</p>
+      <ul>
+        <li><strong>Coupon Rate</strong> — Stated rate on face value. Fixed at issuance. A 7.5% coupon on ₹1,000 face pays ₹75/year.</li>
+        <li><strong>Current Yield</strong> = Annual Coupon / Market Price. If same bond trades at ₹950, current yield = ₹75/₹950 = 7.89%. Ignores capital gain/loss at maturity.</li>
+        <li><strong>YTM (Yield to Maturity)</strong> = IRR of all cash flows assuming bond held to maturity. The most complete measure. Accounts for price discount/premium amortising to par.</li>
+      </ul>
+      <p>For a discount bond: YTM > Current Yield > Coupon Rate. For a premium bond: Coupon Rate > Current Yield > YTM. At par: all three are equal.</p>
+    </div>
+
+    <div class="concept-header" onclick="toggleConcept(this)">
+      <div class="concept-title">📊 Duration — Measuring Interest Rate Sensitivity</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="concept-body">
+      <p><strong>Macaulay Duration</strong> = Weighted average time to receive cash flows (in years). A 10-year bond with 7% coupon might have duration of 7.5 years.</p>
+      <p><strong>Modified Duration</strong> = Macaulay Duration / (1 + y/m). The % price change for a 1% (100bps) change in yield.</p>
+      <div class="formula-box">ΔP/P ≈ −Modified Duration × Δy
+
+Example: Modified Duration = 6.5 years, yield rises 100bps
+Price change ≈ −6.5% × 1% = −6.5%</div>
+      <p><strong>Convexity</strong> adds precision — duration underestimates price rise when yields fall and overestimates price fall when yields rise. High convexity is valuable to bond holders.</p>
+      <p>Key relationships: Zero-coupon bonds have the highest duration (= maturity). Higher coupon → lower duration. Longer maturity → higher duration.</p>
+    </div>
+
+    <div class="concept-header" onclick="toggleConcept(this)">
+      <div class="concept-title">📊 Credit Spread — Pricing the Risk Premium</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="concept-body">
+      <p>Credit spread = Bond YTM − G-Sec (government security) yield of same maturity. It represents the extra yield demanded for taking credit risk over the risk-free rate.</p>
+      <table class="ratio-table">
+        <thead><tr><th>Rating</th><th>Typical Spread (India, 2024)</th><th>YTM if G-Sec = 7%</th></tr></thead>
+        <tbody>
+          <tr><td>AAA</td><td>40–60 bps</td><td>7.4–7.6%</td></tr>
+          <tr><td>AA+</td><td>70–100 bps</td><td>7.7–8.0%</td></tr>
+          <tr><td>AA</td><td>100–160 bps</td><td>8.0–8.6%</td></tr>
+          <tr><td>AA–</td><td>160–230 bps</td><td>8.6–9.3%</td></tr>
+          <tr><td>A+</td><td>230–320 bps</td><td>9.3–10.2%</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top:.75rem">Spreads widen in risk-off environments (post-IL&FS in 2018, COVID in 2020) and compress when liquidity is abundant. The OAS (Option-Adjusted Spread) is used for callable bonds to strip out the embedded option value.</p>
+    </div>
+
+    <div class="concept-header" onclick="toggleConcept(this)">
+      <div class="concept-title">📊 G-Sec Market & the Indian Fixed Income Ecosystem</div>
+      <span class="chevron">▼</span>
+    </div>
+    <div class="concept-body">
+      <p>The Indian fixed income market has several layers:</p>
+      <ul>
+        <li><strong>G-Secs (Government Securities)</strong> — Issued by GoI; risk-free. Benchmarks: 10yr G-Sec yield is the reference rate for all corporate bonds.</li>
+        <li><strong>SDL (State Development Loans)</strong> — Issued by state governments; 25–50bps above G-Sec.</li>
+        <li><strong>PSU Bonds</strong> — NHAI, REC, Power Finance Corporation. AAA-rated PSUs trade at 40–60bps above G-Sec.</li>
+        <li><strong>Corporate Bonds</strong> — Listed and unlisted. Private placement dominates over public issues in India.</li>
+        <li><strong>Commercial Paper (CP)</strong> — Short-term (up to 1 year); money market instrument. Rated A1+ to A4.</li>
+        <li><strong>Masala Bonds</strong> — Rupee-denominated bonds issued overseas; subject to FEMA and RBI guidelines.</li>
+      </ul>
+      <p>RBI's Monetary Policy Committee (MPC) decisions directly move the short end; 10yr G-Sec yields are driven by fiscal deficit, inflation expectations, global rates (Fed), and FII flows.</p>
+    </div>
+
+  </div>
+
+  <!-- KEY RATIOS QUICK REFERENCE -->
+  <div class="section-label" style="margin-top:3rem">Quick Reference — Key Credit Ratios</div>
+  <table class="ratio-table">
+    <thead>
+      <tr>
+        <th>Ratio</th>
+        <th>Formula</th>
+        <th>Safe</th>
+        <th>Watch</th>
+        <th>Stress</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>D/E Ratio</strong></td>
+        <td>Total Debt / Equity</td>
+        <td><span class="tag tag-good">< 0.5x</span></td>
+        <td><span class="tag tag-watch">0.5–1.5x</span></td>
+        <td><span class="tag tag-bad">> 2.5x</span></td>
+      </tr>
+      <tr>
+        <td><strong>Net Debt/EBITDA</strong></td>
+        <td>Net Debt / EBITDA</td>
+        <td><span class="tag tag-good">< 1.5x</span></td>
+        <td><span class="tag tag-watch">1.5–3.5x</span></td>
+        <td><span class="tag tag-bad">> 5x</span></td>
+      </tr>
+      <tr>
+        <td><strong>ICR (EBIT)</strong></td>
+        <td>EBIT / Interest</td>
+        <td><span class="tag tag-good">> 5x</span></td>
+        <td><span class="tag tag-watch">2.5–5x</span></td>
+        <td><span class="tag tag-bad">< 1.5x</span></td>
+      </tr>
+      <tr>
+        <td><strong>CAR (Banks)</strong></td>
+        <td>Tier 1+2 Capital / RWA</td>
+        <td><span class="tag tag-good">> 16%</span></td>
+        <td><span class="tag tag-watch">12–16%</span></td>
+        <td><span class="tag tag-bad">< 11.5%</span></td>
+      </tr>
+      <tr>
+        <td><strong>GNPA (Banks)</strong></td>
+        <td>Gross NPA / Gross Loans</td>
+        <td><span class="tag tag-good">< 2%</span></td>
+        <td><span class="tag tag-watch">2–5%</span></td>
+        <td><span class="tag tag-bad">> 8%</span></td>
+      </tr>
+      <tr>
+        <td><strong>NIM (Banks)</strong></td>
+        <td>Net Interest Income / Avg Assets</td>
+        <td><span class="tag tag-good">> 4%</span></td>
+        <td><span class="tag tag-watch">2.5–4%</span></td>
+        <td><span class="tag tag-bad">< 2%</span></td>
+      </tr>
+      <tr>
+        <td><strong>Altman Z-Score</strong></td>
+        <td>Weighted 5-ratio model</td>
+        <td><span class="tag tag-good">> 3.0</span></td>
+        <td><span class="tag tag-watch">1.8–3.0</span></td>
+        <td><span class="tag tag-bad">< 1.8</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- GLOSSARY -->
+  <div class="section-label" style="margin-top:3rem">Glossary</div>
+  <div class="glossary-grid">
+    <div class="gloss-card"><div class="gloss-term">ICR</div><div class="gloss-def">Interest Coverage Ratio. EBIT divided by interest expense. Shows how many times earnings cover interest cost.</div></div>
+    <div class="gloss-card"><div class="gloss-term">DSCR</div><div class="gloss-def">Debt Service Coverage Ratio. Cash available / (interest + principal). Key metric for project finance.</div></div>
+    <div class="gloss-card"><div class="gloss-term">NPA / GNPA</div><div class="gloss-def">Non-Performing Asset. Loan overdue > 90 days. GNPA = gross; NNPA = net of provisions.</div></div>
+    <div class="gloss-card"><div class="gloss-term">CAR</div><div class="gloss-def">Capital Adequacy Ratio. Tier 1 + Tier 2 capital divided by Risk-Weighted Assets. RBI minimum: 11.5%.</div></div>
+    <div class="gloss-card"><div class="gloss-term">NIM</div><div class="gloss-def">Net Interest Margin. Net interest income as % of average earning assets.</div></div>
+    <div class="gloss-card"><div class="gloss-term">YTM</div><div class="gloss-def">Yield to Maturity. IRR of a bond held to maturity. The single most useful bond return measure.</div></div>
+    <div class="gloss-card"><div class="gloss-term">Duration</div><div class="gloss-def">Weighted average time to cash flows. Modified duration = % price change for 1% yield move.</div></div>
+    <div class="gloss-card"><div class="gloss-term">Credit Spread</div><div class="gloss-def">Extra yield vs. risk-free G-Sec. Compensates for credit risk; widens in downturns.</div></div>
+    <div class="gloss-card"><div class="gloss-term">G-Sec</div><div class="gloss-def">Government Security. Risk-free benchmark. 10yr G-Sec yield is India's reference rate.</div></div>
+    <div class="gloss-card"><div class="gloss-term">IBC</div><div class="gloss-def">Insolvency and Bankruptcy Code 2016. Governs Indian corporate insolvency; 270-day CIRP timeline.</div></div>
+    <div class="gloss-card"><div class="gloss-term">CIRP</div><div class="gloss-def">Corporate Insolvency Resolution Process. Managed by IRP under NCLT; max 270 days.</div></div>
+    <div class="gloss-card"><div class="gloss-term">PCR</div><div class="gloss-def">Provision Coverage Ratio. % of NPAs covered by provisions. RBI guidance: maintain above 70%.</div></div>
+    <div class="gloss-card"><div class="gloss-term">Altman Z</div><div class="gloss-def">5-factor distress score. > 2.99 safe, 1.81–2.99 grey zone, < 1.81 high distress probability.</div></div>
+    <div class="gloss-card"><div class="gloss-term">OAS</div><div class="gloss-def">Option-Adjusted Spread. Credit spread after removing embedded option value (calls, puts).</div></div>
+    <div class="gloss-card"><div class="gloss-term">Masala Bond</div><div class="gloss-def">Rupee-denominated bond issued outside India. Currency risk borne by investor, not issuer.</div></div>
+    <div class="gloss-card"><div class="gloss-term">Convexity</div><div class="gloss-def">Second-order price sensitivity to yield changes. Bonds with higher convexity outperform in volatile rate environments.</div></div>
+  </div>
+
+  <!-- CALCULATORS QUICK LINKS -->
+  <div class="section-label" style="margin-top:3rem">Go Deeper — Calculators</div>
+  <div class="calc-links">
+    <a href="/domains/credit-analysis/calculators/credit-ratios.html" class="calc-link-card">
+      <div class="calc-link-left">
+        <div class="calc-link-name">Credit Ratios</div>
+        <div class="calc-link-tag">FREE · 30 companies</div>
+      </div>
+      <span class="calc-arrow">→</span>
+    </a>
+    <a href="/domains/credit-analysis/calculators/debt-capacity.html" class="calc-link-card">
+      <div class="calc-link-left">
+        <div class="calc-link-name">Debt Capacity</div>
+        <div class="calc-link-tag">PRO</div>
+      </div>
+      <span class="calc-arrow">→</span>
+    </a>
+    <a href="/domains/credit-analysis/calculators/interest-coverage.html" class="calc-link-card">
+      <div class="calc-link-left">
+        <div class="calc-link-name">Interest Coverage</div>
+        <div class="calc-link-tag">PRO</div>
+      </div>
+      <span class="calc-arrow">→</span>
+    </a>
+    <a href="/domains/credit-analysis/calculators/leverage-analysis.html" class="calc-link-card">
+      <div class="calc-link-left">
+        <div class="calc-link-name">Leverage Analysis</div>
+        <div class="calc-link-tag">PRO</div>
+      </div>
+      <span class="calc-arrow">→</span>
+    </a>
+    <a href="/domains/credit-analysis/calculators/credit-scoring.html" class="calc-link-card">
+      <div class="calc-link-left">
+        <div class="calc-link-name">Credit Scoring</div>
+        <div class="calc-link-tag">PRO</div>
+      </div>
+      <span class="calc-arrow">→</span>
+    </a>
+    <a href="/domains/credit-analysis/calculators/default-risk.html" class="calc-link-card">
+      <div class="calc-link-left">
+        <div class="calc-link-name">Default Risk</div>
+        <div class="calc-link-tag">PRO</div>
+      </div>
+      <span class="calc-arrow">→</span>
+    </a>
+    <a href="/domains/credit-analysis/calculators/bond-pricing.html" class="calc-link-card">
+      <div class="calc-link-left">
+        <div class="calc-link-name">Bond Pricing</div>
+        <div class="calc-link-tag">PRO</div>
+      </div>
+      <span class="calc-arrow">→</span>
+    </a>
+  </div>
+
+  <!-- NAV FOOTER -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3rem;padding-top:1.5rem;border-top:1px solid var(--border);flex-wrap:wrap;gap:1rem">
+    <a href="/domains/credit-analysis/calculators/bond-pricing.html" style="font-size:.875rem;font-weight:600;color:var(--muted);display:flex;align-items:center;gap:.4rem">← Bond Pricing</a>
+    <a href="/domains/" style="font-size:.875rem;font-weight:600;color:var(--blue)">All Domains →</a>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-nav">
+    <a href="/">Home</a>
+    <a href="/domains/">Domains</a>
+    <a href="/domains/credit-analysis/">Credit Analysis</a>
+    <a href="/domains/credit-analysis/calculators/">Calculators</a>
+  </div>
+  <div>© 2025 ValuationDesk · Built for Indian equity learners · ₹799/month, no annual plan</div>
+</footer>
+
+<script>
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+
+function scrollTo(id){
+  const el=document.getElementById(id);
+  if(el){el.scrollIntoView({behavior:'smooth',block:'start'});}
+}
+
+function toggleConcept(header){
+  const body=header.nextElementSibling;
+  const isOpen=body.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.concept-header').forEach(h=>{
+    h.classList.remove('open');
+    h.nextElementSibling.classList.remove('open');
+  });
+  if(!isOpen){
+    header.classList.add('open');
+    body.classList.add('open');
+  }
+}
+</script>
+</body>
+</html>

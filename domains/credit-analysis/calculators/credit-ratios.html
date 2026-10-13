@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Credit Ratios Scanner | ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--teal:#0d9488;--accent:#0d9488;--accent-bg:#f0fdfa;--accent-border:#99f6e4}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;gap:16px;position:sticky;top:0;background:var(--bg);z-index:100}
+.nav-logo{font-weight:800;font-size:15px;letter-spacing:-.3px}.nav-logo span{color:var(--blue)}
+.nav-sep{color:var(--border);font-size:18px}
+.nav-crumb{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}.nav-crumb a:hover{color:var(--text)}.nav-crumb .sep{color:var(--border)}
+.nav-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.btn-sm{font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg);cursor:pointer;transition:all .15s}.btn-sm:hover{background:var(--card)}
+.btn-pro{background:var(--text);color:#fff;border-color:var(--text)}.btn-pro:hover{background:#333;border-color:#333}
+
+/* Loading overlay */
+.loader{position:fixed;inset:0;background:#fff;z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px}
+.loader-title{font-size:22px;font-weight:900;letter-spacing:-.3px}
+.loader-bar-wrap{width:280px;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.loader-bar{height:100%;background:var(--accent);border-radius:2px;width:0;transition:width .4s ease}
+.loader-steps{display:flex;flex-direction:column;gap:6px;width:280px}
+.loader-step{font-size:12px;color:var(--muted);display:flex;align-items:center;gap:8px;opacity:0;transition:opacity .3s}
+.loader-step.show{opacity:1}
+.loader-step .dot{width:6px;height:6px;border-radius:50%;background:var(--border);flex-shrink:0}
+.loader-step.done .dot{background:var(--accent)}
+.loader-step.done{color:var(--text)}
+
+/* Toolbar */
+.toolbar{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;max-width:1100px;margin:0 auto;width:100%}
+.search-box{flex:1;min-width:180px;max-width:280px;display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:8px;padding:8px 12px;background:var(--bg)}
+.search-box input{border:none;outline:none;font-size:13px;width:100%;font-family:'Inter',sans-serif}
+.search-box svg{color:var(--muted);flex-shrink:0}
+.filter-chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--bg);cursor:pointer;transition:all .12s;white-space:nowrap}
+.chip.active{background:var(--text);color:#fff;border-color:var(--text)}
+.rating-filter{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.sort-btn{font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg);cursor:pointer;display:flex;align-items:center;gap:4px;white-space:nowrap}
+.sort-btn.active{color:var(--accent);border-color:var(--accent)}
+
+/* Results */
+.results-wrap{max-width:1100px;margin:0 auto;padding:20px 24px}
+.results-meta{font-size:12px;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;justify-content:space-between}
+.results-meta strong{color:var(--text)}
+
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{text-align:left;padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border-bottom:2px solid var(--border);white-space:nowrap;cursor:pointer;user-select:none}
+thead th:hover{color:var(--text)}
+thead th .sort-arrow{font-size:9px;margin-left:3px;color:var(--border)}
+thead th.sorted .sort-arrow{color:var(--accent)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:hover{background:var(--card)}
+tbody td{padding:11px 12px;white-space:nowrap}
+.co-name{font-weight:700;font-size:13px}
+.co-ticker{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);margin-top:1px}
+.sector-pill{font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;background:var(--card);border:1px solid var(--border)}
+.signal{font-size:11px;font-weight:700;padding:3px 9px;border-radius:10px}
+.signal-strong{background:#dcfce7;color:var(--green)}
+.signal-stable{background:#fef3c7;color:#92400e}
+.signal-watch{background:#fee2e2;color:var(--red)}
+.signal-bank{background:#eff6ff;color:var(--blue)}
+.val{font-family:'JetBrains Mono',monospace;font-size:12px}
+.val-good{color:var(--green);font-weight:700}
+.val-warn{color:var(--amber);font-weight:700}
+.val-bad{color:var(--red);font-weight:700}
+.rating-badge{font-size:10px;font-weight:800;padding:2px 7px;border-radius:4px}
+.r-aaa{background:#dcfce7;color:var(--green)}
+.r-aa{background:#dbeafe;color:var(--blue)}
+.r-a{background:#fef3c7;color:#92400e}
+.na{color:var(--muted);font-size:11px}
+
+/* Summary bar */
+.summary-bar{display:flex;gap:16px;flex-wrap:wrap;padding:16px 24px;border-bottom:1px solid var(--border);max-width:1100px;margin:0 auto;width:100%}
+.sum-card{flex:1;min-width:120px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.sum-val{font-size:20px;font-weight:900;letter-spacing:-.3px}
+.sum-label{font-size:10px;color:var(--muted);margin-top:2px}
+
+footer{border-top:1px solid var(--border);padding:20px 24px;max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-left{font-size:12px;color:var(--muted)}.footer-left strong{color:var(--text)}
+.footer-links{display:flex;gap:16px}.footer-links a{font-size:12px;color:var(--muted)}.footer-links a:hover{color:var(--text)}
+@media(max-width:700px){.toolbar{gap:8px}.rating-filter{margin-left:0}.summary-bar{gap:8px}}
+</style>
+</head>
+<body>
+
+<!-- 5-second loading sequence -->
+<div class="loader" id="loader">
+  <div class="loader-title">📋 Credit Ratios Scanner</div>
+  <div class="loader-bar-wrap"><div class="loader-bar" id="loaderBar"></div></div>
+  <div class="loader-steps">
+    <div class="loader-step" id="ls1"><div class="dot"></div>Loading 30 NSE companies</div>
+    <div class="loader-step" id="ls2"><div class="dot"></div>Fetching leverage ratios</div>
+    <div class="loader-step" id="ls3"><div class="dot"></div>Computing interest coverage</div>
+    <div class="loader-step" id="ls4"><div class="dot"></div>Mapping credit ratings</div>
+    <div class="loader-step" id="ls5"><div class="dot"></div>Generating credit signals</div>
+  </div>
+</div>
+
+<nav>
+  <div class="nav-logo">Valuation<span>Desk</span></div>
+  <span class="nav-sep">/</span>
+  <div class="nav-crumb">
+    <a href="/">Home</a><span class="sep">/</span>
+    <a href="../">Credit Analysis</a><span class="sep">/</span>
+    <span>Credit Ratios</span>
+  </div>
+  <div class="nav-actions">
+    <span style="font-size:11px;font-weight:700;color:var(--green);background:#dcfce7;padding:4px 10px;border-radius:20px">FREE</span>
+    <button class="btn-sm btn-pro" onclick="alert('Pro unlock coming soon — ₹799/mo for all 15 domains.')">Unlock Pro — ₹799/mo</button>
+  </div>
+</nav>
+
+<div class="summary-bar" id="summaryBar" style="display:none">
+  <div class="sum-card"><div class="sum-val" id="sumShowing">30</div><div class="sum-label">Companies shown</div></div>
+  <div class="sum-card"><div class="sum-val" id="sumStrong" style="color:var(--green)">—</div><div class="sum-label">Strong credit</div></div>
+  <div class="sum-card"><div class="sum-val" id="sumStable" style="color:var(--amber)">—</div><div class="sum-label">Stable</div></div>
+  <div class="sum-card"><div class="sum-val" id="sumWatch" style="color:var(--red)">—</div><div class="sum-label">Watch / Stressed</div></div>
+  <div class="sum-card"><div class="sum-val" id="sumAvgIcr">—</div><div class="sum-label">Avg ICR (ex-Banks)</div></div>
+</div>
+
+<div class="toolbar">
+  <div class="search-box">
+    <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" id="searchBox" placeholder="Search company or ticker…" oninput="renderTable()">
+  </div>
+  <div class="filter-chips">
+    <button class="chip active" onclick="setSector('All',this)">All</button>
+    <button class="chip" onclick="setSector('Financials',this)">Financials</button>
+    <button class="chip" onclick="setSector('IT',this)">IT</button>
+    <button class="chip" onclick="setSector('FMCG',this)">FMCG</button>
+    <button class="chip" onclick="setSector('Energy',this)">Energy</button>
+    <button class="chip" onclick="setSector('Auto',this)">Auto</button>
+    <button class="chip" onclick="setSector('Industrials',this)">Industrials</button>
+  </div>
+  <div class="rating-filter">
+    <button class="chip" id="ratingChip" onclick="toggleRating()">AAA Only</button>
+    <select id="sortSel" style="font-size:11px;font-weight:600;padding:5px 10px;border-radius:6px;border:1px solid var(--border);background:var(--bg);cursor:pointer;font-family:'Inter',sans-serif" onchange="renderTable()">
+      <option value="name">Sort: Name</option>
+      <option value="de">Sort: D/E ↑</option>
+      <option value="nd">Sort: Net Debt/EBITDA ↑</option>
+      <option value="icr">Sort: ICR ↓</option>
+      <option value="rating">Sort: Rating</option>
+    </select>
+  </div>
+</div>
+
+<div class="results-wrap">
+  <div class="results-meta"><span><strong id="countLabel">30</strong> companies</span><span style="font-size:11px">* Banks show CAR / GNPA instead of D/E and ICR</span></div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Company</th>
+          <th>Sector</th>
+          <th>D/E <span class="sort-arrow">↕</span></th>
+          <th>Net Debt/EBITDA <span class="sort-arrow">↕</span></th>
+          <th>ICR <span class="sort-arrow">↕</span></th>
+          <th>Rating</th>
+          <th>Signal</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-left"><strong>ValuationDesk</strong> · Credit Ratios Scanner · Free</div>
+  <div class="footer-links">
+    <a href="../">Domain Home</a>
+    <a href="./">All Calculators</a>
+    <a href="../learn/">Learn</a>
+    <a href="/">Home</a>
+  </div>
+</footer>
+
+<script>
+const COMPANIES=[
+  {name:'HDFC Bank',ticker:'HDFCBANK',sector:'Financials',de:null,netDebtEbitda:null,icr:null,rating:'AAA',car:19.3,gnpa:1.3,nim:3.5,mcap:'₹12.1L Cr'},
+  {name:'ICICI Bank',ticker:'ICICIBANK',sector:'Financials',de:null,netDebtEbitda:null,icr:null,rating:'AAA',car:16.8,gnpa:2.2,nim:4.5,mcap:'₹8.2L Cr'},
+  {name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',sector:'Financials',de:null,netDebtEbitda:null,icr:null,rating:'AAA',car:21.8,gnpa:1.7,nim:5.0,mcap:'₹3.8L Cr'},
+  {name:'Axis Bank',ticker:'AXISBANK',sector:'Financials',de:null,netDebtEbitda:null,icr:null,rating:'AA+',car:16.6,gnpa:1.6,nim:4.1,mcap:'₹3.5L Cr'},
+  {name:'State Bank of India',ticker:'SBIN',sector:'Financials',de:null,netDebtEbitda:null,icr:null,rating:'AAA',car:14.9,gnpa:2.4,nim:3.3,mcap:'₹7.1L Cr'},
+  {name:'TCS',ticker:'TCS',sector:'IT',de:0.0,netDebtEbitda:-1.2,icr:45,rating:'AAA',car:null,gnpa:null,nim:null,mcap:'₹14.2L Cr'},
+  {name:'Infosys',ticker:'INFY',sector:'IT',de:0.0,netDebtEbitda:-0.8,icr:38,rating:'AAA',car:null,gnpa:null,nim:null,mcap:'₹6.5L Cr'},
+  {name:'Wipro',ticker:'WIPRO',sector:'IT',de:0.1,netDebtEbitda:-0.5,icr:22,rating:'AA+',car:null,gnpa:null,nim:null,mcap:'₹2.4L Cr'},
+  {name:'HCL Technologies',ticker:'HCLTECH',sector:'IT',de:0.1,netDebtEbitda:-0.3,icr:28,rating:'AA+',car:null,gnpa:null,nim:null,mcap:'₹4.5L Cr'},
+  {name:'Tech Mahindra',ticker:'TECHM',sector:'IT',de:0.1,netDebtEbitda:0.2,icr:15,rating:'AA',car:null,gnpa:null,nim:null,mcap:'₹1.2L Cr'},
+  {name:'Hindustan Unilever',ticker:'HINDUNILVR',sector:'FMCG',de:0.0,netDebtEbitda:-0.5,icr:50,rating:'AAA',car:null,gnpa:null,nim:null,mcap:'₹5.4L Cr'},
+  {name:'ITC',ticker:'ITC',sector:'FMCG',de:0.0,netDebtEbitda:-1.5,icr:35,rating:'AAA',car:null,gnpa:null,nim:null,mcap:'₹5.6L Cr'},
+  {name:'Nestle India',ticker:'NESTLEIND',sector:'FMCG',de:0.0,netDebtEbitda:-0.2,icr:42,rating:'AAA',car:null,gnpa:null,nim:null,mcap:'₹2.4L Cr'},
+  {name:'Dabur India',ticker:'DABUR',sector:'FMCG',de:0.1,netDebtEbitda:0.1,icr:25,rating:'AA+',car:null,gnpa:null,nim:null,mcap:'₹1.0L Cr'},
+  {name:'Marico',ticker:'MARICO',sector:'FMCG',de:0.1,netDebtEbitda:-0.1,icr:28,rating:'AA+',car:null,gnpa:null,nim:null,mcap:'₹0.8L Cr'},
+  {name:'Reliance Industries',ticker:'RELIANCE',sector:'Energy',de:0.5,netDebtEbitda:1.8,icr:8,rating:'AAA',car:null,gnpa:null,nim:null,mcap:'₹19.8L Cr'},
+  {name:'ONGC',ticker:'ONGC',sector:'Energy',de:0.3,netDebtEbitda:0.8,icr:12,rating:'AAA',car:null,gnpa:null,nim:null,mcap:'₹3.5L Cr'},
+  {name:'BPCL',ticker:'BPCL',sector:'Energy',de:0.8,netDebitEbitda:2.1,icr:5,rating:'AA+',car:null,gnpa:null,nim:null,mcap:'₹1.4L Cr'},
+  {name:'Coal India',ticker:'COALINDIA',sector:'Energy',de:0.0,netDebtEbitda:-2.0,icr:30,rating:'AAA',car:null,gnpa:null,nim:null,mcap:'₹2.4L Cr'},
+  {name:'NTPC',ticker:'NTPC',sector:'Energy',de:1.5,netDebtEbitda:4.2,icr:3.5,rating:'AA+',car:null,gnpa:null,nim:null,mcap:'₹3.5L Cr'},
+  {name:'Tata Motors',ticker:'TATAMOTORS',sector:'Auto',de:1.2,netDebtEbitda:2.8,icr:4.5,rating:'AA',car:null,gnpa:null,nim:null,mcap:'₹3.2L Cr'},
+  {name:'Maruti Suzuki',ticker:'MARUTI',sector:'Auto',de:0.0,netDebtEbitda:-1.2,icr:32,rating:'AAA',car:null,gnpa:null,nim:null,mcap:'₹3.8L Cr'},
+  {name:'Bajaj Auto',ticker:'BAJAJAUTO',sector:'Auto',de:0.0,netDebtEbitda:-1.5,icr:28,rating:'AAA',car:null,gnpa:null,nim:null,mcap:'₹2.8L Cr'},
+  {name:'Hero MotoCorp',ticker:'HEROMOTOCO',sector:'Auto',de:0.0,netDebtEbitda:-0.8,icr:22,rating:'AA+',car:null,gnpa:null,nim:null,mcap:'₹0.9L Cr'},
+  {name:'Mahindra & Mahindra',ticker:'M_M',sector:'Auto',de:0.3,netDebtEbitda:0.5,icr:12,rating:'AA+',car:null,gnpa:null,nim:null,mcap:'₹3.5L Cr'},
+  {name:'Larsen & Toubro',ticker:'LT',sector:'Industrials',de:0.2,netDebtEbitda:0.8,icr:14,rating:'AAA',car:null,gnpa:null,nim:null,mcap:'₹4.8L Cr'},
+  {name:'Adani Ports',ticker:'ADANIPORTS',sector:'Industrials',de:1.1,netDebtEbitda:3.5,icr:4.5,rating:'AA',car:null,gnpa:null,nim:null,mcap:'₹2.8L Cr'},
+  {name:'Power Grid Corp',ticker:'POWERGRID',sector:'Industrials',de:2.1,netDebtEbitda:5.8,icr:3.2,rating:'AA+',car:null,gnpa:null,nim:null,mcap:'₹2.8L Cr'},
+  {name:'Bharat Electronics',ticker:'BEL',sector:'Industrials',de:0.0,netDebtEbitda:-0.8,icr:35,rating:'AAA',car:null,gnpa:null,nim:null,mcap:'₹2.2L Cr'},
+  {name:'BHEL',ticker:'BHEL',sector:'Industrials',de:0.2,netDebtEbitda:1.2,icr:6,rating:'AA',car:null,gnpa:null,nim:null,mcap:'₹0.8L Cr'}
+];
+
+// Fix BPCL typo
+COMPANIES[17].netDebtEbitda=2.1;
+
+let activeSector='All';
+let ratingOnly=false;
+let sortCol='name';
+let sortDir=1;
+
+function setSector(s,el){
+  activeSector=s;
+  document.querySelectorAll('.filter-chips .chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderTable();
+}
+
+function toggleRating(){
+  ratingOnly=!ratingOnly;
+  const btn=document.getElementById('ratingChip');
+  btn.classList.toggle('active',ratingOnly);
+  renderTable();
+}
+
+function getSignal(c){
+  if(c.sector==='Financials'){
+    const bad=c.gnpa>3;
+    const warn=c.gnpa>2;
+    if(!bad&&c.car>16)return{cls:'signal-strong',label:'Strong'};
+    if(warn)return{cls:'signal-watch',label:'Watch'};
+    return{cls:'signal-stable',label:'Stable'};
+  }
+  if(c.icr===null)return{cls:'signal-bank',label:'N/A'};
+  if(c.icr>=10&&(c.netDebtEbitda===null||c.netDebtEbitda<2)&&c.rating==='AAA')return{cls:'signal-strong',label:'Strong'};
+  if(c.icr>=5&&(c.netDebtEbitda===null||c.netDebtEbitda<4))return{cls:'signal-stable',label:'Stable'};
+  return{cls:'signal-watch',label:'Watch'};
+}
+
+function ratingClass(r){
+  if(!r)return'';
+  if(r==='AAA')return'r-aaa';
+  if(r.startsWith('AA'))return'r-aa';
+  return'r-a';
+}
+
+function deStr(c){
+  if(c.sector==='Financials')return`<span class="val val-good">CAR ${c.car}%</span>`;
+  if(c.de===null)return'<span class="na">—</span>';
+  const v=c.de;
+  const cls=v<=0.3?'val-good':v<=1?'val-warn':'val-bad';
+  return`<span class="val ${cls}">${v===0?'0.0x':v+'x'}</span>`;
+}
+
+function ndStr(c){
+  if(c.sector==='Financials')return`<span class="val val-good">GNPA ${c.gnpa}%</span>`;
+  if(c.netDebtEbitda===null)return'<span class="na">—</span>';
+  const v=c.netDebtEbitda;
+  const cls=v<0?'val-good':v<2?'val-good':v<4?'val-warn':'val-bad';
+  return`<span class="val ${cls}">${v<0?'Net Cash':''+v+'x'}</span>`;
+}
+
+function icrStr(c){
+  if(c.sector==='Financials')return`<span class="val val-good">NIM ${c.nim}%</span>`;
+  if(c.icr===null)return'<span class="na">—</span>';
+  const v=c.icr;
+  const cls=v>=10?'val-good':v>=5?'val-warn':'val-bad';
+  return`<span class="val ${cls}">${v}x</span>`;
+}
+
+function renderTable(){
+  const q=document.getElementById('searchBox').value.toLowerCase();
+  const sortSel=document.getElementById('sortSel').value;
+  let data=COMPANIES.filter(c=>{
+    if(activeSector!=='All'&&c.sector!==activeSector)return false;
+    if(ratingOnly&&c.rating!=='AAA')return false;
+    if(q&&!c.name.toLowerCase().includes(q)&&!c.ticker.toLowerCase().includes(q))return false;
+    return true;
+  });
+
+  data.sort((a,b)=>{
+    if(sortSel==='de'){const av=a.de??99,bv=b.de??99;return av-bv;}
+    if(sortSel==='nd'){const av=a.netDebtEbitda??99,bv=b.netDebtEbitda??99;return av-bv;}
+    if(sortSel==='icr'){const av=a.icr??-1,bv=b.icr??-1;return bv-av;}
+    if(sortSel==='rating'){const order={'AAA':0,'AA+':1,'AA':2,'AA-':3};return(order[a.rating]??4)-(order[b.rating]??4);}
+    return a.name.localeCompare(b.name);
+  });
+
+  const tbody=document.getElementById('tableBody');
+  tbody.innerHTML=data.map(c=>{
+    const sig=getSignal(c);
+    return`<tr>
+      <td><div class="co-name">${c.name}</div><div class="co-ticker">${c.ticker} · ${c.mcap}</div></td>
+      <td><span class="sector-pill">${c.sector}</span></td>
+      <td>${deStr(c)}</td>
+      <td>${ndStr(c)}</td>
+      <td>${icrStr(c)}</td>
+      <td><span class="rating-badge ${ratingClass(c.rating)}">${c.rating}</span></td>
+      <td><span class="signal ${sig.cls}">${sig.label}</span></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('countLabel').textContent=data.length;
+  document.getElementById('sumShowing').textContent=data.length;
+
+  const signals=data.map(getSignal);
+  document.getElementById('sumStrong').textContent=signals.filter(s=>s.label==='Strong').length;
+  document.getElementById('sumStable').textContent=signals.filter(s=>s.label==='Stable').length;
+  document.getElementById('sumWatch').textContent=signals.filter(s=>s.label==='Watch').length;
+
+  const nonBank=data.filter(c=>c.icr!==null);
+  const avgIcr=nonBank.length?Math.round(nonBank.reduce((a,c)=>a+c.icr,0)/nonBank.length*10)/10:0;
+  document.getElementById('sumAvgIcr').textContent=avgIcr+'x';
+}
+
+// 5-second loading sequence
+(function(){
+  const steps=[
+    {id:'ls1',bar:20,delay:0},
+    {id:'ls2',bar:40,delay:800},
+    {id:'ls3',bar:60,delay:1800},
+    {id:'ls4',bar:80,delay:3000},
+    {id:'ls5',bar:100,delay:4200}
+  ];
+  const bar=document.getElementById('loaderBar');
+  steps.forEach(s=>{
+    setTimeout(()=>{
+      const el=document.getElementById(s.id);
+      el.classList.add('show');
+      bar.style.width=s.bar+'%';
+      setTimeout(()=>el.classList.add('done'),200);
+    },s.delay);
+  });
+  setTimeout(()=>{
+    const l=document.getElementById('loader');
+    l.style.opacity='0';
+    l.style.transition='opacity .4s';
+    setTimeout(()=>{
+      l.style.display='none';
+      document.getElementById('summaryBar').style.display='flex';
+    },400);
+  },5000);
+})();
+
+renderTable();
+</script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Credit Analysis | ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--teal:#0d9488;--orange:#ea580c}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;gap:16px;position:sticky;top:0;background:var(--bg);z-index:100}
+.nav-logo{font-weight:800;font-size:15px;letter-spacing:-.3px}.nav-logo span{color:var(--blue)}
+.nav-sep{color:var(--border);font-size:18px}
+.nav-crumb{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}.nav-crumb a:hover{color:var(--text)}.nav-crumb .sep{color:var(--border)}
+.nav-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.btn-sm{font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg);cursor:pointer;transition:all .15s}.btn-sm:hover{background:var(--card)}
+.btn-pro{background:var(--text);color:#fff;border-color:var(--text)}.btn-pro:hover{background:#333;border-color:#333}
+
+.hero{padding:48px 24px 32px;max-width:960px;margin:0 auto}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--orange);background:#fff7ed;border:1px solid #fed7aa;padding:4px 10px;border-radius:20px;margin-bottom:16px}
+.hero h1{font-size:clamp(28px,5vw,42px);font-weight:900;letter-spacing:-.5px;line-height:1.1;margin-bottom:12px}
+.hero-sub{font-size:15px;color:var(--muted);max-width:560px;margin-bottom:28px}
+.hero-actions{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:32px}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--text);color:#fff;font-size:13px;font-weight:700;padding:11px 22px;border-radius:8px;border:none;cursor:pointer;transition:opacity .15s}.btn-primary:hover{opacity:.85}
+.btn-secondary{display:inline-flex;align-items:center;gap:8px;background:var(--bg);color:var(--text);font-size:13px;font-weight:700;padding:11px 22px;border-radius:8px;border:1px solid var(--border);cursor:pointer;transition:all .15s}.btn-secondary:hover{background:var(--card)}
+.hero-stats{display:flex;gap:28px;flex-wrap:wrap;padding-top:24px;border-top:1px solid var(--border)}
+.stat-val{font-size:24px;font-weight:900;letter-spacing:-.5px}.stat-label{font-size:11px;color:var(--muted);margin-top:2px}
+
+.section{padding:24px 24px 0;max-width:960px;margin:0 auto}
+.section-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+
+.calcs{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:40px}
+.calc-card{border:1px solid var(--border);border-radius:10px;padding:18px;transition:box-shadow .15s;display:block;position:relative;overflow:hidden}
+.calc-card:hover{box-shadow:0 4px 16px rgba(0,0,0,.07)}
+.calc-top{height:3px;width:100%;position:absolute;top:0;left:0;border-radius:0}
+.calc-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.calc-num{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;color:var(--muted)}
+.badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px}
+.badge-free{background:#dcfce7;color:var(--green)}
+.badge-pro{background:#fef3c7;color:var(--amber)}
+.calc-title{font-size:14px;font-weight:800;margin-bottom:5px;letter-spacing:-.1px}
+.calc-desc{font-size:12px;color:var(--muted);line-height:1.55}
+.calc-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--blue);margin-top:12px}
+
+.why-box{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:24px;margin-bottom:40px}
+.why-box h3{font-size:14px;font-weight:800;margin-bottom:12px}
+.why-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px}
+.why-item{display:flex;flex-direction:column;gap:4px}
+.why-icon{font-size:18px}
+.why-label{font-size:12px;font-weight:700}
+.why-note{font-size:11px;color:var(--muted)}
+
+footer{border-top:1px solid var(--border);padding:20px 24px;max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-left{font-size:12px;color:var(--muted)}.footer-left strong{color:var(--text)}
+.footer-links{display:flex;gap:16px}.footer-links a{font-size:12px;color:var(--muted);transition:color .15s}.footer-links a:hover{color:var(--text)}
+@media(max-width:600px){.calcs{grid-template-columns:1fr}.hero-actions{flex-direction:column}.hero-stats{gap:16px}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo">Valuation<span>Desk</span></div>
+  <span class="nav-sep">/</span>
+  <div class="nav-crumb"><a href="/">Home</a><span class="sep">/</span><span>Credit Analysis</span></div>
+  <div class="nav-actions">
+    <button class="btn-sm" onclick="location.href='/'">All Domains</button>
+    <button class="btn-sm btn-pro" onclick="alert('Pro unlock coming soon — ₹799/mo for all 15 domains.')">Unlock Pro — ₹799/mo</button>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">📋 Domain 08</div>
+  <h1>Credit Analysis</h1>
+  <p class="hero-sub">From leverage ratios to default risk models — learn how credit analysts assess debt capacity, score creditworthiness, and price bonds on India's NSE-listed companies.</p>
+  <div class="hero-actions">
+    <a href="calculators/credit-ratios.html"><button class="btn-primary">→ Try Credit Ratios — Free</button></a>
+    <a href="learn/"><button class="btn-secondary">Learn the Framework</button></a>
+  </div>
+  <div class="hero-stats">
+    <div><div class="stat-val">7</div><div class="stat-label">Calculators</div></div>
+    <div><div class="stat-val">4</div><div class="stat-label">Learn Modules</div></div>
+    <div><div class="stat-val">30</div><div class="stat-label">NSE Companies</div></div>
+    <div><div class="stat-val">1 Free</div><div class="stat-label">+ 6 Pro</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">7 Calculators</div>
+  <div class="calcs">
+
+    <a href="calculators/credit-ratios.html" class="calc-card">
+      <div class="calc-top" style="background:var(--teal)"></div>
+      <div class="calc-row"><span class="calc-num">01</span><span class="badge badge-free">FREE</span></div>
+      <div class="calc-title">Credit Ratios Scanner</div>
+      <div class="calc-desc">Screen 30 NSE companies by D/E, Net Debt/EBITDA, Interest Coverage, and credit rating. Spot leveraged names and investment-grade anchors instantly.</div>
+      <div class="calc-link">Open Calculator →</div>
+    </a>
+
+    <a href="calculators/debt-capacity.html" class="calc-card">
+      <div class="calc-top" style="background:var(--blue)"></div>
+      <div class="calc-row"><span class="calc-num">02</span><span class="badge badge-pro">PRO</span></div>
+      <div class="calc-title">Debt Capacity Model</div>
+      <div class="calc-desc">Calculate the maximum sustainable debt a company can carry based on EBITDA, FCF, asset base, and sector leverage norms. Build the leverage ceiling.</div>
+      <div class="calc-link">Unlock Pro →</div>
+    </a>
+
+    <a href="calculators/interest-coverage.html" class="calc-card">
+      <div class="calc-top" style="background:var(--green)"></div>
+      <div class="calc-row"><span class="calc-num">03</span><span class="badge badge-pro">PRO</span></div>
+      <div class="calc-title">Interest Coverage Deep Dive</div>
+      <div class="calc-desc">Analyse EBIT/Interest, EBITDA/Interest, and FCF/Debt Service coverage. Find where coverage becomes stressed and what rate environment breaks it.</div>
+      <div class="calc-link">Unlock Pro →</div>
+    </a>
+
+    <a href="calculators/leverage-analysis.html" class="calc-card">
+      <div class="calc-top" style="background:#7c3aed"></div>
+      <div class="calc-row"><span class="calc-num">04</span><span class="badge badge-pro">PRO</span></div>
+      <div class="calc-title">Leverage Analysis</div>
+      <div class="calc-desc">Build a full leverage profile — gross debt, net debt, capital structure mix, EBITDA leverage, and optimal debt/equity for the company's sector and rating target.</div>
+      <div class="calc-link">Unlock Pro →</div>
+    </a>
+
+    <a href="calculators/credit-scoring.html" class="calc-card">
+      <div class="calc-top" style="background:var(--amber)"></div>
+      <div class="calc-row"><span class="calc-num">05</span><span class="badge badge-pro">PRO</span></div>
+      <div class="calc-title">Credit Scoring Model</div>
+      <div class="calc-desc">Score creditworthiness across 5 dimensions — business risk, financial risk, management quality, industry position, and liquidity. Map to an indicative rating band.</div>
+      <div class="calc-link">Unlock Pro →</div>
+    </a>
+
+    <a href="calculators/default-risk.html" class="calc-card">
+      <div class="calc-top" style="background:var(--red)"></div>
+      <div class="calc-row"><span class="calc-num">06</span><span class="badge badge-pro">PRO</span></div>
+      <div class="calc-title">Default Risk Model</div>
+      <div class="calc-desc">Apply the Altman Z-Score framework to estimate distress probability. Get early-warning signals before a credit event becomes a crisis.</div>
+      <div class="calc-link">Unlock Pro →</div>
+    </a>
+
+    <a href="calculators/bond-pricing.html" class="calc-card">
+      <div class="calc-top" style="background:#4f46e5"></div>
+      <div class="calc-row"><span class="calc-num">07</span><span class="badge badge-pro">PRO</span></div>
+      <div class="calc-title">Bond Pricing Calculator</div>
+      <div class="calc-desc">Price a corporate bond given coupon, maturity, and YTM. Calculate duration, convexity, credit spread over G-Sec, and fair value vs market price.</div>
+      <div class="calc-link">Unlock Pro →</div>
+    </a>
+
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Why Credit Analysis</div>
+  <div class="why-box">
+    <h3>The other side of every deal</h3>
+    <div class="why-grid">
+      <div class="why-item"><div class="why-icon">🏦</div><div class="why-label">Banks & Lenders</div><div class="why-note">Every loan starts with credit analysis — the skills banks use before extending ₹1 of debt</div></div>
+      <div class="why-item"><div class="why-icon">📊</div><div class="why-label">Rating Agencies</div><div class="why-note">CRISIL, ICRA, CARE — understand exactly how they assign AAA to BHEL vs NTPC</div></div>
+      <div class="why-item"><div class="why-icon">⚡</div><div class="why-label">Stressed Assets</div><div class="why-note">IBC/NCLT restructurings, distressed debt — credit skills unlock high-return niches</div></div>
+      <div class="why-item"><div class="why-icon">📈</div><div class="why-label">Fixed Income</div><div class="why-note">India's corporate bond market is growing — pricing credit spread is the core skill</div></div>
+      <div class="why-item"><div class="why-icon">🔍</div><div class="why-label">Due Diligence</div><div class="why-note">PE/VC investors run credit checks before equity checks — leverage kills more deals than valuation</div></div>
+      <div class="why-item"><div class="why-icon">🎯</div><div class="why-label">Equity Complement</div><div class="why-note">The best equity analysts understand the debt structure — it's the foundation of EV and FCFF</div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-left"><strong>ValuationDesk</strong> · Domain 08 of 15</div>
+  <div class="footer-links">
+    <a href="/">Home</a>
+    <a href="/domains/equity-research/">← Equity Research</a>
+    <a href="calculators/">All Calculators</a>
+    <a href="learn/">Learn</a>
+  </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Interest Coverage Deep Dive | Credit Analysis | ValuationDesk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--teal:#0d9488;--accent:#16a34a;--accent-bg:#f0fdf4;--accent-border:#bbf7d0}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+a{color:inherit;text-decoration:none}
+nav{border-bottom:1px solid var(--border);padding:0 24px;height:56px;display:flex;align-items:center;gap:16px;position:sticky;top:0;background:var(--bg);z-index:100}
+.nav-logo{font-weight:800;font-size:15px;letter-spacing:-.3px}.nav-logo span{color:var(--blue)}
+.nav-sep{color:var(--border);font-size:18px}
+.nav-crumb{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px}.nav-crumb a:hover{color:var(--text)}.nav-crumb .sep{color:var(--border)}
+.nav-actions{margin-left:auto;display:flex;align-items:center;gap:8px}
+.btn-sm{font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;border:1px solid var(--border);background:var(--bg);cursor:pointer;transition:all .15s}.btn-sm:hover{background:var(--card)}
+.btn-pro{background:var(--text);color:#fff;border-color:var(--text)}.btn-pro:hover{background:#333;border-color:#333}
+
+.stepper{display:flex;align-items:center;padding:20px 24px;max-width:760px;margin:0 auto}
+.step-dot{width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--muted);flex-shrink:0;transition:all .2s;background:var(--bg)}
+.step-dot.active{border-color:var(--accent);color:var(--accent);background:var(--accent-bg)}
+.step-dot.done{border-color:var(--accent);background:var(--accent);color:#fff}
+.step-line{flex:1;height:2px;background:var(--border);transition:background .2s}
+.step-line.done{background:var(--accent)}
+.step-labels{display:flex;justify-content:space-between;padding:0 24px 24px;max-width:760px;margin:0 auto}
+.step-lbl{font-size:11px;font-weight:600;color:var(--muted);width:80px;text-align:center;transition:color .2s}
+.step-lbl.active{color:var(--accent)}
+
+.step{max-width:760px;margin:0 auto;padding:0 24px 40px}
+.hidden{display:none!important}
+
+.step-title{font-size:22px;font-weight:900;letter-spacing:-.3px;margin-bottom:4px}
+.step-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+
+.toolbar1{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.chip{font-size:12px;font-weight:600;padding:5px 12px;border-radius:20px;border:1px solid var(--border);background:var(--bg);cursor:pointer;transition:all .15s;white-space:nowrap}
+.chip:hover{background:var(--card)}.chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.search-box{margin-left:auto;padding:6px 12px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:inherit;outline:none;width:160px}
+.search-box:focus{border-color:var(--accent)}
+
+.co-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin-bottom:20px}
+.co-card{border:1px solid var(--border);border-radius:8px;padding:12px;cursor:pointer;transition:all .15s}
+.co-card:hover{border-color:var(--accent);background:var(--accent-bg)}
+.co-card.selected{border-color:var(--accent);background:var(--accent-bg);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 12%,transparent)}
+.co-name{font-size:13px;font-weight:700;margin-bottom:2px}
+.co-ticker{font-size:10px;color:var(--muted);margin-bottom:6px}
+.co-meta{display:flex;gap:8px;flex-wrap:wrap}
+.co-stat{font-size:10px;color:var(--muted)}.co-stat span{font-weight:700;color:var(--text);font-family:'JetBrains Mono',monospace}
+
+.step-footer{display:flex;justify-content:flex-end;gap:10px;padding-top:16px;border-top:1px solid var(--border)}
+.btn-next{background:var(--accent);color:#fff;border:none;padding:10px 24px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.btn-next:hover{opacity:.85}.btn-next:disabled{opacity:.4;cursor:not-allowed}
+.btn-back{background:var(--bg);color:var(--text);border:1px solid var(--border);padding:10px 20px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}.btn-back:hover{background:var(--card)}
+
+.ctx-card{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:12px;padding:20px;margin-bottom:12px}
+.ctx-header{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.ctx-icon{font-size:22px}
+.ctx-co{font-size:18px;font-weight:900;letter-spacing:-.3px}
+.ctx-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.ctx-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.ctx-chip{font-size:11px;font-weight:700;padding:3px 10px;border-radius:10px;background:rgba(22,163,74,.12);color:var(--accent);border:1px solid var(--accent-border)}
+
+.teach-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+.teach-row{border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.teach-q{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;font-size:13px;font-weight:700;transition:background .12s}
+.teach-q:hover{background:var(--card)}.teach-q .arrow{font-size:12px;color:var(--muted);transition:transform .2s}
+.teach-a{padding:0 16px;max-height:0;overflow:hidden;transition:max-height .3s,padding .3s;font-size:13px;color:var(--muted);line-height:1.65}
+.teach-row.open .teach-q{background:var(--card)}.teach-row.open .teach-a{padding:0 16px 14px;max-height:200px}.teach-row.open .arrow{transform:rotate(180deg)}
+
+.pro-gate{border:2px dashed var(--border);border-radius:12px;padding:28px 24px;text-align:center;background:var(--card)}
+.pro-lock{font-size:28px;margin-bottom:8px}
+.pro-title{font-size:15px;font-weight:800;margin-bottom:4px}
+.pro-sub{font-size:12px;color:var(--muted);margin-bottom:16px}
+.pro-pills{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:18px}
+.pro-pill{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--bg);color:var(--muted)}
+.btn-unlock{background:var(--text);color:#fff;border:none;padding:11px 28px;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s}.btn-unlock:hover{opacity:.8}
+
+.nav-cta{margin-top:28px;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.nav-cta-label{font-size:12px;color:var(--muted)}
+.nav-cta-links{display:flex;gap:12px}
+.nav-cta-btn{font-size:12px;font-weight:600;padding:7px 16px;border-radius:6px;border:1px solid var(--border);background:var(--bg);cursor:pointer;transition:all .15s}.nav-cta-btn:hover{background:var(--card)}
+
+footer{border-top:1px solid var(--border);padding:20px 24px;max-width:760px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.footer-left{font-size:12px;color:var(--muted)}.footer-left strong{color:var(--text)}
+.footer-links{display:flex;gap:16px}.footer-links a{font-size:12px;color:var(--muted)}.footer-links a:hover{color:var(--text)}
+@media(max-width:600px){.co-grid{grid-template-columns:1fr 1fr}.search-box{width:120px}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo">Valuation<span>Desk</span></div>
+  <span class="nav-sep">/</span>
+  <div class="nav-crumb">
+    <a href="/">Home</a><span class="sep">/</span>
+    <a href="../">Credit Analysis</a><span class="sep">/</span>
+    <a href="./">Calculators</a><span class="sep">/</span>
+    <span>Interest Coverage</span>
+  </div>
+  <div class="nav-actions">
+    <button class="btn-sm" onclick="location.href='../'">Domain Home</button>
+    <button class="btn-sm btn-pro" onclick="unlockPro()">Unlock Pro — ₹799/mo</button>
+  </div>
+</nav>
+
+<div class="stepper">
+  <div class="step-dot active" id="dot1">1</div>
+  <div class="step-line" id="line1"></div>
+  <div class="step-dot" id="dot2">2</div>
+  <div class="step-line" id="line2"></div>
+  <div class="step-dot" id="dot3">3</div>
+  <div class="step-line" id="line3"></div>
+  <div class="step-dot" id="dot4">4</div>
+</div>
+<div class="step-labels">
+  <span class="step-lbl active" id="lbl1">Pick Stock</span>
+  <span class="step-lbl" id="lbl2">Understand</span>
+  <span class="step-lbl" id="lbl3">Coverage Model</span>
+  <span class="step-lbl" id="lbl4">Output</span>
+</div>
+
+<!-- Step 1: Pick company -->
+<div class="step" id="step1">
+  <div class="step-title">Interest Coverage Deep Dive</div>
+  <div class="step-sub">Select a company to analyse EBIT, EBITDA, and FCF coverage ratios</div>
+  <div class="toolbar1">
+    <div class="chip active" onclick="setSector('All',this)">All</div>
+    <div class="chip" onclick="setSector('Financials',this)">Financials</div>
+    <div class="chip" onclick="setSector('IT',this)">IT</div>
+    <div class="chip" onclick="setSector('FMCG',this)">FMCG</div>
+    <div class="chip" onclick="setSector('Energy',this)">Energy</div>
+    <div class="chip" onclick="setSector('Auto',this)">Auto</div>
+    <div class="chip" onclick="setSector('Industrials',this)">Industrials</div>
+    <input class="search-box" id="searchBox" placeholder="Search company…" oninput="renderGrid()">
+  </div>
+  <div class="co-grid" id="coGrid"></div>
+  <div class="step-footer">
+    <button class="btn-next" id="nextBtn1" onclick="showStep(2)" disabled>Next — Understand →</button>
+  </div>
+</div>
+
+<!-- Step 2: Teaching context -->
+<div class="step hidden" id="step2">
+  <div class="ctx-card">
+    <div class="ctx-header">
+      <div class="ctx-icon">📉</div>
+      <div>
+        <div class="ctx-co" id="ctxName">—</div>
+        <div class="ctx-sub" id="ctxSub">—</div>
+      </div>
+    </div>
+    <div class="ctx-chips" id="ctxChips"></div>
+  </div>
+
+  <div class="teach-list">
+    <div class="teach-row" onclick="toggleTeach(this)">
+      <div class="teach-q">What is Interest Coverage Ratio (ICR)? <span class="arrow">▾</span></div>
+      <div class="teach-a">ICR = EBIT ÷ Interest Expense. It tells lenders how many times a company can pay its interest from operating profits. An ICR of 3x means the company earns three times its interest obligation — falling below 1.5x is a danger zone for most sectors. Banks use ICR as a primary covenant metric.</div>
+    </div>
+    <div class="teach-row" onclick="toggleTeach(this)">
+      <div class="teach-q">EBIT Coverage vs EBITDA Coverage — which matters more? <span class="arrow">▾</span></div>
+      <div class="teach-a">EBITDA/Interest (typically 20–40% higher than EBIT/Interest) is used by lenders because it's a cash-flow proxy. But EBIT/Interest is more conservative — it accounts for depreciation, which eventually requires capex replacement. Rating agencies track both: EBITDA coverage for liquidity, EBIT coverage for long-run sustainability.</div>
+    </div>
+    <div class="teach-row" onclick="toggleTeach(this)">
+      <div class="teach-q">What is FCF / Debt Service coverage? <span class="arrow">▾</span></div>
+      <div class="teach-a">FCF Debt Service Coverage = (EBITDA − Capex − Taxes) ÷ (Interest + Principal Repayment). This is the strictest test — it asks whether the company can service ALL its debt obligations from free cash flow after essential reinvestment. A DSCR below 1.0x signals a company burning cash to service debt.</div>
+    </div>
+    <div class="teach-row" onclick="toggleTeach(this)">
+      <div class="teach-q">How does the RBI rate cycle affect coverage ratios? <span class="arrow">▾</span></div>
+      <div class="teach-a">When RBI hikes rates by 200bps, floating-rate debt reprices upward — increasing interest expense directly. A company with ₹1,000 Cr debt at 8% pays ₹80 Cr interest; at 10% it pays ₹100 Cr — a 25% jump with no change in EBITDA. Highly leveraged companies on floating rates face rapid coverage deterioration in rising rate cycles.</div>
+    </div>
+    <div class="teach-row" onclick="toggleTeach(this)">
+      <div class="teach-q">What are sector-specific coverage thresholds? <span class="arrow">▾</span></div>
+      <div class="teach-a">Sector thresholds vary sharply: IT companies (zero or negative debt) often have 20x+ ICR. FMCG majors maintain 15–50x coverage. Energy/PSUs can sustain 3–5x on government backing. Highly leveraged infrastructure companies like Power Grid operate at 3x ICR — viable because of contracted, regulated cash flows with minimal business risk.</div>
+    </div>
+  </div>
+
+  <div class="step-footer">
+    <button class="btn-back" onclick="showStep(1)">← Back</button>
+    <button class="btn-next" onclick="showStep(3)">Next — Coverage Model →</button>
+  </div>
+</div>
+
+<!-- Step 3: Coverage Model (Pro Gate) -->
+<div class="step hidden" id="step3">
+  <div class="pro-gate">
+    <div class="pro-lock">🔒</div>
+    <div class="pro-title">Coverage Model — Pro Feature</div>
+    <div class="pro-sub">Unlock the full interest coverage deep dive for <strong id="proCoName">this company</strong></div>
+    <div class="pro-pills">
+      <span class="pro-pill">EBIT coverage ratio</span>
+      <span class="pro-pill">EBITDA coverage ratio</span>
+      <span class="pro-pill">FCF/Debt service ratio</span>
+      <span class="pro-pill">Rate shock sensitivity</span>
+      <span class="pro-pill">Coverage floor analysis</span>
+    </div>
+    <button class="btn-unlock" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+  </div>
+  <div class="step-footer">
+    <button class="btn-back" onclick="showStep(2)">← Back</button>
+    <button class="btn-next" onclick="showStep(4)">Continue →</button>
+  </div>
+</div>
+
+<!-- Step 4: Output (Pro Gate) -->
+<div class="step hidden" id="step4">
+  <div class="pro-gate">
+    <div class="pro-lock">🔒</div>
+    <div class="pro-title">Coverage Stress Output — Pro Feature</div>
+    <div class="pro-sub">Get the complete coverage analysis and lender risk assessment for <strong id="proCoName2">this company</strong></div>
+    <div class="pro-pills">
+      <span class="pro-pill">Current coverage vs threshold</span>
+      <span class="pro-pill">Coverage under +200bps rates</span>
+      <span class="pro-pill">Years to coverage breach</span>
+      <span class="pro-pill">Covenant headroom</span>
+      <span class="pro-pill">Lender risk assessment</span>
+    </div>
+    <button class="btn-unlock" onclick="unlockPro()">Unlock Pro — ₹799/mo →</button>
+  </div>
+  <div class="nav-cta">
+    <span class="nav-cta-label">Continue exploring Credit Analysis</span>
+    <div class="nav-cta-links">
+      <button class="nav-cta-btn" onclick="location.href='debt-capacity.html'">← Debt Capacity</button>
+      <button class="nav-cta-btn" onclick="location.href='leverage-analysis.html'">Next Calculator →</button>
+    </div>
+  </div>
+  <div class="step-footer">
+    <button class="btn-back" onclick="showStep(3)">← Back</button>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-left"><strong>ValuationDesk</strong> · Credit Analysis · Interest Coverage</div>
+  <div class="footer-links">
+    <a href="../">Domain Home</a>
+    <a href="./">All Calculators</a>
+    <a href="../learn/">Learn</a>
+  </div>
+</footer>
+
+<script>
+const COMPANIES=[
+  {name:'HDFC Bank',ticker:'HDFCBANK',sector:'Financials',de:null,netDebtEbitda:null,icr:null,rating:'AAA',car:19.3,gnpa:1.3,nim:3.5},
+  {name:'ICICI Bank',ticker:'ICICIBANK',sector:'Financials',de:null,netDebtEbitda:null,icr:null,rating:'AAA',car:16.8,gnpa:2.2,nim:4.5},
+  {name:'Kotak Mahindra Bank',ticker:'KOTAKBANK',sector:'Financials',de:null,netDebtEbitda:null,icr:null,rating:'AAA',car:21.8,gnpa:1.7,nim:5.0},
+  {name:'Axis Bank',ticker:'AXISBANK',sector:'Financials',de:null,netDebtEbitda:null,icr:null,rating:'AA+',car:16.6,gnpa:1.6,nim:4.1},
+  {name:'State Bank of India',ticker:'SBIN',sector:'Financials',de:null,netDebtEbitda:null,icr:null,rating:'AAA',car:14.9,gnpa:2.4,nim:3.3},
+  {name:'TCS',ticker:'TCS',sector:'IT',de:0.0,netDebtEbitda:-1.2,icr:45,rating:'AAA',car:null,gnpa:null,nim:null},
+  {name:'Infosys',ticker:'INFY',sector:'IT',de:0.0,netDebtEbitda:-0.8,icr:38,rating:'AAA',car:null,gnpa:null,nim:null},
+  {name:'Wipro',ticker:'WIPRO',sector:'IT',de:0.1,netDebtEbitda:-0.5,icr:22,rating:'AA+',car:null,gnpa:null,nim:null},
+  {name:'HCL Technologies',ticker:'HCLTECH',sector:'IT',de:0.1,netDebtEbitda:-0.3,icr:28,rating:'AA+',car:null,gnpa:null,nim:null},
+  {name:'Tech Mahindra',ticker:'TECHM',sector:'IT',de:0.1,netDebtEbitda:0.2,icr:15,rating:'AA',car:null,gnpa:null,nim:null},
+  {name:'Hindustan Unilever',ticker:'HINDUNILVR',sector:'FMCG',de:0.0,netDebtEbitda:-0.5,icr:50,rating:'AAA',car:null,gnpa:null,nim:null},
+  {name:'ITC',ticker:'ITC',sector:'FMCG',de:0.0,netDebtEbitda:-1.5,icr:35,rating:'AAA',car:null,gnpa:null,nim:null},
+  {name:'Nestle India',ticker:'NESTLEIND',sector:'FMCG',de:0.0,netDebtEbitda:-0.2,icr:42,rating:'AAA',car:null,gnpa:null,nim:null},
+  {name:'Dabur India',ticker:'DABUR',sector:'FMCG',de:0.1,netDebtEbitda:0.1,icr:25,rating:'AA+',car:null,gnpa:null,nim:null},
+  {name:'Marico',ticker:'MARICO',sector:'FMCG',de:0.1,netDebtEbitda:-0.1,icr:28,rating:'AA+',car:null,gnpa:null,nim:null},
+  {name:'Reliance Industries',ticker:'RELIANCE',sector:'Energy',de:0.5,netDebtEbitda:1.8,icr:8,rating:'AAA',car:null,gnpa:null,nim:null},
+  {name:'ONGC',ticker:'ONGC',sector:'Energy',de:0.3,netDebtEbitda:0.8,icr:12,rating:'AAA',car:null,gnpa:null,nim:null},
+  {name:'BPCL',ticker:'BPCL',sector:'Energy',de:0.8,netDebtEbitda:2.1,icr:5,rating:'AA+',car:null,gnpa:null,nim:null},
+  {name:'Coal India',ticker:'COALINDIA',sector:'Energy',de:0.0,netDebtEbitda:-2.0,icr:30,rating:'AAA',car:null,gnpa:null,nim:null},
+  {name:'NTPC',ticker:'NTPC',sector:'Energy',de:1.5,netDebtEbitda:4.2,icr:3.5,rating:'AA+',car:null,gnpa:null,nim:null},
+  {name:'Tata Motors',ticker:'TATAMOTORS',sector:'Auto',de:1.2,netDebtEbitda:2.8,icr:4.5,rating:'AA',car:null,gnpa:null,nim:null},
+  {name:'Maruti Suzuki',ticker:'MARUTI',sector:'Auto',de:0.0,netDebtEbitda:-1.2,icr:32,rating:'AAA',car:null,gnpa:null,nim:null},
+  {name:'Bajaj Auto',ticker:'BAJAJAUTO',sector:'Auto',de:0.0,netDebtEbitda:-1.5,icr:28,rating:'AAA',car:null,gnpa:null,nim:null},
+  {name:'Hero MotoCorp',ticker:'HEROMOTOCO',sector:'Auto',de:0.0,netDebtEbitda:-0.8,icr:22,rating:'AA+',car:null,gnpa:null,nim:null},
+  {name:'Mahindra & Mahindra',ticker:'M_M',sector:'Auto',de:0.3,netDebtEbitda:0.5,icr:12,rating:'AA+',car:null,gnpa:null,nim:null},
+  {name:'Larsen & Toubro',ticker:'LT',sector:'Industrials',de:0.2,netDebtEbitda:0.8,icr:14,rating:'AAA',car:null,gnpa:null,nim:null},
+  {name:'Adani Ports',ticker:'ADANIPORTS',sector:'Industrials',de:1.1,netDebtEbitda:3.5,icr:4.5,rating:'AA',car:null,gnpa:null,nim:null},
+  {name:'Power Grid Corp',ticker:'POWERGRID',sector:'Industrials',de:2.1,netDebtEbitda:5.8,icr:3.2,rating:'AA+',car:null,gnpa:null,nim:null},
+  {name:'Bharat Electronics',ticker:'BEL',sector:'Industrials',de:0.0,netDebtEbitda:-0.8,icr:35,rating:'AAA',car:null,gnpa:null,nim:null},
+  {name:'BHEL',ticker:'BHEL',sector:'Industrials',de:0.2,netDebtEbitda:1.2,icr:6,rating:'AA',car:null,gnpa:null,nim:null}
+];
+
+const SECTOR_CONTEXT={
+  'Financials':{ebitIcr:'N/A (banks)',ebitdaIcr:'N/A (NIM metric used)',debtService:'Capital adequacy (CAR)',stressPoint:'GNPA spike + credit losses'},
+  'IT':{ebitIcr:'20–50x typical',ebitdaIcr:'25–60x typical',debtService:'Not applicable (net cash)',stressPoint:'Almost no coverage risk; debt only for M&A'},
+  'FMCG':{ebitIcr:'15–50x typical',ebitdaIcr:'18–60x typical',debtService:'>10x for AAA',stressPoint:'Volume collapse or margin compression'},
+  'Energy':{ebitIcr:'4–12x typical',ebitdaIcr:'5–15x typical',debtService:'>3x for AA',stressPoint:'Commodity price crash + capex overrun'},
+  'Auto':{ebitIcr:'5–35x typical',ebitdaIcr:'6–40x typical',debtService:'>4x for AA',stressPoint:'Volume cycle downturn + EV transition capex'},
+  'Industrials':{ebitIcr:'3–15x typical',ebitdaIcr:'4–18x typical',debtService:'>2.5x for AA',stressPoint:'Contract delays + rising input costs'}
+};
+
+let selectedCo=null;
+let activeSector='All';
+
+function setSector(s,el){
+  activeSector=s;
+  document.querySelectorAll('.toolbar1 .chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderGrid();
+}
+
+function renderGrid(){
+  const q=document.getElementById('searchBox').value.toLowerCase();
+  const filtered=COMPANIES.filter(c=>{
+    if(activeSector!=='All'&&c.sector!==activeSector)return false;
+    if(q&&!c.name.toLowerCase().includes(q)&&!c.ticker.toLowerCase().includes(q))return false;
+    return true;
+  });
+  const grid=document.getElementById('coGrid');
+  grid.innerHTML=filtered.map(c=>`
+    <div class="co-card${selectedCo&&selectedCo.ticker===c.ticker?' selected':''}" data-co='${JSON.stringify(c)}'>
+      <div class="co-name">${c.name}</div>
+      <div class="co-ticker">${c.ticker} · ${c.sector}</div>
+      <div class="co-meta">
+        <div class="co-stat">ICR <span>${c.icr!==null?c.icr+'x':'Bank'}</span></div>
+        <div class="co-stat">Rating <span>${c.rating}</span></div>
+      </div>
+    </div>`).join('');
+}
+
+document.getElementById('coGrid').addEventListener('click',function(e){
+  const card=e.target.closest('.co-card[data-co]');
+  if(!card)return;
+  selectedCo=JSON.parse(card.dataset.co);
+  document.getElementById('nextBtn1').disabled=false;
+  renderGrid();
+});
+
+function renderCtx(){
+  if(!selectedCo)return;
+  document.getElementById('ctxName').textContent=selectedCo.name;
+  document.getElementById('ctxSub').textContent=selectedCo.ticker+' · '+selectedCo.sector+' · '+selectedCo.rating;
+  document.getElementById('proCoName').textContent=selectedCo.name;
+  document.getElementById('proCoName2').textContent=selectedCo.name;
+  const ctx=SECTOR_CONTEXT[selectedCo.sector]||{};
+  const chips=[];
+  if(selectedCo.sector==='Financials'){
+    chips.push('CAR: '+selectedCo.car+'%','GNPA: '+selectedCo.gnpa+'%','NIM: '+selectedCo.nim+'%');
+  } else {
+    if(selectedCo.icr!==null)chips.push('ICR: '+selectedCo.icr+'x');
+    if(selectedCo.netDebtEbitda!==null)chips.push(selectedCo.netDebtEbitda<0?'Net Cash':'ND/EBITDA: '+selectedCo.netDebtEbitda+'x');
+    chips.push('Rating: '+selectedCo.rating);
+  }
+  chips.push('Sector EBIT/Interest: '+ctx.ebitIcr);
+  document.getElementById('ctxChips').innerHTML=chips.map(ch=>`<span class="ctx-chip">${ch}</span>`).join('');
+}
+
+function showStep(n){
+  for(let i=1;i<=4;i++){
+    document.getElementById('step'+i).classList.toggle('hidden',i!==n);
+    const dot=document.getElementById('dot'+i);
+    const lbl=document.getElementById('lbl'+i);
+    dot.classList.remove('active','done');
+    lbl.classList.remove('active');
+    if(i===n){dot.classList.add('active');lbl.classList.add('active');}
+    else if(i<n)dot.classList.add('done');
+    if(i<4){document.getElementById('line'+i).classList.toggle('done',i<n);}
+  }
+  if(n===2)renderCtx();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function toggleTeach(row){row.classList.toggle('open');}
+function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+renderGrid();
+</script>
+</body>
+</html>
