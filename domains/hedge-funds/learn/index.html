@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
+  --bg:#1c1917;--text:#e7e5e4;--muted:#a8a29e;--border:#33302c;--card:#262220;
   --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;
   --accent:#7c3aed;--accent-bg:#f5f3ff;--accent-border:#ddd6fe;
 }
@@ -39,7 +39,7 @@ h1{font-size:clamp(24px,5vw,36px);font-weight:900;margin-bottom:10px;line-height
 
 .mod-header{display:flex;align-items:center;gap:14px;padding:18px 20px;cursor:pointer;user-select:none}
 .mod-num{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;background:var(--accent-bg);color:var(--accent);border:2px solid var(--accent-border)}
-.module.done .mod-num{background:#ede9fe;color:#7c3aed;border-color:#c4b5fd}
+.module.done .mod-num{background:rgba(109,40,217,.18);color:#a78bfa;border-color:#c4b5fd}
 .mod-title-wrap{flex:1}
 .mod-title{font-size:16px;font-weight:700;margin-bottom:2px}
 .mod-meta{font-size:12px;color:var(--muted)}
@@ -47,7 +47,7 @@ h1{font-size:clamp(24px,5vw,36px);font-weight:900;margin-bottom:10px;line-height
 .module.open .mod-arrow{transform:rotate(180deg)}
 .mod-status{font-size:11px;font-weight:700;padding:3px 8px;border-radius:12px}
 .mod-status-new{background:var(--accent-bg);color:var(--accent)}
-.mod-status-done{background:#ede9fe;color:#7c3aed}
+.mod-status-done{background:rgba(109,40,217,.18);color:#a78bfa}
 
 .mod-body{display:none;padding:0 20px 24px}
 .module.open .mod-body{display:block}
@@ -66,11 +66,11 @@ h1{font-size:clamp(24px,5vw,36px);font-weight:900;margin-bottom:10px;line-height
 .flow-head{font-size:14px;font-weight:700;margin-bottom:4px}
 .flow-body{font-size:13px;color:var(--muted);line-height:1.6}
 .flow-tag{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;margin-bottom:6px}
-.tag-strat{background:#ede9fe;color:#7c3aed}
+.tag-strat{background:rgba(109,40,217,.18);color:#a78bfa}
 .tag-risk{background:#fee2e2;color:#991b1b}
 .tag-ops{background:#fef9c3;color:#854d0e}
-.tag-fee{background:#dcfce7;color:#166534}
-.tag-reg{background:#dbeafe;color:#1d4ed8}
+.tag-fee{background:rgba(22,163,74,.15);color:#4ade80}
+.tag-reg{background:rgba(37,99,235,.18);color:#93c5fd}
 .tag-deriv{background:#fce7f3;color:#9d174d}
 
 .concept-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-bottom:20px}
@@ -88,10 +88,10 @@ h1{font-size:clamp(24px,5vw,36px);font-weight:900;margin-bottom:10px;line-height
 .data-table tr:hover td{background:var(--card)}
 .mono{font-family:'JetBrains Mono',monospace;font-weight:700}
 .chip{display:inline-flex;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700}
-.chip-g{background:#dcfce7;color:#166534}
+.chip-g{background:rgba(22,163,74,.15);color:#4ade80}
 .chip-y{background:#fef9c3;color:#854d0e}
 .chip-r{background:#fee2e2;color:#991b1b}
-.chip-v{background:#ede9fe;color:#7c3aed}
+.chip-v{background:rgba(109,40,217,.18);color:#a78bfa}
 
 .glossary{display:grid;gap:8px;margin-bottom:20px}
 .gloss-row{display:grid;grid-template-columns:160px 1fr;gap:12px;align-items:start;padding:10px 0;border-bottom:1px solid var(--border)}

@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
 <style>
 :root{
-  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
+  --bg:#1c1917;--text:#e7e5e4;--muted:#a8a29e;--border:#33302c;--card:#262220;
   --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--teal:#0d9488;
   --violet:#7c3aed;
   --accent:#d97706;--accent-bg:#fffbeb;--accent-border:#fde68a;
@@ -18,12 +18,12 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
 a{color:inherit;text-decoration:none}
-nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);z-index:100}
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(28,25,23,.96);backdrop-filter:blur(8px);z-index:100}
 .nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-.5px}
 .nav-logo span{color:var(--blue)}
 .nav-links{display:flex;gap:1.5rem;align-items:center;font-size:.875rem;font-weight:500;color:var(--muted)}
 .nav-links a:hover{color:var(--text)}
-.nav-cta{background:var(--text);color:#fff;padding:.45rem 1rem;border-radius:6px;font-size:.8rem;font-weight:600}
+.nav-cta{background:var(--text);color:var(--bg);padding:.45rem 1rem;border-radius:6px;font-size:.8rem;font-weight:600}
 .nav-cta:hover{opacity:.85}
 
 .calc-hero{max-width:860px;margin:0 auto;padding:2.5rem 2rem 1.5rem;width:100%}
@@ -64,11 +64,11 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 .ctx-name{font-weight:800;font-size:1rem;margin-bottom:.25rem}
 .ctx-desc{font-size:.82rem;color:var(--muted);margin-bottom:1rem}
 .ctx-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.65rem;margin-bottom:.75rem}
-.ctx-item{background:rgba(255,255,255,.75);border-radius:8px;padding:.6rem .75rem}
+.ctx-item{background:var(--card);border-radius:8px;padding:.6rem .75rem}
 .ctx-val{font-size:.95rem;font-weight:800;font-family:'JetBrains Mono',monospace;letter-spacing:-.02em}
 .ctx-lbl{font-size:.67rem;color:var(--muted);font-weight:500;margin-top:.1rem}
 
-.qoe-meter{background:rgba(255,255,255,.75);border-radius:8px;padding:.75rem 1rem}
+.qoe-meter{background:var(--card);border-radius:8px;padding:.75rem 1rem}
 .qoe-meter-label{font-size:.68rem;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:.6rem}
 .qoe-bar-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.45rem}
 .qoe-bar-name{width:130px;font-size:.76rem;color:var(--muted);font-weight:500;flex-shrink:0}
@@ -81,10 +81,10 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 .concept-card h3{font-size:.85rem;font-weight:700;margin-bottom:.35rem;display:flex;align-items:center;gap:.4rem}
 .concept-card p{font-size:.78rem;color:var(--muted);line-height:1.55}
 .concept-badge{display:inline-block;padding:.12rem .4rem;border-radius:4px;font-size:.65rem;font-weight:700;flex-shrink:0}
-.badge-ccr{background:#dcfce7;color:#15803d}
+.badge-ccr{background:rgba(22,163,74,.15);color:#4ade80}
 .badge-accrual{background:#fef9c3;color:#854d0e}
 .badge-conc{background:#fce7f3;color:#9d174d}
-.badge-score{background:#dbeafe;color:#1e40af}
+.badge-score{background:rgba(37,99,235,.18);color:#93c5fd}
 
 .teach-list{display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.5rem}
 .teach-item{border:1px solid var(--border);border-radius:8px;overflow:hidden}
@@ -102,7 +102,7 @@ nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2
 .pro-gate p{font-size:.85rem;color:var(--muted);margin-bottom:1.25rem;max-width:420px;margin-left:auto;margin-right:auto}
 .pro-features{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-bottom:1.5rem}
 .pro-feat{background:#fff;border:1px solid var(--border);border-radius:999px;padding:.3rem .75rem;font-size:.75rem;font-weight:600;color:var(--text)}
-.pro-btn{background:var(--text);color:#fff;border:none;border-radius:8px;padding:.75rem 1.75rem;font-size:.9rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+.pro-btn{background:var(--text);color:var(--bg);border:none;border-radius:8px;padding:.75rem 1.75rem;font-size:.9rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
 .pro-btn:hover{opacity:.85}
 
 .bank-msg{border:1px solid #ddd6fe;border-radius:12px;padding:1.5rem;background:#f5f3ff;text-align:center;margin-bottom:1.5rem}

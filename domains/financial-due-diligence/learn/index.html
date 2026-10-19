@@ -10,14 +10,14 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
 <style>
 :root{
-  --bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;
+  --bg:#1c1917;--text:#e7e5e4;--muted:#a8a29e;--border:#33302c;--card:#262220;
   --green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--teal:#0d9488;
   --violet:#7c3aed;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;min-height:100vh;display:flex;flex-direction:column}
 a{color:inherit;text-decoration:none}
-nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);z-index:100}
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(28,25,23,.96);backdrop-filter:blur(8px);z-index:100}
 .nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-.5px}
 .nav-logo span{color:var(--blue)}
 .nav-links{display:flex;gap:1.5rem;align-items:center;font-size:.875rem;font-weight:500;color:var(--muted)}
@@ -40,7 +40,7 @@ h1{font-size:clamp(1.6rem,4vw,2.25rem);font-weight:900;letter-spacing:-.04em;mar
 /* Module cards */
 .module-card{border:1px solid var(--border);border-radius:14px;margin-bottom:1.5rem;overflow:hidden}
 .module-header{padding:1.25rem 1.5rem;background:var(--card);display:flex;align-items:center;gap:1rem;cursor:pointer;transition:background .15s}
-.module-header:hover{background:#f3f4f6}
+.module-header:hover{background:var(--card)}
 .module-num{font-family:'JetBrains Mono',monospace;font-size:.7rem;font-weight:700;color:var(--muted);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.2rem .5rem;flex-shrink:0}
 .module-title{font-size:1rem;font-weight:800;flex:1}
 .module-chevron{color:var(--muted);font-size:.9rem;transition:transform .2s}
@@ -75,7 +75,7 @@ h1{font-size:clamp(1.6rem,4vw,2.25rem);font-weight:900;letter-spacing:-.04em;mar
 .glossary-grid{display:flex;flex-direction:column;gap:.6rem}
 .gloss-item{border:1px solid var(--border);border-radius:8px;overflow:hidden}
 .gloss-term{padding:.7rem 1rem;font-size:.88rem;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center;background:var(--card)}
-.gloss-term:hover{background:#f3f4f6}
+.gloss-term:hover{background:var(--card)}
 .gloss-def{padding:.75rem 1rem;font-size:.82rem;color:var(--muted);line-height:1.6;border-top:1px solid var(--border);display:none}
 .gloss-def.open{display:block}
 

@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+:root{--bg:#1c1917;--text:#e7e5e4;--muted:#a8a29e;--border:#33302c;--card:#262220;--green:#16a34a;--red:#dc2626;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
 body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5;-webkit-font-smoothing:antialiased}
 a{text-decoration:none;color:inherit}
 
@@ -20,7 +20,7 @@ a{text-decoration:none;color:inherit}
 .nav-links{display:flex;gap:20px;flex:1}.nav-links a{font-size:13px;color:var(--muted);font-weight:500}.nav-links a:hover{color:var(--text)}
 .nav-cta{display:flex;gap:8px;align-items:center;margin-left:auto}
 .vault-btn{font-size:12px;font-weight:600;padding:6px 12px;border:1px solid var(--border);border-radius:6px;color:var(--text)}
-.pro-btn{font-size:12px;font-weight:700;padding:6px 14px;background:var(--text);color:#fff;border-radius:6px}
+.pro-btn{font-size:12px;font-weight:700;padding:6px 14px;background:var(--text);color:var(--bg);border-radius:6px}
 .domain-nav{border-bottom:1px solid var(--border);background:var(--bg)}
 .domain-nav-inner{max-width:1200px;margin:0 auto;padding:0 24px;display:flex}
 .domain-nav a{font-size:13px;font-weight:500;color:var(--muted);padding:10px 16px;border-bottom:2px solid transparent}
@@ -37,7 +37,7 @@ a{text-decoration:none;color:inherit}
 .stepper{display:flex;align-items:center;gap:0;margin-bottom:40px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
 .step-item{flex:1;padding:10px 16px;text-align:center;font-size:12px;font-weight:600;color:var(--muted);border-right:1px solid var(--border);background:var(--card);transition:all .2s;cursor:default}
 .step-item:last-child{border-right:none}
-.step-item.active{background:var(--text);color:#fff}
+.step-item.active{background:var(--text);color:var(--bg)}
 .step-item.done{background:#f0fdf4;color:#16a34a}
 .step-num{display:block;font-size:10px;font-weight:700;opacity:.7;margin-bottom:1px;font-family:var(--mono)}
 
@@ -49,7 +49,7 @@ a{text-decoration:none;color:inherit}
 .region-tabs{display:flex;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:20px;width:fit-content}
 .rtab{padding:7px 18px;font-size:13px;font-weight:600;color:var(--muted);background:var(--card);cursor:pointer;border-right:1px solid var(--border);transition:all .15s}
 .rtab:last-child{border-right:none}
-.rtab.active{background:var(--text);color:#fff}
+.rtab.active{background:var(--text);color:var(--bg)}
 .company-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .co-card{border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;cursor:pointer;transition:all .15s}
 .co-card:hover{border-color:#888}
@@ -61,7 +61,7 @@ a{text-decoration:none;color:inherit}
 /* STEP 2 — CONTEXT */
 .context-card{border:1.5px solid var(--border);border-radius:14px;padding:28px;margin-bottom:20px;background:var(--card)}
 .context-company{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border)}
-.context-co-icon{width:44px;height:44px;border-radius:10px;background:var(--text);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;font-family:var(--mono)}
+.context-co-icon{width:44px;height:44px;border-radius:10px;background:var(--text);color:var(--bg);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;font-family:var(--mono)}
 .context-co-name{font-size:18px;font-weight:800}
 .context-co-sub{font-size:13px;color:var(--muted)}
 .context-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px}
@@ -84,7 +84,7 @@ a{text-decoration:none;color:inherit}
 select.input-field{cursor:pointer}
 .radio-group{display:flex;gap:8px;flex-wrap:wrap}
 .radio-btn{padding:7px 14px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;background:var(--bg)}
-.radio-btn.selected{background:var(--text);color:#fff;border-color:var(--text)}
+.radio-btn.selected{background:var(--text);color:var(--bg);border-color:var(--text)}
 .retainer-block{border:1px solid var(--border);border-radius:10px;padding:16px;background:var(--card);margin-top:8px}
 .retainer-block.hidden{display:none}
 
@@ -144,7 +144,7 @@ select.input-field{cursor:pointer}
 .syndicate-fee{font-family:var(--mono);font-weight:700}
 
 /* BUTTONS */
-.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:var(--text);color:#fff;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:opacity .15s}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;padding:13px 28px;background:var(--text);color:var(--bg);border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:opacity .15s}
 .btn-primary:hover{opacity:.85}
 .btn-secondary{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;background:var(--bg);color:var(--text);transition:border-color .15s}
 .btn-secondary:hover{border-color:var(--text)}
@@ -152,7 +152,7 @@ select.input-field{cursor:pointer}
 .save-btn{font-size:13px;font-weight:600;color:var(--muted);cursor:pointer;padding:10px;border:none;background:none;transition:color .15s}
 .save-btn:hover{color:var(--text)}
 
-.vault-toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;z-index:999}
+.vault-toast{position:fixed;bottom:24px;right:24px;background:var(--text);color:var(--bg);padding:12px 20px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;z-index:999}
 .vault-toast.show{opacity:1;transform:translateY(0)}
 
 @media(max-width:640px){.company-grid{grid-template-columns:repeat(2,1fr)}.fee-norms{grid-template-columns:1fr 1fr}.fee-summary{grid-template-columns:1fr 1fr}.lt-row{grid-template-columns:1fr 1fr}.lt-row .lt-cell:nth-child(3),.lt-row .lt-cell:nth-child(4){display:none}.input-row{grid-template-columns:1fr}.nav-links{display:none}}

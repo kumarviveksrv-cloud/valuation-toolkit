@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#fff;--text:#0a0a0a;--muted:#6b7280;--border:#e5e5e5;--card:#f9fafb;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;}
+:root{--bg:#1c1917;--text:#e7e5e4;--muted:#a8a29e;--border:#33302c;--card:#262220;--green:#16a34a;--red:#dc2626;--blue:#2563eb;--amber:#d97706;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
 body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;}
@@ -22,7 +22,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 .top-nav-links a:hover,.top-nav-links a.active{color:var(--text);background:var(--card);}
 .top-nav-right{display:flex;align-items:center;gap:0.75rem;}
 .top-nav-free-badge{font-family:var(--mono);font-size:0.62rem;font-weight:700;color:var(--green);background:#dcfce7;padding:0.25rem 0.6rem;border-radius:4px;}
-.top-nav-pro-btn{font-size:0.78rem;font-weight:700;color:#fff;background:var(--text);text-decoration:none;padding:0.4rem 1rem;border-radius:6px;}
+.top-nav-pro-btn{font-size:0.78rem;font-weight:700;color:var(--bg);background:var(--text);text-decoration:none;padding:0.4rem 1rem;border-radius:6px;}
 .domain-nav{background:var(--bg);border-bottom:1px solid var(--border);padding:0 2rem;}
 .domain-nav-inner{display:flex;overflow-x:auto;scrollbar-width:none;}
 .domain-nav-inner::-webkit-scrollbar{display:none;}
@@ -63,11 +63,11 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 .search-input:focus{border-color:var(--text);}
 .sector-pills{display:flex;flex-wrap:wrap;gap:0.4rem;margin-bottom:1.25rem;}
 .sector-pill{font-size:0.72rem;font-weight:600;padding:0.3rem 0.7rem;border-radius:20px;border:1px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;transition:all 0.15s;}
-.sector-pill.active{background:var(--text);color:#fff;border-color:var(--text);}
+.sector-pill.active{background:var(--text);color:var(--bg);border-color:var(--text);}
 .co-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0.6rem;margin-bottom:1.5rem;}
 .co-card{border:1px solid var(--border);border-radius:7px;padding:0.7rem 0.8rem;cursor:pointer;transition:all 0.15s;background:var(--bg);}
 .co-card:hover{border-color:#999;}
-.co-card.selected{border-color:var(--text);background:#f3f4f6;}
+.co-card.selected{border-color:var(--text);background:var(--card);}
 .co-ticker{font-family:var(--mono);font-size:0.6rem;font-weight:700;color:var(--muted);margin-bottom:0.2rem;}
 .co-name{font-size:0.75rem;font-weight:600;color:var(--text);line-height:1.3;}
 .co-sector{font-size:0.65rem;color:var(--muted);margin-top:0.2rem;}
@@ -110,7 +110,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 .input-field:focus{border-color:var(--text);}
 .input-unit{font-family:var(--mono);font-size:0.7rem;color:var(--muted);white-space:nowrap;}
 .divider{height:1px;background:var(--border);margin:1rem 0;}
-.calc-btn{width:100%;padding:0.7rem;background:var(--text);color:#fff;border:none;border-radius:7px;font-size:0.85rem;font-weight:700;cursor:pointer;margin-top:0.5rem;}
+.calc-btn{width:100%;padding:0.7rem;background:var(--text);color:var(--bg);border:none;border-radius:7px;font-size:0.85rem;font-weight:700;cursor:pointer;margin-top:0.5rem;}
 .calc-btn:hover{opacity:0.85;}
 .results-panel{border:1px solid var(--border);border-radius:10px;overflow:hidden;}
 .results-header{padding:1rem 1.25rem;border-bottom:1px solid var(--border);font-size:0.85rem;font-weight:700;display:flex;align-items:center;justify-content:space-between;}
@@ -139,7 +139,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 .step-nav{display:flex;align-items:center;justify-content:space-between;margin-top:1.5rem;}
 .btn-back{font-size:0.82rem;font-weight:600;color:var(--muted);background:none;border:1px solid var(--border);padding:0.55rem 1.1rem;border-radius:6px;cursor:pointer;}
 .btn-back:hover{color:var(--text);}
-.btn-next{font-size:0.82rem;font-weight:700;color:#fff;background:var(--text);border:none;padding:0.55rem 1.2rem;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:0.4rem;}
+.btn-next{font-size:0.82rem;font-weight:700;color:var(--bg);background:var(--text);border:none;padding:0.55rem 1.2rem;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:0.4rem;}
 .btn-next:disabled{opacity:0.35;cursor:not-allowed;}
 .btn-next:not(:disabled):hover{opacity:0.85;}
 
@@ -393,7 +393,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 
   <div class="step-nav">
     <button class="btn-back" onclick="showStep(3)">← Back to Inputs</button>
-    <a href="pre-post-money.html" style="display:inline-flex;align-items:center;gap:0.4rem;font-size:0.82rem;font-weight:700;color:#fff;background:var(--text);text-decoration:none;padding:0.55rem 1.2rem;border-radius:6px;" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">Next: Multi-Round Modelling (Pro) →</a>
+    <a href="pre-post-money.html" style="display:inline-flex;align-items:center;gap:0.4rem;font-size:0.82rem;font-weight:700;color:var(--bg);background:var(--text);text-decoration:none;padding:0.55rem 1.2rem;border-radius:6px;" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">Next: Multi-Round Modelling (Pro) →</a>
   </div>
 </div>
 
