@@ -510,7 +510,14 @@ function goStep(n){
 }
 
 function toggleQA(el){el.classList.toggle('open');}
-function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+function _vdAdmin(){return localStorage.getItem('vd_admin')==='VD-ADMIN-2026';}
+function _vdAdminUnlock(){
+  document.querySelectorAll('.pro-gate').forEach(function(g){g.style.display='none';});
+  document.querySelectorAll('.tag-pro').forEach(function(t){t.style.opacity='0.35';t.title='PRO (admin bypass active)';});
+  var nb=document.querySelector('.top-nav-pro-btn');if(nb){nb.textContent='Admin Mode ✓';nb.style.background='var(--green,#22c55e)';}
+}
+function unlockPro(){if(_vdAdmin()){_vdAdminUnlock();return;}alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+document.addEventListener('DOMContentLoaded',function(){if(_vdAdmin())_vdAdminUnlock();});
 
 buildGrid();
 </script>

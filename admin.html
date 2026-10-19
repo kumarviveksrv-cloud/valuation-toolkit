@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ValuationDesk Admin</title>
+<style>
+:root{--bg:#1c1917;--text:#e7e5e4;--muted:#a8a29e;--border:#33302c;--card:#262220;--accent:#0ea5e9;--green:#22c55e;--red:#ef4444}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:40px 36px;max-width:420px;width:100%;text-align:center}
+.logo{font-size:13px;font-weight:700;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;margin-bottom:28px}
+h1{font-size:22px;font-weight:700;margin-bottom:8px}
+.sub{font-size:14px;color:var(--muted);margin-bottom:32px;line-height:1.5}
+.key-input{width:100%;padding:14px 16px;background:var(--bg);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:15px;font-family:monospace;text-align:center;letter-spacing:.12em;margin-bottom:16px;outline:none}
+.key-input:focus{border-color:var(--accent)}
+.btn{width:100%;padding:14px;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .15s}
+.btn-activate{background:var(--accent);color:#fff}
+.btn-deactivate{background:transparent;border:1px solid var(--border);color:var(--muted);margin-top:10px}
+.btn:hover{opacity:.85}
+.status{margin-top:20px;padding:12px 16px;border-radius:8px;font-size:13px;font-weight:600;display:none}
+.status.ok{background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.25);display:block}
+.status.err{background:rgba(239,68,68,.12);color:var(--red);border:1px solid rgba(239,68,68,.25);display:block}
+.status.off{background:rgba(168,162,158,.1);color:var(--muted);border:1px solid var(--border);display:block}
+.current{margin-top:24px;padding-top:20px;border-top:1px solid var(--border);font-size:12px;color:var(--muted)}
+.badge{display:inline-block;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;margin-top:6px}
+.badge.active{background:rgba(34,197,94,.15);color:var(--green)}
+.badge.inactive{background:rgba(168,162,158,.1);color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="logo">ValuationDesk</div>
+  <h1>Admin Access</h1>
+  <p class="sub">Enter the admin key to bypass PRO gates across all calculators. Stored in your browser — works everywhere on this device.</p>
+
+  <input class="key-input" id="keyInput" type="password" placeholder="Enter admin key" autocomplete="off" spellcheck="false">
+  <button class="btn btn-activate" onclick="activate()">Activate Admin Mode</button>
+  <button class="btn btn-deactivate" onclick="deactivate()">Deactivate</button>
+
+  <div class="status" id="status"></div>
+
+  <div class="current">
+    Current status
+    <div id="badgeWrap"><span class="badge inactive">Inactive</span></div>
+  </div>
+</div>
+
+<script>
+var ADMIN_KEY = 'VD-ADMIN-2026';
+
+function checkCurrent(){
+  var active = localStorage.getItem('vd_admin') === ADMIN_KEY;
+  document.getElementById('badgeWrap').innerHTML = active
+    ? '<span class="badge active">✓ Admin mode active</span>'
+    : '<span class="badge inactive">Inactive</span>';
+}
+
+function showStatus(msg, type){
+  var el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status ' + type;
+}
+
+function activate(){
+  var val = document.getElementById('keyInput').value.trim();
+  if(val === ADMIN_KEY){
+    localStorage.setItem('vd_admin', ADMIN_KEY);
+    showStatus('✓ Admin mode activated. All PRO gates are now bypassed.', 'ok');
+    checkCurrent();
+    document.getElementById('keyInput').value = '';
+  } else {
+    showStatus('✗ Incorrect key.', 'err');
+  }
+}
+
+function deactivate(){
+  localStorage.removeItem('vd_admin');
+  showStatus('Admin mode deactivated.', 'off');
+  checkCurrent();
+}
+
+// Also support ?key=... in URL for quick one-click activation
+(function(){
+  var params = new URLSearchParams(location.search);
+  var k = params.get('key');
+  if(k && k === ADMIN_KEY){
+    localStorage.setItem('vd_admin', ADMIN_KEY);
+    showStatus('✓ Admin mode activated via URL.', 'ok');
+    history.replaceState(null,'','/valuation-toolkit/admin.html');
+  }
+  checkCurrent();
+})();
+
+document.getElementById('keyInput').addEventListener('keydown', function(e){
+  if(e.key === 'Enter') activate();
+});
+</script>
+</body>
+</html>

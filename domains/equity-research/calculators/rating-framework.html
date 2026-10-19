@@ -236,7 +236,14 @@ footer{border-top:1px solid var(--border);padding:20px 24px;max-width:860px;marg
 </footer>
 
 <script>
-function unlockPro(){alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+function _vdAdmin(){return localStorage.getItem('vd_admin')==='VD-ADMIN-2026';}
+function _vdAdminUnlock(){
+  document.querySelectorAll('.pro-gate').forEach(function(g){g.style.display='none';});
+  document.querySelectorAll('.tag-pro').forEach(function(t){t.style.opacity='0.35';t.title='PRO (admin bypass active)';});
+  var nb=document.querySelector('.top-nav-pro-btn');if(nb){nb.textContent='Admin Mode ✓';nb.style.background='var(--green,#22c55e)';}
+}
+function unlockPro(){if(_vdAdmin()){_vdAdminUnlock();return;}alert('Pro unlock coming soon — ₹799/mo for all 15 domains.');}
+document.addEventListener('DOMContentLoaded',function(){if(_vdAdmin())_vdAdminUnlock();});
 
 const COMPANIES=[
   {name:'HDFC Bank',ticker:'HDFCBANK',sector:'Financials',pe:18,evEbitda:null,roe:15,revGrowth:15,mcap:'₹12.1L Cr',rating:'Buy'},
