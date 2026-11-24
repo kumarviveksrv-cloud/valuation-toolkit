@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Working Capital Peg — Transaction Advisory — ValuationDesk</title>
-<link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+<link rel="icon" href="/valuation-toolkit/favicon.svg" type="image/svg+xml"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
@@ -144,21 +144,21 @@ footer{border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;
 </head>
 <body>
 <nav>
-  <a href="/" class="nav-logo">Valuation<span>Desk</span></a>
+  <a href="/valuation-toolkit/" class="nav-logo">Valuation<span>Desk</span></a>
   <div class="nav-links">
-    <a href="/domains/">All Domains</a>
-    <a href="/domains/transaction-advisory/">Transaction Advisory</a>
-    <a href="/domains/transaction-advisory/calculators/">Calculators</a>
+    <a href="/valuation-toolkit/domains/">All Domains</a>
+    <a href="/valuation-toolkit/domains/transaction-advisory/">Transaction Advisory</a>
+    <a href="/valuation-toolkit/domains/transaction-advisory/calculators/">Calculators</a>
   </div>
   <a href="#" class="nav-cta" onclick="unlockPro();return false">Unlock Pro — ₹799/mo →</a>
 </nav>
 
 <div class="calc-hero">
   <div class="breadcrumb">
-    <a href="/">Home</a> /
-    <a href="/domains/">Domains</a> /
-    <a href="/domains/transaction-advisory/">Transaction Advisory</a> /
-    <a href="/domains/transaction-advisory/calculators/">Calculators</a> /
+    <a href="/valuation-toolkit/">Home</a> /
+    <a href="/valuation-toolkit/domains/">Domains</a> /
+    <a href="/valuation-toolkit/domains/transaction-advisory/">Transaction Advisory</a> /
+    <a href="/valuation-toolkit/domains/transaction-advisory/calculators/">Calculators</a> /
     Working Capital Peg
   </div>
   <div class="calc-badge">💰 Calculator 03</div>
@@ -313,18 +313,18 @@ footer{border-top:1px solid var(--border);padding:1.5rem 2rem;text-align:center;
 
 <div class="calc-nav">
   <div class="calc-nav-inner">
-    <a href="/domains/transaction-advisory/calculators/normalisation.html">← Normalisation Adjustments</a>
+    <a href="/valuation-toolkit/domains/transaction-advisory/calculators/normalisation.html">← Normalisation Adjustments</a>
     <span>|</span>
-    <a href="/domains/transaction-advisory/calculators/quality-of-earnings.html">Quality of Earnings →</a>
+    <a href="/valuation-toolkit/domains/transaction-advisory/calculators/quality-of-earnings.html">Quality of Earnings →</a>
   </div>
 </div>
 
 <footer>
   <div class="footer-nav">
-    <a href="/">Home</a>
-    <a href="/domains/">All Domains</a>
-    <a href="/domains/transaction-advisory/">Transaction Advisory</a>
-    <a href="/domains/transaction-advisory/calculators/">Calculators</a>
+    <a href="/valuation-toolkit/">Home</a>
+    <a href="/valuation-toolkit/domains/">All Domains</a>
+    <a href="/valuation-toolkit/domains/transaction-advisory/">Transaction Advisory</a>
+    <a href="/valuation-toolkit/domains/transaction-advisory/calculators/">Calculators</a>
   </div>
   <div>© 2025 ValuationDesk · ₹799/month · No annual plan</div>
 </footer>
@@ -483,7 +483,7 @@ function renderCtx(){
   if(c.isBank){
     wrap.innerHTML = `<div class="bank-msg">
       <h3>🏦 ${c.name} — Working Capital Peg Not Applicable</h3>
-      <p>Banks operate on a Net Interest Margin model, not a trading working capital cycle. Trade receivables, inventory, and trade payables don't apply in the same way. NWC peg analysis is specific to operating companies. For ${c.name}, explore <a href="/domains/credit-analysis/calculators/credit-ratios.html">Credit Ratios</a> instead.</p>
+      <p>Banks operate on a Net Interest Margin model, not a trading working capital cycle. Trade receivables, inventory, and trade payables don't apply in the same way. NWC peg analysis is specific to operating companies. For ${c.name}, explore <a href="/valuation-toolkit/domains/credit-analysis/calculators/credit-ratios.html">Credit Ratios</a> instead.</p>
     </div>`;
     return;
   }

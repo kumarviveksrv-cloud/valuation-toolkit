@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>EBITDA Bridge — Transaction Advisory — ValuationDesk</title>
-<link rel="icon" href="/favicon.svg" type="image/svg+xml"/>
+<link rel="icon" href="/valuation-toolkit/favicon.svg" type="image/svg+xml"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet"/>
@@ -155,18 +155,18 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-si
 </head>
 <body>
 <nav>
-  <a href="/" class="nav-logo">Valuation<span>Desk</span></a>
+  <a href="/valuation-toolkit/" class="nav-logo">Valuation<span>Desk</span></a>
   <div class="nav-links">
-    <a href="/domains/transaction-advisory/">Transaction Advisory</a>
-    <a href="/domains/transaction-advisory/calculators/">Calculators</a>
-    <a href="/domains/transaction-advisory/learn/">Learn</a>
+    <a href="/valuation-toolkit/domains/transaction-advisory/">Transaction Advisory</a>
+    <a href="/valuation-toolkit/domains/transaction-advisory/calculators/">Calculators</a>
+    <a href="/valuation-toolkit/domains/transaction-advisory/learn/">Learn</a>
   </div>
   <a href="#" class="nav-cta" onclick="unlockPro();return false">Unlock Pro — ₹799/mo →</a>
 </nav>
 
 <div class="main">
   <div class="breadcrumb">
-    <a href="/">Home</a> / <a href="/domains/transaction-advisory/">Transaction Advisory</a> / <a href="/domains/transaction-advisory/calculators/">Calculators</a> / EBITDA Bridge
+    <a href="/valuation-toolkit/">Home</a> / <a href="/valuation-toolkit/domains/transaction-advisory/">Transaction Advisory</a> / <a href="/valuation-toolkit/domains/transaction-advisory/calculators/">Calculators</a> / EBITDA Bridge
   </div>
 
   <div class="calc-header">
@@ -281,17 +281,17 @@ footer{border-top:1px solid var(--border);padding:2rem;text-align:center;font-si
   </div>
 
   <div class="calc-nav">
-    <a href="/domains/transaction-advisory/calculators/">← All Calculators</a>
-    <a href="/domains/transaction-advisory/calculators/normalisation.html">Normalisation →</a>
+    <a href="/valuation-toolkit/domains/transaction-advisory/calculators/">← All Calculators</a>
+    <a href="/valuation-toolkit/domains/transaction-advisory/calculators/normalisation.html">Normalisation →</a>
   </div>
 </div>
 
 <footer>
   <div class="footer-nav">
-    <a href="/">Home</a>
-    <a href="/domains/transaction-advisory/">Transaction Advisory</a>
-    <a href="/domains/transaction-advisory/calculators/">Calculators</a>
-    <a href="/domains/transaction-advisory/learn/">Learn</a>
+    <a href="/valuation-toolkit/">Home</a>
+    <a href="/valuation-toolkit/domains/transaction-advisory/">Transaction Advisory</a>
+    <a href="/valuation-toolkit/domains/transaction-advisory/calculators/">Calculators</a>
+    <a href="/valuation-toolkit/domains/transaction-advisory/learn/">Learn</a>
   </div>
   <div>© 2025 ValuationDesk · ₹799/month · No annual plan</div>
 </footer>
@@ -690,7 +690,7 @@ function renderBridge(c){
   const tbody=document.getElementById('bridgeTbody');
 
   if(c.isBank){
-    sr.innerHTML=`<div class="signal-card" style="grid-column:1/-1;color:var(--muted);font-size:.9rem;padding:2rem">EBITDA bridge is not applicable to banks and financial companies. Use the <a href="/domains/credit-analysis/calculators/credit-ratios.html" style="color:var(--accent)">Credit Ratios calculator</a> instead.</div>`;
+    sr.innerHTML=`<div class="signal-card" style="grid-column:1/-1;color:var(--muted);font-size:.9rem;padding:2rem">EBITDA bridge is not applicable to banks and financial companies. Use the <a href="/valuation-toolkit/domains/credit-analysis/calculators/credit-ratios.html" style="color:var(--accent)">Credit Ratios calculator</a> instead.</div>`;
     tbody.innerHTML='';
     return;
   }
