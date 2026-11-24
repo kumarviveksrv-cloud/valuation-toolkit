@@ -66,9 +66,10 @@ function activate(){
   var val = document.getElementById('keyInput').value.trim();
   if(val === ADMIN_KEY){
     localStorage.setItem('vd_admin', ADMIN_KEY);
-    showStatus('✓ Admin mode activated. All PRO gates are now bypassed.', 'ok');
+    showStatus('✓ Admin mode activated. Redirecting to home…', 'ok');
     checkCurrent();
     document.getElementById('keyInput').value = '';
+    setTimeout(function(){ window.location.href = '/valuation-toolkit/'; }, 1200);
   } else {
     showStatus('✗ Incorrect key.', 'err');
   }
@@ -86,8 +87,8 @@ function deactivate(){
   var k = params.get('key');
   if(k && k === ADMIN_KEY){
     localStorage.setItem('vd_admin', ADMIN_KEY);
-    showStatus('✓ Admin mode activated via URL.', 'ok');
-    history.replaceState(null,'','/valuation-toolkit/admin.html');
+    showStatus('✓ Admin mode activated via URL. Redirecting…', 'ok');
+    setTimeout(function(){ window.location.href = '/valuation-toolkit/'; }, 1200);
   }
   checkCurrent();
 })();
