@@ -2,7 +2,7 @@
 // Configured for GitHub Pages subfolder: /valuation-toolkit/
 
 const BASE = '/valuation-toolkit';
-const CACHE_NAME = 'valuationdesk-v17';
+const CACHE_NAME = 'valuationdesk-v18';
 
 const STATIC_ASSETS = [
   BASE + '/',
