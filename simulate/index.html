@@ -150,7 +150,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); line
       <div style="margin-bottom:2rem;">
         <div style="font-family:var(--font-mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;">Step 01 — Upload Your CSV</div>
 
-        <div id="dropzone" style="border:2px dashed var(--border);padding:3rem 2rem;text-align:center;cursor:pointer;transition:var(--transition);background:white;position:relative;"
+        <div id="dropzone" style="border:2px dashed var(--border);padding:3rem 2rem;text-align:center;cursor:pointer;transition:var(--transition);background:var(--card);position:relative;"
           onclick="document.getElementById('csv-file').click()"
           ondragover="event.preventDefault();this.style.borderColor='var(--gold)';this.style.background='var(--gold-dim)';"
           ondragleave="this.style.borderColor='';this.style.background='white';"
@@ -183,7 +183,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); line
       <!-- STEP 2: Column Mapper (hidden until upload) -->
       <div id="mapper-section" style="display:none;margin-bottom:2rem;">
         <div style="font-family:var(--font-mono);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;">Step 02 — Map Your Columns</div>
-        <div style="background:white;border:1px solid var(--border);padding:1.5rem;">
+        <div style="background:var(--card);border:1px solid var(--border);padding:1.5rem;">
           <p style="font-size:.8rem;color:var(--muted);margin-bottom:1.25rem;">We detected the following columns. Map them to the correct financial metrics:</p>
           <div id="mapper-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.5rem;"></div>
           <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
@@ -212,7 +212,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); line
         <div id="kpi-cards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1rem;margin-bottom:2rem;"></div>
 
         <!-- Trend Chart -->
-        <div style="background:white;border:1px solid var(--border);padding:1.5rem;margin-bottom:1.5rem;">
+        <div style="background:var(--card);border:1px solid var(--border);padding:1.5rem;margin-bottom:1.5rem;">
           <div class="vd-mono-label" style="margin-bottom:1rem;">Revenue &amp; EBITDA Trend</div>
           <div style="position:relative;height:200px;" id="trend-chart-wrap">
             <canvas id="trend-chart"></canvas>
@@ -220,7 +220,7 @@ body { font-family: var(--font); background: var(--bg); color: var(--text); line
         </div>
 
         <!-- Sector Benchmarking -->
-        <div style="background:white;border:1px solid var(--border);padding:1.5rem;margin-bottom:1.5rem;">
+        <div style="background:var(--card);border:1px solid var(--border);padding:1.5rem;margin-bottom:1.5rem;">
           <div class="vd-mono-label" style="margin-bottom:1rem;">Sector Benchmarking</div>
           <div id="benchmark-table"></div>
         </div>
